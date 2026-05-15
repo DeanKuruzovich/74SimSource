@@ -1,0 +1,910 @@
+{
+  "components": [
+    {
+      "id": 35,
+      "type": "chip",
+      "tileX": 0,
+      "tileY": 1,
+      "col": 5,
+      "row": 4,
+      "chipId": "7486"
+    },
+    {
+      "id": 36,
+      "type": "chip",
+      "tileX": 0,
+      "tileY": 1,
+      "col": 17,
+      "row": 4,
+      "chipId": "7408"
+    },
+    {
+      "id": 37,
+      "type": "chip",
+      "tileX": 0,
+      "tileY": 1,
+      "col": 29,
+      "row": 4,
+      "chipId": "7486"
+    },
+    {
+      "id": 38,
+      "type": "chip",
+      "tileX": 0,
+      "tileY": 1,
+      "col": 41,
+      "row": 4,
+      "chipId": "7408"
+    },
+    {
+      "id": 39,
+      "type": "chip",
+      "tileX": 0,
+      "tileY": 1,
+      "col": 53,
+      "row": 4,
+      "chipId": "7432"
+    },
+    {
+      "id": 1,
+      "type": "switch",
+      "on": false,
+      "startHoleId": "0:0:power:2:3",
+      "endHoleId": "0:0:main:2:8"
+    },
+    {
+      "id": 3,
+      "type": "switch",
+      "on": false,
+      "startHoleId": "0:0:power:3:3",
+      "endHoleId": "0:0:main:3:8"
+    },
+    {
+      "id": 5,
+      "type": "switch",
+      "on": false,
+      "startHoleId": "0:0:power:4:3",
+      "endHoleId": "0:0:main:4:8"
+    },
+    {
+      "id": 7,
+      "type": "switch",
+      "on": false,
+      "startHoleId": "0:0:power:5:3",
+      "endHoleId": "0:0:main:5:8"
+    },
+    {
+      "id": 59,
+      "type": "resistor",
+      "resistance": 10000,
+      "startHoleId": "0:0:main:5:5",
+      "endHoleId": "0:0:power:5:0"
+    },
+    {
+      "id": 60,
+      "type": "resistor",
+      "resistance": 10000,
+      "startHoleId": "0:0:main:4:5",
+      "endHoleId": "0:0:power:4:0"
+    },
+    {
+      "id": 61,
+      "type": "resistor",
+      "resistance": 10000,
+      "startHoleId": "0:0:main:3:5",
+      "endHoleId": "0:0:power:3:0"
+    },
+    {
+      "id": 62,
+      "type": "resistor",
+      "resistance": 10000,
+      "startHoleId": "0:0:main:2:5",
+      "endHoleId": "0:0:power:2:0"
+    },
+    {
+      "id": 9,
+      "type": "chip",
+      "tileX": 0,
+      "tileY": 0,
+      "col": 8,
+      "row": 4,
+      "chipId": "7447"
+    },
+    {
+      "id": 10,
+      "type": "seven_seg",
+      "tileX": 0,
+      "tileY": 0,
+      "col": 18,
+      "row": 2,
+      "commonAnode": true
+    },
+    {
+      "id": 94,
+      "type": "resistor",
+      "resistance": 1000,
+      "startHoleId": "0:0:main:20:7",
+      "endHoleId": "0:0:power:20:3"
+    },
+    {
+      "id": 106,
+      "type": "seven_seg",
+      "tileX": 0,
+      "tileY": 0,
+      "col": 42,
+      "row": 2,
+      "commonAnode": true
+    },
+    {
+      "id": 97,
+      "type": "switch",
+      "on": false,
+      "startHoleId": "0:0:power:26:3",
+      "endHoleId": "0:0:main:26:8"
+    },
+    {
+      "id": 98,
+      "type": "switch",
+      "on": false,
+      "startHoleId": "0:0:power:27:3",
+      "endHoleId": "0:0:main:27:8"
+    },
+    {
+      "id": 99,
+      "type": "switch",
+      "on": false,
+      "startHoleId": "0:0:power:28:3",
+      "endHoleId": "0:0:main:28:8"
+    },
+    {
+      "id": 104,
+      "type": "resistor",
+      "resistance": 10000,
+      "startHoleId": "0:0:main:26:5",
+      "endHoleId": "0:0:power:26:0"
+    },
+    {
+      "id": 107,
+      "type": "resistor",
+      "resistance": 1000,
+      "startHoleId": "0:0:main:44:7",
+      "endHoleId": "0:0:power:44:3"
+    },
+    {
+      "id": 116,
+      "type": "switch",
+      "on": false,
+      "startHoleId": "0:0:power:29:3",
+      "endHoleId": "0:0:main:29:8"
+    },
+    {
+      "id": 120,
+      "type": "chip",
+      "tileX": 0,
+      "tileY": 0,
+      "col": 32,
+      "row": 4,
+      "chipId": "7447"
+    },
+    {
+      "id": 121,
+      "type": "resistor",
+      "resistance": 10000,
+      "startHoleId": "0:0:main:27:5",
+      "endHoleId": "0:0:power:27:0"
+    },
+    {
+      "id": 122,
+      "type": "resistor",
+      "resistance": 10000,
+      "startHoleId": "0:0:main:28:5",
+      "endHoleId": "0:0:power:28:0"
+    },
+    {
+      "id": 123,
+      "type": "resistor",
+      "resistance": 10000,
+      "startHoleId": "0:0:main:29:5",
+      "endHoleId": "0:0:power:29:0"
+    },
+    {
+      "id": 51,
+      "type": "seven_seg",
+      "tileX": 0,
+      "tileY": 0,
+      "col": 56,
+      "row": 2,
+      "commonAnode": true
+    },
+    {
+      "id": 127,
+      "type": "resistor",
+      "resistance": 1000,
+      "startHoleId": "0:0:main:58:7",
+      "endHoleId": "0:0:power:58:3"
+    },
+    {
+      "id": 200,
+      "type": "chip",
+      "tileX": 0,
+      "tileY": 0,
+      "col": 48,
+      "row": 4,
+      "chipId": "7447"
+    }
+  ],
+  "wires": [
+    {
+      "id": 2,
+      "startHoleId": "0:0:power:15:2",
+      "endHoleId": "0:0:main:15:6",
+      "color": "#4ecdc4"
+    },
+    {
+      "id": 3,
+      "startHoleId": "0:0:power:10:3",
+      "endHoleId": "0:0:main:10:6",
+      "color": "#dddddd"
+    },
+    {
+      "id": 4,
+      "startHoleId": "0:0:power:11:3",
+      "endHoleId": "0:0:main:11:6",
+      "color": "#dddddd"
+    },
+    {
+      "id": 5,
+      "startHoleId": "0:0:power:12:3",
+      "endHoleId": "0:0:main:12:6",
+      "color": "#dddddd"
+    },
+    {
+      "id": 23,
+      "startHoleId": "0:1:power:5:1",
+      "endHoleId": "0:1:main:5:3",
+      "color": "#ff6b6b"
+    },
+    {
+      "id": 24,
+      "startHoleId": "0:1:power:11:2",
+      "endHoleId": "0:1:main:11:6",
+      "color": "#4ecdc4"
+    },
+    {
+      "id": 25,
+      "startHoleId": "0:1:power:17:1",
+      "endHoleId": "0:1:main:17:3",
+      "color": "#ff6b6b"
+    },
+    {
+      "id": 26,
+      "startHoleId": "0:1:power:23:2",
+      "endHoleId": "0:1:main:23:6",
+      "color": "#4ecdc4"
+    },
+    {
+      "id": 27,
+      "startHoleId": "0:1:power:29:1",
+      "endHoleId": "0:1:main:29:3",
+      "color": "#ff6b6b"
+    },
+    {
+      "id": 28,
+      "startHoleId": "0:1:power:35:2",
+      "endHoleId": "0:1:main:35:6",
+      "color": "#4ecdc4"
+    },
+    {
+      "id": 29,
+      "startHoleId": "0:1:power:41:1",
+      "endHoleId": "0:1:main:41:3",
+      "color": "#ff6b6b"
+    },
+    {
+      "id": 30,
+      "startHoleId": "0:1:power:47:2",
+      "endHoleId": "0:1:main:47:6",
+      "color": "#4ecdc4"
+    },
+    {
+      "id": 31,
+      "startHoleId": "0:1:power:53:1",
+      "endHoleId": "0:1:main:53:3",
+      "color": "#ff6b6b"
+    },
+    {
+      "id": 32,
+      "startHoleId": "0:1:power:59:2",
+      "endHoleId": "0:1:main:59:6",
+      "color": "#4ecdc4"
+    },
+    {
+      "id": 33,
+      "startHoleId": "0:0:main:2:7",
+      "endHoleId": "0:1:main:1:3",
+      "color": "#74b9ff"
+    },
+    {
+      "id": 35,
+      "startHoleId": "0:0:main:3:7",
+      "endHoleId": "0:1:main:2:3",
+      "color": "#74b9ff"
+    },
+    {
+      "id": 37,
+      "startHoleId": "0:0:main:4:7",
+      "endHoleId": "0:1:main:3:3",
+      "color": "#74b9ff"
+    },
+    {
+      "id": 39,
+      "startHoleId": "0:0:main:5:7",
+      "endHoleId": "0:1:main:4:3",
+      "color": "#74b9ff"
+    },
+    {
+      "id": 41,
+      "startHoleId": "0:1:main:1:0",
+      "endHoleId": "0:1:main:5:6",
+      "color": "#74b9ff"
+    },
+    {
+      "id": 42,
+      "startHoleId": "0:1:main:1:5",
+      "endHoleId": "0:1:main:6:6",
+      "color": "#a29bfe"
+    },
+    {
+      "id": 43,
+      "startHoleId": "0:1:main:1:1",
+      "endHoleId": "0:1:main:17:6",
+      "color": "#74b9ff"
+    },
+    {
+      "id": 44,
+      "startHoleId": "0:1:main:1:7",
+      "endHoleId": "0:1:main:18:6",
+      "color": "#a29bfe"
+    },
+    {
+      "id": 45,
+      "startHoleId": "0:1:main:2:0",
+      "endHoleId": "0:1:main:8:6",
+      "color": "#74b9ff"
+    },
+    {
+      "id": 46,
+      "startHoleId": "0:1:main:2:5",
+      "endHoleId": "0:1:main:9:6",
+      "color": "#a29bfe"
+    },
+    {
+      "id": 47,
+      "startHoleId": "0:1:main:2:1",
+      "endHoleId": "0:1:main:20:6",
+      "color": "#74b9ff"
+    },
+    {
+      "id": 48,
+      "startHoleId": "0:1:main:2:7",
+      "endHoleId": "0:1:main:21:6",
+      "color": "#a29bfe"
+    },
+    {
+      "id": 49,
+      "startHoleId": "0:1:main:3:0",
+      "endHoleId": "0:1:main:10:3",
+      "color": "#74b9ff"
+    },
+    {
+      "id": 50,
+      "startHoleId": "0:1:main:3:5",
+      "endHoleId": "0:1:main:9:3",
+      "color": "#a29bfe"
+    },
+    {
+      "id": 51,
+      "startHoleId": "0:1:main:3:1",
+      "endHoleId": "0:1:main:22:3",
+      "color": "#74b9ff"
+    },
+    {
+      "id": 52,
+      "startHoleId": "0:1:main:3:7",
+      "endHoleId": "0:1:main:21:3",
+      "color": "#a29bfe"
+    },
+    {
+      "id": 53,
+      "startHoleId": "0:1:main:4:0",
+      "endHoleId": "0:1:main:7:3",
+      "color": "#74b9ff"
+    },
+    {
+      "id": 54,
+      "startHoleId": "0:1:main:4:5",
+      "endHoleId": "0:1:main:6:3",
+      "color": "#a29bfe"
+    },
+    {
+      "id": 55,
+      "startHoleId": "0:1:main:4:1",
+      "endHoleId": "0:1:main:19:3",
+      "color": "#74b9ff"
+    },
+    {
+      "id": 56,
+      "startHoleId": "0:1:main:4:7",
+      "endHoleId": "0:1:main:18:3",
+      "color": "#a29bfe"
+    },
+    {
+      "id": 57,
+      "startHoleId": "0:1:power:60:0",
+      "endHoleId": "0:1:main:60:3",
+      "color": "#4ecdc4"
+    },
+    {
+      "id": 58,
+      "startHoleId": "0:1:main:7:6",
+      "endHoleId": "0:1:main:29:6",
+      "color": "#9bd9a3"
+    },
+    {
+      "id": 59,
+      "startHoleId": "0:1:main:60:0",
+      "endHoleId": "0:1:main:30:6",
+      "color": "#fd79a8"
+    },
+    {
+      "id": 60,
+      "startHoleId": "0:1:main:60:1",
+      "endHoleId": "0:1:main:41:6",
+      "color": "#fd79a8"
+    },
+    {
+      "id": 61,
+      "startHoleId": "0:1:main:7:5",
+      "endHoleId": "0:1:main:42:6",
+      "color": "#9bd9a3"
+    },
+    {
+      "id": 62,
+      "startHoleId": "0:1:main:19:6",
+      "endHoleId": "0:1:main:53:6",
+      "color": "#fd79a8"
+    },
+    {
+      "id": 63,
+      "startHoleId": "0:1:main:43:6",
+      "endHoleId": "0:1:main:54:6",
+      "color": "#fd79a8"
+    },
+    {
+      "id": 64,
+      "startHoleId": "0:1:main:10:6",
+      "endHoleId": "0:1:main:32:6",
+      "color": "#9bd9a3"
+    },
+    {
+      "id": 65,
+      "startHoleId": "0:1:main:55:6",
+      "endHoleId": "0:1:main:33:6",
+      "color": "#fd79a8"
+    },
+    {
+      "id": 66,
+      "startHoleId": "0:1:main:55:5",
+      "endHoleId": "0:1:main:44:6",
+      "color": "#fd79a8"
+    },
+    {
+      "id": 67,
+      "startHoleId": "0:1:main:10:5",
+      "endHoleId": "0:1:main:45:6",
+      "color": "#9bd9a3"
+    },
+    {
+      "id": 68,
+      "startHoleId": "0:1:main:22:6",
+      "endHoleId": "0:1:main:56:6",
+      "color": "#fd79a8"
+    },
+    {
+      "id": 69,
+      "startHoleId": "0:1:main:46:6",
+      "endHoleId": "0:1:main:57:6",
+      "color": "#fd79a8"
+    },
+    {
+      "id": 70,
+      "startHoleId": "0:1:main:11:3",
+      "endHoleId": "0:1:main:34:3",
+      "color": "#9bd9a3"
+    },
+    {
+      "id": 71,
+      "startHoleId": "0:1:main:58:6",
+      "endHoleId": "0:1:main:33:3",
+      "color": "#fd79a8"
+    },
+    {
+      "id": 72,
+      "startHoleId": "0:1:main:58:5",
+      "endHoleId": "0:1:main:46:3",
+      "color": "#fd79a8"
+    },
+    {
+      "id": 73,
+      "startHoleId": "0:1:main:11:0",
+      "endHoleId": "0:1:main:45:3",
+      "color": "#9bd9a3"
+    },
+    {
+      "id": 74,
+      "startHoleId": "0:1:main:23:3",
+      "endHoleId": "0:1:main:58:3",
+      "color": "#fd79a8"
+    },
+    {
+      "id": 75,
+      "startHoleId": "0:1:main:47:3",
+      "endHoleId": "0:1:main:57:3",
+      "color": "#fd79a8"
+    },
+    {
+      "id": 76,
+      "startHoleId": "0:1:main:8:3",
+      "endHoleId": "0:1:main:31:3",
+      "color": "#9bd9a3"
+    },
+    {
+      "id": 77,
+      "startHoleId": "0:1:main:59:3",
+      "endHoleId": "0:1:main:30:3",
+      "color": "#fd79a8"
+    },
+    {
+      "id": 78,
+      "startHoleId": "0:1:main:59:0",
+      "endHoleId": "0:1:main:43:3",
+      "color": "#fd79a8"
+    },
+    {
+      "id": 79,
+      "startHoleId": "0:1:main:8:0",
+      "endHoleId": "0:1:main:42:3",
+      "color": "#9bd9a3"
+    },
+    {
+      "id": 80,
+      "startHoleId": "0:1:main:20:3",
+      "endHoleId": "0:1:main:55:3",
+      "color": "#fd79a8"
+    },
+    {
+      "id": 81,
+      "startHoleId": "0:1:main:44:3",
+      "endHoleId": "0:1:main:54:3",
+      "color": "#fd79a8"
+    },
+    {
+      "id": 93,
+      "startHoleId": "0:0:main:8:3",
+      "endHoleId": "0:0:power:8:1",
+      "color": "#f39c12"
+    },
+    {
+      "id": 100,
+      "startHoleId": "0:0:main:11:3",
+      "endHoleId": "0:0:main:21:1",
+      "color": "#f39c12"
+    },
+    {
+      "id": 101,
+      "startHoleId": "0:0:main:12:3",
+      "endHoleId": "0:0:main:22:1",
+      "color": "#00cec9"
+    },
+    {
+      "id": 102,
+      "startHoleId": "0:0:main:13:3",
+      "endHoleId": "0:0:main:21:7",
+      "color": "#74b9ff"
+    },
+    {
+      "id": 103,
+      "startHoleId": "0:0:main:14:3",
+      "endHoleId": "0:0:main:19:7",
+      "color": "#fdcb6e"
+    },
+    {
+      "id": 104,
+      "startHoleId": "0:0:main:15:3",
+      "endHoleId": "0:0:main:18:7",
+      "color": "#f39c12"
+    },
+    {
+      "id": 105,
+      "startHoleId": "0:0:main:9:3",
+      "endHoleId": "0:0:main:19:1",
+      "color": "#74b9ff"
+    },
+    {
+      "id": 106,
+      "startHoleId": "0:0:main:10:3",
+      "endHoleId": "0:0:main:18:1",
+      "color": "#6c5ce7"
+    },
+    {
+      "id": 108,
+      "startHoleId": "0:0:power:39:2",
+      "endHoleId": "0:0:main:39:6",
+      "color": "#4ecdc4"
+    },
+    {
+      "id": 109,
+      "startHoleId": "0:0:power:35:3",
+      "endHoleId": "0:0:main:35:6",
+      "color": "#dddddd"
+    },
+    {
+      "id": 110,
+      "startHoleId": "0:0:power:36:3",
+      "endHoleId": "0:0:main:36:6",
+      "color": "#dddddd"
+    },
+    {
+      "id": 111,
+      "startHoleId": "0:0:main:35:3",
+      "endHoleId": "0:0:main:45:1",
+      "color": "#f39c12"
+    },
+    {
+      "id": 112,
+      "startHoleId": "0:0:main:36:3",
+      "endHoleId": "0:0:main:46:1",
+      "color": "#00cec9"
+    },
+    {
+      "id": 113,
+      "startHoleId": "0:0:main:37:3",
+      "endHoleId": "0:0:main:45:7",
+      "color": "#74b9ff"
+    },
+    {
+      "id": 114,
+      "startHoleId": "0:0:main:38:3",
+      "endHoleId": "0:0:main:43:7",
+      "color": "#fdcb6e"
+    },
+    {
+      "id": 115,
+      "startHoleId": "0:0:main:39:3",
+      "endHoleId": "0:0:main:42:7",
+      "color": "#f39c12"
+    },
+    {
+      "id": 117,
+      "startHoleId": "0:0:main:32:3",
+      "endHoleId": "0:0:power:32:1",
+      "color": "#3498db"
+    },
+    {
+      "id": 118,
+      "startHoleId": "0:0:power:34:3",
+      "endHoleId": "0:0:main:34:6",
+      "color": "#dddddd"
+    },
+    {
+      "id": 119,
+      "startHoleId": "0:0:main:34:3",
+      "endHoleId": "0:0:main:42:1",
+      "color": "#2ecc71"
+    },
+    {
+      "id": 125,
+      "startHoleId": "0:0:main:33:3",
+      "endHoleId": "0:0:main:43:1",
+      "color": "#ff7675"
+    },
+    {
+      "id": 300,
+      "startHoleId": "0:0:main:2:6",
+      "endHoleId": "0:0:main:14:6",
+      "color": "#a29bfe"
+    },
+    {
+      "id": 301,
+      "startHoleId": "0:0:main:3:6",
+      "endHoleId": "0:0:main:8:6",
+      "color": "#a29bfe"
+    },
+    {
+      "id": 302,
+      "startHoleId": "0:0:main:4:6",
+      "endHoleId": "0:0:main:9:6",
+      "color": "#a29bfe"
+    },
+    {
+      "id": 303,
+      "startHoleId": "0:0:main:5:6",
+      "endHoleId": "0:0:main:13:6",
+      "color": "#a29bfe"
+    },
+    {
+      "id": 304,
+      "startHoleId": "0:0:main:26:6",
+      "endHoleId": "0:0:main:38:6",
+      "color": "#74b9ff"
+    },
+    {
+      "id": 305,
+      "startHoleId": "0:0:main:27:6",
+      "endHoleId": "0:0:main:32:6",
+      "color": "#74b9ff"
+    },
+    {
+      "id": 306,
+      "startHoleId": "0:0:main:28:6",
+      "endHoleId": "0:0:main:33:6",
+      "color": "#74b9ff"
+    },
+    {
+      "id": 307,
+      "startHoleId": "0:0:main:29:6",
+      "endHoleId": "0:0:main:37:6",
+      "color": "#74b9ff"
+    },
+    {
+      "id": 308,
+      "startHoleId": "0:0:main:26:7",
+      "endHoleId": "0:1:main:1:6",
+      "color": "#a29bfe"
+    },
+    {
+      "id": 309,
+      "startHoleId": "0:0:main:27:7",
+      "endHoleId": "0:1:main:2:6",
+      "color": "#a29bfe"
+    },
+    {
+      "id": 310,
+      "startHoleId": "0:0:main:28:7",
+      "endHoleId": "0:1:main:3:6",
+      "color": "#a29bfe"
+    },
+    {
+      "id": 311,
+      "startHoleId": "0:0:main:29:7",
+      "endHoleId": "0:1:main:4:6",
+      "color": "#a29bfe"
+    },
+    {
+      "id": 312,
+      "startHoleId": "0:0:power:48:1",
+      "endHoleId": "0:0:main:48:3",
+      "color": "#ff6b6b"
+    },
+    {
+      "id": 313,
+      "startHoleId": "0:0:power:55:2",
+      "endHoleId": "0:0:main:55:6",
+      "color": "#4ecdc4"
+    },
+    {
+      "id": 314,
+      "startHoleId": "0:0:power:50:3",
+      "endHoleId": "0:0:main:50:6",
+      "color": "#dddddd"
+    },
+    {
+      "id": 315,
+      "startHoleId": "0:0:power:51:3",
+      "endHoleId": "0:0:main:51:6",
+      "color": "#dddddd"
+    },
+    {
+      "id": 316,
+      "startHoleId": "0:0:power:52:3",
+      "endHoleId": "0:0:main:52:6",
+      "color": "#dddddd"
+    },
+    {
+      "id": 317,
+      "startHoleId": "0:1:main:31:6",
+      "endHoleId": "0:0:main:54:6",
+      "color": "#ffd93d"
+    },
+    {
+      "id": 318,
+      "startHoleId": "0:1:main:34:6",
+      "endHoleId": "0:0:main:48:6",
+      "color": "#ffd93d"
+    },
+    {
+      "id": 319,
+      "startHoleId": "0:1:main:35:3",
+      "endHoleId": "0:0:main:49:6",
+      "color": "#ffd93d"
+    },
+    {
+      "id": 320,
+      "startHoleId": "0:1:main:32:3",
+      "endHoleId": "0:0:main:53:6",
+      "color": "#ffd93d"
+    },
+    {
+      "id": 321,
+      "startHoleId": "0:0:main:51:3",
+      "endHoleId": "0:0:main:59:1",
+      "color": "#ff6b6b"
+    },
+    {
+      "id": 322,
+      "startHoleId": "0:0:main:52:3",
+      "endHoleId": "0:0:main:60:1",
+      "color": "#ff6b6b"
+    },
+    {
+      "id": 323,
+      "startHoleId": "0:0:main:53:3",
+      "endHoleId": "0:0:main:59:7",
+      "color": "#ff6b6b"
+    },
+    {
+      "id": 324,
+      "startHoleId": "0:0:main:54:3",
+      "endHoleId": "0:0:main:57:7",
+      "color": "#ff6b6b"
+    },
+    {
+      "id": 325,
+      "startHoleId": "0:0:main:55:3",
+      "endHoleId": "0:0:main:56:7",
+      "color": "#ff6b6b"
+    },
+    {
+      "id": 326,
+      "startHoleId": "0:0:main:49:3",
+      "endHoleId": "0:0:main:57:1",
+      "color": "#ff6b6b"
+    },
+    {
+      "id": 327,
+      "startHoleId": "0:0:main:50:3",
+      "endHoleId": "0:0:main:56:1",
+      "color": "#ff6b6b"
+    }
+  ],
+  "extraTiles": [],
+  "textBoxes": [
+    {
+      "id": 7,
+      "x": 10,
+      "y": -180,
+      "w": 400,
+      "h": 50,
+      "text": "Title: 4 bit Adder",
+      "v": 2
+    },
+    {
+      "id": 8,
+      "x": 10,
+      "y": -120,
+      "w": 800,
+      "h": 50,
+      "text": "Description: Adds two 4 bit numbers and shows the sum on a 7-segment display.",
+      "v": 2
+    },
+    {
+      "id": 9,
+      "x": 10,
+      "y": -60,
+      "w": 800,
+      "h": 60,
+      "text": "Details: A (switches cols 2 5) + B (switches cols 26 29) are summed by a ripple-carry adder. Sum is shown on the top-right 7-seg via a 74x47 decoder. Input displays show the A and B values.",
+      "v": 2
+    }
+  ]
+}

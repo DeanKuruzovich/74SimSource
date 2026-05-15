@@ -1,0 +1,56 @@
+{
+  "components": [
+    {
+      "id": 1,
+      "type": "resistor",
+      "resistance": 470,
+      "startHoleId": "0:0:main:8:3",
+      "endHoleId": "0:0:main:12:3"
+    },
+    {
+      "id": 2,
+      "type": "led",
+      "color": "red",
+      "startHoleId": "0:0:main:8:1",
+      "endHoleId": "0:0:power:8:0"
+    },
+    {
+      "id": 3,
+      "type": "button",
+      "tileX": 0,
+      "tileY": 0,
+      "col": 12,
+      "row": 2,
+      "vertical": false
+    }
+  ],
+  "wires": [
+    {
+      "id": 1,
+      "startHoleId": "0:0:main:15:1",
+      "endHoleId": "0:0:power:15:1",
+      "color": "#00cec9"
+    }
+  ],
+  "extraTiles": [],
+  "textBoxes": [
+    {
+      "id": 1,
+      "x": 10,
+      "y": -120,
+      "w": 400,
+      "h": 50,
+      "text": "Title: Hello LED!",
+      "v": 2
+    },
+    {
+      "id": 2,
+      "x": 10,
+      "y": -60,
+      "w": 600,
+      "h": 70,
+      "text": "Description: Power an LED with a button.",
+      "v": 2
+    }
+  ]
+}

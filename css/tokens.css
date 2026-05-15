@@ -1,0 +1,62 @@
+/* ── 74Sim shared design tokens ──────────────────────────────────────────── */
+/* Single source of truth for colors and text styling across all pages.
+   Per-page CSS may override individual tokens (e.g. landing pages use a
+   slightly darker --bg) but should not redefine the whole palette. */
+
+:root {
+  /* Surfaces   default to the simulator's lighter base; marketing/docs
+     pages override --bg to #0f0f0f for a deeper feel. */
+  --bg:           #1a1a1a;
+  --bg-elev:      #222;
+  --bg-elev-2:    #2a2a2a;
+  --bg-input:     #141414;
+
+  /* Text   every value here is readable on the darkest --bg (#0f0f0f).
+     Contrast targets (against #0f0f0f):
+       --text         ≈ 13:1   primary body / headings
+       --text-dim     ≈  8.5:1 secondary body
+       --text-muted   ≈  6:1   labels, metadata, captions
+       --text-faint   ≈  4.5:1 lowest readable   sparing use only
+       --text-disabled ~ 3:1   disabled controls only, NOT body text
+     Old `#555` (~3:1) is below WCAG AA for body text   don't reintroduce. */
+  --text:          #ffffff;
+  --text-dim:      #b8b8b8;
+  --text-muted:    #9a9a9a;
+  --text-faint:    #7a7a7a;
+  --text-disabled: #5a5a5a;
+  --text-inverse:  #111;     /* for text on light buttons */
+
+  /* Borders */
+  --border:         #2e2e2e;
+  --border-strong:  #444;
+  --border-subtle:  #262626;
+
+  /* Accent / links */
+  --accent:        #5b9bd5;
+  --accent-dim:    rgba(91,155,213,0.15);
+  --link:          #8ab4d8;
+  --link-hover:    #d0e3f3;
+
+  /* Status */
+  --ok:    #6ab06a;
+  --warn:  #d4a14a;
+  --error: #d46a6a;
+}
+
+/* ── Standardized text utilities ─────────────────────────────────────────── */
+/* Eyebrow / small section label. Replaces the scattered pattern of
+   `font-size:10 11px; letter-spacing:1.5 2px; text-transform:uppercase`.
+   Same visual weight, no forced caps. Use sentence/title case in the HTML. */
+.eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+  color: var(--text-muted);
+}
+
+.eyebrow-sm {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+}

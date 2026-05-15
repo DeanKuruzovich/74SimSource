@@ -1,0 +1,211 @@
+{
+  "components": [
+    {
+      "id": 1,
+      "type": "slide_switch",
+      "tileX": 0,
+      "tileY": 0,
+      "col": 4,
+      "row": 7,
+      "state": 2
+    },
+    {
+      "id": 2,
+      "type": "slide_switch",
+      "tileX": 0,
+      "tileY": 0,
+      "col": 1,
+      "row": 7,
+      "state": 2
+    },
+    {
+      "id": 9,
+      "type": "chip",
+      "tileX": 0,
+      "tileY": 0,
+      "col": 21,
+      "row": 4,
+      "chipId": "7432"
+    },
+    {
+      "id": 5,
+      "type": "chip",
+      "tileX": 0,
+      "tileY": 0,
+      "col": 7,
+      "row": 4,
+      "chipId": "7408"
+    },
+    {
+      "id": 7,
+      "type": "chip",
+      "tileX": 0,
+      "tileY": 0,
+      "col": 14,
+      "row": 4,
+      "chipId": "7404"
+    },
+    {
+      "id": 14,
+      "type": "led",
+      "color": "red",
+      "startHoleId": "0:0:main:30:7",
+      "endHoleId": "0:0:power:30:2"
+    }
+  ],
+  "wires": [
+    {
+      "id": 1,
+      "startHoleId": "0:0:power:3:3",
+      "endHoleId": "0:0:main:3:9",
+      "color": "#9b59b6"
+    },
+    {
+      "id": 3,
+      "startHoleId": "0:0:main:6:9",
+      "endHoleId": "0:0:power:6:3",
+      "color": "#1abc9c"
+    },
+    {
+      "id": 9,
+      "startHoleId": "0:0:main:4:9",
+      "endHoleId": "0:0:power:4:2",
+      "color": "#1abc9c"
+    },
+    {
+      "id": 10,
+      "startHoleId": "0:0:main:1:9",
+      "endHoleId": "0:0:power:2:2",
+      "color": "#ff7675"
+    },
+    {
+      "id": 12,
+      "startHoleId": "0:0:main:5:6",
+      "endHoleId": "0:0:main:7:6",
+      "color": "#3498db"
+    },
+    {
+      "id": 13,
+      "startHoleId": "0:0:main:2:6",
+      "endHoleId": "0:0:main:14:6",
+      "color": "#ff7675"
+    },
+    {
+      "id": 14,
+      "startHoleId": "0:0:main:15:6",
+      "endHoleId": "0:0:main:8:6",
+      "color": "#1abc9c"
+    },
+    {
+      "id": 15,
+      "startHoleId": "0:0:main:9:6",
+      "endHoleId": "0:0:main:21:6",
+      "color": "#2ecc71"
+    },
+    {
+      "id": 16,
+      "startHoleId": "0:0:main:5:5",
+      "endHoleId": "0:0:main:16:6",
+      "color": "#3498db"
+    },
+    {
+      "id": 17,
+      "startHoleId": "0:0:main:17:6",
+      "endHoleId": "0:0:main:10:6",
+      "color": "#2ecc71"
+    },
+    {
+      "id": 18,
+      "startHoleId": "0:0:main:2:5",
+      "endHoleId": "0:0:main:11:6",
+      "color": "#ff7675"
+    },
+    {
+      "id": 19,
+      "startHoleId": "0:0:main:12:6",
+      "endHoleId": "0:0:main:22:6",
+      "color": "#9b59b6"
+    },
+    {
+      "id": 20,
+      "startHoleId": "0:0:main:23:6",
+      "endHoleId": "0:0:main:30:6",
+      "color": "#3498db"
+    },
+    {
+      "id": 21,
+      "startHoleId": "0:0:main:7:3",
+      "endHoleId": "0:0:power:8:1",
+      "color": "#2ecc71"
+    },
+    {
+      "id": 22,
+      "startHoleId": "0:0:main:14:3",
+      "endHoleId": "0:0:power:14:1",
+      "color": "#6c5ce7"
+    },
+    {
+      "id": 23,
+      "startHoleId": "0:0:main:21:3",
+      "endHoleId": "0:0:power:21:1",
+      "color": "#fdcb6e"
+    },
+    {
+      "id": 24,
+      "startHoleId": "0:0:main:27:6",
+      "endHoleId": "0:0:power:27:2",
+      "color": "#00cec9"
+    },
+    {
+      "id": 25,
+      "startHoleId": "0:0:main:20:6",
+      "endHoleId": "0:0:power:20:2",
+      "color": "#1abc9c"
+    },
+    {
+      "id": 26,
+      "startHoleId": "0:0:main:13:6",
+      "endHoleId": "0:0:power:14:2",
+      "color": "#6c5ce7"
+    }
+  ],
+  "extraTiles": [],
+  "textBoxes": [
+    {
+      "id": 5,
+      "x": -183.1019472408023,
+      "y": 232.0555976631079,
+      "w": 210.39082213049986,
+      "h": 164.57716818115298,
+      "text": "Tip: Shift click on the 3 state switch to toggle between the far left and far right states. This type of switch is used so a pull down resistor is not needed.",
+      "v": 2
+    },
+    {
+      "id": 6,
+      "x": 681.3339528739148,
+      "y": 276.29205910914675,
+      "w": 259.90666834014405,
+      "h": 185.85841182182932,
+      "text": "Use the Combinational Logic Analyzer under Analysis to see the truth table for this circuit. The keen eyed might see that this is actually an XOR gate!",
+      "v": 2
+    },
+    {
+      "id": 7,
+      "x": 101.21753038777115,
+      "y": -100.93648166530488,
+      "w": 341.07468995082655,
+      "h": 40,
+      "text": "Title: Combinational Logic Circuit",
+      "v": 2
+    },
+    {
+      "id": 8,
+      "x": 100.0606797070792,
+      "y": -52.8142415774624,
+      "w": 351.6015477408515,
+      "h": 65.69969104223675,
+      "text": "Description: A combination logic circuit with 2 switch inputs, and one output.",
+      "v": 2
+    }
+  ]
+}

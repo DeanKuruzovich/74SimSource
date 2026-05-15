@@ -1,0 +1,135 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'SF Mono', 'Menlo', 'Monaco', 'Consolas', monospace;
+  background: var(--bg);
+  color: var(--text-dim);
+  min-height: 100vh;
+  line-height: 1.55;
+  font-size: 13px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 64px 28px 80px;
+}
+
+a { color: var(--link); text-decoration: none; }
+a:hover { color: var(--link-hover); text-decoration: underline; }
+
+.card {
+  width: 100%;
+  max-width: 960px;
+}
+
+.back-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.back-btn {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  font-family: inherit;
+  font-size: 13px;
+  padding: 6px 12px 6px 10px;
+  border-radius: 3px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  transition: border-color 0.12s, color 0.12s;
+}
+.back-btn:hover { border-color: var(--text-muted); color: var(--text); text-decoration: none; }
+.back-btn svg { display: block; }
+
+h1 {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.2px;
+  margin-bottom: 18px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+p {
+  color: var(--text-dim);
+  margin-bottom: 20px;
+}
+
+.signed-in-banner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 11px 16px;
+  background: #1f1f1f;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  margin-bottom: 24px;
+}
+.signed-in-label { font-size: 12px; color: var(--text-muted); flex: 1; }
+.signed-in-label span { color: var(--text); }
+
+.signout-btn {
+  background: transparent;
+  color: var(--text-dim);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  padding: 6px 14px;
+  border: 1px solid #333;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: border-color 0.12s, color 0.12s;
+}
+.signout-btn:hover { border-color: var(--text-muted); color: var(--text); }
+
+h2 {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  color: var(--text-muted);
+  margin-bottom: 14px;
+}
+
+.lesson-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+.lesson-card {
+  display: block;
+  padding: 16px 18px;
+  background: #1f1f1f;
+  border: 1px solid #2a2a2a;
+  border-radius: 4px;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.12s, background 0.12s;
+}
+.lesson-card:hover {
+  background: #242424;
+  border-color: var(--border-strong);
+  text-decoration: none;
+}
+
+.lesson-card h3 {
+  font-size: 14px;
+  color: var(--text);
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+.lesson-card p {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+@media (max-width: 600px) {
+  body { padding: 40px 20px 60px; }
+}

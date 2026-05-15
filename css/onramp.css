@@ -1,0 +1,450 @@
+/* ── Onramp Tutorial Styles ─────────────────────────────────────────────────── */
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #111;
+  color: #ffffff;
+  font-family: 'Menlo', 'Consolas', 'Courier New', monospace;
+  overflow: hidden;
+  height: 100vh;
+}
+
+#onramp-app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* ── Toolbar ─────────────────────────────────────────────────────────────────── */
+
+#onramp-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px;
+  height: 40px;
+  min-height: 40px;
+  background: #1a1a1a;
+  border-bottom: 1px solid #252525;
+}
+
+#onramp-toolbar .toolbar-title {
+  font-size: 14px;
+  font-weight: bold;
+  color: #ffffff;
+  text-decoration: none;
+}
+
+#onramp-toolbar .toolbar-back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  color: #888;
+  border: 1px solid #2e2e2e;
+  border-radius: 3px;
+  text-decoration: none;
+  transition: color 0.12s, border-color 0.12s;
+}
+
+#onramp-toolbar .toolbar-back:hover {
+  color: #ddd;
+  border-color: #555;
+}
+
+#onramp-lesson-title {
+  font-size: 12px;
+  color: #888;
+}
+
+.toolbar-spacer { flex: 1; }
+
+#onramp-toolbar-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.onramp-toolbar-btn {
+  background: #2a2a2a;
+  border: 1px solid #333;
+  border-radius: 3px;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 11px;
+  padding: 5px 12px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.onramp-toolbar-btn:hover { background: #333; }
+.onramp-toolbar-btn.active { background: #444; border-color: #888; }
+
+/* ── Body: Split Pane ────────────────────────────────────────────────────────── */
+
+#onramp-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ── Left Panel (Instructions) ───────────────────────────────────────────────── */
+
+#onramp-panel {
+  width: clamp(280px, 28vw, 420px);
+  min-width: 280px;
+  max-width: 450px;
+  background: #1a1a1a;
+  border-right: 1px solid #252525;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Tablet & narrow viewports: stack vertically. Instructions become a top
+   accordion the user can collapse to give the canvas full width below. */
+@media (max-width: 768px) {
+  #onramp-body {
+    flex-direction: column;
+  }
+  #onramp-panel {
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    max-height: 50vh;
+    border-right: none;
+    border-bottom: 1px solid #252525;
+    flex-shrink: 0;
+  }
+  #onramp-panel.collapsed {
+    max-height: 40px;
+  }
+  #onramp-panel.collapsed #onramp-step-content,
+  #onramp-panel.collapsed #onramp-step-nav {
+    display: none;
+  }
+  #onramp-canvas-area {
+    flex: 1;
+    min-height: 240px;
+  }
+}
+
+#onramp-step-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px 20px;
+  line-height: 1.7;
+  font-size: 13px;
+}
+
+#onramp-step-content h2 {
+  font-size: 16px;
+  color: #eee;
+  margin-bottom: 16px;
+  font-weight: 600;
+}
+
+#onramp-step-content h3 {
+  font-size: 14px;
+  color: #ddd;
+  margin: 16px 0 8px 0;
+  font-weight: 600;
+}
+
+#onramp-step-content p {
+  margin-bottom: 12px;
+  color: #bbb;
+}
+
+#onramp-step-content ul, #onramp-step-content ol {
+  margin: 8px 0 12px 20px;
+  color: #bbb;
+}
+
+#onramp-step-content li {
+  margin-bottom: 6px;
+}
+
+#onramp-step-content strong {
+  color: #eee;
+  font-weight: 600;
+}
+
+#onramp-step-content em {
+  color: #aaa;
+  font-style: italic;
+}
+
+#onramp-step-content code {
+  background: #252525;
+  padding: 2px 5px;
+  border-radius: 3px;
+  font-size: 12px;
+  color: #e0e0e0;
+}
+
+.onramp-hint {
+  background: #1e2a1e;
+  border: 1px solid #2a4a2a;
+  border-radius: 4px;
+  padding: 10px 14px;
+  margin: 12px 0;
+  font-size: 12px;
+  color: #8dca8d;
+  line-height: 1.6;
+}
+
+.onramp-warning {
+  background: #2a2a1e;
+  border: 1px solid #4a4a2a;
+  border-radius: 4px;
+  padding: 10px 14px;
+  margin: 12px 0;
+  font-size: 12px;
+  color: #caca8d;
+  line-height: 1.6;
+}
+
+.onramp-success {
+  background: #1a2a1a;
+  border: 1px solid #2a5a2a;
+  border-radius: 4px;
+  padding: 10px 14px;
+  margin: 12px 0;
+  font-size: 12px;
+  color: #6dda6d;
+  line-height: 1.6;
+}
+
+.onramp-error-callout {
+  background: #2a1a1a;
+  border: 1px solid #5a2a2a;
+  border-radius: 4px;
+  padding: 10px 14px;
+  margin: 12px 0;
+  font-size: 12px;
+  color: #da6d6d;
+  line-height: 1.6;
+}
+
+/* ── Step Navigation ─────────────────────────────────────────────────────────── */
+
+#onramp-step-nav {
+  display: flex;
+  gap: 8px;
+  padding: 12px 20px;
+  border-top: 1px solid #252525;
+  background: #1a1a1a;
+}
+
+.onramp-nav-btn {
+  flex: 1;
+  padding: 8px 0;
+  border: 1px solid #333;
+  border-radius: 4px;
+  background: #2a2a2a;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.onramp-nav-btn:hover:not(:disabled) { background: #333; }
+.onramp-nav-btn:disabled { opacity: 0.3; cursor: default; }
+
+.onramp-nav-btn.primary {
+  background: #2a5a2a;
+  border-color: #3a7a3a;
+  color: #8dda8d;
+}
+
+.onramp-nav-btn.primary:hover:not(:disabled) { background: #3a6a3a; }
+
+.onramp-nav-btn.check {
+  background: #2a3a5a;
+  border-color: #3a5a8a;
+  color: #8daadd;
+}
+
+.onramp-nav-btn.check:hover:not(:disabled) { background: #3a4a6a; }
+
+/* ── Canvas Area ─────────────────────────────────────────────────────────────── */
+
+#onramp-canvas-area {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background: #111;
+}
+
+#onramp-canvas-area canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ── Progress Bar ────────────────────────────────────────────────────────────── */
+
+#onramp-progress {
+  height: 28px;
+  min-height: 28px;
+  background: #141414;
+  border-top: 1px solid #252525;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  position: relative;
+}
+
+#onramp-progress-bar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  background: #2a5a2a;
+  transition: width 0.4s ease;
+  opacity: 0.3;
+}
+
+#onramp-progress-text {
+  position: relative;
+  font-size: 11px;
+  color: #666;
+  z-index: 1;
+}
+
+/* ── Lesson Select ───────────────────────────────────────────────────────────── */
+
+.onramp-lesson-select {
+  padding: 24px 20px;
+}
+
+.onramp-lesson-select h2 {
+  margin-bottom: 20px;
+}
+
+.onramp-lesson-card {
+  background: #222;
+  border: 1px solid #333;
+  border-radius: 6px;
+  padding: 16px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.onramp-lesson-card:hover {
+  background: #2a2a2a;
+  border-color: #444;
+}
+
+.onramp-lesson-card h3 {
+  font-size: 14px;
+  color: #eee;
+  margin-bottom: 6px;
+}
+
+.onramp-lesson-card p {
+  font-size: 12px;
+  color: #888;
+  margin: 0;
+}
+
+.onramp-lesson-card.completed {
+  border-color: #2a5a2a;
+}
+
+.onramp-lesson-card.completed h3::after {
+  content: ' \2713';
+  color: #6dda6d;
+}
+
+/* ── Completion Screen ───────────────────────────────────────────────────────── */
+
+.onramp-completion {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.onramp-completion h1 {
+  font-size: 24px;
+  color: #6dda6d;
+  margin-bottom: 16px;
+}
+
+.onramp-completion p {
+  color: #bbb;
+  margin-bottom: 12px;
+}
+
+.onramp-completion ul {
+  text-align: left;
+  display: inline-block;
+  margin: 16px 0;
+}
+
+.onramp-completion-actions {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+}
+
+.onramp-btn {
+  display: inline-block;
+  padding: 10px 24px;
+  border: 1px solid #3a7a3a;
+  border-radius: 4px;
+  background: #2a5a2a;
+  color: #8dda8d;
+  font-family: inherit;
+  font-size: 13px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.onramp-btn:hover { background: #3a6a3a; }
+
+.onramp-btn.secondary {
+  background: #2a2a2a;
+  border-color: #444;
+  color: #ffffff;
+}
+
+.onramp-btn.secondary:hover { background: #333; }
+
+/* ── Step complete animation ─────────────────────────────────────────────────── */
+
+@keyframes onramp-step-complete {
+  0% { border-color: #2a5a2a; }
+  50% { border-color: #4a8a4a; }
+  100% { border-color: #252525; }
+}
+
+#onramp-panel.step-complete {
+  animation: onramp-step-complete 0.6s ease;
+}
+
+/* ── Scrollbar styling ───────────────────────────────────────────────────────── */
+
+#onramp-step-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+#onramp-step-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#onramp-step-content::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 3px;
+}
+
+#onramp-step-content::-webkit-scrollbar-thumb:hover {
+  background: #444;
+}
+

@@ -1,0 +1,188 @@
+{
+  "components": [
+    {
+      "id": 1,
+      "type": "chip",
+      "tileX": 0,
+      "tileY": 0,
+      "col": 10,
+      "row": 4,
+      "chipId": "555",
+      "ffState": {
+        "OUT": {
+          "q": 0
+        }
+      }
+    },
+    {
+      "id": 2,
+      "type": "resistor",
+      "resistance": 10000,
+      "startHoleId": "0:0:power:5:1",
+      "endHoleId": "0:0:main:11:2"
+    },
+    {
+      "id": 3,
+      "type": "capacitor",
+      "capacitance": 0.000009999999999999999,
+      "startHoleId": "0:0:main:11:1",
+      "endHoleId": "0:0:power:11:0"
+    },
+    {
+      "id": 4,
+      "type": "resistor",
+      "resistance": 10000,
+      "startHoleId": "0:0:power:16:3",
+      "endHoleId": "0:0:main:11:6"
+    },
+    {
+      "id": 5,
+      "type": "push_button",
+      "startHoleId": "0:0:main:11:9",
+      "endHoleId": "0:0:power:11:2"
+    },
+    {
+      "id": 6,
+      "type": "resistor",
+      "resistance": 470,
+      "startHoleId": "0:0:main:12:6",
+      "endHoleId": "0:0:main:17:6"
+    },
+    {
+      "id": 7,
+      "type": "led",
+      "color": "red",
+      "startHoleId": "0:0:main:17:6",
+      "endHoleId": "0:0:power:17:2"
+    },
+    {
+      "id": 13,
+      "type": "led",
+      "color": "green",
+      "startHoleId": "0:0:main:36:7",
+      "endHoleId": "0:0:power:36:2"
+    },
+    {
+      "id": 12,
+      "type": "resistor",
+      "resistance": 470,
+      "startHoleId": "0:0:main:31:6",
+      "endHoleId": "0:0:main:36:6"
+    },
+    {
+      "id": 8,
+      "type": "chip",
+      "tileX": 0,
+      "tileY": 0,
+      "col": 29,
+      "row": 4,
+      "chipId": "555",
+      "ffState": {
+        "OUT": {
+          "q": 1
+        }
+      }
+    },
+    {
+      "id": 9,
+      "type": "resistor",
+      "resistance": 10000,
+      "startHoleId": "0:0:power:24:1",
+      "endHoleId": "0:0:main:30:1"
+    },
+    {
+      "id": 11,
+      "type": "capacitor",
+      "capacitance": 1e-7,
+      "startHoleId": "0:0:main:30:8",
+      "endHoleId": "0:0:power:30:2"
+    },
+    {
+      "id": 10,
+      "type": "resistor",
+      "resistance": 10000,
+      "startHoleId": "0:0:main:30:3",
+      "endHoleId": "0:0:main:30:6"
+    }
+  ],
+  "wires": [
+    {
+      "id": 1,
+      "startHoleId": "0:0:power:10:1",
+      "endHoleId": "0:0:main:10:3",
+      "color": "#ff6b6b"
+    },
+    {
+      "id": 2,
+      "startHoleId": "0:0:power:10:2",
+      "endHoleId": "0:0:main:10:6",
+      "color": "#4ecdc4"
+    },
+    {
+      "id": 3,
+      "startHoleId": "0:0:power:12:3",
+      "endHoleId": "0:0:main:13:6",
+      "color": "#ff6b6b"
+    },
+    {
+      "id": 4,
+      "startHoleId": "0:0:main:11:3",
+      "endHoleId": "0:0:main:12:3",
+      "color": "#ffd93d"
+    },
+    {
+      "id": 5,
+      "startHoleId": "0:0:power:29:1",
+      "endHoleId": "0:0:main:29:3",
+      "color": "#ff6b6b"
+    },
+    {
+      "id": 6,
+      "startHoleId": "0:0:power:29:2",
+      "endHoleId": "0:0:main:29:6",
+      "color": "#4ecdc4"
+    },
+    {
+      "id": 7,
+      "startHoleId": "0:0:main:31:3",
+      "endHoleId": "0:0:main:30:7",
+      "color": "#ffd93d"
+    },
+    {
+      "id": 8,
+      "startHoleId": "0:0:main:32:8",
+      "endHoleId": "0:0:power:33:3",
+      "color": "#fdcb6e"
+    }
+  ],
+  "extraTiles": [],
+  "textBoxes": [
+    {
+      "id": 2,
+      "x": 10,
+      "y": -120,
+      "w": 634.0678481539336,
+      "h": 50,
+      "text": "Description: Two 555 timers   one monostable, one astable.",
+      "v": 2
+    },
+    {
+      "id": 1,
+      "x": 10,
+      "y": -180,
+      "w": 400,
+      "h": 50,
+      "text": "Title: Dual 555 Timers",
+      "v": 2
+    },
+    {
+      "id": 3,
+      "x": 10,
+      "y": -60,
+      "w": 634.0678481539336,
+      "h": 90,
+      "text": "Details: LEFT   press the button to trigger a one-shot pulse (monostable). RIGHT   LED blinks automatically at ~1 Hz (astable). Both use external RC networks for timing.",
+      "v": 2
+    }
+  ]
+}

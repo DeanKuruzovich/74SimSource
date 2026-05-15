@@ -1,0 +1,2090 @@
+/* ── 74Sim Stylesheet ─── Black & White Theme ─────────────────────────────── */
+
+/* ── Design tokens ──────────────────────────────────────────────────────────
+   Standardized breakpoints (used in @media queries throughout):
+     --bp-sm   480px   phones
+     --bp-md   768px   tablets / simulator minimum
+     --bp-lg   1024px  small laptop
+     --bp-xl   1400px  desktop (side-panel widens)
+     --bp-2xl  1800px  ultrawide (side-panel widens further)
+   Note: CSS custom properties cannot be used inside @media conditions, so
+   the numeric values are repeated in each query below. Treat the comment
+   above as the source of truth.
+*/
+:root {
+  /* Side panel width fluid; overridden by drawer rules at small widths */
+  --side-panel-w: clamp(280px, 24vw, 460px);
+
+  /* Spacing scale */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+
+  /* Type scale */
+  --font-xs: 11px;
+  --font-sm: 12px;
+  --font-md: 13px;
+  --font-lg: 15px;
+  --font-xl: 18px;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  font-family: 'SF Mono', 'Menlo', 'Monaco', 'Consolas', monospace;
+  background: #1a1a1a;
+  color: #ffffff;
+}
+
+/* ── App Layout ──────────────────────────────────────────────────────────── */
+
+#app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* ── Toolbar ─────────────────────────────────────────────────────────────── */
+
+#toolbar {
+  display: flex;
+  align-items: stretch;
+  flex-wrap: nowrap;
+  gap: clamp(2px, 0.3vw, 6px);
+  background: #111;
+  border-bottom: 1px solid #333;
+  padding: clamp(4px, 0.5vw, 10px) clamp(8px, 1vw, 18px);
+  min-height: clamp(42px, 5.5vh, 72px);
+  z-index: 100;
+  flex-shrink: 0;
+}
+
+/* On narrow viewports, hide the brand title to reclaim toolbar space. */
+@media (max-width: 900px) {
+  .toolbar-title { display: none; }
+}
+
+#toolbar > div[style*="position:relative"] {
+  display: flex;
+  align-items: stretch;
+}
+
+.toolbar-btn {
+  background: #222;
+  color: #ffffff;
+  border: 1px solid #444;
+  padding: 0 clamp(12px, 1.4vw, 22px);
+  font-family: inherit;
+  font-size: clamp(10px, 0.95vw, 15px);
+  cursor: pointer;
+  border-radius: 3px;
+  position: relative;
+  white-space: nowrap;
+  align-self: stretch;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.toolbar-btn:hover {
+  background: #333;
+  color: #fff;
+}
+
+.toolbar-btn.active {
+  background: #444;
+  color: #fff;
+  border-color: #888;
+}
+
+.toolbar-spacer {
+  flex: 1;
+  min-width: 8px;
+}
+
+.toolbar-title {
+  font-size: clamp(14px, 1.3vw, 20px);
+  font-weight: bold;
+  color: #888;
+  margin-right: clamp(12px, 1.2vw, 24px);
+  letter-spacing: 1px;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Small autosave status pill next to the File menu (desktop builds only). */
+.autosave-status {
+  display: inline-flex;
+  align-items: center;
+  font-size: clamp(9px, 0.8vw, 12px);
+  letter-spacing: 0.04em;
+  color: #888;
+  padding: 0 clamp(6px, 0.7vw, 10px);
+  margin-right: clamp(4px, 0.4vw, 8px);
+  font-style: italic;
+  user-select: none;
+  white-space: nowrap;
+  transition: color 0.2s ease;
+}
+.autosave-status.is-saving { color: #d8b25a; }   /* warm amber */
+.autosave-status.is-saved  { color: #6fa86f; }   /* muted green */
+.autosave-status.is-error  { color: #c66666; }   /* muted red */
+
+/* ── Dropdown Panels ─────────────────────────────────────────────────────── */
+
+#dropdown-chip {
+  min-width: 364px;
+}
+
+#dropdown-chip .dropdown-list {
+  max-height: 480px;
+}
+
+.dropdown-panel {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 280px;
+  max-width: calc(100vw - 16px);
+  max-height: min(600px, 80vh);
+  background: #1e1e1e;
+  border: 1px solid #444;
+  border-radius: 4px;
+  overflow: hidden;
+  z-index: 200;
+  margin-top: 4px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+}
+
+.dropdown-panel.show {
+  display: block;
+}
+
+.dropdown-section {
+  padding: 6px 10px;
+  border-bottom: 1px solid #333;
+}
+
+.dropdown-divider {
+  border-top: 1px solid #444;
+  margin: 6px 0;
+}
+
+.dropdown-submenu {
+  padding-left: 12px;
+}
+
+.dropdown-submenu-trigger .dropdown-item-name {
+  color: #ffffff;
+}
+
+.dropdown-section-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.3px;
+  margin-bottom: 4px;
+}
+
+.dropdown-search {
+  width: 100%;
+  background: #2a2a2a;
+  border: 1px solid #444;
+  color: #ffffff;
+  padding: 5px 8px;
+  font-family: inherit;
+  font-size: 12px;
+  border-radius: 3px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.chip-sort-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 5px;
+  font-size: 11px;
+  color: #888;
+  cursor: pointer;
+  user-select: none;
+}
+.chip-sort-label input[type="checkbox"] {
+  accent-color: #888;
+  cursor: pointer;
+}
+
+.dropdown-search:focus {
+  border-color: #888;
+}
+
+.dropdown-list {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.dropdown-item {
+  padding: 6px 10px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid #2a2a2a;
+}
+
+.dropdown-item:hover {
+  background: #333;
+}
+
+.dropdown-item-name {
+  font-size: 12px;
+  font-weight: bold;
+  color: #ddd;
+}
+
+.dropdown-item-desc {
+  font-size: 10px;
+  color: #888;
+  margin-top: 2px;
+}
+
+/* Toggle items inside dropdowns circle outline when off, filled when active */
+.dropdown-item-toggle .dropdown-item-name::before {
+  content: '○ ';
+  display: inline-block;
+  width: 14px;
+}
+
+.dropdown-item-toggle.active .dropdown-item-name::before {
+  content: '● ';
+  color: #aaa;
+}
+
+.dropdown-divider {
+  border: none;
+  border-top: 2px solid #555;
+  margin: 4px 0;
+}
+
+/* ── Main Area ───────────────────────────────────────────────────────────── */
+
+#main-area {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  position: relative; /* anchors side-panel drawer at small viewports */
+}
+
+/* ── Status Bar ──────────────────────────────────────────────────────────── */
+#status-bar {
+  height: 24px;
+  background: #141414;
+  border-top: 1px solid #2a2a2a;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  font-size: 11px;
+  flex-shrink: 0;
+}
+
+#overcurrent-status {
+  color: #ff4444;
+  cursor: pointer;
+  user-select: none;
+}
+
+#overcurrent-status:hover {
+  text-decoration: underline;
+}
+
+#app-info {
+  margin-left: auto;
+  color: #888;
+  font-size: 11px;
+  user-select: none;
+}
+
+#app-info a {
+  color: #888;
+  text-decoration: none;
+}
+
+#app-info a:hover {
+  color: #bbb;
+  text-decoration: underline;
+}
+
+#app-version {
+  margin-left: 26px;
+}
+
+#rotating-message-text {
+  transition: opacity 0.4s ease;
+}
+
+#rotating-message-text.fading {
+  opacity: 0;
+}
+
+.rotating-msg-btn {
+  background: none;
+  border: none;
+  color: #888;
+  font-family: inherit;
+  font-size: 11px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.rotating-msg-btn:hover {
+  color: #bbb;
+  text-decoration: underline;
+}
+
+#overcurrent-status:empty {
+  display: none;
+}
+
+#canvas-container {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+#canvas-container canvas {
+  display: block;
+}
+
+/* ── Side Panel (Logic) ──────────────────────────────────────────────────── */
+
+#side-panel {
+  width: var(--side-panel-w);
+  background: #1e1e1e;
+  border-left: 1px solid #333;
+  overflow-y: auto;
+  flex-shrink: 0;
+  padding: 12px;
+  font-size: 12px;
+  transition: width 0.18s ease, transform 0.18s ease;
+}
+
+#side-panel.collapsed {
+  width: 0;
+  padding: 0;
+  border: none;
+  overflow: hidden;
+}
+
+/* Tablet/small-laptop: side panel becomes a slide-over drawer so the canvas
+   keeps the full width. The existing .collapsed class drives visibility. */
+@media (max-width: 1024px) {
+  #side-panel {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: min(420px, 92vw);
+    z-index: 150;
+    box-shadow: -4px 0 16px rgba(0, 0, 0, 0.5);
+    transform: translateX(0);
+  }
+  #side-panel.collapsed {
+    width: min(420px, 92vw);
+    padding: 12px;
+    border-left: 1px solid #333;
+    overflow: hidden;
+    transform: translateX(100%);
+    pointer-events: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #side-panel { transition: none; }
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.panel-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: 0.2px;
+}
+
+.panel-toggle {
+  background: none;
+  border: none;
+  color: #888;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 2px 6px;
+}
+
+.panel-toggle:hover {
+  color: #fff;
+}
+
+/* ── Expression Display ──────────────────────────────────────────────────── */
+
+.expr-block {
+  background: #2a2a2a;
+  border: 1px solid #444;
+  border-radius: 4px;
+  padding: 8px;
+  margin-bottom: 10px;
+}
+
+.expr-label {
+  font-size: 10px;
+  color: #888;
+  margin-bottom: 4px;
+}
+
+.expr-text {
+  font-size: 12px;
+  color: #ddd;
+  word-break: break-all;
+}
+
+/* ── Truth Table ─────────────────────────────────────────────────────────── */
+
+.truth-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 12px;
+  font-size: 11px;
+}
+
+.truth-table th {
+  background: #333;
+  color: #aaa;
+  padding: 4px 8px;
+  border: 1px solid #444;
+  text-align: center;
+}
+
+.truth-table td {
+  padding: 3px 8px;
+  border: 1px solid #333;
+  text-align: center;
+  color: #ffffff;
+}
+
+.truth-table tr:nth-child(even) td {
+  background: #252525;
+}
+
+.truth-table td.output-col {
+  font-weight: bold;
+  color: #fff;
+}
+
+/* ── Warning Box ─────────────────────────────────────────────────────────── */
+
+.warning-box {
+  background: #332b00;
+  border: 1px solid #665500;
+  color: #ddaa00;
+  padding: 8px;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  font-size: 11px;
+}
+
+/* ── Simulation Note ─────────────────────────────────────────────────────── */
+
+.sim-note {
+  color: #666;
+  font-size: 10px;
+  font-style: italic;
+  padding: 10px 8px 4px;
+  border-top: 1px solid #2a2a2a;
+  margin-top: 10px;
+  line-height: 1.5;
+}
+
+/* ── Empty State ─────────────────────────────────────────────────────────── */
+
+.empty-state {
+  color: var(--text-muted);
+  text-align: center;
+  padding: 24px 12px;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* ── Logic Analyzer Panel ────────────────────────────────────────────────── */
+/* Visually aligned with Circuit Analyzer (.ci-*): compact monochrome tables,
+   neutral grays, white reserved for active values. */
+
+.la-section-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.3px;
+  margin: 12px 0 5px;
+  border-bottom: 1px solid #333;
+  padding-bottom: 3px;
+}
+
+.la-section-title:first-child {
+  margin-top: 0;
+}
+
+.la-expr {
+  background: #222;
+  border: 1px solid #383838;
+  border-radius: 3px;
+  padding: 5px 8px;
+  margin-bottom: 4px;
+  font-family: monospace;
+  font-size: 11px;
+  color: #ffffff;
+  word-break: break-all;
+  line-height: 1.5;
+}
+
+.la-expr .la-out-name {
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.la-expr .la-eq {
+  color: var(--text-muted);
+  margin: 0 2px;
+}
+
+.la-non-comb-label {
+  color: var(--text-faint);
+  font-style: italic;
+}
+
+.la-sequential-warning {
+  background: #1c1c1c;
+  border: 1px solid #383838;
+  border-radius: 3px;
+  padding: 5px 8px;
+  margin-bottom: 6px;
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.la-state-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 2px;
+  background: #222;
+  border: 1px solid #383838;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.la-state-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 3px 6px;
+  font-size: 10px;
+  color: #ffffff;
+  border-bottom: 1px solid #2c2c2c;
+}
+
+.la-state-item:nth-child(even) {
+  background: #252525;
+}
+
+.la-state-item:last-child {
+  border-bottom: none;
+}
+
+.la-state-label {
+  font-family: monospace;
+  font-weight: bold;
+  color: #aaa;
+}
+
+.la-state-label-in,
+.la-state-label-out {
+  color: #aaa;
+}
+
+.la-state-val {
+  font-family: monospace;
+  font-size: 10px;
+  font-weight: bold;
+}
+
+.la-state-on {
+  color: #ffffff;
+}
+
+.la-state-off {
+  color: var(--text-faint);
+  font-weight: normal;
+}
+
+/* Format selector header */
+.la-expr-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.la-format-select {
+  background: #222;
+  color: var(--text-dim);
+  border: 1px solid #383838;
+  border-radius: 3px;
+  font-size: 10px;
+  font-family: monospace;
+  padding: 2px 4px;
+  cursor: pointer;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.la-format-select:hover {
+  border-color: #555;
+}
+
+/* K-Map and Truth Table */
+.la-kmap-block,
+.la-tt-block {
+  margin-bottom: 8px;
+}
+
+.la-kmap-title,
+.la-tt-title {
+  font-family: monospace;
+  font-size: 10px;
+  color: #aaa;
+  margin-bottom: 3px;
+}
+
+.la-kmap,
+.la-tt {
+  border-collapse: collapse;
+  font-family: monospace;
+  font-size: 10px;
+  color: #ffffff;
+  background: #222;
+  border: 1px solid #383838;
+  border-radius: 3px;
+  margin-bottom: 4px;
+  overflow: hidden;
+}
+
+.la-kmap th,
+.la-kmap td,
+.la-tt th,
+.la-tt td {
+  border-bottom: 1px solid #2c2c2c;
+  border-right: 1px solid #2c2c2c;
+  padding: 3px 8px;
+  text-align: center;
+  min-width: 22px;
+}
+
+.la-kmap tr:last-child th,
+.la-kmap tr:last-child td,
+.la-tt tr:last-child th,
+.la-tt tr:last-child td {
+  border-bottom: none;
+}
+
+.la-kmap th:last-child,
+.la-kmap td:last-child,
+.la-tt th:last-child,
+.la-tt td:last-child {
+  border-right: none;
+}
+
+.la-kmap th,
+.la-tt th {
+  background: #2a2a2a;
+  color: var(--text-muted);
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+.la-kmap-corner {
+  position: relative;
+  background: #2a2a2a !important;
+  color: var(--text-muted) !important;
+  font-size: 10px;
+  padding: 2px 6px !important;
+  white-space: nowrap;
+}
+
+.la-kmap-rowname,
+.la-kmap-colname {
+  color: var(--text-muted);
+}
+
+.la-kmap-slash {
+  color: var(--text-faint);
+  padding: 0 2px;
+}
+
+.la-kmap-one,
+.la-tt-one {
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.la-kmap-zero,
+.la-tt-zero {
+  color: var(--text-faint);
+}
+
+.la-tt-out {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.la-kmap-empty,
+.la-tt-empty {
+  font-family: monospace;
+  font-size: 10px;
+  color: var(--text-muted);
+  font-style: italic;
+  padding: 4px 0;
+}
+
+/* ── Scrollbar Styling ───────────────────────────────────────────────────── */
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1a1a1a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #444;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* ── Welcome Overlay ─────────────────────────────────────────────────────── */
+
+#welcome-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(0, 0, 0, 0.80);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#welcome-overlay.hidden {
+  display: none;
+}
+
+#welcome-modal {
+  background: #1e1e1e;
+  border: 1px solid #333;
+  border-radius: 6px;
+  padding: clamp(1.5rem, 4vw, 2.5rem) clamp(1.5rem, 4vw, 2.5rem) clamp(1.25rem, 3vw, 2rem);
+  max-width: 480px;
+  width: 90%;
+  max-height: 92vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7);
+}
+
+#welcome-title {
+  font-family: monospace;
+  font-size: 22px;
+  font-weight: 700;
+  color: #eee;
+  margin: 0 0 1rem;
+  letter-spacing: 0.03em;
+}
+
+#welcome-desc {
+  font-family: monospace;
+  font-size: 13px;
+  color: #999;
+  line-height: 1.6;
+  margin: 0 0 1.75rem;
+}
+
+#welcome-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.welcome-btn {
+  font-family: monospace;
+  font-size: 13px;
+  padding: 7px 16px;
+  border-radius: 3px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  border: 1px solid transparent;
+  transition: background 0.15s, color 0.15s;
+}
+
+.welcome-btn-primary {
+  background: #eee;
+  color: #111;
+  border-color: #eee;
+  margin-left: auto;
+}
+
+.welcome-btn-primary:hover {
+  background: #fff;
+  border-color: #fff;
+}
+
+.welcome-btn-secondary {
+  background: transparent;
+  color: #aaa;
+  border-color: #444;
+}
+
+.welcome-btn-secondary:hover {
+  background: #2a2a2a;
+  color: #ddd;
+  border-color: #555;
+}
+
+/* ── Update Log Overlay ──────────────────────────────────────────────────── */
+
+.update-log-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2100;
+  background: rgba(0, 0, 0, 0.80);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: monospace;
+}
+
+.update-log-modal {
+  background: #1e1e1e;
+  border: 1px solid #333;
+  border-radius: 6px;
+  width: min(560px, 92%);
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7);
+}
+
+.update-log-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 22px 10px;
+  border-bottom: 1px solid #2a2a2a;
+}
+
+.update-log-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #eee;
+  letter-spacing: 0.04em;
+}
+
+.update-log-close {
+  background: none;
+  border: none;
+  color: #888;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+.update-log-close:hover {
+  color: #eee;
+  background: #333;
+}
+
+.update-log-current {
+  font-size: 12px;
+  color: #888;
+  letter-spacing: 0.05em;
+}
+
+.update-log-body {
+  padding: 14px 22px 4px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.update-log-entry {
+  padding: 10px 0 14px;
+  border-bottom: 1px solid #262626;
+}
+
+.update-log-entry:last-child {
+  border-bottom: none;
+}
+
+.update-log-entry-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.update-log-version {
+  font-size: 13px;
+  font-weight: 700;
+  color: #eee;
+}
+
+.update-log-date {
+  font-size: 11px;
+  color: #777;
+}
+
+.update-log-entry-title {
+  font-size: 12px;
+  color: #aaa;
+  margin-bottom: 8px;
+}
+
+.update-log-changes {
+  margin: 0;
+  padding-left: 18px;
+  color: #bbb;
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+.update-log-changes li {
+  margin-bottom: 4px;
+}
+
+.update-log-footer {
+  padding: 12px 22px 16px;
+  border-top: 1px solid #2a2a2a;
+  text-align: right;
+}
+
+.update-log-btn {
+  background: #eee;
+  color: #111;
+  border: 1px solid #eee;
+  border-radius: 3px;
+  font-family: monospace;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 7px 18px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.update-log-btn:hover {
+  background: #fff;
+  border-color: #fff;
+}
+
+/* ── Chip Info Panel ─────────────────────────────────────────────────────── */
+
+.chip-info-desc {
+  color: #aaa;
+  font-size: 12px;
+  margin-bottom: 10px;
+}
+
+.chip-datasheet-link {
+  display: inline-block;
+  color: #6af;
+  font-size: 11px;
+  text-decoration: none;
+  margin-bottom: 14px;
+  border: 1px solid #335;
+  padding: 4px 10px;
+  border-radius: 3px;
+}
+
+.chip-family-override-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: 10px 0 14px;
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.chip-family-override-label {
+  color: var(--text-muted);
+  flex-shrink: 0;
+  font-size: 10px;
+}
+
+.chip-family-override-select {
+  background: #1e1e1e;
+  border: 1px solid #333;
+  color: var(--text-dim);
+  padding: 2px 5px;
+  font-family: inherit;
+  font-size: 10px;
+  border-radius: 3px;
+  outline: none;
+  cursor: pointer;
+}
+
+.chip-family-override-select:focus {
+  border-color: #666;
+}
+
+.chip-datasheet-link:hover {
+  background: #223;
+  color: #8cf;
+}
+
+.chip-pinout {
+  margin-bottom: 14px;
+}
+
+.chip-pinout-header {
+  text-align: center;
+  font-size: 11px;
+  font-weight: bold;
+  color: #888;
+  margin-bottom: 6px;
+  text-align: center;
+}
+
+.chip-pinout-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+  background: #222;
+  border: 1px solid #444;
+  border-radius: 4px;
+}
+
+.chip-pinout-table tr:first-child td {
+  border-top: none;
+}
+
+.chip-pinout-table td {
+  padding: 3px 6px;
+  border-top: 1px solid #333;
+}
+
+.chip-pinout-table .pin-name {
+  width: 35%;
+  font-weight: bold;
+}
+
+.chip-pinout-table .pin-name.pin-input { color: #8d8; }
+.chip-pinout-table .pin-name.pin-output { color: #e88; }
+.chip-pinout-table .pin-name.pin-power { color: #fd6; }
+
+.chip-pinout-table .pin-num {
+  width: 10%;
+  text-align: center;
+  color: #888;
+  font-size: 10px;
+}
+
+.chip-pinout-table .pin-body {
+  width: 10%;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 14px;
+  border-left: 2px solid var(--border-strong);
+  border-right: 2px solid var(--border-strong);
+}
+
+.chip-pinout-table td:first-child {
+  text-align: right;
+}
+
+.chip-pinout-table td:last-child {
+  text-align: left;
+}
+
+.chip-pinout-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 10px;
+  margin-top: 14px;
+  margin-bottom: 8px;
+  color: #666;
+  justify-content: center;
+}
+
+.legend-input { color: #8d8; }
+.legend-output { color: #e88; }
+.legend-power { color: #fd6; }
+
+/* ── SVG DIP Chip Diagram ────────────────────────────────────────────────── */
+
+.chip-dip-wrap {
+  overflow-x: auto;
+  margin: 14px 0 8px;
+  -webkit-overflow-scrolling: touch;
+  display: flex;
+  justify-content: center;
+}
+
+.chip-dip-svg {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+}
+
+/* ── Chip Help Section ─────────────────────────────────────────────────── */
+
+/* ── Live Gate Evaluation ─────────────────────────────────────────────── */
+
+.gate-eval-section {
+  margin-top: 12px;
+  border-top: 1px solid #333;
+  padding-top: 8px;
+  margin-bottom: 4px;
+}
+
+.gate-eval-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.2px;
+  margin-bottom: 6px;
+}
+
+.gate-eval-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-family: Menlo, Consolas, monospace;
+  font-size: 11px;
+  color: #aaa;
+  padding: 2px 0;
+}
+
+.gate-eval-num {
+  color: var(--text-muted);
+  min-width: 14px;
+  text-align: right;
+}
+
+.gate-eval-expr {
+  color: #bbb;
+}
+
+.gate-eval-out {
+  font-weight: bold;
+}
+
+.gate-eval-hi {
+  color: #4f4;
+}
+
+.gate-eval-lo {
+  color: #f66;
+}
+
+.chip-help-section {
+  margin-top: 14px;
+  border-top: 1px solid #333;
+  padding-top: 10px;
+}
+
+.chip-help-section-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.2px;
+  margin-bottom: 8px;
+}
+
+.chip-help-btn {
+  background: none;
+  border: 1px solid #555;
+  color: #999;
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.chip-help-btn:hover {
+  border-color: #888;
+  color: #ffffff;
+  background: #1e1e1e;
+}
+
+.chip-help-text {
+  margin-top: 10px;
+  font-size: 11px;
+  color: #aaa;
+  line-height: 1.6;
+  padding: 8px 10px;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 4px;
+}
+
+.chip-help-text.chip-help-text-open {
+  display: block;
+}
+
+/* ── Chip Guide ───────────────────────────────────────────────────────── */
+
+.chip-guide-overview {
+  font-size: 11px;
+  color: #bbb;
+  line-height: 1.55;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #333;
+}
+
+.chip-guide-subtitle {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.2px;
+  margin: 10px 0 4px;
+}
+
+.chip-guide-row {
+  font-size: 11px;
+  color: #bbb;
+  margin-bottom: 2px;
+}
+
+.chip-guide-note {
+  font-size: 11px;
+  color: #888;
+  font-style: italic;
+  margin: 4px 0 8px;
+  line-height: 1.5;
+}
+
+.chip-guide-figure {
+  margin: 6px 0 10px;
+}
+
+.chip-guide-image {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  border: 1px solid #333;
+  border-radius: 4px;
+  background: #fff;
+}
+
+.chip-guide-caption {
+  font-size: 10px;
+  color: #666;
+  margin-top: 5px;
+  line-height: 1.4;
+}
+
+.chip-guide-paragraph {
+  font-size: 11px;
+  color: #aaa;
+  line-height: 1.6;
+  margin-bottom: 7px;
+}
+
+.chip-guide-formulas {
+  margin: 6px 0 8px;
+}
+
+.chip-guide-formula {
+  font-family: 'SF Mono', 'Consolas', monospace;
+  font-size: 11px;
+  color: #cfcfcf;
+  background: #151515;
+  border: 1px solid #2d2d2d;
+  border-radius: 3px;
+  padding: 4px 6px;
+  margin-bottom: 4px;
+}
+
+.chip-guide-list {
+  margin: 6px 0 8px 18px;
+  color: #aaa;
+}
+
+.chip-guide-list li {
+  margin-bottom: 5px;
+  line-height: 1.5;
+}
+
+.chip-guide-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 4px 0 8px;
+}
+
+.chip-guide-table td {
+  font-size: 11px;
+  padding: 2px 6px 2px 0;
+  border-bottom: 1px solid #2a2a2a;
+  vertical-align: top;
+}
+
+.chip-guide-table .cg-pin {
+  color: #888;
+  white-space: nowrap;
+  width: 42px;
+}
+
+.chip-guide-table .cg-name {
+  color: #ffffff;
+  font-family: 'SF Mono', 'Consolas', monospace;
+  white-space: nowrap;
+  width: 50px;
+}
+
+.chip-guide-table .cg-desc {
+  color: #999;
+}
+
+.chip-guide-gate {
+  font-size: 11px;
+  color: #aaa;
+  margin: 4px 0;
+  line-height: 1.5;
+}
+
+.chip-guide-tips {
+  font-size: 11px;
+  color: #aaa;
+  line-height: 1.7;
+}
+
+/* ── 7-Segment Info Panel ───────────────────────────────────────────────── */
+
+.seven-seg-panel {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+.seven-seg-visual {
+  flex-shrink: 0;
+  background: #111;
+  border: 1px solid #444;
+  border-radius: 4px;
+  padding: 6px;
+}
+
+.seven-seg-svg {
+  display: block;
+  width: 52px;
+  height: 78px;
+}
+
+.seven-seg-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.seven-seg-pin-table {
+  margin-top: 6px;
+}
+
+.seven-seg-pin-table th {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.2px;
+  padding: 2px 4px;
+  border-bottom: 1px solid #333;
+}
+
+
+
+/* ── Component State Badge (Button / Slide Switch) ─────────────────────── */
+
+.comp-state-wrap {
+  margin-bottom: 8px;
+}
+
+.comp-state-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: bold;
+  padding: 5px 10px;
+  border-radius: 4px;
+  letter-spacing: 0.3px;
+}
+
+.comp-state-active {
+  background: #1a2f1a;
+  color: #6f6;
+  border: 1px solid #3a5a3a;
+}
+
+.comp-state-inactive {
+  background: #222;
+  color: #888;
+  border: 1px solid #404040;
+}
+
+/* ── Button / SPDT SVG pinout diagrams ─────────────────────────────────── */
+
+.btn-pinout-wrap {
+  display: flex;
+  justify-content: center;
+  margin: 10px 0;
+}
+
+.btn-pinout-svg {
+  width: 90px;
+  height: 90px;
+}
+
+.spdt-svg {
+  width: 130px;
+  height: 70px;
+}
+
+/* ── Chip Powered Badge ─────────────────────────────────────────────────── */
+
+.chip-power-badge {
+  font-size: 11px;
+  font-weight: bold;
+  padding: 6px 10px;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  letter-spacing: 0.3px;
+}
+
+.chip-power-ok {
+  background: #1a3a1a;
+  color: #6f6;
+  border: 1px solid #3a6a3a;
+}
+
+.chip-power-partial {
+  background: #3a2c00;
+  color: #fc6;
+  border: 1px solid #6a4c00;
+}
+
+.chip-power-none {
+  background: #3a1a1a;
+  color: #f66;
+  border: 1px solid #6a2a2a;
+}
+
+.pin-v-hi   { color: #6f6; font-size: 10px; font-weight: bold; }
+.pin-v-lo   { color: #f66; font-size: 10px; font-weight: bold; }
+.pin-v-float{ color: #666; font-size: 10px; }
+.pin-v-mid  { color: #fc6; font-size: 10px; }
+
+
+
+/* ── Floating Input Panel (resistor edit, etc.) ─────────────────────────── */
+
+.floating.input-panel {
+  position: fixed;
+  z-index: 1000;
+  background: #1e1e1e;
+  border: 1px solid #555;
+  border-radius: 5px;
+  padding: 10px 12px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.6);
+  min-width: 200px;
+}
+
+.floating.input-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.3px;
+  margin-bottom: 7px;
+}
+
+.floating.input-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.floating.input-field {
+  flex: 1;
+  background: #2a2a2a;
+  border: 1px solid #555;
+  border-radius: 3px;
+  color: #ddd;
+  font-family: inherit;
+  font-size: 13px;
+  padding: 5px 8px;
+  outline: none;
+  min-width: 0;
+}
+
+.floating.input-field:focus {
+  border-color: #888;
+}
+
+.floating.input-units {
+  background: #2a2a2a;
+  border: 1px solid #555;
+  border-radius: 3px;
+  color: #ddd;
+  font-family: inherit;
+  font-size: 13px;
+  padding: 5px 6px;
+  outline: none;
+  cursor: pointer;
+}
+
+.floating.input-units:focus {
+  border-color: #888;
+}
+
+.floating.input-presets {
+  width: 100%;
+  background: #2a2a2a;
+  border: 1px solid #555;
+  border-radius: 3px;
+  color: #ddd;
+  font-family: inherit;
+  font-size: 12px;
+  padding: 5px 6px;
+  margin-top: 6px;
+  outline: none;
+  cursor: pointer;
+}
+
+.floating.input-presets:focus {
+  border-color: #888;
+}
+
+/* ── Circuit Info Panel ──────────────────────────────────────────────────── */
+
+.ci-section-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.3px;
+  margin: 12px 0 5px;
+  border-bottom: 1px solid #333;
+  padding-bottom: 3px;
+}
+
+.ci-section-title:first-child {
+  margin-top: 0;
+}
+
+.ci-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 10px;
+  background: #222;
+  border: 1px solid #383838;
+  border-radius: 3px;
+  margin-bottom: 2px;
+}
+
+.ci-table th {
+  background: #2a2a2a;
+  color: var(--text-muted);
+  padding: 3px 5px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 10px;
+  letter-spacing: 0.2px;
+  border-bottom: 1px solid #383838;
+}
+
+.ci-table td {
+  padding: 3px 5px;
+  border-bottom: 1px solid #2c2c2c;
+  color: #ffffff;
+  vertical-align: middle;
+}
+
+.ci-table tr:last-child td {
+  border-bottom: none;
+}
+
+.ci-table tr:nth-child(even) td {
+  background: #252525;
+}
+
+.ci-lbl {
+  font-weight: bold;
+  color: #aaa;
+  font-family: monospace;
+  white-space: nowrap;
+  width: 32px;
+}
+
+.ci-val {
+  font-family: monospace;
+  color: #bbb;
+  white-space: nowrap;
+  text-align: right;
+}
+
+.ci-conn {
+  font-family: monospace;
+  font-size: 9px;
+  color: #777;
+}
+
+.ci-drop {
+  color: #fc6;
+}
+
+.ci-cur {
+  color: #8cf;
+}
+
+.ci-float {
+  color: var(--text-muted);
+}
+
+/* Net labels */
+.ci-net-vcc    { color: #f66; font-weight: bold; font-family: monospace; }
+.ci-net-gnd    { color: #6af; font-weight: bold; font-family: monospace; }
+.ci-net-num    { color: #aaa; font-family: monospace; }
+.ci-net-short  { color: #f44; font-weight: bold; font-family: monospace; }
+
+/* LED state */
+.ci-led-on  { color: #fa0; font-weight: bold; font-size: 10px; }
+.ci-led-off { color: var(--text-muted); font-size: 10px; }
+
+/* Chip power */
+.ci-powered   { color: #6f6; font-size: 10px; font-weight: bold; }
+.ci-unpowered { color: #f66; font-size: 10px; }
+
+/* Input states */
+.ci-state-on  { color: #6f6; font-size: 10px; font-weight: bold; }
+.ci-state-off { color: #666; font-size: 10px; }
+.ci-state-sw  { color: #8cf; font-size: 10px; }
+
+/* ── Circuit Info Warnings ───────────────────────────────────────────────── */
+
+.ci-warning-item {
+  font-size: 10px;
+  padding: 5px 8px;
+  border-radius: 3px;
+  margin-bottom: 4px;
+  line-height: 1.5;
+}
+
+.ci-warn-error {
+  background: #2e1010;
+  color: #f88;
+  border: 1px solid #5a2020;
+}
+
+.ci-warn-warn {
+  background: #2e2200;
+  color: #fca;
+  border: 1px solid #5a4400;
+}
+
+.ci-over {
+  color: #f66;
+  font-weight: bold;
+  font-family: monospace;
+  font-size: 10px;
+}
+
+.ci-row-warn td {
+  background: #1e0808 !important;
+}
+
+.ci-clickable-row {
+  cursor: pointer;
+}
+
+.ci-clickable-row:hover td {
+  background: #1e2a2a !important;
+}
+
+.ci-selected td {
+  background: #0d2a1a !important;
+  outline: 1px solid #2a6a3a;
+}
+
+.ci-power-table {
+  margin-bottom: 8px;
+}
+
+.ci-info-note {
+  font-size: 10px;
+  color: #789;
+  background: #111a22;
+  border: 1px solid #223344;
+  border-radius: 3px;
+  padding: 5px 8px;
+  margin-top: 5px;
+  line-height: 1.5;
+}
+
+/* ── Text Box Annotations ────────────────────────────────────────────────── */
+
+#textbox-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.textbox {
+  position: absolute;
+  background: #1c1c1c;
+  border: 1.5px solid #555;
+  border-radius: 2px;
+  box-sizing: border-box;
+  pointer-events: all;
+  cursor: grab;
+  user-select: none;
+}
+
+.textbox:active {
+  cursor: grabbing;
+}
+
+.textbox.selected {
+  border-color: #aaa;
+  box-shadow: 0 0 0 1px #555;
+}
+
+.textbox.editing {
+  cursor: default;
+}
+
+.textbox-content {
+  width: 100%;
+  height: 100%;
+  padding: 8px 10px;
+  color: #ffffff;
+  font-family: 'SF Mono', 'Menlo', 'Monaco', 'Consolas', monospace;
+  /* Fixed world-pixel font size; pan/zoom is applied via a CSS transform on
+     #textbox-layer, so text scales naturally with the canvas. */
+  font-size: 13px;
+  line-height: 1.5;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+  outline: none;
+  box-sizing: border-box;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.textbox.editing .textbox-content {
+  pointer-events: all;
+  cursor: text;
+  caret-color: #ffffff;
+  overflow: auto;
+}
+
+/* Corner resize handles shown only when selected */
+.textbox-handle {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  background: #999;
+  border: 1px solid #1c1c1c;
+  border-radius: 1px;
+  display: none;
+  z-index: 2;
+}
+
+.textbox.selected .textbox-handle { display: block; }
+
+.textbox-handle-nw { top: -5px;    left: -5px;   cursor: nw-resize; }
+.textbox-handle-ne { top: -5px;    right: -5px;  cursor: ne-resize; }
+.textbox-handle-sw { bottom: -5px; left: -5px;   cursor: sw-resize; }
+.textbox-handle-se { bottom: -5px; right: -5px;  cursor: se-resize; }
+
+/* ── Right-click context panel controls ──────────────────────────────────── */
+
+.ctx-panel-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.ctx-toggle-item {
+  font-size: 12px;
+  color: #aaa;
+  cursor: pointer;
+  padding: 3px 0;
+  user-select: none;
+}
+
+.ctx-toggle-item::before {
+  content: '○ ';
+  display: inline-block;
+  width: 14px;
+}
+
+.ctx-toggle-item.active {
+  color: #ffffff;
+}
+
+.ctx-toggle-item.active::before {
+  content: '● ';
+  color: #aaa;
+}
+
+.ctx-toggle-item:hover {
+  color: #fff;
+}
+
+.ctx-pullres-link {
+  margin-top: 10px;
+  font-size: 11px;
+}
+
+.ctx-pullres-link a {
+  color: #7af;
+  text-decoration: none;
+}
+
+.ctx-pullres-link a:hover {
+  text-decoration: underline;
+}
+
+.ctx-spdt-list {
+  margin: 8px 0 0 16px;
+  font-size: 11px;
+  color: #aaa;
+  line-height: 1.7;
+}
+
+/* ── Responsive side panel ──────────────────────────────────────────────────
+   Width is now driven by the fluid clamp() in --side-panel-w (see :root).
+   This block is intentionally empty; previously there were hard-coded
+   width overrides at 1400px/1800px which the clamp() now handles. */
+
+/* ── Projects Modal ───────────────────────────────────────────────────────── */
+
+.projects-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.projects-overlay.hidden {
+  display: none;
+}
+
+.projects-modal {
+  background: #1a1a1a;
+  border: 1px solid #2e2e2e;
+  border-radius: 6px;
+  width: 540px;
+  max-width: 92vw;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.8);
+  font-family: 'SF Mono', 'Menlo', monospace;
+  overflow: hidden;
+}
+
+.projects-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px;
+  border-bottom: 1px solid #252525;
+  flex-shrink: 0;
+}
+
+.projects-modal-title {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  color: var(--text);
+}
+
+.projects-modal-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 2px;
+  transition: color 0.15s;
+}
+
+.projects-modal-close:hover {
+  color: #ffffff;
+}
+
+.projects-modal-actions {
+  padding: 14px 20px;
+  border-bottom: 1px solid #252525;
+  flex-shrink: 0;
+}
+
+.projects-btn {
+  font-family: inherit;
+  font-size: 11px;
+  padding: 7px 14px;
+  border-radius: 3px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.projects-btn-primary {
+  background: #252525;
+  border-color: #383838;
+  color: #ffffff;
+  width: 100%;
+}
+
+.projects-btn-primary:hover {
+  background: #2e2e2e;
+  border-color: #444;
+}
+
+.projects-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 6px 0;
+}
+
+.projects-loading,
+.projects-empty,
+.projects-error {
+  padding: 24px 20px;
+  font-size: 12px;
+  text-align: center;
+}
+
+.projects-loading { color: var(--text-muted); }
+.projects-empty   { color: var(--text-muted); }
+.projects-error   { color: #c06060; }
+
+.project-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 11px 20px;
+  border-bottom: 1px solid #1e1e1e;
+  transition: background 0.1s;
+}
+
+.project-row:last-child {
+  border-bottom: none;
+}
+
+.project-row:hover {
+  background: #212121;
+}
+
+.project-row-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.project-row-name {
+  font-size: 12px;
+  color: #ddd;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.project-row-meta {
+  font-size: 11px;
+  color: var(--text-faint);
+  margin-top: 3px;
+}
+
+.project-row-btns {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.project-btn {
+  font-family: inherit;
+  font-size: 10px;
+  padding: 4px 10px;
+  border-radius: 3px;
+  cursor: pointer;
+  background: none;
+  border: 1px solid #333;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.project-btn-open {
+  color: #aaa;
+}
+
+.project-btn-open:hover {
+  background: #2a2a2a;
+  border-color: #555;
+  color: #eee;
+}
+
+.project-btn-delete {
+  color: #7a3a3a;
+  border-color: #3a2a2a;
+}
+
+.project-btn-delete:hover {
+  background: #2a1818;
+  border-color: #6a3333;
+  color: #c06060;
+}
+
+.projects-modal-footer {
+  padding: 11px 20px;
+  border-top: 1px solid #252525;
+  flex-shrink: 0;
+}
+
+.projects-quota {
+  font-size: 11px;
+  color: var(--text-faint);
+}
+

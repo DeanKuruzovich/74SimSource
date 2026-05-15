@@ -1,0 +1,38 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Node
+node_modules/
+
+# Build artifacts
+dist-app/
+src-tauri/target/
+
+# Environment / secrets (never commit these)
+.env
+.env.local
+spaces.env
+
+# Backup files
+*.bak
+*.backup
+*.orig
+
+# IDE
+.vscode/
+.idea/
+
+helperscripts
+updatingTools
+scripts
+
+# Deployment/release files
+desktop-latest.json
+latestVersionInfo.json
+releases
+reports
+
+# Claude / internal dev docs
+CLAUDE.md
+DesktopGuide.md

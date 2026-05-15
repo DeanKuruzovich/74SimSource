@@ -1,0 +1,1491 @@
+{
+  "title": "Linkable Terms for 74Sim Docs",
+  "generatedAt": "2026-05-11",
+  "preferredSourcePolicy": "Prefer Wikipedia article URLs; use section anchors when no standalone article exists; alternative sources only for poor or unavailable Wikipedia coverage.",
+  "categories": [
+    {
+      "name": "LOGIC GATES",
+      "terms": [
+        {
+          "term": "AND gate",
+          "url": "https://en.wikipedia.org/wiki/AND_gate",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "OR gate",
+          "url": "https://en.wikipedia.org/wiki/OR_gate",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "NAND gate",
+          "url": "https://en.wikipedia.org/wiki/NAND_gate",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "NOR gate",
+          "url": "https://en.wikipedia.org/wiki/NOR_gate",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "XOR gate (exclusive-OR)",
+          "url": "https://en.wikipedia.org/wiki/XOR_gate",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "XNOR gate (exclusive-NOR)",
+          "url": "https://en.wikipedia.org/wiki/XNOR_gate",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "NOT gate",
+          "url": "https://en.wikipedia.org/wiki/NOT_gate",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Buffer (logic)",
+          "url": "https://en.wikipedia.org/wiki/Buffer",
+          "source": "wikipedia",
+          "matchType": "close"
+        },
+        {
+          "term": "Hex inverter",
+          "url": "https://en.wikipedia.org/wiki/Inverter_(logic_gate)",
+          "source": "wikipedia",
+          "matchType": "close"
+        },
+        {
+          "term": "AND-OR-INVERT (AOI) gate",
+          "url": "https://en.wikipedia.org/wiki/AND-OR-invert",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Universal gate",
+          "url": "https://en.wikipedia.org/wiki/NAND_gate#Universal_gates",
+          "source": "wikipedia-section",
+          "matchType": "close"
+        },
+        {
+          "term": "Functional completeness",
+          "url": "https://en.wikipedia.org/wiki/Functional_completeness",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Totem-pole output",
+          "url": "https://en.wikipedia.org/wiki/Transistor%E2%80%93transistor_logic#Output_stages",
+          "source": "wikipedia-section",
+          "matchType": "close"
+        },
+        {
+          "term": "Active pull up",
+          "url": "https://en.wikipedia.org/wiki/Pull up_resistor",
+          "source": "wikipedia-section",
+          "matchType": "broader"
+        },
+        {
+          "term": "Active pull down",
+          "url": "https://en.wikipedia.org/wiki/Pull down_resistor",
+          "source": "wikipedia-section",
+          "matchType": "broader"
+        },
+        {
+          "term": "Complementary outputs",
+          "url": "https://en.wikipedia.org/wiki/Push%E2%80%93pull_output",
+          "source": "wikipedia",
+          "matchType": "close"
+        }
+      ]
+    },
+    {
+      "name": "MEMORY ELEMENTS",
+      "terms": [
+        {
+          "term": "Latch",
+          "url": "https://en.wikipedia.org/wiki/Latch",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "SR latch",
+          "url": "https://en.wikipedia.org/wiki/SR_latch",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Gated SR latch",
+          "url": "https://en.wikipedia.org/wiki/SR_latch#Gated_SR_latch",
+          "source": "wikipedia-section",
+          "matchType": "close"
+        },
+        {
+          "term": "D latch (transparent latch)",
+          "url": "https://en.wikipedia.org/wiki/Flip-flop_(electronics)#D_latch",
+          "source": "wikipedia-section",
+          "matchType": "close"
+        },
+        {
+          "term": "Flip-flop",
+          "url": "https://en.wikipedia.org/wiki/Flip-flop_(electronics)",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "D flip-flop",
+          "url": "https://en.wikipedia.org/wiki/Flip-flop_(electronics)#D_flip-flop",
+          "source": "wikipedia-section",
+          "matchType": "close"
+        },
+        {
+          "term": "JK flip-flop",
+          "url": "https://en.wikipedia.org/wiki/JK_flip-flop",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "T flip-flop (toggle flip-flop)",
+          "url": "https://en.wikipedia.org/wiki/Flip-flop_(electronics)#T_flip-flop",
+          "source": "wikipedia-section",
+          "matchType": "close"
+        },
+        {
+          "term": "SR flip-flop",
+          "url": "https://en.wikipedia.org/wiki/SR_flip-flop",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Master-slave flip-flop (leader-follower flip-flop)",
+          "url": "https://en.wikipedia.org/wiki/Flip-flop_(electronics)#Master%E2%80%93slave",
+          "source": "wikipedia-section",
+          "matchType": "close"
+        },
+        {
+          "term": "Edge-triggered",
+          "url": "https://en.wikipedia.org/wiki/Flip-flop_(electronics)#Edge-triggered",
+          "source": "wikipedia-section",
+          "matchType": "close"
+        },
+        {
+          "term": "Level-sensitive",
+          "url": "https://en.wikipedia.org/wiki/Latch",
+          "source": "wikipedia",
+          "matchType": "broader"
+        },
+        {
+          "term": "Asynchronous preset",
+          "url": "https://en.wikipedia.org/wiki/Flip-flop_(electronics)#Asynchronous_inputs",
+          "source": "wikipedia-section",
+          "matchType": "close"
+        },
+        {
+          "term": "Asynchronous clear",
+          "url": "https://en.wikipedia.org/wiki/Flip-flop_(electronics)#Asynchronous_inputs",
+          "source": "wikipedia-section",
+          "matchType": "close"
+        },
+        {
+          "term": "Ones catching",
+          "url": "https://en.wikipedia.org/wiki/SR_latch#Race_condition",
+          "source": "wikipedia-section",
+          "matchType": "close"
+        }
+      ]
+    },
+    {
+      "name": "REGISTERS & SEQUENTIAL LOGIC",
+      "terms": [
+        {
+          "term": "Register",
+          "url": "https://en.wikipedia.org/wiki/Processor_register",
+          "source": "wikipedia",
+          "matchType": "broader"
+        },
+        {
+          "term": "Shift register",
+          "url": "https://en.wikipedia.org/wiki/Shift_register",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "SIPO (serial-in parallel-out)",
+          "url": "https://en.wikipedia.org/wiki/Shift_register#SIPO",
+          "source": "wikipedia-section",
+          "matchType": "close"
+        },
+        {
+          "term": "PISO (parallel-in serial-out)",
+          "url": "https://en.wikipedia.org/wiki/Shift_register#PISO",
+          "source": "wikipedia-section",
+          "matchType": "close"
+        },
+        {
+          "term": "Bidirectional shift register",
+          "url": "https://en.wikipedia.org/wiki/Shift_register#Bidirectional_shift_register",
+          "source": "wikipedia-section",
+          "matchType": "close"
+        },
+        {
+          "term": "Universal shift register",
+          "url": "https://en.wikipedia.org/wiki/Shift_register#Universal_shift_register",
+          "source": "wikipedia-section",
+          "matchType": "close"
+        },
+        {
+          "term": "State machine",
+          "url": "https://en.wikipedia.org/wiki/Finite-state_machine",
+          "source": "wikipedia",
+          "matchType": "close"
+        },
+        {
+          "term": "State diagram",
+          "url": "https://en.wikipedia.org/wiki/State_diagram",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Sequential circuit",
+          "url": "https://en.wikipedia.org/wiki/Sequential_logic",
+          "source": "wikipedia",
+          "matchType": "close"
+        },
+        {
+          "term": "Synchronous design",
+          "url": "https://en.wikipedia.org/wiki/Synchronous_circuit",
+          "source": "wikipedia",
+          "matchType": "close"
+        }
+      ]
+    },
+    {
+      "name": "COUNTERS",
+      "terms": [
+        {
+          "term": "Binary counter",
+          "url": "https://en.wikipedia.org/wiki/Counter_(digital)#Binary_counter",
+          "source": "wikipedia-section",
+          "matchType": "close"
+        },
+        {
+          "term": "Decade counter",
+          "url": "https://en.wikipedia.org/wiki/Decade_counter",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Ripple counter (asynchronous counter)",
+          "url": "https://en.wikipedia.org/wiki/Counter_(digital)#Ripple_counter",
+          "source": "wikipedia-section",
+          "matchType": "close"
+        },
+        {
+          "term": "Synchronous counter",
+          "url": "https://en.wikipedia.org/wiki/Counter_(digital)#Synchronous_counter",
+          "source": "wikipedia-section",
+          "matchType": "close"
+        },
+        {
+          "term": "Up/down counter",
+          "url": "https://en.wikipedia.org/wiki/Counter_(digital)#Up%E2%80%93down_counter",
+          "source": "wikipedia-section",
+          "matchType": "close"
+        },
+        {
+          "term": "Johnson counter",
+          "url": "https://en.wikipedia.org/wiki/Johnson_counter",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Ring counter",
+          "url": "https://en.wikipedia.org/wiki/Ring_counter",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Modulo-N counter",
+          "url": "https://en.wikipedia.org/wiki/Counter_(digital)#Modulo_counter",
+          "source": "wikipedia-section",
+          "matchType": "close"
+        },
+        {
+          "term": "Presettable counter",
+          "url": "https://en.wikipedia.org/wiki/Counter_(digital)#Presettable_counter",
+          "source": "wikipedia-section",
+          "matchType": "close"
+        },
+        {
+          "term": "Terminal count",
+          "url": "https://en.wikipedia.org/wiki/Counter_(digital)#Terminal_count",
+          "source": "wikipedia-section",
+          "matchType": "close"
+        },
+        {
+          "term": "Ripple carry output (RCO)",
+          "url": "https://en.wikipedia.org/wiki/Counter_(digital)#Ripple_carry",
+          "source": "wikipedia-section",
+          "matchType": "close"
+        },
+        {
+          "term": "Frequency divider",
+          "url": "https://en.wikipedia.org/wiki/Frequency_divider",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Divide-by-2",
+          "url": "https://en.wikipedia.org/wiki/Frequency_divider#Divide-by-2_divider",
+          "source": "wikipedia-section",
+          "matchType": "close"
+        },
+        {
+          "term": "Binary rate multiplier",
+          "url": "https://en.wikipedia.org/wiki/Rate_multiplier",
+          "source": "wikipedia",
+          "matchType": "close"
+        },
+        {
+          "term": "Programmable frequency divider",
+          "url": "https://en.wikipedia.org/wiki/Frequency_divider#Programmable_dividers",
+          "source": "wikipedia-section",
+          "matchType": "close"
+        }
+      ]
+    },
+    {
+      "name": "DATA ROUTING",
+      "terms": [
+        {
+          "term": "Multiplexer (data selector)",
+          "url": "https://en.wikipedia.org/wiki/Multiplexer",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Demultiplexer",
+          "url": "https://en.wikipedia.org/wiki/Multiplexer#Demultiplexer",
+          "source": "wikipedia-section",
+          "matchType": "close"
+        },
+        {
+          "term": "Decoder",
+          "url": "https://en.wikipedia.org/wiki/Binary_decoder",
+          "source": "wikipedia",
+          "matchType": "close"
+        },
+        {
+          "term": "Encoder",
+          "url": "https://en.wikipedia.org/wiki/Encoder_(digital)",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Priority encoder",
+          "url": "https://en.wikipedia.org/wiki/Priority_encoder",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Addressable latch",
+          "url": "https://en.wikipedia.org/wiki/Latch",
+          "source": "wikipedia",
+          "matchType": "broader"
+        },
+        {
+          "term": "Address decoding",
+          "url": "https://en.wikipedia.org/wiki/Address_decoder",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Address multiplexing",
+          "url": "https://en.wikipedia.org/wiki/Memory_address#Address_multiplexing",
+          "source": "wikipedia-section",
+          "matchType": "close"
+        },
+        {
+          "term": "Memory-mapped I/O",
+          "url": "https://en.wikipedia.org/wiki/Memory-mapped_I/O",
+          "source": "wikipedia",
+          "matchType": "exact"
+        }
+      ]
+    },
+    {
+      "name": "ARITHMETIC",
+      "terms": [
+        {
+          "term": "Adder",
+          "url": "https://en.wikipedia.org/wiki/Adder_(electronics)",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Half adder",
+          "url": "https://en.wikipedia.org/wiki/Adder_(electronics)#Half_adder",
+          "source": "wikipedia-section",
+          "matchType": "close"
+        },
+        {
+          "term": "Full adder",
+          "url": "https://en.wikipedia.org/wiki/Adder_(electronics)#Full_adder",
+          "source": "wikipedia-section",
+          "matchType": "close"
+        },
+        {
+          "term": "Carry ripple / ripple carry",
+          "url": "https://en.wikipedia.org/wiki/Adder_(electronics)#Ripple_carry_adder",
+          "source": "wikipedia-section",
+          "matchType": "close"
+        },
+        {
+          "term": "Carry lookahead",
+          "url": "https://en.wikipedia.org/wiki/Carry_lookahead_adder",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Carry generate",
+          "url": "https://en.wikipedia.org/wiki/Carry_lookahead_adder#Generate_and_propagate",
+          "source": "wikipedia-section",
+          "matchType": "close"
+        },
+        {
+          "term": "Carry propagate",
+          "url": "https://en.wikipedia.org/wiki/Carry_lookahead_adder#Generate_and_propagate",
+          "source": "wikipedia-section",
+          "matchType": "close"
+        },
+        {
+          "term": "Carry-in / carry-out",
+          "url": "https://en.wikipedia.org/wiki/Adder_(electronics)#Carry_input_and_output",
+          "source": "wikipedia-section",
+          "matchType": "close"
+        },
+        {
+          "term": "Wallace tree (carry save)",
+          "url": "https://en.wikipedia.org/wiki/Wallace_tree",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Magnitude comparator",
+          "url": "https://en.wikipedia.org/wiki/Magnitude_comparator",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "ALU (arithmetic logic unit)",
+          "url": "https://en.wikipedia.org/wiki/Arithmetic_logic_unit",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Accumulator",
+          "url": "https://en.wikipedia.org/wiki/Accumulator_(computing)",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Two's complement",
+          "url": "https://en.wikipedia.org/wiki/Two%27s_complement",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "One's complement",
+          "url": "https://en.wikipedia.org/wiki/One%27s_complement",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Binary weighted",
+          "url": "https://en.wikipedia.org/wiki/Weighted_code",
+          "source": "wikipedia",
+          "matchType": "close"
+        }
+      ]
+    },
+    {
+      "name": "DISPLAY & ENCODING",
+      "terms": [
+        {
+          "term": "Seven-segment display",
+          "url": "https://en.wikipedia.org/wiki/Seven-segment_display",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "BCD-to-seven-segment decoder",
+          "url": "https://en.wikipedia.org/wiki/Seven-segment_display#Decoder",
+          "source": "wikipedia-section",
+          "matchType": "close"
+        },
+        {
+          "term": "Ripple blanking",
+          "url": "https://en.wikipedia.org/wiki/Seven-segment_display#Ripple_blanking",
+          "source": "wikipedia-section",
+          "matchType": "close"
+        },
+        {
+          "term": "Zero suppression (leading zero suppression)",
+          "url": "https://en.wikipedia.org/wiki/Seven-segment_display#Zero_suppression",
+          "source": "wikipedia-section",
+          "matchType": "close"
+        },
+        {
+          "term": "Common-anode",
+          "url": "https://en.wikipedia.org/wiki/Seven-segment_display#Common-anode",
+          "source": "wikipedia-section",
+          "matchType": "close"
+        },
+        {
+          "term": "Common-cathode",
+          "url": "https://en.wikipedia.org/wiki/Seven-segment_display#Common-cathode",
+          "source": "wikipedia-section",
+          "matchType": "close"
+        },
+        {
+          "term": "Lamp test",
+          "url": "https://en.wikipedia.org/wiki/Seven-segment_display#Lamp_test",
+          "source": "wikipedia-section",
+          "matchType": "close"
+        }
+      ]
+    },
+    {
+      "name": "BUS & INTERFACE",
+      "terms": [
+        {
+          "term": "Bus transceiver",
+          "url": "https://en.wikipedia.org/wiki/Transceiver",
+          "source": "wikipedia",
+          "matchType": "broader"
+        },
+        {
+          "term": "Bidirectional transceiver",
+          "url": "https://en.wikipedia.org/wiki/Transceiver",
+          "source": "wikipedia",
+          "matchType": "broader"
+        },
+        {
+          "term": "Bus driver",
+          "url": "https://en.wikipedia.org/wiki/Line_driver",
+          "source": "wikipedia",
+          "matchType": "close"
+        },
+        {
+          "term": "Line driver",
+          "url": "https://en.wikipedia.org/wiki/Line_driver",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Line receiver",
+          "url": "https://en.wikipedia.org/wiki/Line_driver",
+          "source": "wikipedia",
+          "matchType": "broader"
+        },
+        {
+          "term": "Data bus",
+          "url": "https://en.wikipedia.org/wiki/Bus_(computing)#Data_bus",
+          "source": "wikipedia-section",
+          "matchType": "close"
+        },
+        {
+          "term": "Address bus",
+          "url": "https://en.wikipedia.org/wiki/Bus_(computing)#Address_bus",
+          "source": "wikipedia-section",
+          "matchType": "close"
+        },
+        {
+          "term": "Control bus",
+          "url": "https://en.wikipedia.org/wiki/Bus_(computing)#Control_bus",
+          "source": "wikipedia-section",
+          "matchType": "close"
+        },
+        {
+          "term": "Bus contention",
+          "url": "https://en.wikipedia.org/wiki/Bus_contention",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Wired AND",
+          "url": "https://en.wikipedia.org/wiki/Wired_AND",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Wired OR",
+          "url": "https://en.wikipedia.org/wiki/Wired_OR",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Open collector",
+          "url": "https://en.wikipedia.org/wiki/Open_collector",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Open drain",
+          "url": "https://en.wikipedia.org/wiki/Open_drain",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Tri-state (three-state) output",
+          "url": "https://en.wikipedia.org/wiki/Tri-state",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "High impedance (Hi-Z)",
+          "url": "https://en.wikipedia.org/wiki/High_impedance",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Pull up resistor",
+          "url": "https://en.wikipedia.org/wiki/Pull up_resistor",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Pull down resistor",
+          "url": "https://en.wikipedia.org/wiki/Pull down_resistor",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Bus hold / bus keeper",
+          "url": "https://en.wikipedia.org/wiki/Bus-holder",
+          "source": "wikipedia",
+          "matchType": "close"
+        },
+        {
+          "term": "Bus termination",
+          "url": "https://en.wikipedia.org/wiki/Transmission_line#Termination",
+          "source": "wikipedia-section",
+          "matchType": "close"
+        },
+        {
+          "term": "Bus arbitration",
+          "url": "https://en.wikipedia.org/wiki/Bus_arbitration",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Backplane",
+          "url": "https://en.wikipedia.org/wiki/Backplane",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Differential signaling",
+          "url": "https://en.wikipedia.org/wiki/Differential_signaling",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "GTL (gunning transceiver logic)",
+          "url": "https://en.wikipedia.org/wiki/Gunning_transceiver_logic",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "FIFO (first-in first-out)",
+          "url": "https://en.wikipedia.org/wiki/FIFO_(computing_and_electronics)",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "LIFO (last-in first-out)",
+          "url": "https://en.wikipedia.org/wiki/Stack_(abstract_data_type)",
+          "source": "wikipedia",
+          "matchType": "close"
+        },
+        {
+          "term": "Glue logic",
+          "url": "https://en.wikipedia.org/wiki/Glue_logic",
+          "source": "wikipedia",
+          "matchType": "exact"
+        }
+      ]
+    },
+    {
+      "name": "LOGIC FAMILIES",
+      "terms": [
+        {
+          "term": "TTL (transistor-transistor logic)",
+          "url": "https://en.wikipedia.org/wiki/Transistor%E2%80%93transistor_logic",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "CMOS",
+          "url": "https://en.wikipedia.org/wiki/CMOS",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Schottky",
+          "url": "https://en.wikipedia.org/wiki/Schottky_diode",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Low-power Schottky (74LS)",
+          "url": "https://en.wikipedia.org/wiki/Transistor%E2%80%93transistor_logic#74LS",
+          "source": "wikipedia-section",
+          "matchType": "close"
+        },
+        {
+          "term": "High-speed CMOS (74HC)",
+          "url": "https://en.wikipedia.org/wiki/CMOS#74_series_CMOS",
+          "source": "wikipedia-section",
+          "matchType": "close"
+        },
+        {
+          "term": "Bipolar transistor",
+          "url": "https://en.wikipedia.org/wiki/Bipolar_junction_transistor",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Fan-out",
+          "url": "https://en.wikipedia.org/wiki/Fan-out",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Noise margin",
+          "url": "https://en.wikipedia.org/wiki/Noise_margin",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Noise immunity",
+          "url": "https://en.wikipedia.org/wiki/Noise_immunity",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Logic levels",
+          "url": "https://en.wikipedia.org/wiki/Logic_level",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Supply voltage",
+          "url": "https://en.wikipedia.org/wiki/Power_supply",
+          "source": "wikipedia",
+          "matchType": "broader"
+        },
+        {
+          "term": "ESD (electrostatic discharge)",
+          "url": "https://en.wikipedia.org/wiki/Electrostatic_discharge",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Decoupling capacitor",
+          "url": "https://en.wikipedia.org/wiki/Decoupling_capacitor",
+          "source": "wikipedia",
+          "matchType": "exact"
+        }
+      ]
+    },
+    {
+      "name": "TIMING",
+      "terms": [
+        {
+          "term": "Propagation delay",
+          "url": "https://en.wikipedia.org/wiki/Propagation_delay",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Setup time",
+          "url": "https://en.wikipedia.org/wiki/Flip-flop_(electronics)",
+          "source": "wikipedia",
+          "matchType": "broader"
+        },
+        {
+          "term": "Hold time",
+          "url": "https://en.wikipedia.org/wiki/Flip-flop_(electronics)",
+          "source": "wikipedia",
+          "matchType": "broader"
+        },
+        {
+          "term": "Clock-to-Q delay",
+          "url": "https://en.wikipedia.org/wiki/Flip-flop_(electronics)",
+          "source": "wikipedia",
+          "matchType": "broader"
+        },
+        {
+          "term": "Metastability",
+          "url": "https://en.wikipedia.org/wiki/Metastability_(electronics)",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Clock skew",
+          "url": "https://en.wikipedia.org/wiki/Clock_skew",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Rising edge",
+          "url": "https://en.wikipedia.org/wiki/Signal_edge",
+          "source": "wikipedia",
+          "matchType": "close"
+        },
+        {
+          "term": "Falling edge",
+          "url": "https://en.wikipedia.org/wiki/Signal_edge",
+          "source": "wikipedia",
+          "matchType": "close"
+        },
+        {
+          "term": "Duty cycle",
+          "url": "https://en.wikipedia.org/wiki/Duty_cycle",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Clock enable",
+          "url": "https://en.wikipedia.org/wiki/Clock_gating",
+          "source": "wikipedia",
+          "matchType": "close"
+        },
+        {
+          "term": "Clock domain",
+          "url": "https://en.wikipedia.org/wiki/Clock_domain",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Clock gating",
+          "url": "https://en.wikipedia.org/wiki/Clock_gating",
+          "source": "wikipedia",
+          "matchType": "exact"
+        }
+      ]
+    },
+    {
+      "name": "SIGNAL INTEGRITY & ANALOG CONCEPTS",
+      "terms": [
+        {
+          "term": "Floating input",
+          "url": "https://learn.sparkfun.com/tutorials/pull up-resistors/all",
+          "source": "other",
+          "matchType": "close"
+        },
+        {
+          "term": "Schmitt trigger",
+          "url": "https://en.wikipedia.org/wiki/Schmitt_trigger",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Hysteresis",
+          "url": "https://en.wikipedia.org/wiki/Hysteresis",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Debounce",
+          "url": "https://en.wikipedia.org/wiki/Debouncing",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Slew rate",
+          "url": "https://en.wikipedia.org/wiki/Slew_rate",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Signal integrity",
+          "url": "https://en.wikipedia.org/wiki/Signal_integrity",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Impedance",
+          "url": "https://en.wikipedia.org/wiki/Electrical_impedance",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Output impedance",
+          "url": "https://en.wikipedia.org/wiki/Output_impedance",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "RC circuit",
+          "url": "https://en.wikipedia.org/wiki/RC_circuit",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Time constant",
+          "url": "https://en.wikipedia.org/wiki/Time_constant",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Decoupling capacitor",
+          "url": "https://en.wikipedia.org/wiki/Decoupling_capacitor",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Totem-pole output",
+          "url": "https://en.wikipedia.org/wiki/Transistor%E2%80%93transistor_logic#Output_stages",
+          "source": "wikipedia-section",
+          "matchType": "close"
+        },
+        {
+          "term": "Diode",
+          "url": "https://en.wikipedia.org/wiki/Diode",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Forward bias",
+          "url": "https://en.wikipedia.org/wiki/Forward_bias",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Reverse bias",
+          "url": "https://en.wikipedia.org/wiki/Reverse_bias",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Forward voltage",
+          "url": "https://en.wikipedia.org/wiki/Forward_voltage",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Shockley diode equation",
+          "url": "https://en.wikipedia.org/wiki/Shockley_ideal_diode_equation",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Bipolar transistor",
+          "url": "https://en.wikipedia.org/wiki/Bipolar_junction_transistor",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Oscillator",
+          "url": "https://en.wikipedia.org/wiki/Oscillator",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Ring oscillator",
+          "url": "https://en.wikipedia.org/wiki/Ring_oscillator",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "RC oscillator",
+          "url": "https://en.wikipedia.org/wiki/RC_oscillator",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Monostable multivibrator (one-shot)",
+          "url": "https://en.wikipedia.org/wiki/Monostable_multivibrator",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Retriggerable one-shot",
+          "url": "https://en.wikipedia.org/wiki/Monostable_multivibrator#Retriggerable_design",
+          "source": "wikipedia-section",
+          "matchType": "close"
+        },
+        {
+          "term": "Astable multivibrator",
+          "url": "https://en.wikipedia.org/wiki/Astable_multivibrator",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Phase-locked loop (PLL)",
+          "url": "https://en.wikipedia.org/wiki/Phase-locked_loop",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Voltage-controlled oscillator (VCO)",
+          "url": "https://en.wikipedia.org/wiki/Voltage-controlled_oscillator",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Phase comparator",
+          "url": "https://en.wikipedia.org/wiki/Phase_detector",
+          "source": "wikipedia",
+          "matchType": "close"
+        },
+        {
+          "term": "Frequency synthesizer",
+          "url": "https://en.wikipedia.org/wiki/Frequency_synthesizer",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Sample and hold",
+          "url": "https://en.wikipedia.org/wiki/Sample_and_hold",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Charge pump",
+          "url": "https://en.wikipedia.org/wiki/Charge_pump",
+          "source": "wikipedia",
+          "matchType": "exact"
+        }
+      ]
+    },
+    {
+      "name": "BOOLEAN ALGEBRA & LOGIC DESIGN",
+      "terms": [
+        {
+          "term": "Boolean algebra",
+          "url": "https://en.wikipedia.org/wiki/Boolean_algebra",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Truth table",
+          "url": "https://en.wikipedia.org/wiki/Truth_table",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Characteristic equation",
+          "url": "https://en.wikipedia.org/wiki/Flip-flop_(electronics)",
+          "source": "wikipedia",
+          "matchType": "broader"
+        },
+        {
+          "term": "Excitation table",
+          "url": "https://en.wikipedia.org/wiki/Excitation_table",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Sum-of-products (SOP)",
+          "url": "https://en.wikipedia.org/wiki/Canonical_normal_form#Disjunctive_normal_form",
+          "source": "wikipedia-section",
+          "matchType": "close"
+        },
+        {
+          "term": "De Morgan's theorem",
+          "url": "https://en.wikipedia.org/wiki/De_Morgan%27s_laws",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Karnaugh map",
+          "url": "https://en.wikipedia.org/wiki/Karnaugh_map",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Combinational logic",
+          "url": "https://en.wikipedia.org/wiki/Combinational_logic",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Active LOW",
+          "url": "https://en.wikipedia.org/wiki/Logic_level",
+          "source": "wikipedia",
+          "matchType": "broader"
+        },
+        {
+          "term": "Active HIGH",
+          "url": "https://en.wikipedia.org/wiki/Logic_level",
+          "source": "wikipedia",
+          "matchType": "broader"
+        },
+        {
+          "term": "Parity bit",
+          "url": "https://en.wikipedia.org/wiki/Parity_bit",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Parity generator",
+          "url": "https://en.wikipedia.org/wiki/Parity_bit",
+          "source": "wikipedia",
+          "matchType": "broader"
+        },
+        {
+          "term": "Parity checker",
+          "url": "https://en.wikipedia.org/wiki/Parity_bit",
+          "source": "wikipedia",
+          "matchType": "broader"
+        },
+        {
+          "term": "Even parity",
+          "url": "https://en.wikipedia.org/wiki/Parity_bit#Even_parity",
+          "source": "wikipedia-section",
+          "matchType": "close"
+        },
+        {
+          "term": "Odd parity",
+          "url": "https://en.wikipedia.org/wiki/Parity_bit#Odd_parity",
+          "source": "wikipedia-section",
+          "matchType": "close"
+        },
+        {
+          "term": "Error detection",
+          "url": "https://en.wikipedia.org/wiki/Error_detection_and_correction#Error_detection",
+          "source": "wikipedia-section",
+          "matchType": "close"
+        },
+        {
+          "term": "Error correction",
+          "url": "https://en.wikipedia.org/wiki/Error_correction_code",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Hamming code",
+          "url": "https://en.wikipedia.org/wiki/Hamming_code",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "CRC (cyclic redundancy check)",
+          "url": "https://en.wikipedia.org/wiki/Cyclic_redundancy_check",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Gray code",
+          "url": "https://en.wikipedia.org/wiki/Gray_code",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "BCD (Binary Coded Decimal)",
+          "url": "https://en.wikipedia.org/wiki/Binary-coded_decimal",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Binary",
+          "url": "https://en.wikipedia.org/wiki/Binary_number",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Hexadecimal",
+          "url": "https://en.wikipedia.org/wiki/Hexadecimal",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Octal",
+          "url": "https://en.wikipedia.org/wiki/Octal",
+          "source": "wikipedia",
+          "matchType": "exact"
+        }
+      ]
+    },
+    {
+      "name": "CIRCUIT ANALYSIS & SIMULATION",
+      "terms": [
+        {
+          "term": "Modified Nodal Analysis (MNA)",
+          "url": "https://en.wikipedia.org/wiki/Nodal_analysis#Modified_nodal_analysis",
+          "source": "wikipedia-section",
+          "matchType": "close"
+        },
+        {
+          "term": "Kirchhoff's Current Law",
+          "url": "https://en.wikipedia.org/wiki/Kirchhoff%27s_circuit_laws#Kirchhoff%27s_current_law",
+          "source": "wikipedia-section",
+          "matchType": "close"
+        },
+        {
+          "term": "Norton equivalent",
+          "url": "https://en.wikipedia.org/wiki/Norton%27s_theorem",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Thevenin equivalent",
+          "url": "https://en.wikipedia.org/wiki/Th%C3%A9venin%27s_theorem",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Ohm's law",
+          "url": "https://en.wikipedia.org/wiki/Ohm%27s_law",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Gaussian elimination",
+          "url": "https://en.wikipedia.org/wiki/Gaussian_elimination",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Backward Euler method",
+          "url": "https://en.wikipedia.org/wiki/Backward_Euler_method",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Newton-Raphson iteration",
+          "url": "https://en.wikipedia.org/wiki/Newton%27s_method",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Netlist",
+          "url": "https://en.wikipedia.org/wiki/Netlist",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Conductance matrix",
+          "url": "https://en.wikipedia.org/wiki/Admittance_matrix",
+          "source": "wikipedia",
+          "matchType": "close"
+        },
+        {
+          "term": "Event-driven simulation",
+          "url": "https://en.wikipedia.org/wiki/Discrete-event_simulation",
+          "source": "wikipedia",
+          "matchType": "close"
+        },
+        {
+          "term": "Union-find algorithm",
+          "url": "https://en.wikipedia.org/wiki/Disjoint-set_data_structure",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Fixed-point iteration",
+          "url": "https://en.wikipedia.org/wiki/Fixed-point_iteration",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Transient response",
+          "url": "https://en.wikipedia.org/wiki/Transient_response",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Steady state",
+          "url": "https://en.wikipedia.org/wiki/Steady_state",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "DC operating point",
+          "url": "https://en.wikipedia.org/wiki/Operating_point",
+          "source": "wikipedia",
+          "matchType": "close"
+        }
+      ]
+    },
+    {
+      "name": "ANALOG COMPONENTS",
+      "terms": [
+        {
+          "term": "R-2R ladder network",
+          "url": "https://en.wikipedia.org/wiki/Resistor_ladder",
+          "source": "wikipedia",
+          "matchType": "close"
+        },
+        {
+          "term": "DAC (digital-to-analog converter)",
+          "url": "https://en.wikipedia.org/wiki/Digital-to-analog_converter",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "ADC (analog-to-digital converter)",
+          "url": "https://en.wikipedia.org/wiki/Analog-to-digital_converter",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Voltage comparator",
+          "url": "https://en.wikipedia.org/wiki/Comparator",
+          "source": "wikipedia",
+          "matchType": "close"
+        },
+        {
+          "term": "Window comparator",
+          "url": "https://en.wikipedia.org/wiki/Window_comparator",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Reference voltage",
+          "url": "https://en.wikipedia.org/wiki/Voltage_reference",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Majority logic",
+          "url": "https://en.wikipedia.org/wiki/Majority_function",
+          "source": "wikipedia",
+          "matchType": "exact"
+        }
+      ]
+    },
+    {
+      "name": "PHYSICAL & PACKAGING",
+      "terms": [
+        {
+          "term": "Breadboard",
+          "url": "https://en.wikipedia.org/wiki/Breadboard",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "DIP package (dual in-line package)",
+          "url": "https://en.wikipedia.org/wiki/Dual_in_line_package",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Through-hole",
+          "url": "https://en.wikipedia.org/wiki/Through-hole_technology",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Pinout",
+          "url": "https://en.wikipedia.org/wiki/Pinout",
+          "source": "wikipedia",
+          "matchType": "exact"
+        }
+      ]
+    },
+    {
+      "name": "OTHER / MISCELLANEOUS",
+      "terms": [
+        {
+          "term": "JTAG (boundary scan)",
+          "url": "https://en.wikipedia.org/wiki/JTAG",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "SRAM (static RAM)",
+          "url": "https://en.wikipedia.org/wiki/Static_random-access_memory",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "DRAM (dynamic RAM)",
+          "url": "https://en.wikipedia.org/wiki/Dynamic_random-access_memory",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Relay driver",
+          "url": "https://en.wikipedia.org/wiki/Relay",
+          "source": "wikipedia",
+          "matchType": "broader"
+        },
+        {
+          "term": "Oscilloscope",
+          "url": "https://en.wikipedia.org/wiki/Oscilloscope",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Logic analyzer",
+          "url": "https://en.wikipedia.org/wiki/Logic_analyzer",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Logic probe",
+          "url": "https://en.wikipedia.org/wiki/Logic_probe",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Multimeter",
+          "url": "https://en.wikipedia.org/wiki/Multimeter",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Glitch",
+          "url": "https://en.wikipedia.org/wiki/Glitch",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Race condition",
+          "url": "https://en.wikipedia.org/wiki/Race_condition",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Logic hazard",
+          "url": "https://en.wikipedia.org/wiki/Hazard_(logic)",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Display multiplexing",
+          "url": "https://en.wikipedia.org/wiki/Multiplexing#Display_multiplexing",
+          "source": "wikipedia-section",
+          "matchType": "close"
+        },
+        {
+          "term": "Level translation",
+          "url": "https://en.wikipedia.org/wiki/Level_shifting",
+          "source": "wikipedia",
+          "matchType": "exact"
+        },
+        {
+          "term": "Bilateral switch",
+          "url": "https://en.wikipedia.org/wiki/Analog_switch",
+          "source": "wikipedia",
+          "matchType": "close"
+        },
+        {
+          "term": "Memory-mapped I/O",
+          "url": "https://en.wikipedia.org/wiki/Memory-mapped_I/O",
+          "source": "wikipedia",
+          "matchType": "exact"
+        }
+      ]
+    }
+  ]
+}

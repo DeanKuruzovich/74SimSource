@@ -1,0 +1,434 @@
+{
+  "components": [
+    {
+      "id": 7,
+      "type": "switch",
+      "on": false,
+      "startHoleId": "0:0:power:6:2",
+      "endHoleId": "0:0:main:6:7"
+    },
+    {
+      "id": 8,
+      "type": "switch",
+      "on": false,
+      "startHoleId": "0:0:power:8:2",
+      "endHoleId": "0:0:main:8:7"
+    },
+    {
+      "id": 9,
+      "type": "switch",
+      "on": false,
+      "startHoleId": "0:0:power:9:2",
+      "endHoleId": "0:0:main:9:7"
+    },
+    {
+      "id": 113,
+      "type": "switch",
+      "on": false,
+      "startHoleId": "0:0:power:4:2",
+      "endHoleId": "0:0:main:4:7"
+    },
+    {
+      "id": 6,
+      "type": "switch",
+      "on": false,
+      "startHoleId": "0:0:power:5:2",
+      "endHoleId": "0:0:main:5:7"
+    },
+    {
+      "id": 120,
+      "type": "switch",
+      "on": false,
+      "startHoleId": "0:0:power:3:2",
+      "endHoleId": "0:0:main:3:7"
+    },
+    {
+      "id": 122,
+      "type": "switch",
+      "on": false,
+      "startHoleId": "0:0:power:10:2",
+      "endHoleId": "0:0:main:10:7"
+    },
+    {
+      "id": 123,
+      "type": "switch",
+      "on": false,
+      "startHoleId": "0:0:power:11:2",
+      "endHoleId": "0:0:main:11:7"
+    },
+    {
+      "id": 1,
+      "type": "chip",
+      "tileX": 0,
+      "tileY": 0,
+      "col": 13,
+      "row": 4,
+      "chipId": "74148"
+    },
+    {
+      "id": 126,
+      "type": "led",
+      "color": "red",
+      "startHoleId": "0:0:main:22:0",
+      "endHoleId": "0:0:power:22:0"
+    },
+    {
+      "id": 127,
+      "type": "led",
+      "color": "red",
+      "startHoleId": "0:0:main:23:0",
+      "endHoleId": "0:0:power:23:0"
+    },
+    {
+      "id": 128,
+      "type": "led",
+      "color": "red",
+      "startHoleId": "0:0:main:24:0",
+      "endHoleId": "0:0:power:24:0"
+    },
+    {
+      "id": 130,
+      "type": "resistor",
+      "resistance": 1000,
+      "startHoleId": "0:0:main:11:5",
+      "endHoleId": "0:0:power:11:1"
+    },
+    {
+      "id": 131,
+      "type": "resistor",
+      "resistance": 1000,
+      "startHoleId": "0:0:main:10:5",
+      "endHoleId": "0:0:power:10:1"
+    },
+    {
+      "id": 132,
+      "type": "resistor",
+      "resistance": 1000,
+      "startHoleId": "0:0:main:9:5",
+      "endHoleId": "0:0:power:9:1"
+    },
+    {
+      "id": 133,
+      "type": "resistor",
+      "resistance": 1000,
+      "startHoleId": "0:0:main:8:5",
+      "endHoleId": "0:0:power:8:1"
+    },
+    {
+      "id": 134,
+      "type": "resistor",
+      "resistance": 1000,
+      "startHoleId": "0:0:main:6:5",
+      "endHoleId": "0:0:power:6:1"
+    },
+    {
+      "id": 135,
+      "type": "resistor",
+      "resistance": 1000,
+      "startHoleId": "0:0:main:5:5",
+      "endHoleId": "0:0:power:5:1"
+    },
+    {
+      "id": 136,
+      "type": "resistor",
+      "resistance": 1000,
+      "startHoleId": "0:0:main:4:5",
+      "endHoleId": "0:0:power:4:1"
+    },
+    {
+      "id": 137,
+      "type": "resistor",
+      "resistance": 1000,
+      "startHoleId": "0:0:power:3:1",
+      "endHoleId": "0:0:main:3:5"
+    },
+    {
+      "id": 141,
+      "type": "chip",
+      "tileX": 0,
+      "tileY": 0,
+      "col": 27,
+      "row": 4,
+      "chipId": "74237",
+      "ffState": {
+        "Y0_dl8hi": {
+          "addr": 7
+        }
+      }
+    },
+    {
+      "id": 146,
+      "type": "led",
+      "color": "yellow",
+      "startHoleId": "0:0:main:38:0",
+      "endHoleId": "0:0:power:38:0"
+    },
+    {
+      "id": 147,
+      "type": "led",
+      "color": "yellow",
+      "startHoleId": "0:0:main:39:0",
+      "endHoleId": "0:0:power:39:0"
+    },
+    {
+      "id": 152,
+      "type": "led",
+      "color": "yellow",
+      "startHoleId": "0:0:main:40:0",
+      "endHoleId": "0:0:power:40:0"
+    },
+    {
+      "id": 153,
+      "type": "led",
+      "color": "yellow",
+      "startHoleId": "0:0:main:41:0",
+      "endHoleId": "0:0:power:41:0"
+    },
+    {
+      "id": 154,
+      "type": "led",
+      "color": "yellow",
+      "startHoleId": "0:0:main:44:0",
+      "endHoleId": "0:0:power:44:0"
+    },
+    {
+      "id": 155,
+      "type": "led",
+      "color": "yellow",
+      "startHoleId": "0:0:main:45:0",
+      "endHoleId": "0:0:power:45:0"
+    },
+    {
+      "id": 156,
+      "type": "led",
+      "color": "yellow",
+      "startHoleId": "0:0:main:46:0",
+      "endHoleId": "0:0:power:46:0"
+    },
+    {
+      "id": 157,
+      "type": "led",
+      "color": "yellow",
+      "startHoleId": "0:0:main:47:0",
+      "endHoleId": "0:0:power:47:0"
+    }
+  ],
+  "wires": [
+    {
+      "id": 1,
+      "startHoleId": "0:0:power:12:1",
+      "endHoleId": "0:0:main:13:3",
+      "color": "#ff6b6b"
+    },
+    {
+      "id": 2,
+      "startHoleId": "0:0:power:20:2",
+      "endHoleId": "0:0:main:20:6",
+      "color": "#4ecdc4"
+    },
+    {
+      "id": 13,
+      "startHoleId": "0:0:main:20:3",
+      "endHoleId": "0:0:main:24:3",
+      "color": "#74b9ff"
+    },
+    {
+      "id": 14,
+      "startHoleId": "0:0:main:19:6",
+      "endHoleId": "0:0:main:23:3",
+      "color": "#55efc4"
+    },
+    {
+      "id": 15,
+      "startHoleId": "0:0:main:18:6",
+      "endHoleId": "0:0:main:22:3",
+      "color": "#1abc9c"
+    },
+    {
+      "id": 16,
+      "startHoleId": "0:0:main:14:3",
+      "endHoleId": "0:0:power:14:0",
+      "color": "#ffeaa7"
+    },
+    {
+      "id": 18,
+      "startHoleId": "0:0:main:17:6",
+      "endHoleId": "0:0:power:17:2",
+      "color": "#6c5ce7"
+    },
+    {
+      "id": 19,
+      "startHoleId": "0:0:main:3:6",
+      "endHoleId": "0:0:main:19:3",
+      "color": "#ffeaa7"
+    },
+    {
+      "id": 20,
+      "startHoleId": "0:0:main:4:6",
+      "endHoleId": "0:0:main:18:3",
+      "color": "#ff7675"
+    },
+    {
+      "id": 21,
+      "startHoleId": "0:0:main:5:6",
+      "endHoleId": "0:0:main:17:3",
+      "color": "#3498db"
+    },
+    {
+      "id": 22,
+      "startHoleId": "0:0:main:6:6",
+      "endHoleId": "0:0:main:16:3",
+      "color": "#74b9ff"
+    },
+    {
+      "id": 23,
+      "startHoleId": "0:0:main:8:6",
+      "endHoleId": "0:0:main:13:6",
+      "color": "#6c5ce7"
+    },
+    {
+      "id": 24,
+      "startHoleId": "0:0:main:9:6",
+      "endHoleId": "0:0:main:14:6",
+      "color": "#74b9ff"
+    },
+    {
+      "id": 25,
+      "startHoleId": "0:0:main:10:6",
+      "endHoleId": "0:0:main:15:6",
+      "color": "#f39c12"
+    },
+    {
+      "id": 26,
+      "startHoleId": "0:0:main:11:6",
+      "endHoleId": "0:0:main:16:6",
+      "color": "#f39c12"
+    },
+    {
+      "id": 27,
+      "startHoleId": "0:0:main:24:2",
+      "endHoleId": "0:0:main:27:6",
+      "color": "#74b9ff"
+    },
+    {
+      "id": 28,
+      "startHoleId": "0:0:main:23:2",
+      "endHoleId": "0:0:main:28:6",
+      "color": "#55efc4"
+    },
+    {
+      "id": 29,
+      "startHoleId": "0:0:main:22:2",
+      "endHoleId": "0:0:main:29:6",
+      "color": "#1abc9c"
+    },
+    {
+      "id": 30,
+      "startHoleId": "0:0:main:27:3",
+      "endHoleId": "0:0:power:27:1",
+      "color": "#fdcb6e"
+    },
+    {
+      "id": 31,
+      "startHoleId": "0:0:main:34:6",
+      "endHoleId": "0:0:power:34:2",
+      "color": "#f39c12"
+    },
+    {
+      "id": 32,
+      "startHoleId": "0:0:main:30:6",
+      "endHoleId": "0:0:power:30:3",
+      "color": "#74b9ff"
+    },
+    {
+      "id": 33,
+      "startHoleId": "0:0:main:31:6",
+      "endHoleId": "0:0:power:32:2",
+      "color": "#9b59b6"
+    },
+    {
+      "id": 34,
+      "startHoleId": "0:0:main:32:6",
+      "endHoleId": "0:0:power:32:3",
+      "color": "#2ecc71"
+    },
+    {
+      "id": 35,
+      "startHoleId": "0:0:main:28:3",
+      "endHoleId": "0:0:main:38:1",
+      "color": "#74b9ff"
+    },
+    {
+      "id": 36,
+      "startHoleId": "0:0:main:29:3",
+      "endHoleId": "0:0:main:39:1",
+      "color": "#3498db"
+    },
+    {
+      "id": 37,
+      "startHoleId": "0:0:main:30:3",
+      "endHoleId": "0:0:main:40:1",
+      "color": "#74b9ff"
+    },
+    {
+      "id": 38,
+      "startHoleId": "0:0:main:31:3",
+      "endHoleId": "0:0:main:41:1",
+      "color": "#9b59b6"
+    },
+    {
+      "id": 39,
+      "startHoleId": "0:0:main:32:3",
+      "endHoleId": "0:0:main:44:1",
+      "color": "#00cec9"
+    },
+    {
+      "id": 40,
+      "startHoleId": "0:0:main:33:3",
+      "endHoleId": "0:0:main:45:1",
+      "color": "#2ecc71"
+    },
+    {
+      "id": 41,
+      "startHoleId": "0:0:main:34:3",
+      "endHoleId": "0:0:main:46:1",
+      "color": "#ff7675"
+    },
+    {
+      "id": 42,
+      "startHoleId": "0:0:main:33:6",
+      "endHoleId": "0:0:main:47:1",
+      "color": "#74b9ff"
+    }
+  ],
+  "extraTiles": [],
+  "textBoxes": [
+    {
+      "id": 2,
+      "x": 10,
+      "y": -60,
+      "w": 600,
+      "h": 70,
+      "text": "Description: Eight switches get converted to 3 data wires, get outputted back to 1 of 8 yellow LEDs.",
+      "v": 2
+    },
+    {
+      "id": 1,
+      "x": 10,
+      "y": -120,
+      "w": 400,
+      "h": 50,
+      "text": "Title: 8-3-8 Encoder / Decoder",
+      "v": 2
+    },
+    {
+      "id": 3,
+      "x": -180.63929956476818,
+      "y": 153.8364917272096,
+      "w": 229.87508679232508,
+      "h": 184.37140341072669,
+      "text": "Inputs to the 74x148 chip are active low, meaning to select a input to be active it needs to be low(connected to GND). The pull up resistors bring the inputs back up to high.",
+      "v": 2
+    }
+  ]
+}

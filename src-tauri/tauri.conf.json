@@ -1,0 +1,53 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "74SIM",
+  "version": "1.0.0",
+  "identifier": "com.deankuruzovich.sim74",
+  "build": {
+    "frontendDist": "../dist-app",
+    "devUrl": null,
+    "beforeBuildCommand": "node scripts/prep-frontend.mjs",
+    "beforeDevCommand": "node scripts/prep-frontend.mjs"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [
+      {
+        "label": "main",
+        "title": "74SIM",
+        "width": 1280,
+        "height": 820,
+        "minWidth": 900,
+        "minHeight": 600,
+        "url": "index.html",
+        "resizable": true,
+        "fullscreen": false
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.png",
+      "icons/icon.ico"
+    ],
+    "shortDescription": "74SIM breadboard simulator",
+    "longDescription": "74SIM is an interactive breadboard simulator for the 74-series digital logic family.",
+    "createUpdaterArtifacts": true
+  },
+  "plugins": {
+    "updater": {
+      "endpoints": [
+        "https://74sim.com/desktop-latest.json"
+      ],
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEE5RDMzMjRBMjY3OUY5MDgKUldRSStYa21TakxUcWZ4NkVLUTZYeUVVczdBWkYyQUZFTk9oZTArNTBROGEwLzQzUG4xOEVnMUsK"
+    }
+  }
+}

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>74SIM</title>
+  <link rel="icon" type="image/png" href="assets/Logo74Sim.png">
+  <link rel="stylesheet" href="/css/tokens.css">
+  <link rel="stylesheet" href="/css/landing.css">
+</head>
+<body>
+
+  <div class="desk-shell">
+    <header class="desk-header">
+      <img src="/assets/Logo74Sim.png" alt="74SIM" class="desk-logo">
+    </header>
+
+    <section class="desk-actions">
+      <button class="desk-action desk-action-primary" id="desk-new">
+        <span class="desk-action-title">New Circuit</span>
+      </button>
+      <button class="desk-action" id="desk-open">
+        <span class="desk-action-title">Open File</span>
+      </button>
+      <button class="desk-action" id="desk-resume">
+        <span class="desk-action-title">Resume Last Session</span>
+      </button>
+    </section>
+
+    <section class="desk-recents">
+      <div class="desk-section-head">
+        <span>Recent Files</span>
+        <button class="desk-link" id="desk-clear-recents" type="button">Clear</button>
+      </div>
+      <ul class="desk-recent-list" id="desk-recent-list">
+        <li class="desk-recent-empty">No recent files yet.</li>
+      </ul>
+    </section>
+
+    <footer class="desk-footer">
+      <a href="/docs.html" class="desk-link">Docs</a>
+      <span class="desk-footer-sep">·</span>
+      <button class="desk-link" id="desk-bug-report" type="button">Report a Bug</button>
+      <span class="desk-footer-sep">·</span>
+      <button class="desk-link" id="desk-feedback" type="button">Feedback</button>
+      <span class="desk-footer-sep">·</span>
+      <span class="desk-version">beta</span>
+    </footer>
+  </div>
+
+  <!-- Bug report modal -->
+  <div class="desk-modal-backdrop" id="desk-bug-backdrop" style="display:none;">
+    <div class="desk-modal">
+      <button class="desk-modal-close" id="desk-bug-close">&times;</button>
+      <div class="desk-modal-title">Report a Bug</div>
+      <form id="desk-bug-form">
+        <textarea id="desk-bug-description" rows="6" placeholder="Describe the bug — what happened, what you expected, and how to reproduce it..." required></textarea>
+        <button type="submit" class="desk-modal-submit" id="desk-bug-submit">Submit Bug Report</button>
+        <div class="desk-modal-status" id="desk-bug-status"></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Feedback modal -->
+  <div class="desk-modal-backdrop" id="desk-feedback-backdrop" style="display:none;">
+    <div class="desk-modal">
+      <button class="desk-modal-close" id="desk-feedback-close">&times;</button>
+      <div class="desk-modal-title">Feedback</div>
+      <form id="desk-feedback-form">
+        <textarea id="desk-feedback-description" rows="6" placeholder="Share your thoughts, suggestions, or questions..." required></textarea>
+        <button type="submit" class="desk-modal-submit" id="desk-feedback-submit">Submit Feedback</button>
+        <div class="desk-modal-status" id="desk-feedback-status"></div>
+      </form>
+    </div>
+  </div>
+
+  <script type="module" src="/js/landing-desktop.js"></script>
+</body>
+</html>
