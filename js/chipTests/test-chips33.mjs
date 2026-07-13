@@ -5,9 +5,9 @@
 // Chips under test:
 //   74615   Octal reg bus transceiver, non-inv, OC
 //   74620   Octal bus transceiver, inverting, TRI
-//   74621   Octal bus transceiver, non-inverting, OC
+//   74621   Octal bus transceiver, non inverting, OC
 //   74622   Octal bus transceiver, inverting, OC
-//   74623   Octal bus transceiver, non-inverting, TRI
+//   74623   Octal bus transceiver, non inverting, TRI
 //   74624   VCO single (analog stub)
 //   74625   Dual VCO (analog stub)
 //   74626   Dual VCO with enable (analog stub)
@@ -17,7 +17,7 @@
 //   74636   8 bit ECC, TRI (stub)
 //   74637   8 bit ECC, OC (stub)
 //   74638   Octal bus transceiver, inverting, TS/OC
-//   74639   Octal bus transceiver, non-inverting, TS/OC
+//   74639   Octal bus transceiver, non inverting, TS/OC
 //   74640   Octal bus transceiver, inverting, TRI
 
 import { CHIPS_BLOCK_33 } from '../chips/chips33.js';
@@ -105,14 +105,14 @@ function connectPinsLow(wm, chip, pinNames) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const EXPECTED_CHIP_IDS = [
-  '74615',
-  '74620', '74621', '74622', '74623',
-  '74624', '74625', '74626', '74627', '74628', '74629',
-  '74636', '74637',
-  '74638', '74639', '74640',
+  '74x615',
+  '74x620', '74x621', '74x622', '74x623',
+  '74x624', '74x625', '74x626', '74x627', '74x628', '74x629',
+  '74x636', '74x637',
+  '74x638', '74x639', '74x640',
 ];
 
-const SEQUENTIAL_IDS = ['74615'];
+const SEQUENTIAL_IDS = ['74x615'];
 
 console.log('\nS1: All 16 chip IDs present in CHIPS_BLOCK_33');
 {
@@ -152,7 +152,9 @@ console.log('\nS3: All gate input/output names exist in pinout');
       const inputs  = Array.isArray(gate.inputs)  ? gate.inputs  : [];
       const outputs = Array.isArray(gate.outputs) ? gate.outputs
                     : gate.output                 ? [gate.output] : [];
-      for (const name of [...inputs, ...outputs]) {
+      // null entries are positional placeholders (e.g. a VCO channel with no
+      // enable or range pin) — same convention as the 74x113's null CLR slot.
+      for (const name of [...inputs, ...outputs].filter(n => n != null)) {
         assert(pinNames.has(name), `${id}: gate references '${name}' in pinout`);
       }
     }
@@ -178,7 +180,7 @@ console.log('\nG1: 74620 - Octal inverting transceiver (TRI)');
 
 console.log('  G1a: OEn=H → all outputs HiZ');
 {
-  const { world, chip, wm } = setupChipWithPower('74620');
+  const { world, chip, wm } = setupChipWithPower('74x620');
   // OEn=H (disabled), DIR=H
   connectPinsHigh(wm, chip, ['OEn', 'DIR']);
   // Set A-side inputs high
@@ -191,7 +193,7 @@ console.log('  G1a: OEn=H → all outputs HiZ');
 
 console.log('  G1b: OEn=L, DIR=H → A→/B (B=NOT A)');
 {
-  const { world, chip, wm } = setupChipWithPower('74620');
+  const { world, chip, wm } = setupChipWithPower('74x620');
   // OEn=L (enabled), DIR=H (A→B direction)
   connectPinToGnd(wm, findPin(chip, 'OEn'));
   connectPinToVcc(wm, findPin(chip, 'DIR'));
@@ -213,7 +215,7 @@ console.log('  G1b: OEn=L, DIR=H → A→/B (B=NOT A)');
 
 console.log('  G1c: OEn=L, DIR=L → B→/A (A=NOT B)');
 {
-  const { world, chip, wm } = setupChipWithPower('74620');
+  const { world, chip, wm } = setupChipWithPower('74x620');
   connectPinToGnd(wm, findPin(chip, 'OEn'));
   connectPinToGnd(wm, findPin(chip, 'DIR'));
   // B1-B8: all HIGH
@@ -225,14 +227,14 @@ console.log('  G1c: OEn=L, DIR=L → B→/A (A=NOT B)');
     assertPinBit(sim, chip, a, 0, `74620 DIR=L: ${a}=NOT B=0`);
 }
 
-// ── G2: 74621 - Octal non-inverting transceiver (OC) ─────────────────────────
-// Same function as 74245/74623: non-inverting, bidirectional.
+// ── G2: 74621 - Octal non inverting transceiver (OC) ─────────────────────────
+// Same function as 74245/74623: non inverting, bidirectional.
 
-console.log('\nG2: 74621 - Octal non-inverting transceiver (OC)');
+console.log('\nG2: 74621 - Octal non inverting transceiver (OC)');
 
 console.log('  G2a: OEn=H → all outputs HiZ');
 {
-  const { world, chip, wm } = setupChipWithPower('74621');
+  const { world, chip, wm } = setupChipWithPower('74x621');
   connectPinsHigh(wm, chip, ['OEn', 'DIR', 'A1','A2','A3','A4','A5','A6','A7','A8']);
   const sim = new CircuitSimulator();
   sim.evaluate(world, [chip], wm);
@@ -240,9 +242,9 @@ console.log('  G2a: OEn=H → all outputs HiZ');
     assertPinHighZ(sim, chip, b, `74621 OEn=H → ${b} HiZ`);
 }
 
-console.log('  G2b: OEn=L, DIR=H → A→B (non-inverting)');
+console.log('  G2b: OEn=L, DIR=H → A→B (non inverting)');
 {
-  const { world, chip, wm } = setupChipWithPower('74621');
+  const { world, chip, wm } = setupChipWithPower('74x621');
   connectPinToGnd(wm, findPin(chip, 'OEn'));
   connectPinToVcc(wm, findPin(chip, 'DIR'));
   connectPinsHigh(wm, chip, ['A1','A3','A5','A7']);
@@ -255,9 +257,9 @@ console.log('  G2b: OEn=L, DIR=H → A→B (non-inverting)');
   assertPinBit(sim, chip, 'B4', 0, '74621 DIR=H: B4=A4=0');
 }
 
-console.log('  G2c: OEn=L, DIR=L → B→A (non-inverting)');
+console.log('  G2c: OEn=L, DIR=L → B→A (non inverting)');
 {
-  const { world, chip, wm } = setupChipWithPower('74621');
+  const { world, chip, wm } = setupChipWithPower('74x621');
   connectPinToGnd(wm, findPin(chip, 'OEn'));
   connectPinToGnd(wm, findPin(chip, 'DIR'));
   connectPinsHigh(wm, chip, ['B1','B3','B5','B7']);
@@ -277,7 +279,7 @@ console.log('\nG3: 74622 - Octal inverting transceiver (OC)');
 
 console.log('  G3a: OEn=H → all outputs HiZ');
 {
-  const { world, chip, wm } = setupChipWithPower('74622');
+  const { world, chip, wm } = setupChipWithPower('74x622');
   connectPinsHigh(wm, chip, ['OEn', 'DIR']);
   const sim = new CircuitSimulator();
   sim.evaluate(world, [chip], wm);
@@ -287,7 +289,7 @@ console.log('  G3a: OEn=H → all outputs HiZ');
 
 console.log('  G3b: OEn=L, DIR=H → A→/B (inverted)');
 {
-  const { world, chip, wm } = setupChipWithPower('74622');
+  const { world, chip, wm } = setupChipWithPower('74x622');
   connectPinToGnd(wm, findPin(chip, 'OEn'));
   connectPinToVcc(wm, findPin(chip, 'DIR'));
   connectPinsHigh(wm, chip, ['A1','A2','A3','A4','A5','A6','A7','A8']);
@@ -297,14 +299,14 @@ console.log('  G3b: OEn=L, DIR=H → A→/B (inverted)');
     assertPinBit(sim, chip, b, 0, `74622 DIR=H: ${b}=NOT A=0`);
 }
 
-// ── G4: 74623 - Octal non-inverting transceiver (TRI) ────────────────────────
+// ── G4: 74623 - Octal non inverting transceiver (TRI) ────────────────────────
 // Same as 74621 behaviour.
 
-console.log('\nG4: 74623 - Octal non-inverting transceiver (TRI)');
+console.log('\nG4: 74623 - Octal non inverting transceiver (TRI)');
 
 console.log('  G4a: OEn=H → all outputs HiZ');
 {
-  const { world, chip, wm } = setupChipWithPower('74623');
+  const { world, chip, wm } = setupChipWithPower('74x623');
   connectPinsHigh(wm, chip, ['OEn', 'DIR']);
   const sim = new CircuitSimulator();
   sim.evaluate(world, [chip], wm);
@@ -312,9 +314,9 @@ console.log('  G4a: OEn=H → all outputs HiZ');
     assertPinHighZ(sim, chip, b, `74623 OEn=H → ${b} HiZ`);
 }
 
-console.log('  G4b: OEn=L, DIR=H → A→B (non-inverting)');
+console.log('  G4b: OEn=L, DIR=H → A→B (non inverting)');
 {
-  const { world, chip, wm } = setupChipWithPower('74623');
+  const { world, chip, wm } = setupChipWithPower('74x623');
   connectPinToGnd(wm, findPin(chip, 'OEn'));
   connectPinToVcc(wm, findPin(chip, 'DIR'));
   connectPinsHigh(wm, chip, ['A1','A2','A3','A4','A5','A6','A7','A8']);
@@ -331,7 +333,7 @@ console.log('\nG5: 74638 - Octal inverting transceiver (TS/OC)');
 
 console.log('  G5a: OEn=H → all outputs HiZ');
 {
-  const { world, chip, wm } = setupChipWithPower('74638');
+  const { world, chip, wm } = setupChipWithPower('74x638');
   connectPinsHigh(wm, chip, ['OEn', 'DIR']);
   const sim = new CircuitSimulator();
   sim.evaluate(world, [chip], wm);
@@ -341,7 +343,7 @@ console.log('  G5a: OEn=H → all outputs HiZ');
 
 console.log('  G5b: OEn=L, DIR=H → A→/B (inverted)');
 {
-  const { world, chip, wm } = setupChipWithPower('74638');
+  const { world, chip, wm } = setupChipWithPower('74x638');
   connectPinToGnd(wm, findPin(chip, 'OEn'));
   connectPinToVcc(wm, findPin(chip, 'DIR'));
   connectPinsLow(wm, chip, ['A1','A2','A3','A4','A5','A6','A7','A8']);
@@ -351,13 +353,13 @@ console.log('  G5b: OEn=L, DIR=H → A→/B (inverted)');
     assertPinBit(sim, chip, b, 1, `74638 DIR=H: ${b}=NOT A(0)=1`);
 }
 
-// ── G6: 74639 - Octal non-inverting transceiver (TS/OC) ──────────────────────
+// ── G6: 74639 - Octal non inverting transceiver (TS/OC) ──────────────────────
 
-console.log('\nG6: 74639 - Octal non-inverting transceiver (TS/OC)');
+console.log('\nG6: 74639 - Octal non inverting transceiver (TS/OC)');
 
 console.log('  G6a: OEn=H → all outputs HiZ');
 {
-  const { world, chip, wm } = setupChipWithPower('74639');
+  const { world, chip, wm } = setupChipWithPower('74x639');
   connectPinsHigh(wm, chip, ['OEn', 'DIR']);
   const sim = new CircuitSimulator();
   sim.evaluate(world, [chip], wm);
@@ -365,9 +367,9 @@ console.log('  G6a: OEn=H → all outputs HiZ');
     assertPinHighZ(sim, chip, b, `74639 OEn=H → ${b} HiZ`);
 }
 
-console.log('  G6b: OEn=L, DIR=L → B→A (non-inverting)');
+console.log('  G6b: OEn=L, DIR=L → B→A (non inverting)');
 {
-  const { world, chip, wm } = setupChipWithPower('74639');
+  const { world, chip, wm } = setupChipWithPower('74x639');
   connectPinToGnd(wm, findPin(chip, 'OEn'));
   connectPinToGnd(wm, findPin(chip, 'DIR'));
   connectPinsHigh(wm, chip, ['B1','B2','B3','B4','B5','B6','B7','B8']);
@@ -383,7 +385,7 @@ console.log('\nG7: 74640 - Octal inverting transceiver (TRI)');
 
 console.log('  G7a: OEn=H → all outputs HiZ');
 {
-  const { world, chip, wm } = setupChipWithPower('74640');
+  const { world, chip, wm } = setupChipWithPower('74x640');
   connectPinsHigh(wm, chip, ['OEn', 'DIR']);
   const sim = new CircuitSimulator();
   sim.evaluate(world, [chip], wm);
@@ -393,7 +395,7 @@ console.log('  G7a: OEn=H → all outputs HiZ');
 
 console.log('  G7b: OEn=L, DIR=L → B→/A (inverted)');
 {
-  const { world, chip, wm } = setupChipWithPower('74640');
+  const { world, chip, wm } = setupChipWithPower('74x640');
   connectPinToGnd(wm, findPin(chip, 'OEn'));
   connectPinToGnd(wm, findPin(chip, 'DIR'));
   connectPinsHigh(wm, chip, ['B1','B2','B3','B4','B5','B6','B7','B8']);
@@ -403,30 +405,53 @@ console.log('  G7b: OEn=L, DIR=L → B→/A (inverted)');
     assertPinBit(sim, chip, a, 0, `74640 DIR=L: ${a}=NOT B(1)=0`);
 }
 
-// ── G8: 74624 - VCO stub (all outputs HiZ) ───────────────────────────────────
+// ── G8: 74624 - VCO (behavioral) ─────────────────────────────────────────────
+// The VCO family is simulated behaviorally: outputs oscillate from simTime.
+// OEn is active LOW; floating (TTL pull-up HIGH) = disabled, OUT held LOW
+// with OUTn its complement.
 
-console.log('\nG8: 74624 - VCO stub');
+console.log('\nG8: 74624 - VCO behavioral model');
 
-console.log('  G8a: OUT and OUTn are always HiZ (analog, not simulatable)');
+console.log('  G8a: OEn floating (disabled): OUT LOW, OUTn HIGH');
 {
-  const { world, chip, wm } = setupChipWithPower('74624');
+  const { world, chip, wm } = setupChipWithPower('74x624');
   const sim = new CircuitSimulator();
   sim.evaluate(world, [chip], wm);
-  assertPinHighZ(sim, chip, 'OUT',  '74624: OUT HiZ');
-  assertPinHighZ(sim, chip, 'OUTn', '74624: OUTn HiZ');
+  const vOut  = getPinVoltage(sim, findPin(chip, 'OUT'));
+  const vOutn = getPinVoltage(sim, findPin(chip, 'OUTn'));
+  assert(vOut !== undefined && vOut < 2.5,   `74624: OEn floating -> OUT LOW (got ${vOut})`);
+  assert(vOutn !== undefined && vOutn > 2.5, `74624: OEn floating -> OUTn HIGH (got ${vOutn})`);
 }
 
-// ── G9: 74625 - Dual VCO stub ─────────────────────────────────────────────────
-
-console.log('\nG9: 74625 - Dual VCO stub');
-
-console.log('  G9a: All VCO outputs HiZ');
+console.log('  G8b: OEn=0 (enabled): outputs driven and complementary');
 {
-  const { world, chip, wm } = setupChipWithPower('74625');
+  const { world, chip, wm } = setupChipWithPower('74x624');
+  connectPinToGnd(wm, findPin(chip, 'OEn'));
   const sim = new CircuitSimulator();
   sim.evaluate(world, [chip], wm);
-  for (const p of ['OUTA','OUTnA','OUTB','OUTnB'])
-    assertPinHighZ(sim, chip, p, `74625: ${p} HiZ`);
+  const vOut  = getPinVoltage(sim, findPin(chip, 'OUT'));
+  const vOutn = getPinVoltage(sim, findPin(chip, 'OUTn'));
+  assert(vOut !== undefined && vOutn !== undefined, '74624: enabled -> both outputs driven');
+  const outBit  = vOut  > 2.5 ? 1 : 0;
+  const outnBit = vOutn > 2.5 ? 1 : 0;
+  assert(outBit !== outnBit, `74624: OUT/OUTn complementary (got ${vOut} / ${vOutn})`);
+}
+
+// ── G9: 74625 - Dual VCO (behavioral, no enable: free-running) ───────────────
+
+console.log('\nG9: 74625 - Dual VCO behavioral model');
+
+console.log('  G9a: Both channels free-running with complementary outputs');
+{
+  const { world, chip, wm } = setupChipWithPower('74x625');
+  const sim = new CircuitSimulator();
+  sim.evaluate(world, [chip], wm);
+  for (const [p, pn] of [['OUTA','OUTnA'], ['OUTB','OUTnB']]) {
+    const v  = getPinVoltage(sim, findPin(chip, p));
+    const vn = getPinVoltage(sim, findPin(chip, pn));
+    assert(v !== undefined && vn !== undefined, `74625: ${p}/${pn} driven`);
+    assert((v > 2.5) !== (vn > 2.5), `74625: ${p}/${pn} complementary (got ${v} / ${vn})`);
+  }
 }
 
 // ── G10: 74636 - ECC stub (all outputs HiZ) ───────────────────────────────────
@@ -435,24 +460,26 @@ console.log('\nG10: 74636 - 8 bit ECC stub');
 
 console.log('  G10a: All outputs HiZ (ECC too complex to simulate)');
 {
-  const { world, chip, wm } = setupChipWithPower('74636');
+  const { world, chip, wm } = setupChipWithPower('74x636');
   const sim = new CircuitSimulator();
   sim.evaluate(world, [chip], wm);
   for (const p of ['D0','D1','D2','D3','D4','D5','D6','D7','CB0','CB1','CB2','CB3','CB4','CB5','CB6','fE'])
     assertPinHighZ(sim, chip, p, `74636: ${p} HiZ`);
 }
 
-// ── G11: 74637 - ECC stub (OC, all outputs HiZ) ───────────────────────────────
+// ── G11: 74637 - ECC stub (OC, all outputs HiZ → pulled HIGH by implicit pullup) ─
 
 console.log('\nG11: 74637 - 8 bit ECC stub (OC)');
 
-console.log('  G11a: All outputs HiZ');
+console.log('  G11a: All outputs HiZ → implicit 4.7kΩ pull-up drives them HIGH');
 {
-  const { world, chip, wm } = setupChipWithPower('74637');
+  const { world, chip, wm } = setupChipWithPower('74x637');
   const sim = new CircuitSimulator();
   sim.evaluate(world, [chip], wm);
+  // The 74x637 has openCollector: true. A HiZ OC output gets an implicit
+  // 4.7kΩ pull-up to VCC, so the net resolves to HIGH (not floating low).
   for (const p of ['D0','D1','D2','D3','D4','D5','D6','D7','CB0','CB1','CB2','CB3','CB4','CB5','CB6','fE'])
-    assertPinHighZ(sim, chip, p, `74637: ${p} HiZ`);
+    assertPinBit(sim, chip, p, 1, `74637: ${p} pulled HIGH by OC pullup`);
 }
 
 // ── G12: 74615 - Octal registered transceiver (TRANSCEIVER_OCTAL_REG) ─────────
@@ -463,7 +490,7 @@ console.log('\nG12: 74615 - Octal registered transceiver (basic latch-through)')
 
 console.log('  G12a: DIR=H, CLK rising edge captures A data, then drives B with OEABn=L');
 {
-  const { world, chip, wm } = setupChipWithPower('74615');
+  const { world, chip, wm } = setupChipWithPower('74x615');
   // OEABn=L (enable A→B output), OEBAn=H (disable B→A), DIR=H
   connectPinToGnd(wm, findPin(chip, 'OEABn'));
   connectPinToVcc(wm, findPin(chip, 'OEBAn'));

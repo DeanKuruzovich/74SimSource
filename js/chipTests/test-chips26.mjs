@@ -55,6 +55,22 @@ SIM._drivePinHighZ = function(comp, name) {
   comp.pins[name].voltage = 2.5;
   return true;
 };
+SIM._drivePinOC = function(comp, name, bit) {
+  // OC stub: bit=0 sinks to GND; bit=1 is HiZ but the implicit 4.7kΩ pull-up
+  // in production resolves to ~5V, so model the resolved value here.
+  if (!comp.pins[name]) return false;
+  const newV = bit ? 5 : 0;
+  if (comp.pins[name].voltage === newV) return false;
+  comp.pins[name].voltage = newV;
+  return true;
+};
+SIM._drivePinBitsOC = function(comp, names, bits) {
+  let changed = false;
+  for (let i = 0; i < names.length; i++) {
+    if (SIM._drivePinOC(comp, names[i], bits[i])) changed = true;
+  }
+  return changed;
+};
 
 function runGate(comp, gate) {
   switch (gate.type) {
@@ -89,9 +105,9 @@ function expect(label, actual, expected) {
   }
 }
 
-// ─── 74446 - Quad Inv Bus Xcvr (tri-state) ────────────────────────────────
+// ─── 74446 - Quad Inv Bus Xcvr (tri state) ────────────────────────────────
 {
-  const { comp, spec } = makeComp('74446');
+  const { comp, spec } = makeComp('74x446');
   const gate = spec.gates[0]; // BUS_XCVR_QUAD_INV_TRI
 
   // OEn=0, OE2n=0, DIR=0: A→B inverted
@@ -103,7 +119,7 @@ function expect(label, actual, expected) {
   expect('74446 DIR=0 B3=NOT(A3)', getPin(comp, 'B3'), 0);
   expect('74446 DIR=0 B4=NOT(A4)', getPin(comp, 'B4'), 1);
 
-  // OEn=1: tri-state
+  // OEn=1: tri state
   setPin(comp, 'OE1n', 1);
   runGate(comp, gate);
   expect('74446 OE1n=1 B1 HiZ', getPin(comp, 'B1'), 0.5);
@@ -113,7 +129,7 @@ function expect(label, actual, expected) {
 // Note: BCD_7SEG evaluator requires full simulator netlist context,
 //       so we verify chip spec structure only.
 {
-  const spec = CHIPS_BLOCK_26['74447'];
+  const spec = CHIPS_BLOCK_26['74x447'];
   const gate = spec.gates[0];
 
   expect('74447 gate type is BCD_7SEG', gate.type === 'BCD_7SEG' ? 1 : 0, 1);
@@ -123,12 +139,12 @@ function expect(label, actual, expected) {
   expect('74447 has input D', gate.inputs.includes('D') ? 1 : 0, 1);
   expect('74447 has output a', gate.outputs.includes('a') ? 1 : 0, 1);
   expect('74447 has output g', gate.outputs.includes('g') ? 1 : 0, 1);
-  expect('74447 is open-collector', spec.openCollector ? 1 : 0, 1);
+  expect('74447 is open collector', spec.openCollector ? 1 : 0, 1);
 }
 
 // ─── 74448 - Quad Inv OC bus xcvr ─────────────────────────────────────────
 {
-  const { comp, spec } = makeComp('74448');
+  const { comp, spec } = makeComp('74x448');
   const gate = spec.gates[0];
 
   // OE1n=0, OE2n=0, DIR=0: A→B inverted
@@ -141,12 +157,12 @@ function expect(label, actual, expected) {
   expect('74448 DIR=0 B4=NOT(A4)', getPin(comp, 'B4'), 1);
 }
 
-// ─── 74449 - Quad Non-Inv Bus Xcvr (tri-state) ────────────────────────────
+// ─── 74449 - Quad Non-Inv Bus Xcvr (tri state) ────────────────────────────
 {
-  const { comp, spec } = makeComp('74449');
+  const { comp, spec } = makeComp('74x449');
   const gate = spec.gates[0];
 
-  // OE1n=0, OE2n=0, DIR=0: A→B non-inverted
+  // OE1n=0, OE2n=0, DIR=0: A→B non inverted
   setPin(comp, 'OE1n', 0); setPin(comp, 'OE2n', 0); setPin(comp, 'DIR', 0);
   setPin(comp, 'A1', 1); setPin(comp, 'A2', 0); setPin(comp, 'A3', 1); setPin(comp, 'A4', 0);
   runGate(comp, gate);
@@ -155,49 +171,18 @@ function expect(label, actual, expected) {
   expect('74449 DIR=0 B3=A3', getPin(comp, 'B3'), 1);
   expect('74449 DIR=0 B4=A4', getPin(comp, 'B4'), 0);
 
-  // OE1n=1: tri-state
+  // OE1n=1: tri state
   setPin(comp, 'OE1n', 1);
   runGate(comp, gate);
   expect('74449 OE1n=1 B1 HiZ', getPin(comp, 'B1'), 0.5);
 }
 
-= makeComp('74S450');
-  const gate = spec.gates[0];
+// (A 74S450 1K-bit PROM test block sat here for a chip that was never added
+// to the catalog; its mangled remains broke the file's parse.)
 
-  // Write value 0xA5 to address 3 via state
-  setPin(comp, 'OEn', 0); setPin(comp, 'CSn', 0);
-  // Set address = 3: A0=1, A1=1, rest=0
-  for (let i = 0; i < 10; i++) setPin(comp, `A${i}`, 0);
-  setPin(comp, 'A0', 1); setPin(comp, 'A1', 1);
-  runGate(comp, gate);
-  // PROM blank = all zeros
-  expect('74S450 blank addr=3 D0=0', getPin(comp, 'D0'), 0);
-  expect('74S450 blank addr=3 D7=0', getPin(comp, 'D7'), 0);
-
-  // Write data
-  comp.state.rom = new Uint8Array(1024);
-  comp.state.rom[3] = 0xA5; // 10100101
-  runGate(comp, gate);
-  expect('74S450 addr=3 D0=1', getPin(comp, 'D0'), 1);
-  expect('74S450 addr=3 D1=0', getPin(comp, 'D1'), 0);
-  expect('74S450 addr=3 D2=1', getPin(comp, 'D2'), 1);
-  expect('74S450 addr=3 D5=1', getPin(comp, 'D5'), 1);
-  expect('74S450 addr=3 D7=1', getPin(comp, 'D7'), 1);
-
-  // CSn=1 → HiZ
-  setPin(comp, 'CSn', 1);
-  runGate(comp, gate);
-  expect('74S450 CSn=1 D0 HiZ', getPin(comp, 'D0'), 0.5);
-
-  // OEn=1 → HiZ
-  setPin(comp, 'CSn', 0); setPin(comp, 'OEn', 1);
-  runGate(comp, gate);
-  expect('74S450 OEn=1 D3 HiZ', getPin(comp, 'D3'), 0.5);
-}
-
-// ─── 74LS450 - 16-to-1 Mux (complementary output) ────────────────────────
+// ─── 74x450 - 16-to-1 Mux (complementary output) ────────────────────────
 {
-  const { comp, spec } = makeComp('74LS450');
+  const { comp, spec } = makeComp('74x450');
   const gate = spec.gates[0];
 
   const dataNames = ['E0','E1','E2','E3','E4','E5','E6','E7','E8','E9','E10','E11','E12','E13','E14','E15'];
@@ -207,45 +192,26 @@ function expect(label, actual, expected) {
   setPin(comp, 'A', 0); setPin(comp, 'B', 0); setPin(comp, 'C', 0); setPin(comp, 'D', 0);
   setPin(comp, 'Gn', 0);
   runGate(comp, gate);
-  expect('74LS450 E0=0 W=1', getPin(comp, 'W'), 1);
+  expect('74x450 E0=0 W=1', getPin(comp, 'W'), 1);
 
   // E5=1, sel=5 → W = NOT(E5) = 0
   setPin(comp, 'E5', 1);
   setPin(comp, 'A', 1); setPin(comp, 'B', 0); setPin(comp, 'C', 1); setPin(comp, 'D', 0); // sel=5
   runGate(comp, gate);
-  expect('74LS450 E5=1 sel=5 W=0', getPin(comp, 'W'), 0);
+  expect('74x450 E5=1 sel=5 W=0', getPin(comp, 'W'), 0);
 
   // Gn=1 → W=1 (disabled)
   setPin(comp, 'Gn', 1);
   runGate(comp, gate);
-  expect('74LS450 Gn=1 W=1', getPin(comp, 'W'), 1);
+  expect('74x450 Gn=1 W=1', getPin(comp, 'W'), 1);
 }
 
-= makeComp('74S451');
-  const gate = spec.gates[0];
+// (A 74S451 PROM test block sat here for a chip that was never added to the
+// catalog; its mangled remains broke the file's parse.)
 
-  setPin(comp, 'OEn', 0); setPin(comp, 'CSn', 0);
-  for (let i = 0; i < 10; i++) setPin(comp, `A${i}`, 0);
-  // Addr=0, blank PROM
-  runGate(comp, gate);
-  expect('74S451 blank D0=0', getPin(comp, 'D0'), 0);
-
-  // Write to state.rom
-  comp.state.rom = new Uint8Array(1024);
-  comp.state.rom[0] = 0xFF;
-  runGate(comp, gate);
-  expect('74S451 addr=0 D0=1', getPin(comp, 'D0'), 1);
-  expect('74S451 addr=0 D7=1', getPin(comp, 'D7'), 1);
-
-  // OEn=1 → HiZ
-  setPin(comp, 'OEn', 1);
-  runGate(comp, gate);
-  expect('74S451 OEn=1 D0 HiZ', getPin(comp, 'D0'), 0.5);
-}
-
-// ─── 74LS451 - Dual 8-to-1 Mux ───────────────────────────────────────────
+// ─── 74x451 - Dual 8-to-1 Mux ───────────────────────────────────────────
 {
-  const { comp, spec } = makeComp('74LS451');
+  const { comp, spec } = makeComp('74x451');
 
   // Section 1: sel=2, 1D2=1 → 1W=1, 1Wn=0
   const gate1 = spec.gates[0];
@@ -254,13 +220,13 @@ function expect(label, actual, expected) {
   for (const n of ['D0','D1','D2','D3','1D4','1D5','1D6','1D7']) setPin(comp, n, 0);
   setPin(comp, 'D2', 1); // 1D2=1
   runGate(comp, gate1);
-  expect('74LS451 sec1 sel=2 1D2=1 1W=1',  getPin(comp, '1W'),  1);
-  expect('74LS451 sec1 sel=2 1D2=1 1Wn=0', getPin(comp, '1Wn'), 0);
+  expect('74x451 sec1 sel=2 1D2=1 1W=1',  getPin(comp, '1W'),  1);
+  expect('74x451 sec1 sel=2 1D2=1 1Wn=0', getPin(comp, '1Wn'), 0);
 
   // Section 1: 1Gn=1 → HiZ
   setPin(comp, '1Gn', 1);
   runGate(comp, gate1);
-  expect('74LS451 sec1 1Gn=1 1W HiZ', getPin(comp, '1W'), 0.5);
+  expect('74x451 sec1 1Gn=1 1W HiZ', getPin(comp, '1W'), 0.5);
 
   // Section 2: sel=0, D0=1 → 2W=1, 2Wn=0
   const gate2 = spec.gates[1];
@@ -269,13 +235,13 @@ function expect(label, actual, expected) {
   for (const n of ['D0','D1','D2','D3','2D4','2D5','2D6','2D7']) setPin(comp, n, 0);
   setPin(comp, 'D0', 1);
   runGate(comp, gate2);
-  expect('74LS451 sec2 sel=0 D0=1 2W=1',  getPin(comp, '2W'),  1);
-  expect('74LS451 sec2 sel=0 D0=1 2Wn=0', getPin(comp, '2Wn'), 0);
+  expect('74x451 sec2 sel=0 D0=1 2W=1',  getPin(comp, '2W'),  1);
+  expect('74x451 sec2 sel=0 D0=1 2Wn=0', getPin(comp, '2Wn'), 0);
 }
 
 // ─── 74452 - Dual Decade Counter (sync) ────────────────────────────────────
 {
-  const { comp, spec } = makeComp('74452');
+  const { comp, spec } = makeComp('74x452');
   const gate = spec.gates[0];
 
   // Reset both sections
@@ -314,9 +280,9 @@ function expect(label, actual, expected) {
   expect('74452 cnt2 wraps QA2=0', getPin(comp, 'QA2'), 0);
 }
 
-// ─── 74LS453 - Quad 4-to-1 Mux ───────────────────────────────────────────
+// ─── 74x453 - Quad 4-to-1 Mux ───────────────────────────────────────────
 {
-  const { comp, spec } = makeComp('74LS453');
+  const { comp, spec } = makeComp('74x453');
   const gate = spec.gates[0];
 
   // sel=1: C1_1, C2_1, C3_1, C4_1 selected
@@ -326,22 +292,22 @@ function expect(label, actual, expected) {
   setPin(comp, 'C1_1', 1);
   setPin(comp, 'C3_1', 1);
   runGate(comp, gate);
-  expect('74LS453 sel=1 Y1=C1_1=1', getPin(comp, 'Y1'), 1);
-  expect('74LS453 sel=1 Y2=C2_1=0', getPin(comp, 'Y2'), 0);
-  expect('74LS453 sel=1 Y3=C3_1=1', getPin(comp, 'Y3'), 1);
-  expect('74LS453 sel=1 Y4=C4_1=0', getPin(comp, 'Y4'), 0);
+  expect('74x453 sel=1 Y1=C1_1=1', getPin(comp, 'Y1'), 1);
+  expect('74x453 sel=1 Y2=C2_1=0', getPin(comp, 'Y2'), 0);
+  expect('74x453 sel=1 Y3=C3_1=1', getPin(comp, 'Y3'), 1);
+  expect('74x453 sel=1 Y4=C4_1=0', getPin(comp, 'Y4'), 0);
 
   // sel=3
   setPin(comp, 'S0', 1); setPin(comp, 'S1', 1); // sel=3
   setPin(comp, 'C2_3', 1);
   runGate(comp, gate);
-  expect('74LS453 sel=3 Y2=C2_3=1', getPin(comp, 'Y2'), 1);
-  expect('74LS453 sel=3 Y1=C1_3=0', getPin(comp, 'Y1'), 0);
+  expect('74x453 sel=3 Y2=C2_3=1', getPin(comp, 'Y2'), 1);
+  expect('74x453 sel=3 Y1=C1_3=0', getPin(comp, 'Y1'), 0);
 }
 
 // ─── 74454 - Dual Decade Up/Down Counter ─────────────────────────────────
 {
-  const { comp, spec } = makeComp('74454');
+  const { comp, spec } = makeComp('74x454');
   const gate = spec.gates[0];
 
   // Reset
@@ -376,40 +342,40 @@ function expect(label, actual, expected) {
   expect('74454 load=7 Q3=0', getPin(comp, 'Q3'), 0);
 }
 
-// ─── 74F455 - Octal Buffer w/ Parity (inverting) ─────────────────────────
+// ─── 74x455 - Octal Buffer w/ Parity (inverting) ─────────────────────────
 {
-  const { comp, spec } = makeComp('74F455');
+  const { comp, spec } = makeComp('74x455');
   const gate = spec.gates[0];
 
   // OEn=0, all A=0 → Y outputs all 1 (inverted), 0 ones → even parity → EP=0 no error
   setPin(comp, 'OEn', 0); setPin(comp, 'EP', 0);
   for (let i = 0; i < 8; i++) setPin(comp, `A${i}`, 0);
   runGate(comp, gate);
-  expect('74F455 all-0 Y0=1', getPin(comp, 'Y0'), 1);
-  expect('74F455 all-0 Y7=1', getPin(comp, 'Y7'), 1);
-  expect('74F455 all-0 PERR=0', getPin(comp, 'PERR'), 0);
+  expect('74x455 all-0 Y0=1', getPin(comp, 'Y0'), 1);
+  expect('74x455 all-0 Y7=1', getPin(comp, 'Y7'), 1);
+  expect('74x455 all-0 PERR=0', getPin(comp, 'PERR'), 0);
 
   // A0=1: 1 one → odd count → EP=0(even expected) → PERR=1
   setPin(comp, 'A0', 1);
   runGate(comp, gate);
-  expect('74F455 A0=1 Y0=0 (inverted)', getPin(comp, 'Y0'), 0);
-  expect('74F455 A0=1 PERR=1', getPin(comp, 'PERR'), 1);
+  expect('74x455 A0=1 Y0=0 (inverted)', getPin(comp, 'Y0'), 0);
+  expect('74x455 A0=1 PERR=1', getPin(comp, 'PERR'), 1);
 
   // A0=1,A1=1: 2 ones → even → PERR=0
   setPin(comp, 'A1', 1);
   runGate(comp, gate);
-  expect('74F455 A0=A1=1 PERR=0', getPin(comp, 'PERR'), 0);
+  expect('74x455 A0=A1=1 PERR=0', getPin(comp, 'PERR'), 0);
 
   // OEn=1 → HiZ
   setPin(comp, 'OEn', 1);
   runGate(comp, gate);
-  expect('74F455 OEn=1 Y0 HiZ', getPin(comp, 'Y0'), 0.5);
-  expect('74F455 OEn=1 PERR HiZ', getPin(comp, 'PERR'), 0.5);
+  expect('74x455 OEn=1 Y0 HiZ', getPin(comp, 'Y0'), 0.5);
+  expect('74x455 OEn=1 PERR HiZ', getPin(comp, 'PERR'), 0.5);
 }
 
-// ─── 74F456 - Octal Buffer w/ Parity (non-inverting) ─────────────────────
+// ─── 74x456 - Octal Buffer w/ Parity (non inverting) ─────────────────────
 {
-  const { comp, spec } = makeComp('74F456');
+  const { comp, spec } = makeComp('74x456');
   const gate = spec.gates[0];
 
   // OEn=0, A0=1, rest 0 → Y0=1, odd → EP=0 → PERR=1
@@ -417,23 +383,23 @@ function expect(label, actual, expected) {
   for (let i = 0; i < 8; i++) setPin(comp, `A${i}`, 0);
   setPin(comp, 'A0', 1);
   runGate(comp, gate);
-  expect('74F456 A0=1 Y0=1',    getPin(comp, 'Y0'), 1);
-  expect('74F456 A0=1 PERR=1',  getPin(comp, 'PERR'), 1);
+  expect('74x456 A0=1 Y0=1',    getPin(comp, 'Y0'), 1);
+  expect('74x456 A0=1 PERR=1',  getPin(comp, 'PERR'), 1);
 
   // EP=1 (odd parity expected): 1 one → correct → PERR=0
   setPin(comp, 'EP', 1);
   runGate(comp, gate);
-  expect('74F456 EP=1 A0=1 PERR=0', getPin(comp, 'PERR'), 0);
+  expect('74x456 EP=1 A0=1 PERR=0', getPin(comp, 'PERR'), 0);
 
   // OEn=1 → HiZ
   setPin(comp, 'OEn', 1);
   runGate(comp, gate);
-  expect('74F456 OEn=1 Y0 HiZ', getPin(comp, 'Y0'), 0.5);
+  expect('74x456 OEn=1 Y0 HiZ', getPin(comp, 'Y0'), 0.5);
 }
 
 // ─── 74458 - Nines Complement ────────────────────────────────────────────
 {
-  const { comp, spec } = makeComp('74458');
+  const { comp, spec } = makeComp('74x458');
   const gate = spec.gates[0];
 
   // ZEn=1, A=3 → Y = 9-3 = 6 = 0110
@@ -459,9 +425,9 @@ function expect(label, actual, expected) {
   expect('74458 9s-compl(9)=0 Y3=0', getPin(comp, 'Y3'), 0);
 }
 
-// ─── 74LS460 - 10 bit Comparator ─────────────────────────────────────────
+// ─── 74x460 - 10 bit Comparator ─────────────────────────────────────────
 {
-  const { comp, spec } = makeComp('74LS460');
+  const { comp, spec } = makeComp('74x460');
   const gate = spec.gates[0];
 
   // A=B=0b1010101010, OEn=0 → AEQB=1
@@ -472,22 +438,22 @@ function expect(label, actual, expected) {
     setPin(comp, `B${i}`, bit);
   }
   runGate(comp, gate);
-  expect('74LS460 A==B AEQB=1', getPin(comp, 'AEQB'), 1);
+  expect('74x460 A==B AEQB=1', getPin(comp, 'AEQB'), 1);
 
   // Change A1 to differ
   setPin(comp, 'A1', 0);
   runGate(comp, gate);
-  expect('74LS460 A!=B AEQB=0', getPin(comp, 'AEQB'), 0);
+  expect('74x460 A!=B AEQB=0', getPin(comp, 'AEQB'), 0);
 
   // OEn=1 → HiZ
   setPin(comp, 'OEn', 1);
   runGate(comp, gate);
-  expect('74LS460 OEn=1 AEQB HiZ', getPin(comp, 'AEQB'), 0.5);
+  expect('74x460 OEn=1 AEQB HiZ', getPin(comp, 'AEQB'), 0.5);
 }
 
 // ─── 74461 - 8 bit Presettable Counter ───────────────────────────────────
 {
-  const { comp, spec } = makeComp('74461');
+  const { comp, spec } = makeComp('74x461');
   const gate = spec.gates[0];
 
   // Clear: CLRn=0

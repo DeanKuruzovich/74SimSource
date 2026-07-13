@@ -85,7 +85,7 @@
     if (document.getElementById('article-' + id)) {
       showArticle(id, false);
     } else {
-      // id is a heading anchor inside an article — show the parent article without
+      // id is a heading anchor inside an article show the parent article without
       // resetting scroll, then jump directly to the heading
       const heading = document.getElementById(id);
       const parentArticle = heading && heading.closest('.doc-article');

@@ -1,21 +1,21 @@
 // test-chips39.mjs - Tests for all chips defined in js/chips/chips39.js
 // Chips under test:
-//   74758        : Quad bus transceiver, inverting, OC        (GENERIC_STUB + OC, 14-pin)
-//   74759        : Quad bus transceiver, non-inverting, OC    (GENERIC_STUB + OC, 14-pin)
-//   74760        : Octal buffer, non-inverting, OC            (GENERIC_STUB + OC, 20-pin)
-//   74762        : Octal buffer, inv+non-inv, OC              (GENERIC_STUB + OC, 20-pin)
-//   74763        : Octal buffer, inverting, comp.en, OC       (GENERIC_STUB + OC, 20-pin)
-//   74777        : Triple latched transceiver, TRI+OC         (GENERIC_STUB, 20-pin)
-//   74779        : 8 bit bidirectional counter, TRI           (GENERIC_STUB, 16-pin)
-//   74784        : 8 bit multiplier/adder                     (GENERIC_STUB, 20-pin)
-//   74786        : 4 input asynchronous bus arbiter           (GENERIC_STUB, 16-pin)
-//   74793        : 8 bit latch, readback                      (GENERIC_STUB, 20-pin)
-//   74794        : 8 bit register, readback                   (GENERIC_STUB, 20-pin)
-//   74795        : Octal buffer, non-inv, shared en, TRI      (GENERIC_STUB, 20-pin)
-//   74796        : Octal buffer, inv, shared en, TRI          (GENERIC_STUB, 20-pin)
-//   74797        : Octal buffer, non-inv, split en, TRI       (GENERIC_STUB, 20-pin)
-//   74798        : Octal buffer, inv, split en, TRI           (GENERIC_STUB, 20-pin)
-//   74800        : Triple 4 input AND/NAND driver             (GENERIC_STUB, 20-pin)
+//   74758        : Quad bus transceiver, inverting, OC        (GENERIC_STUB + OC, 14 pin)
+//   74759        : Quad bus transceiver, non inverting, OC    (GENERIC_STUB + OC, 14 pin)
+//   74760        : Octal buffer, non inverting, OC            (GENERIC_STUB + OC, 20 pin)
+//   74762        : Octal buffer, inv+non-inv, OC              (GENERIC_STUB + OC, 20 pin)
+//   74763        : Octal buffer, inverting, comp.en, OC       (GENERIC_STUB + OC, 20 pin)
+//   74777        : Triple latched transceiver, TRI+OC         (GENERIC_STUB, 20 pin)
+//   74779        : 8 bit bidirectional counter, TRI           (GENERIC_STUB, 16 pin)
+//   74784        : 8 bit multiplier/adder                     (GENERIC_STUB, 20 pin)
+//   74786        : 4 input asynchronous bus arbiter           (GENERIC_STUB, 16 pin)
+//   74793        : 8 bit latch, readback                      (GENERIC_STUB, 20 pin)
+//   74794        : 8 bit register, readback                   (GENERIC_STUB, 20 pin)
+//   74795        : Octal buffer, non-inv, shared en, TRI      (GENERIC_STUB, 20 pin)
+//   74796        : Octal buffer, inv, shared en, TRI          (GENERIC_STUB, 20 pin)
+//   74797        : Octal buffer, non-inv, split en, TRI       (GENERIC_STUB, 20 pin)
+//   74798        : Octal buffer, inv, split en, TRI           (GENERIC_STUB, 20 pin)
+//   74800        : Triple 4 input AND/NAND driver             (GENERIC_STUB, 20 pin)
 
 import { CHIPS_BLOCK_39 } from '../chips/chips39.js';
 import { BreadboardWorld, holeId } from '../breadboard.js';
@@ -91,39 +91,39 @@ function connectPinLow(wm, chip, name) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const EXPECTED_IDS = [
-  '74758','74759',
-  '74760',
-  '74762','74763',
-  '74777',
-  '74779',
-  '74784',
-  '74786',
-  '74793','74794',
-  '74795','74796',
-  '74797','74798',
-  '74800',
+  '74x758','74x759',
+  '74x760',
+  '74x762','74x763',
+  '74x777',
+  '74x779',
+  '74x784',
+  '74x786',
+  '74x793','74x794',
+  '74x795','74x796',
+  '74x797','74x798',
+  '74x800',
 ];
 
 const EXPECTED_SPECS = {
-  '74758': { pins: 14, gnd:  7, vcc: 14 },
-  '74759': { pins: 14, gnd:  7, vcc: 14 },
-  '74760': { pins: 20, gnd: 10, vcc: 20 },
-  '74762': { pins: 20, gnd: 10, vcc: 20 },
-  '74763': { pins: 20, gnd: 10, vcc: 20 },
-  '74777': { pins: 20, gnd: 10, vcc: 20 },
-  '74779': { pins: 16, gnd:  8, vcc: 16 },
-  '74784': { pins: 20, gnd: 10, vcc: 20 },
-  '74786': { pins: 16, gnd:  8, vcc: 16 },
-  '74793': { pins: 20, gnd: 10, vcc: 20 },
-  '74794': { pins: 20, gnd: 10, vcc: 20 },
-  '74795': { pins: 20, gnd: 10, vcc: 20 },
-  '74796': { pins: 20, gnd: 10, vcc: 20 },
-  '74797': { pins: 20, gnd: 10, vcc: 20 },
-  '74798': { pins: 20, gnd: 10, vcc: 20 },
-  '74800': { pins: 20, gnd: 10, vcc: 20 },
+  '74x758': { pins: 14, gnd:  7, vcc: 14 },
+  '74x759': { pins: 14, gnd:  7, vcc: 14 },
+  '74x760': { pins: 20, gnd: 10, vcc: 20 },
+  '74x762': { pins: 20, gnd: 10, vcc: 20 },
+  '74x763': { pins: 20, gnd: 10, vcc: 20 },
+  '74x777': { pins: 20, gnd: 10, vcc: 20 },
+  '74x779': { pins: 16, gnd:  8, vcc: 16 },
+  '74x784': { pins: 20, gnd: 10, vcc: 20 },
+  '74x786': { pins: 16, gnd:  8, vcc: 16 },
+  '74x793': { pins: 20, gnd: 10, vcc: 20 },
+  '74x794': { pins: 20, gnd: 10, vcc: 20 },
+  '74x795': { pins: 20, gnd: 10, vcc: 20 },
+  '74x796': { pins: 20, gnd: 10, vcc: 20 },
+  '74x797': { pins: 20, gnd: 10, vcc: 20 },
+  '74x798': { pins: 20, gnd: 10, vcc: 20 },
+  '74x800': { pins: 20, gnd: 10, vcc: 20 },
 };
 
-const OC_IDS = ['74758','74759','74760','74762','74763'];
+const OC_IDS = ['74x758','74x759','74x760','74x762','74x763'];
 
 console.log('\n=== SECTION S: Structure ===');
 
@@ -161,17 +161,17 @@ for (const id of EXPECTED_IDS) {
 console.log('\n=== SECTION A: Stub chips (HiZ outputs) ===');
 
 const STUB_CONFIGS = [
-  { id: '74777', outputs: ['B0','B1','B2'] },
-  { id: '74779', outputs: ['D0','D1','D2','D3','D4','D5','D6','D7','TC'] },
-  { id: '74784', outputs: ['S0','S1','S2','S3','S4','S5','S6','S7','OVF'] },
-  { id: '74786', outputs: ['GNT0n','GNT1n','GNT2n','GNT3n'] },
-  { id: '74793', outputs: ['Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7'] },
-  { id: '74794', outputs: ['Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7'] },
-  { id: '74795', outputs: ['Y0','Y1','Y2','Y3','Y4','Y5','Y6','Y7'] },
-  { id: '74796', outputs: ['Y0','Y1','Y2','Y3','Y4','Y5','Y6','Y7'] },
-  { id: '74797', outputs: ['Y0','Y1','Y2','Y3','Y4','Y5','Y6','Y7'] },
-  { id: '74798', outputs: ['Y0','Y1','Y2','Y3','Y4','Y5','Y6','Y7'] },
-  { id: '74800', outputs: ['Y0','Y0n','Y1','Y1n','Y2','Y2n'] },
+  { id: '74x777', outputs: ['B0','B1','B2'] },
+  { id: '74x779', outputs: ['D0','D1','D2','D3','D4','D5','D6','D7','TC'] },
+  { id: '74x784', outputs: ['S0','S1','S2','S3','S4','S5','S6','S7','OVF'] },
+  { id: '74x786', outputs: ['GNT0n','GNT1n','GNT2n','GNT3n'] },
+  { id: '74x793', outputs: ['Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7'] },
+  { id: '74x794', outputs: ['Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7'] },
+  { id: '74x795', outputs: ['Y0','Y1','Y2','Y3','Y4','Y5','Y6','Y7'] },
+  { id: '74x796', outputs: ['Y0','Y1','Y2','Y3','Y4','Y5','Y6','Y7'] },
+  { id: '74x797', outputs: ['Y0','Y1','Y2','Y3','Y4','Y5','Y6','Y7'] },
+  { id: '74x798', outputs: ['Y0','Y1','Y2','Y3','Y4','Y5','Y6','Y7'] },
+  { id: '74x800', outputs: ['Y0','Y0n','Y1','Y1n','Y2','Y2n'] },
 ];
 
 for (const { id, outputs } of STUB_CONFIGS) {
@@ -190,11 +190,11 @@ for (const { id, outputs } of STUB_CONFIGS) {
 console.log('\n=== SECTION B: OC stub chips (outputs pulled HIGH) ===');
 
 const OC_STUB_CONFIGS = [
-  { id: '74758', outputs: ['B0','B1','B2','B3'] },
-  { id: '74759', outputs: ['B0','B1','B2','B3'] },
-  { id: '74760', outputs: ['Y0','Y1','Y2','Y3','Y4','Y5','Y6','Y7'] },
-  { id: '74762', outputs: ['Y4','Y4n','Y5','Y5n','Y6','Y6n','Y7','Y7n'] },
-  { id: '74763', outputs: ['Y0','Y1','Y2','Y3','Y4','Y5','Y6','Y7'] },
+  { id: '74x758', outputs: ['B0','B1','B2','B3'] },
+  { id: '74x759', outputs: ['B0','B1','B2','B3'] },
+  { id: '74x760', outputs: ['Y0','Y1','Y2','Y3','Y4','Y5','Y6','Y7'] },
+  { id: '74x762', outputs: ['Y4','Y4n','Y5','Y5n','Y6','Y6n','Y7','Y7n'] },
+  { id: '74x763', outputs: ['Y0','Y1','Y2','Y3','Y4','Y5','Y6','Y7'] },
 ];
 
 for (const { id, outputs } of OC_STUB_CONFIGS) {

@@ -1,7 +1,7 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  font-family: 'SF Mono', 'Menlo', 'Monaco', 'Consolas', monospace;
+  font-family: var(--font-body);
   background: var(--bg);
   color: var(--text-dim);
   min-height: 100vh;
@@ -33,11 +33,6 @@ a:hover { color: var(--link-hover); text-decoration: underline; }
   aspect-ratio: 227 / 137;
   height: auto;
   display: block;
-}
-
-.topbar-auth {
-  display: flex;
-  align-items: center;
 }
 
 .page {
@@ -75,22 +70,6 @@ aside {
   color: var(--text-muted);
   margin-bottom: 10px;
 }
-
-.user-pill {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 11px;
-  color: var(--text-muted);
-}
-
-.user-pill .username {
-  color: var(--text);
-  letter-spacing: 0.2px;
-  word-break: break-all;
-}
-
-
 
 main { min-width: 0; }
 

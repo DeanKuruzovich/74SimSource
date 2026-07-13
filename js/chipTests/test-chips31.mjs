@@ -81,7 +81,7 @@ function evalComp(comp) {
 console.log('--- REG_OCTAL_INV_TRI (74564 / 74576) ---');
 {
   // Gate type reuse: on rising CLK, Qn = NOT(D)
-  const c = makeComp('74564');
+  const c = makeComp('74x564');
   setPin(c, 'OEn', 0); setPin(c, 'CLK', 0);
   const data = 0b10110011;
   for (let i = 0; i < 8; i++) setPin(c, `D${i}`, (data >> i) & 1);
@@ -98,7 +98,7 @@ console.log('--- REG_OCTAL_INV_TRI (74564 / 74576) ---');
 }
 {
   // 74576 same gate type
-  const c = makeComp('74576');
+  const c = makeComp('74x576');
   setPin(c, 'OEn', 0); setPin(c, 'CLK', 0);
   for (let i = 0; i < 8; i++) setPin(c, `D${i}`, 1);
   evalComp(c);
@@ -114,7 +114,7 @@ console.log('--- REG_OCTAL_INV_TRI (74564 / 74576) ---');
 console.log('--- TRANSCEIVER_OCTAL_REG_INV (74566) ---');
 {
   // Gate type reuse: DIR=1 A→B inverted, on CLK rising
-  const c = makeComp('74566');
+  const c = makeComp('74x566');
   setPin(c, 'OEABn', 0); setPin(c, 'OEBAn', 1);
   setPin(c, 'LEAB', 0); setPin(c, 'LEBA', 0);
   setPin(c, 'CLK', 0); setPin(c, 'DIR', 1);
@@ -136,7 +136,7 @@ console.log('--- TRANSCEIVER_OCTAL_REG_INV (74566) ---');
 console.log('--- TRANSCEIVER_OCTAL_LATCH_INV (74567) ---');
 {
   // DIR=1: LEAB=1 → latch A, drive B inverted
-  const c = makeComp('74567');
+  const c = makeComp('74x567');
   setPin(c, 'OEABn', 0); setPin(c, 'OEBAn', 1);
   setPin(c, 'LEAB', 1); setPin(c, 'LEBA', 0);
   setPin(c, 'DIR', 1);
@@ -154,7 +154,7 @@ console.log('--- TRANSCEIVER_OCTAL_LATCH_INV (74567) ---');
 }
 {
   // DIR=0: LEBA=1 → latch B, drive A inverted
-  const c = makeComp('74567');
+  const c = makeComp('74x567');
   setPin(c, 'OEABn', 1); setPin(c, 'OEBAn', 0);
   setPin(c, 'LEAB', 0); setPin(c, 'LEBA', 1);
   setPin(c, 'DIR', 0);
@@ -173,7 +173,7 @@ console.log('--- TRANSCEIVER_OCTAL_LATCH_INV (74567) ---');
 console.log('--- COUNTER_SYNC_DECADE_UPDOWN_TRI (74568) ---');
 {
   // Count up 0→9→0
-  const c = makeComp('74568');
+  const c = makeComp('74x568');
   setPin(c, 'CLRn', 1); setPin(c, 'CLK', 0);
   setPin(c, 'U_Dn', 1); setPin(c, 'ENP', 1); setPin(c, 'ENT', 1);
   setPin(c, 'LOAD', 1); setPin(c, 'OEn', 0);
@@ -192,7 +192,7 @@ console.log('--- COUNTER_SYNC_DECADE_UPDOWN_TRI (74568) ---');
 }
 {
   // Count down: load=5, then count down to 0 → RCO
-  const c = makeComp('74568');
+  const c = makeComp('74x568');
   setPin(c, 'CLRn', 1); setPin(c, 'CLK', 0);
   setPin(c, 'U_Dn', 0); setPin(c, 'ENP', 1); setPin(c, 'ENT', 1);
   setPin(c, 'LOAD', 0); setPin(c, 'OEn', 0);
@@ -209,7 +209,7 @@ console.log('--- COUNTER_SYNC_DECADE_UPDOWN_TRI (74568) ---');
 }
 {
   // OEn=1 → Q=HiZ
-  const c = makeComp('74568');
+  const c = makeComp('74x568');
   setPin(c, 'CLRn', 1); setPin(c, 'CLK', 0);
   setPin(c, 'ENP', 1); setPin(c, 'ENT', 1); setPin(c, 'LOAD', 1); setPin(c, 'OEn', 1);
   evalComp(c);
@@ -218,7 +218,7 @@ console.log('--- COUNTER_SYNC_DECADE_UPDOWN_TRI (74568) ---');
 }
 {
   // CLRn=0 → synchronous clear
-  const c = makeComp('74568');
+  const c = makeComp('74x568');
   setPin(c, 'CLRn', 1); setPin(c, 'CLK', 0);
   setPin(c, 'U_Dn', 1); setPin(c, 'ENP', 1); setPin(c, 'ENT', 1);
   setPin(c, 'LOAD', 1); setPin(c, 'OEn', 0);
@@ -235,7 +235,7 @@ console.log('--- COUNTER_SYNC_DECADE_UPDOWN_TRI (74568) ---');
 console.log('--- COUNTER_SYNC_BIN_UPDOWN_TRI (74569) ---');
 {
   // Count up 0→15→0
-  const c = makeComp('74569');
+  const c = makeComp('74x569');
   setPin(c, 'CLRn', 1); setPin(c, 'CLK', 0);
   setPin(c, 'U_Dn', 1); setPin(c, 'ENP', 1); setPin(c, 'ENT', 1);
   setPin(c, 'LOAD', 1); setPin(c, 'OEn', 0);
@@ -249,7 +249,7 @@ console.log('--- COUNTER_SYNC_BIN_UPDOWN_TRI (74569) ---');
 }
 {
   // Count down from 15
-  const c = makeComp('74569');
+  const c = makeComp('74x569');
   setPin(c, 'CLRn', 1); setPin(c, 'CLK', 0);
   setPin(c, 'U_Dn', 0); setPin(c, 'ENP', 1); setPin(c, 'ENT', 1);
   setPin(c, 'LOAD', 0); setPin(c, 'OEn', 0);
@@ -261,60 +261,13 @@ console.log('--- COUNTER_SYNC_BIN_UPDOWN_TRI (74569) ---');
   assert(getPin(c, 'QA') === 0 && getPin(c, 'QB') === 0 && getPin(c, 'QC') === 0 && getPin(c, 'QD') === 0, '74569 count-down reached 0');
   assert(getPin(c, 'RCO') === 1, '74569 down at 0: RCO=1');
 }
-, _chipKey: '74570' };
-  // CSn=1 → HiZ
-  setPin(c, 'CSn', 1);
-  SIM._evaluateProm512x4Oc(c, chip.gates[0]);
-  for (const d of ['D0','D1','D2','D3'])
-    assert(getPin(c, d) === 'Z', `74570 CSn=1 → ${d}=HiZ`);
-  // CSn=0, addr 0 → default 0
-  setPin(c, 'CSn', 0);
-  for (let i = 0; i < 9; i++) setPin(c, `A${i}`, 0);
-  SIM._evaluateProm512x4Oc(c, chip.gates[0]);
-  for (const d of ['D0','D1','D2','D3'])
-    assert(getPin(c, d) === 0, `74570 addr=0 → ${d}=0`);
-  // Write to ROM and read back
-  c.state.rom[0x1A5] = 0b1010;
-  setPin(c, 'A0', 1); setPin(c, 'A1', 0); setPin(c, 'A2', 1);
-  setPin(c, 'A3', 0); setPin(c, 'A4', 0); setPin(c, 'A5', 1);
-  setPin(c, 'A6', 1); setPin(c, 'A7', 0); setPin(c, 'A8', 0);
-  // addr=0x025 (binary: A0=1,A1=0,A2=1,A3=0,A4=0,A5=1,A6=0,A7=0,A8=0) = 0x025=37
-  // Actually: 0b0'0010'0101 = 0x025 → let me recalculate. A0=1,A1=0,A2=1=4+1=5, A3=0,A4=0,A5=1=32: addr=5+32=37≠0x1A5
-  // Let me just test addr=5 (A0=1,A1=0,A2=1)
-  c.state.rom[5] = 0b1001;
-  setPin(c, 'A0', 1); setPin(c, 'A1', 0); setPin(c, 'A2', 1);
-  setPin(c, 'A3', 0); setPin(c, 'A4', 0); setPin(c, 'A5', 0);
-  setPin(c, 'A6', 0); setPin(c, 'A7', 0); setPin(c, 'A8', 0);
-  SIM._evaluateProm512x4Oc(c, chip.gates[0]);
-  assert(getPin(c, 'D0') === 1, '74570 rom[5] D0=1');
-  assert(getPin(c, 'D1') === 0, '74570 rom[5] D1=0');
-  assert(getPin(c, 'D2') === 0, '74570 rom[5] D2=0');
-  assert(getPin(c, 'D3') === 1, '74570 rom[5] D3=1');
-}
-, _chipKey: '74571' };
-  setPin(c, 'OEn', 1);
-  SIM._evaluateProm512x4Tri(c, chip.gates[0]);
-  for (const d of ['D0','D1','D2','D3'])
-    assert(getPin(c, d) === 'Z', `74571 OEn=1 → ${d}=HiZ`);
-  setPin(c, 'OEn', 0);
-  for (let i = 0; i < 9; i++) setPin(c, `A${i}`, 0);
-  SIM._evaluateProm512x4Tri(c, chip.gates[0]);
-  for (const d of ['D0','D1','D2','D3'])
-    assert(getPin(c, d) === 0, `74571 addr=0 → ${d}=0`);
-  // Write and read
-  c.state.rom[7] = 0b0110;
-  setPin(c, 'A0', 1); setPin(c, 'A1', 1); setPin(c, 'A2', 1);
-  for (let i = 3; i < 9; i++) setPin(c, `A${i}`, 0);
-  SIM._evaluateProm512x4Tri(c, chip.gates[0]);
-  assert(getPin(c, 'D0') === 0 && getPin(c, 'D1') === 1 && getPin(c, 'D2') === 1 && getPin(c, 'D3') === 0, '74571 rom[7]=0b0110');
-}
 // ─────────────────────────────────────────────────────────────────────────────
 // REG_OCTAL_SYNCLR_TRI (74575)
 // ─────────────────────────────────────────────────────────────────────────────
 console.log('--- REG_OCTAL_SYNCLR_TRI (74575) ---');
 {
   // Normal capture on rising CLK
-  const c = makeComp('74575');
+  const c = makeComp('74x575');
   setPin(c, 'OEn', 0); setPin(c, 'CLRn', 1); setPin(c, 'CLK', 0);
   const data = 0b11001010;
   for (let i = 0; i < 8; i++) setPin(c, `D${i}`, (data >> i) & 1);
@@ -325,7 +278,7 @@ console.log('--- REG_OCTAL_SYNCLR_TRI (74575) ---');
 }
 {
   // Synchronous clear: CLRn=0 on rising CLK → Q=0
-  const c = makeComp('74575');
+  const c = makeComp('74x575');
   setPin(c, 'OEn', 0); setPin(c, 'CLRn', 1); setPin(c, 'CLK', 0);
   for (let i = 0; i < 8; i++) setPin(c, `D${i}`, 1);
   evalComp(c);
@@ -337,7 +290,7 @@ console.log('--- REG_OCTAL_SYNCLR_TRI (74575) ---');
 }
 {
   // OEn=1 → Q=HiZ
-  const c = makeComp('74575');
+  const c = makeComp('74x575');
   setPin(c, 'OEn', 1); setPin(c, 'CLRn', 1); setPin(c, 'CLK', 0);
   evalComp(c);
   for (let i = 0; i < 8; i++)
@@ -350,7 +303,7 @@ console.log('--- REG_OCTAL_SYNCLR_TRI (74575) ---');
 console.log('--- REG_OCTAL_SYNCLR_INV_TRI (74577) ---');
 {
   // Normal: capture NOT(D) on rising CLK
-  const c = makeComp('74577');
+  const c = makeComp('74x577');
   setPin(c, 'OEn', 0); setPin(c, 'CLRn', 1); setPin(c, 'CLK', 0);
   const data = 0b10101100;
   for (let i = 0; i < 8; i++) setPin(c, `D${i}`, (data >> i) & 1);
@@ -363,7 +316,7 @@ console.log('--- REG_OCTAL_SYNCLR_INV_TRI (74577) ---');
 }
 {
   // Sync clear: Q=0 → Qn=1
-  const c = makeComp('74577');
+  const c = makeComp('74x577');
   setPin(c, 'OEn', 0); setPin(c, 'CLRn', 1); setPin(c, 'CLK', 0);
   for (let i = 0; i < 8; i++) setPin(c, `D${i}`, 0); // D=0 → Qn=1
   evalComp(c);
@@ -380,7 +333,7 @@ console.log('--- REG_OCTAL_SYNCLR_INV_TRI (74577) ---');
 console.log('--- COUNTER_8BIT_BIDIR_TRI (74579) ---');
 {
   // Count up 0→255→0
-  const c = makeComp('74579');
+  const c = makeComp('74x579');
   setPin(c, 'CLK', 0); setPin(c, 'ENT', 1); setPin(c, 'ENP', 1);
   setPin(c, 'U_Dn', 1); setPin(c, 'LOAD', 1); setPin(c, 'OEn', 0);
   for (let i = 0; i < 8; i++) setPin(c, `A${i}`, 0);
@@ -399,7 +352,7 @@ console.log('--- COUNTER_8BIT_BIDIR_TRI (74579) ---');
 }
 {
   // Count down
-  const c = makeComp('74579');
+  const c = makeComp('74x579');
   setPin(c, 'ENT', 1); setPin(c, 'ENP', 1);
   setPin(c, 'U_Dn', 0); setPin(c, 'LOAD', 0); setPin(c, 'OEn', 0);
   for (let i = 0; i < 8; i++) setPin(c, `A${i}`, 1); // data=0xFF
@@ -412,7 +365,7 @@ console.log('--- COUNTER_8BIT_BIDIR_TRI (74579) ---');
 }
 {
   // OEn=1 → A0-A7=HiZ (TC always driven)
-  const c = makeComp('74579');
+  const c = makeComp('74x579');
   setPin(c, 'CLK', 0); setPin(c, 'OEn', 1);
   setPin(c, 'ENT', 1); setPin(c, 'U_Dn', 1); setPin(c, 'LOAD', 1);
   evalComp(c);
@@ -425,9 +378,9 @@ console.log('--- COUNTER_8BIT_BIDIR_TRI (74579) ---');
 // ─────────────────────────────────────────────────────────────────────────────
 console.log('--- LATCH_OCTAL_INV_TRI reuse (74580) ---');
 {
-  assert(CHIPS_BLOCK_31['74580'].gates[0].type === 'LATCH_OCTAL_INV_TRI', '74580 uses LATCH_OCTAL_INV_TRI');
-  const chip = CHIPS_BLOCK_31['74580'];
-  const c = { id: 'U1', type: 'LATCH_OCTAL_INV_TRI', pins: {}, _chipKey: '74580' };
+  assert(CHIPS_BLOCK_31['74x580'].gates[0].type === 'LATCH_OCTAL_INV_TRI', '74580 uses LATCH_OCTAL_INV_TRI');
+  const chip = CHIPS_BLOCK_31['74x580'];
+  const c = { id: 'U1', type: 'LATCH_OCTAL_INV_TRI', pins: {}, _chipKey: '74x580' };
   setPin(c, 'OEn', 0); setPin(c, 'LE', 1);
   const data = 0b10110101;
   for (let i = 0; i < 8; i++) setPin(c, `D${i}`, (data >> i) & 1);
@@ -441,8 +394,8 @@ console.log('--- LATCH_OCTAL_INV_TRI reuse (74580) ---');
 // ─────────────────────────────────────────────────────────────────────────────
 console.log('--- ADDER_BCD_4BIT (74583) ---');
 {
-  const chip = CHIPS_BLOCK_31['74583'];
-  const c = { id: 'U1', type: 'ADDER_BCD_4BIT', pins: {}, _chipKey: '74583' };
+  const chip = CHIPS_BLOCK_31['74x583'];
+  const c = { id: 'U1', type: 'ADDER_BCD_4BIT', pins: {}, _chipKey: '74x583' };
   // 3 + 4 = 7, no carry
   const a = 3, b = 4;
   for (let i = 0; i < 4; i++) setPin(c, `A${i}`, (a >> i) & 1);
@@ -453,8 +406,8 @@ console.log('--- ADDER_BCD_4BIT (74583) ---');
   assert(getPin(c, 'Cout') === 0, '74583 3+4 no carry');
 }
 {
-  const chip = CHIPS_BLOCK_31['74583'];
-  const c = { id: 'U1', type: 'ADDER_BCD_4BIT', pins: {}, _chipKey: '74583' };
+  const chip = CHIPS_BLOCK_31['74x583'];
+  const c = { id: 'U1', type: 'ADDER_BCD_4BIT', pins: {}, _chipKey: '74x583' };
   // 5 + 8 = 13 → BCD: result=3, carry=1  (13-10=3, since 13>9: (13+6)&0xF=3, carry=1 ✓)
   const a = 5, b = 8;
   for (let i = 0; i < 4; i++) setPin(c, `A${i}`, (a >> i) & 1);
@@ -466,8 +419,8 @@ console.log('--- ADDER_BCD_4BIT (74583) ---');
   assert(getPin(c, 'Cout') === 1, '74583 5+8 carry=1');
 }
 {
-  const chip = CHIPS_BLOCK_31['74583'];
-  const c = { id: 'U1', type: 'ADDER_BCD_4BIT', pins: {}, _chipKey: '74583' };
+  const chip = CHIPS_BLOCK_31['74x583'];
+  const c = { id: 'U1', type: 'ADDER_BCD_4BIT', pins: {}, _chipKey: '74x583' };
   // With carry in: 9 + 0 + 1 = 10 → BCD: result=0, carry=1
   const a = 9, b = 0;
   for (let i = 0; i < 4; i++) setPin(c, `A${i}`, (a >> i) & 1);
@@ -483,8 +436,8 @@ console.log('--- ADDER_BCD_4BIT (74583) ---');
 // ─────────────────────────────────────────────────────────────────────────────
 console.log('--- ALU_BCD_4BIT (74582) ---');
 {
-  const chip = CHIPS_BLOCK_31['74582'];
-  const c = { id: 'U1', type: 'ALU_BCD_4BIT', pins: {}, _chipKey: '74582' };
+  const chip = CHIPS_BLOCK_31['74x582'];
+  const c = { id: 'U1', type: 'ALU_BCD_4BIT', pins: {}, _chipKey: '74x582' };
   // BCD add: A=3, B=4, Cn=0, M=0, S=1001 (add)
   const a = 3, b = 4;
   for (let i = 0; i < 4; i++) setPin(c, `A${i}`, (a >> i) & 1);
@@ -503,7 +456,7 @@ console.log('--- ALU_BCD_4BIT (74582) ---');
 // ─────────────────────────────────────────────────────────────────────────────
 console.log('--- TRANSCEIVER_8BIT reuse (74588) ---');
 {
-  assert(CHIPS_BLOCK_31['74588'].gates[0].type === 'TRANSCEIVER_8BIT', '74588 uses TRANSCEIVER_8BIT');
+  assert(CHIPS_BLOCK_31['74x588'].gates[0].type === 'TRANSCEIVER_8BIT', '74588 uses TRANSCEIVER_8BIT');
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

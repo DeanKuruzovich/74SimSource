@@ -40,6 +40,24 @@ SIM._drivePinHighZ = function(comp, name) {
   return changed;
 };
 
+SIM._drivePinOC = function(comp, name, bit) {
+  // OC stub: bit=0 sinks to GND; bit=1 is HiZ but the implicit 4.7kΩ pull-up
+  // in production resolves to ~5V, so model the resolved value here.
+  if (!comp.pins[name]) comp.pins[name] = {};
+  const newV = bit ? 5 : 0;
+  const changed = comp.pins[name].voltage !== newV;
+  comp.pins[name].voltage = newV;
+  return changed;
+};
+
+SIM._drivePinBitsOC = function(comp, names, bits) {
+  let changed = false;
+  for (let i = 0; i < names.length; i++) {
+    if (SIM._drivePinOC(comp, names[i], bits[i])) changed = true;
+  }
+  return changed;
+};
+
 function makeComp(type) {
   return { id: 'U1', type, pins: {} };
 }
@@ -63,9 +81,6 @@ function evalGate(comp, gateType) {
     CMP_8BIT_INV:        '_evaluateCmp8BitInv',
     CMP_8BIT_INV_OC:     '_evaluateCmp8BitInvOc',
     CMP_8BIT_REG_OC:     '_evaluateCmp8BitRegOc',
-    CMP_16BIT_PROG:      '_evaluateCmp16BitProg',
-    CMP_12BIT_PROG:      '_evaluateCmp12BitProg',
-    CMP_12BIT_OC:        '_evaluateCmp12BitOc',
     LATCH_OCTAL_TRI:     '_evaluateLatchOctalTri',
     REG_OCTAL_TRI:       '_evaluateRegOctalTri',
     LATCH_OCTAL_INV_TRI: '_evaluateLatchOctalInvTri',
@@ -128,8 +143,8 @@ console.log('--- CMP_8BIT_OC (74518/74519) ---');
 }
 {
   // Test: 74519 chip entry exists
-  assert('74519' in CHIPS_BLOCK_29, '74519 chip entry exists');
-  assert(CHIPS_BLOCK_29['74519'].gates[0].type === 'CMP_8BIT_OC', '74519 gate type = CMP_8BIT_OC');
+  assert('74x519' in CHIPS_BLOCK_29, '74519 chip entry exists');
+  assert(CHIPS_BLOCK_29['74x519'].gates[0].type === 'CMP_8BIT_OC', '74519 gate type = CMP_8BIT_OC');
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -162,7 +177,7 @@ console.log('--- CMP_8BIT_INV (74520/74521) ---');
 }
 {
   // 74521 uses same gate type
-  assert(CHIPS_BLOCK_29['74521'].gates[0].type === 'CMP_8BIT_INV', '74521 gate type = CMP_8BIT_INV');
+  assert(CHIPS_BLOCK_29['74x521'].gates[0].type === 'CMP_8BIT_INV', '74521 gate type = CMP_8BIT_INV');
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -230,68 +245,6 @@ console.log('--- CMP_8BIT_REG_OC (74524) ---');
   setABus(c, 0x55); setBBus(c, 0xAA);
   evalGate(c, 'CMP_8BIT_REG_OC');
   assert(getPin(c, 'EQn') === 0, 'CMP_8BIT_REG_OC: hold output when CLK already high');
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// CMP_16BIT_PROG (74526)
-// ─────────────────────────────────────────────────────────────────────────────
-console.log('--- CMP_16BIT_PROG (74526) ---');
-{
-  // G1n=1 → HiZ
-  const c = makeComp('CMP_16BIT_PROG');
-  setPin(c, 'G1n', 1);
-  evalGate(c, 'CMP_16BIT_PROG');
-  assert(getPin(c, 'EQn') === 'Z', 'CMP_16BIT_PROG: G1n=1 → EQn=HiZ');
-}
-{
-  // G1n=0 → EQn=0 (always match, stub)
-  const c = makeComp('CMP_16BIT_PROG');
-  setPin(c, 'G1n', 0);
-  for (let i = 0; i < 16; i++) setPin(c, `A${i}`, (0xABCD >> i) & 1);
-  evalGate(c, 'CMP_16BIT_PROG');
-  assert(getPin(c, 'EQn') === 0, 'CMP_16BIT_PROG: G1n=0 → EQn=0 (stub match)');
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// CMP_12BIT_PROG (74527)
-// ─────────────────────────────────────────────────────────────────────────────
-console.log('--- CMP_12BIT_PROG (74527) ---');
-{
-  // G1n=1 → HiZ
-  const c = makeComp('CMP_12BIT_PROG');
-  setPin(c, 'G1n', 1);
-  evalGate(c, 'CMP_12BIT_PROG');
-  assert(getPin(c, 'EQn') === 'Z', 'CMP_12BIT_PROG: G1n=1 → EQn=HiZ');
-}
-{
-  // G1n=0 → EQn=0
-  const c = makeComp('CMP_12BIT_PROG');
-  setPin(c, 'G1n', 0);
-  evalGate(c, 'CMP_12BIT_PROG');
-  assert(getPin(c, 'EQn') === 0, 'CMP_12BIT_PROG: G1n=0 → EQn=0 (stub match)');
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// CMP_12BIT_OC (74528)
-// ─────────────────────────────────────────────────────────────────────────────
-console.log('--- CMP_12BIT_OC (74528) ---');
-{
-  // G1n=1 → HiZ
-  const c = makeComp('CMP_12BIT_OC');
-  setPin(c, 'G1n', 1);
-  evalGate(c, 'CMP_12BIT_OC');
-  assert(getPin(c, 'EQn') === 'Z', 'CMP_12BIT_OC: G1n=1 → EQn=HiZ');
-}
-{
-  // G1n=0 → EQn=0
-  const c = makeComp('CMP_12BIT_OC');
-  setPin(c, 'G1n', 0);
-  evalGate(c, 'CMP_12BIT_OC');
-  assert(getPin(c, 'EQn') === 0, 'CMP_12BIT_OC: G1n=0 → EQn=0 (stub match)');
-}
-{
-  // 74528 has 16 pins
-  assert(CHIPS_BLOCK_29['74528'].pins === 16, '74528 has 16 pins');
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -415,7 +368,7 @@ console.log('--- LATCH_OCTAL_INV_TRI (74533/74535) ---');
 }
 {
   // 74535 uses same gate type
-  assert(CHIPS_BLOCK_29['74535'].gates[0].type === 'LATCH_OCTAL_INV_TRI', '74535 gate = LATCH_OCTAL_INV_TRI');
+  assert(CHIPS_BLOCK_29['74x535'].gates[0].type === 'LATCH_OCTAL_INV_TRI', '74535 gate = LATCH_OCTAL_INV_TRI');
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -465,7 +418,7 @@ console.log('--- REG_OCTAL_INV_TRI (74534/74536) ---');
 }
 {
   // 74536 uses same gate type
-  assert(CHIPS_BLOCK_29['74536'].gates[0].type === 'REG_OCTAL_INV_TRI', '74536 gate = REG_OCTAL_INV_TRI');
+  assert(CHIPS_BLOCK_29['74x536'].gates[0].type === 'REG_OCTAL_INV_TRI', '74536 gate = REG_OCTAL_INV_TRI');
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

@@ -7,7 +7,7 @@
       "tileY": 1,
       "col": 5,
       "row": 4,
-      "chipId": "7486"
+      "chipId": "74x86"
     },
     {
       "id": 36,
@@ -16,7 +16,7 @@
       "tileY": 1,
       "col": 17,
       "row": 4,
-      "chipId": "7408"
+      "chipId": "74x08"
     },
     {
       "id": 37,
@@ -25,7 +25,7 @@
       "tileY": 1,
       "col": 29,
       "row": 4,
-      "chipId": "7486"
+      "chipId": "74x86"
     },
     {
       "id": 38,
@@ -34,7 +34,7 @@
       "tileY": 1,
       "col": 41,
       "row": 4,
-      "chipId": "7408"
+      "chipId": "74x08"
     },
     {
       "id": 39,
@@ -43,7 +43,7 @@
       "tileY": 1,
       "col": 53,
       "row": 4,
-      "chipId": "7432"
+      "chipId": "74x32"
     },
     {
       "id": 1,
@@ -108,7 +108,7 @@
       "tileY": 0,
       "col": 8,
       "row": 4,
-      "chipId": "7447"
+      "chipId": "74x47"
     },
     {
       "id": 10,
@@ -122,7 +122,7 @@
     {
       "id": 94,
       "type": "resistor",
-      "resistance": 1000,
+      "resistance": 330,
       "startHoleId": "0:0:main:20:7",
       "endHoleId": "0:0:power:20:3"
     },
@@ -166,7 +166,7 @@
     {
       "id": 107,
       "type": "resistor",
-      "resistance": 1000,
+      "resistance": 330,
       "startHoleId": "0:0:main:44:7",
       "endHoleId": "0:0:power:44:3"
     },
@@ -184,7 +184,7 @@
       "tileY": 0,
       "col": 32,
       "row": 4,
-      "chipId": "7447"
+      "chipId": "74x47"
     },
     {
       "id": 121,
@@ -219,7 +219,7 @@
     {
       "id": 127,
       "type": "resistor",
-      "resistance": 1000,
+      "resistance": 330,
       "startHoleId": "0:0:main:58:7",
       "endHoleId": "0:0:power:58:3"
     },
@@ -230,7 +230,7 @@
       "tileY": 0,
       "col": 48,
       "row": 4,
-      "chipId": "7447"
+      "chipId": "74x47"
     }
   ],
   "wires": [
@@ -894,7 +894,7 @@
       "y": -120,
       "w": 800,
       "h": 50,
-      "text": "Description: Adds two 4 bit numbers and shows the sum on a 7-segment display.",
+      "text": "Description: Adds two 4 bit numbers and shows the sum on a 7 segment display.",
       "v": 2
     },
     {

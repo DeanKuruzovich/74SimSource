@@ -5,29 +5,29 @@ export const CHIPS_BLOCK_18 = {
 
   // ── 74265: Quad Complementary Output Elements ─────────────────────────────
   /* Primary source: Texas Instruments, SN74265 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74265.pdf */
-  '74265': {
+  '74x265': {
     name: '74x265',
     simpleName: 'Quad Compl. Buffer',
-    description: 'Quad complementary output elements: each section has an input, a Q output and a /Q output (14-pin)',
+    description: 'Quad complementary elements, each with Q and /Q outputs (14-pin)',
     pins: 14,
     vcc: 14,
     gnd: 7,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74265.pdf',
     tags: ['buffer', 'complementary', 'inverter', 'logic', 'quad'],
-    guideOverview: 'The 74x265 contains four complementary output elements. Each section has one input (A) and two outputs: Y (non-inverting, same polarity as A) and Yn (inverting, opposite polarity). This eliminates the need for a separate inverter when both the true and complemented versions of a signal are required a common need in clock trees, differential signaling stubs, and control logic.',
+    guideOverview: 'The 74x265 contains four complementary output elements. Each section has one input (A) and two outputs: Y (non inverting, same polarity as A) and Yn (inverting, opposite polarity). This eliminates the need for a separate inverter when both the true and complemented versions of a signal are required a common need in clock trees, differential signaling stubs, and control logic.',
     guidePinDescriptions: {
       '1A':  'Section 1 input.',
-      '1Y':  'Section 1 non-inverting output. Follows 1A.',
+      '1Y':  'Section 1 non inverting output. Follows 1A.',
       '1Yn': 'Section 1 inverting output. Complement of 1A.',
       '2A':  'Section 2 input.',
-      '2Y':  'Section 2 non-inverting output.',
+      '2Y':  'Section 2 non inverting output.',
       '2Yn': 'Section 2 inverting output.',
       'GND': 'Ground reference (pin 7).',
       '3Yn': 'Section 3 inverting output.',
-      '3Y':  'Section 3 non-inverting output.',
+      '3Y':  'Section 3 non inverting output.',
       '3A':  'Section 3 input.',
       '4Yn': 'Section 4 inverting output.',
-      '4Y':  'Section 4 non-inverting output.',
+      '4Y':  'Section 4 non inverting output.',
       '4A':  'Section 4 input.',
       'VCC': 'Positive supply (+5 V, pin 14).',
     },
@@ -57,27 +57,27 @@ export const CHIPS_BLOCK_18 = {
       {
         title: 'Complementary Outputs',
         paragraphs: [
-          'Having both Q and /Q available on the same chip simplifies layouts: you route one wire and get both phases without adding a NOT gate. This is particularly useful in registered clock trees where both rising-edge and falling-edge flip-flops are present, or when driving push-pull stages that need complementary drive signals.',
+          'Having both Q and /Q available on the same chip simplifies layouts: you route one wire and get both phases without adding a NOT gate. This is particularly useful in registered clock trees where both rising edge and falling edge flip flops are present, or when driving push pull stages that need complementary drive signals.',
         ],
       },
     ],
   },
 
-  // ── 74268: Hex D-Type Latches, Tri-state ─────────────────────────────────
+  // ── 74268: Hex D Type Latches, Tri state ─────────────────────────────────
   /* Primary source: Texas Instruments, SN74268 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74268.pdf
      Wikipedia: https://en.wikipedia.org/wiki/Flip-flop_(electronics)
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic */
-  '74268': {
+  '74x268': {
     name: '74x268',
     simpleName: 'Hex D Latches (3-state)',
-    description: 'Hex D-type latches with shared gate enable and shared output control (3-state) (16-pin)',
+    description: 'Hex D-type latch, shared gate enable, 3-state output control (16-pin)',
     pins: 16,
     vcc: 16,
     gnd: 8,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74268.pdf',
-    tags: ['latch', 'd-type', 'hex', 'tri-state', 'sequential'],
+    tags: ['latch', 'd type', 'hex', 'tri state', 'sequential'],
     sequential: true,
-    guideOverview: 'The 74x268 is a hex (6 bit) D-type latch with 3-state outputs. A shared Gate pin G controls transparency for all six bits simultaneously: when G is HIGH, each Q output follows its D input (transparent); when G goes LOW, all six bits are latched (stored). A separate Output Enable pin OEn (active LOW) controls whether the Q outputs are driven or tri-stated, allowing the chip to connect to a shared bus.',
+    guideOverview: 'The 74x268 is a hex (6 bit) D type latch with 3-state outputs. A shared Gate pin G controls transparency for all six bits simultaneously: when G is HIGH, each Q output follows its D input (transparent); when G goes LOW, all six bits are latched (stored). A separate Output Enable pin OEn (active LOW) controls whether the Q outputs are driven or tri stated, allowing the chip to connect to a shared bus.',
     guidePinDescriptions: {
       'G':   'Latch gate enable. HIGH = transparent (Q tracks D); LOW = latch (Q holds last value).',
       '1D':  'Data input for bit 1.',
@@ -87,7 +87,7 @@ export const CHIPS_BLOCK_18 = {
       '5D':  'Data input for bit 5.',
       '6D':  'Data input for bit 6.',
       'GND': 'Ground reference (pin 8).',
-      'OEn': 'Output Enable (active LOW). When asserted (LOW), drives Q outputs; when HIGH, tri-states them.',
+      'OEn': 'Output Enable (active LOW). When asserted (LOW), drives Q outputs; when HIGH, tri states them.',
       '6Q':  'Latched output for bit 6.',
       '5Q':  'Latched output for bit 5.',
       '4Q':  'Latched output for bit 4.',
@@ -134,10 +134,10 @@ export const CHIPS_BLOCK_18 = {
   // ── 74269: 8 bit Bidirectional Binary Counter ──────────────────────────────
   /* Primary source: Texas Instruments, MC74F269 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/mc74f269.pdf
      Wikipedia: https://en.wikipedia.org/wiki/Counter_(digital) */
-  '74269': {
+  '74x269': {
     name: '74x269',
     simpleName: '8 bit Bidir Counter',
-    description: '8 bit synchronous up/down binary counter with synchronous load and clear (24-pin)',
+    description: '8-bit sync up/down binary counter, sync load and clear (24-pin)',
     pins: 24,
     vcc: 24,
     gnd: 12,
@@ -215,10 +215,10 @@ export const CHIPS_BLOCK_18 = {
     ],
   },
 
-  // ── 74274: 4 bit by 4 bit Binary Multiplier, Tri-state ───────────────────
+  // ── 74274: 4 bit by 4 bit Binary Multiplier, Tri state ───────────────────
   /* Primary source: Texas Instruments, SN74S274 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74s274.pdf
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic */
-  '74274': {
+  '74x274': {
     name: '74x274',
     simpleName: '4×4 Multiplier (3-state)',
     description: '4 bit by 4 bit parallel binary multiplier with 3-state output (20-pin)',
@@ -226,8 +226,8 @@ export const CHIPS_BLOCK_18 = {
     vcc: 20,
     gnd: 10,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74s274.pdf',
-    tags: ['multiplier', 'binary', '4 bit', 'tri-state', 'arithmetic'],
-    guideOverview: 'The 74x274 is a 4×4 bit parallel binary multiplier with 3-state outputs. It multiplies two unsigned 4 bit numbers (X0 X3 and Y0 Y3) and produces an 8 bit product (P0 P7) combinationally. Output Enable (active LOW): when asserted (LOW), drives product outputs; when HIGH, tri-states them, allowing multiple multipliers to share a product bus.',
+    tags: ['multiplier', 'binary', '4 bit', 'tri state', 'arithmetic'],
+    guideOverview: 'The 74x274 is a 4×4 bit parallel binary multiplier with 3-state outputs. It multiplies two unsigned 4 bit numbers (X0 X3 and Y0 Y3) and produces an 8 bit product (P0 P7) combinationally. Output Enable (active LOW): when asserted (LOW), drives product outputs; when HIGH, tri states them, allowing multiple multipliers to share a product bus.',
     guidePinDescriptions: {
       'X0':  'Multiplicand bit 0 (LSB).',
       'X1':  'Multiplicand bit 1.',
@@ -237,7 +237,7 @@ export const CHIPS_BLOCK_18 = {
       'Y1':  'Multiplier bit 1.',
       'Y2':  'Multiplier bit 2.',
       'Y3':  'Multiplier bit 3 (MSB).',
-      'OEn': 'Output Enable (active LOW). When asserted (LOW), drives P outputs; when HIGH, tri-states them.',
+      'OEn': 'Output Enable (active LOW). When asserted (LOW), drives P outputs; when HIGH, tri states them.',
       'GND': 'Ground reference (pin 10).',
       'P0':  'Product bit 0 (LSB).',
       'P1':  'Product bit 1.',
@@ -295,16 +295,16 @@ export const CHIPS_BLOCK_18 = {
 
   // ── 74275: 7 bit Slice Wallace Tree ──────────────────────────────────────
   /* Primary source: Texas Instruments, SN74S275 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74s275.pdf */
-  '74275': {
+  '74x275': {
     name: '74x275',
     simpleName: '7 bit Wallace Tree Slice',
-    description: '7 bit slice Wallace tree multiplier element for building multiplier arrays (16-pin)',
+    description: '7-bit slice Wallace tree multiplier element (16-pin)',
     pins: 16,
     vcc: 16,
     gnd: 8,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74s275.pdf',
-    tags: ['multiplier', 'wallace tree', 'arithmetic', 'carry-save'],
-    guideOverview: 'The 74x275 is a 7 bit slice Wallace tree element used to build fast parallel multipliers. A Wallace tree reduces multiple partial product bits at the same column weight to a two-number sum (sum + carry) using a network of full adders, enabling multiplication in O(log N) gate stages. The 74x275 processes 7 input bits per bit position and produces partial sum and carry outputs for the next stage.',
+    tags: ['multiplier', 'wallace tree', 'arithmetic', 'carry save'],
+    guideOverview: 'The 74x275 is a 7 bit slice Wallace tree element used to build fast parallel multipliers. A Wallace tree reduces multiple partial product bits at the same column weight to a two number sum (sum + carry) using a network of full adders, enabling multiplication in O(log N) gate stages. The 74x275 processes 7 input bits per bit position and produces partial sum and carry outputs for the next stage.',
     guidePinDescriptions: {
       'W0':  'Input partial product bit 0.',
       'W1':  'Input partial product bit 1.',
@@ -315,10 +315,10 @@ export const CHIPS_BLOCK_18 = {
       'Y0':  'Input partial product bit 6.',
       'GND': 'Ground reference (pin 8).',
       'Y1':  'Carry output to the next bit position.',
-      'S0':  'Carry-save sum output bit 0.',
-      'S1':  'Carry-save sum output bit 1.',
-      'S2':  'Carry-save sum output bit 2.',
-      'S3':  'Carry-save sum output bit 3.',
+      'S0':  'Carry save sum output bit 0.',
+      'S1':  'Carry save sum output bit 1.',
+      'S2':  'Carry save sum output bit 2.',
+      'S3':  'Carry save sum output bit 3.',
       'C2':  'Carry output from adder level 2.',
       'C3':  'Carry output from adder level 3.',
       'VCC': 'Positive supply (+5 V, pin 16).',
@@ -352,47 +352,47 @@ export const CHIPS_BLOCK_18 = {
       {
         title: 'Wallace Tree Multiplication',
         paragraphs: [
-          'In Wallace tree multiplication, partial products from all pairs of multiplier and multiplicand bits are organized by column (bit weight) and reduced using carry-save adders (CSA). Each CSA takes three inputs and produces a sum and a carry-out, reducing 3 bits to 2 at each stage. After log₂N stages, only two rows remain, and a single fast adder produces the final product.',
+          'In Wallace tree multiplication, partial products from all pairs of multiplier and multiplicand bits are organized by column (bit weight) and reduced using carry save adders (CSA). Each CSA takes three inputs and produces a sum and a carry out, reducing 3 bits to 2 at each stage. After log₂N stages, only two rows remain, and a single fast adder produces the final product.',
           'The 74x275 is one slice: it handles 7 bits at one bit position. Multiple slices are cascaded horizontally and vertically to build large multipliers (e.g., 8×8 or 16×16).',
         ],
       },
     ],
   },
 
-  // ── 74276: Quad J-K FFs, Separate Clocks, Shared PRE/CLR ─────────────────
+  // ── 74276: Quad JK FFs, Separate Clocks, Shared PRE/CLR ─────────────────
   /* Primary source: Texas Instruments, SN74276 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74276.pdf
      Wikipedia: https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
-  '74276': {
+  '74x276': {
     name: '74x276',
     simpleName: 'Quad JK FF (sep. CLK)',
-    description: 'Quad J-K controller-device flip-flops with separate clocks, shared preset and clear (20-pin)',
+    description: 'Quad JK flip-flops, separate clocks, shared preset and clear (20-pin)',
     pins: 20,
     vcc: 20,
     gnd: 10,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74276.pdf',
-    tags: ['flip-flop', 'jk', 'quad', 'sequential', 'controller-device'],
+    tags: ['flip flop', 'jk', 'quad', 'sequential', 'controller device'],
     sequential: true,
-    guideOverview: 'The 74x276 contains four J-K flip-flops sharing a common clock (CLK, active LOW) and a combined preset/clear pin (PRE/CLR, active LOW). Each flip-flop has independent J and K inputs and both Q and Q (inverted) outputs. JK logic: J=0,K=0 → hold; J=1,K=0 → set; J=0,K=1 → reset; J=1,K=1 → toggle on clock edge. The chip is intended for controller-to-device interface applications where a toggle or set/reset pattern drives peripheral control lines.',
+    guideOverview: 'The 74x276 contains four JK flip flops sharing a common clock (CLK, active LOW) and a combined preset/clear pin (PRE/CLR, active LOW). Each flip flop has independent J and K inputs and both Q and Q (inverted) outputs. JK logic: J=0,K=0 → hold; J=1,K=0 → set; J=0,K=1 → reset; J=1,K=1 → toggle on clock edge. The chip is intended for controller to device interface applications where a toggle or set/reset pattern drives peripheral control lines.',
     guidePinDescriptions: {
-      'CLKn':    'Clock input (active LOW edge). All four flip-flops clock on falling edge.',
-      '1J':      'J input for flip-flop 1.',
-      '1K':      'K input for flip-flop 1.',
-      '1Q':      'Q output for flip-flop 1.',
-      '1Qn':     'Complement Q output for flip-flop 1.',
-      '2J':      'J input for flip-flop 2.',
-      '2K':      'K input for flip-flop 2.',
-      '2Q':      'Q output for flip-flop 2.',
-      '2Qn':     'Complement Q output for flip-flop 2.',
+      'CLKn':    'Clock input (active LOW edge). All four flip flops clock on falling edge.',
+      '1J':      'J input for flip flop 1.',
+      '1K':      'K input for flip flop 1.',
+      '1Q':      'Q output for flip flop 1.',
+      '1Qn':     'Complement Q output for flip flop 1.',
+      '2J':      'J input for flip flop 2.',
+      '2K':      'K input for flip flop 2.',
+      '2Q':      'Q output for flip flop 2.',
+      '2Qn':     'Complement Q output for flip flop 2.',
       'GND':     'Ground reference (pin 10).',
-      '3Q':      'Q output for flip-flop 3.',
-      '3Qn':     'Complement Q output for flip-flop 3.',
-      '3K':      'K input for flip-flop 3.',
-      '3J':      'J input for flip-flop 3.',
-      '4Q':      'Q output for flip-flop 4.',
-      '4Qn':     'Complement Q output for flip-flop 4.',
-      '4K':      'K input for flip-flop 4.',
-      '4J':      'J input for flip-flop 4.',
-      'PRE_CLRn': 'Combined Preset/Clear (active LOW). Asynchronously presets or clears all flip-flops.',
+      '3Q':      'Q output for flip flop 3.',
+      '3Qn':     'Complement Q output for flip flop 3.',
+      '3K':      'K input for flip flop 3.',
+      '3J':      'J input for flip flop 3.',
+      '4Q':      'Q output for flip flop 4.',
+      '4Qn':     'Complement Q output for flip flop 4.',
+      '4K':      'K input for flip flop 4.',
+      '4J':      'J input for flip flop 4.',
+      'PRE_CLRn': 'Combined Preset/Clear (active LOW). Asynchronously presets or clears all flip flops.',
       'VCC':     'Positive supply (+5 V, pin 20).',
     },
     pinout: [
@@ -426,9 +426,9 @@ export const CHIPS_BLOCK_18 = {
     ],
     guideSections: [
       {
-        title: 'J-K Flip-Flop Modes',
+        title: 'JK Flip Flop Modes',
         paragraphs: [
-          'The J-K flip-flop is the most versatile storage element because J=1,K=1 causes a toggle on every clock edge. This allows it to function as: a D flip-flop (tie K = NOT J), an SR flip-flop (J=S, K=R), a T flip-flop (J=K=1), or a divide-by-2 counter.',
+          'The JK flip flop is the most versatile storage element because J=1,K=1 causes a toggle on every clock edge. This allows it to function as: a D flip flop (tie K = NOT J), an SR flip flop (J=S, K=R), a T flip flop (J=K=1), or a divide by-2 counter.',
         ],
         formulas: [
           'J=0, K=0 → Q unchanged (hold)',
@@ -443,7 +443,7 @@ export const CHIPS_BLOCK_18 = {
   // ── 74278: 4 bit Cascadeable Priority Register with Latched Inputs ─────────
   /* Primary source: Texas Instruments, SN74278 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74278.pdf
      Wikipedia: https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
-  '74278': {
+  '74x278': {
     name: '74x278',
     simpleName: '4 bit Priority Reg',
     description: '4 bit cascadeable priority registers with latched data inputs (14-pin)',
@@ -453,7 +453,7 @@ export const CHIPS_BLOCK_18 = {
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74278.pdf',
     tags: ['priority', 'register', '4 bit', 'cascadeable', 'sequential'],
     sequential: true,
-    guideOverview: 'The 74x278 is a 4 bit cascadeable priority register. It latches four data inputs (D0 D3) on the CLK edge and presents the address of the highest-priority active input on Q0 Q2 (encoded). GS (Group Select) goes HIGH when any input is active. EO (Enable Output) goes LOW when all inputs are LOW, allowing cascading of multiple chips. EI (Enable Input) disables all outputs when LOW, enabling priority daisy-chains.',
+    guideOverview: 'The 74x278 is a 4 bit cascadeable priority register. It latches four data inputs (D0-D3) on the CLK edge and presents the address of the highest priority active input on Q0-Q2 (encoded). GS (Group Select) goes HIGH when any input is active. EO (Enable Output) goes LOW when all inputs are LOW, allowing cascading of multiple chips. EI (Enable Input) disables all outputs when LOW, enabling priority daisy chains.',
     guidePinDescriptions: {
       'D3':   'Data input 3 (highest priority). When HIGH, encodes to Q=11.',
       'D2':   'Data input 2.',
@@ -467,7 +467,7 @@ export const CHIPS_BLOCK_18 = {
       'GS':   'Group Select output. HIGH when any input is active and EI=HIGH.',
       'EO':   'Enable Output. Goes LOW when no inputs are active; connects to EI of next chip in cascade.',
       'CLK':  'Clock input. Latches current priority on rising edge.',
-      'CLRn': 'Clear (active LOW). Asynchronously clears Q0 Q2 and GS.',
+      'CLRn': 'Clear (active LOW). Asynchronously clears Q0-Q2 and GS.',
       'VCC':  'Positive supply (+5 V, pin 14).',
     },
     pinout: [
@@ -497,20 +497,20 @@ export const CHIPS_BLOCK_18 = {
       {
         title: 'Priority Encoding',
         paragraphs: [
-          'A priority encoder resolves conflicts when multiple inputs are active simultaneously by assigning fixed priority levels. The highest-priority active input wins; lower-priority inputs are ignored. Here D3 has highest priority.',
-          'Cascading: connect EO of the lower-priority chip to EI of the higher-priority chip. GS on each chip signals whether that group contains the winning input.',
+          'A priority encoder resolves conflicts when multiple inputs are active simultaneously by assigning fixed priority levels. The highest priority active input wins; lower priority inputs are ignored. Here D3 has highest priority.',
+          'Cascading: connect EO of the lower priority chip to EI of the higher priority chip. GS on each chip signals whether that group contains the winning input.',
         ],
       },
     ],
   },
 
-  // ── 74279: Quad Set-Reset Latch ───────────────────────────────────────────
+  // ── 74279: Quad Set Reset Latch ───────────────────────────────────────────
   /* Primary source: Texas Instruments, SN74LS279A datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls279a.pdf
      Wikipedia: https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
-  '74279': {
+  '74x279': {
     name: '74x279',
     simpleName: 'Quad SR Latch',
-    description: 'Quad set-reset latch (active LOW S and R inputs) (16-pin)',
+    description: 'Quad set reset latch (active LOW S and R inputs) (16-pin)',
     pins: 16,
     vcc: 16,
     gnd: 8,
@@ -575,7 +575,7 @@ export const CHIPS_BLOCK_18 = {
   // ── 74280: 9 bit Odd/Even Parity Generator/Checker ───────────────────────
   /* Primary source: Texas Instruments, SN74LS280 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls280.pdf
      Wikipedia: https://en.wikipedia.org/wiki/Parity_bit */
-  '74280': {
+  '74x280': {
     name: '74x280',
     simpleName: '9 bit Parity Gen/Chk',
     description: '9 bit odd/even parity generator/checker (14-pin)',
@@ -584,7 +584,7 @@ export const CHIPS_BLOCK_18 = {
     gnd: 7,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls280.pdf',
     tags: ['parity', '9 bit', 'logic', 'checker', 'generator'],
-    guideOverview: 'The 74x280 is a 9 bit odd/even parity generator and checker. It XORs all nine inputs (A I) together and drives two complementary outputs: EVEN goes HIGH when an even number of inputs are HIGH; ODD goes HIGH when an odd number are HIGH. Used in data transmission to detect single-bit errors: add a parity bit to make the total count odd (or even), then check at the receiver.',
+    guideOverview: 'The 74x280 is a 9 bit odd/even parity generator and checker. It XORs all nine inputs (A I) together and drives two complementary outputs: EVEN goes HIGH when an even number of inputs are HIGH; ODD goes HIGH when an odd number are HIGH. Used in data transmission to detect single bit errors: add a parity bit to make the total count odd (or even), then check at the receiver.',
     guidePinDescriptions: {
       'A':    'Parity input bit A.',
       'B':    'Parity input bit B.',
@@ -625,7 +625,7 @@ export const CHIPS_BLOCK_18 = {
         title: 'Parity Generation and Checking',
         paragraphs: [
           'For generation: send 8 data bits through A H, and tie I to 0. Connect the ODD output as the parity bit appended to the 8 bit word (odd parity convention).',
-          'For checking: send all 9 bits (8 data + 1 parity) through A I. If ODD=HIGH, parity is correct (odd count maintained). If ODD=LOW, a single-bit error was detected.',
+          'For checking: send all 9 bits (8 data + 1 parity) through A I. If ODD=HIGH, parity is correct (odd count maintained). If ODD=LOW, a single bit error was detected.',
         ],
         formulas: [
           'EVEN = NOT(A XOR B XOR C XOR D XOR E XOR F XOR G XOR H XOR I)',
@@ -639,7 +639,7 @@ export const CHIPS_BLOCK_18 = {
   /* Primary source: Texas Instruments, SN74S281 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74s281.pdf
      Wikipedia: https://en.wikipedia.org/wiki/Adder_(electronics)
      Wikipedia: https://en.wikipedia.org/wiki/Arithmetic_logic_unit */
-  '74281': {
+  '74x281': {
     name: '74x281',
     simpleName: '4 bit Accumulator',
     description: '4 bit parallel binary accumulator with synchronous load and carry (24-pin)',
@@ -649,7 +649,7 @@ export const CHIPS_BLOCK_18 = {
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74s281.pdf',
     tags: ['accumulator', '4 bit', 'arithmetic', 'sequential', 'adder'],
     sequential: true,
-    guideOverview: 'The 74x281 is a 4 bit parallel binary accumulator that combines an ALU-like function unit with a clocked 4 bit register. B0 B3 are the external data inputs; M0 M3 and S0 S3 select the arithmetic or logic function. On each rising CLK edge, the result of the selected operation is stored in the internal register. CLRn asynchronously clears the register. This chip is used to iteratively accumulate sums, products, or logic operations.',
+    guideOverview: 'The 74x281 is a 4 bit parallel binary accumulator that combines an ALU like function unit with a clocked 4 bit register. B0 B3 are the external data inputs; M0 M3 and S0 S3 select the arithmetic or logic function. On each rising CLK edge, the result of the selected operation is stored in the internal register. CLRn asynchronously clears the register. This chip is used to iteratively accumulate sums, products, or logic operations.',
     guidePinDescriptions: {
       'B0':   'External operand input bit 0 (LSB).',
       'B1':   'External operand input bit 1.',
@@ -720,20 +720,20 @@ export const CHIPS_BLOCK_18 = {
     ],
   },
 
-  // ── 74282: Look-Ahead Carry Generator (Selectable) ───────────────────────
+  // ── 74282: Look Ahead Carry Generator (Selectable) ───────────────────────
   /* Primary source: Texas Instruments, SN74AS282 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74as282.pdf
      Wikipedia: https://en.wikipedia.org/wiki/Adder_(electronics)
      Wikipedia: https://en.wikipedia.org/wiki/Arithmetic_logic_unit */
-  '74282': {
+  '74x282': {
     name: '74x282',
-    simpleName: 'Look-Ahead Carry (sel)',
-    description: 'High-speed look-ahead carry generator with selectable carry inputs (20-pin)',
+    simpleName: 'Look Ahead Carry (sel)',
+    description: 'High speed look ahead carry generator with selectable carry inputs (20-pin)',
     pins: 20,
     vcc: 20,
     gnd: 10,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74as282.pdf',
-    tags: ['carry', 'look-ahead', 'alu', 'arithmetic', 'carry generator'],
-    guideOverview: 'The 74x282 is a look-ahead carry generator with selectable carry inputs. Like the 74x264/74x182, it takes Propagate (P0 P3) and Generate (G0 G3) signals from four ALU slices and generates carry outputs Cn4, Cn8, Cn12 for 4 bit groups. The SEL input, along with P_in and G_in, selects between the locally computed carry or an external carry source, enabling flexible multi-level lookahead in wider adders.',
+    tags: ['carry', 'look ahead', 'alu', 'arithmetic', 'carry generator'],
+    guideOverview: 'The 74x282 is a look ahead carry generator with selectable carry inputs. Like the 74x264/74x182, it takes Propagate (P0 P3) and Generate (G0 G3) signals from four ALU slices and generates carry outputs Cn4, Cn8, Cn12 for 4 bit groups. The SEL input, along with P_in and G_in, selects between the locally computed carry or an external carry source, enabling flexible multi level lookahead in wider adders.',
     guidePinDescriptions: {
       'P0':   'Propagate from ALU slice 0.',
       'G0':   'Generate from ALU slice 0.',
@@ -750,7 +750,7 @@ export const CHIPS_BLOCK_18 = {
       'Cn12': 'Carry into bit 12.',
       'G':    'Group Generate output.',
       'P':    'Group Propagate output.',
-      'SEL':  'Select input. Controls whether the internal or external P/G is used for higher-level lookahead.',
+      'SEL':  'Select input. Controls whether the internal or external P/G is used for higher level lookahead.',
       'P_in': 'External Propagate input (selected by SEL).',
       'G_in': 'External Generate input (selected by SEL).',
       'NC1':  'Not connected.',
@@ -789,91 +789,129 @@ export const CHIPS_BLOCK_18 = {
       {
         title: 'Selectable Carry Source',
         paragraphs: [
-          'The SEL input allows the 74x282 to work in two modes. When SEL=LOW, the chip behaves like a standard 74x182 / 74x264. When SEL=HIGH, the P_in and G_in values (from an external carry source) are substituted into the lookahead equations, enabling multi-tier lookahead schemes where the 74x282 receives partial group P/G from another unit.',
+          'The SEL input allows the 74x282 to work in two modes. When SEL=LOW, the chip behaves like a standard 74x182 / 74x264. When SEL=HIGH, the P_in and G_in values (from an external carry source) are substituted into the lookahead equations, enabling multi tier lookahead schemes where the 74x282 receives partial group P/G from another unit.',
         ],
       },
     ],
   },
 
   // ── 74283: 4 bit Binary Full Adder ────────────────────────────────────────
-  /* Primary source: Texas Instruments, SN74LS283 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls283.pdf
-     Wikipedia: https://en.wikipedia.org/wiki/Adder_(electronics) */
-  '74283': {
+  /* Sources:
+     [1] Texas Instruments, "SN54283, SN54LS283, SN54S283, SN74283, SN74LS283,
+         SN74S283 4-Bit Binary Full Adders With Fast Carry", SDLS095A, Oct. 1976
+         (rev. Mar. 1988). [Online]. Available:
+         https://www.ti.com/lit/ds/symlink/sn74ls283.pdf. Verified: terminal
+         assignment (D/N package, top view), function table, and logic diagram,
+         pages 1-2, read as rendered PDF page images (issues.md C4). Confirms
+         pin 9 = C4 (carry out), C0 (carry in) on pin 7, power on the corner pins
+         (VCC=16, GND=8), and that the 283 is functionally identical to the older
+         83 with only the terminal arrangement changed.
+     [2] Wikipedia contributors, "Adder (electronics)."
+         https://en.wikipedia.org/wiki/Adder_(electronics). Used only for the
+         general full-adder and carry-look-ahead background. */
+  '74x283': {
     name: '74x283',
     simpleName: '4 bit Full Adder',
-    description: '4 bit binary full adder with fast carry (16-pin)',
+    description: '4 bit binary full adder with fast (look-ahead) carry. (16-pin)',
     pins: 16,
     vcc: 16,
     gnd: 8,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls283.pdf',
     tags: ['adder', '4 bit', 'binary', 'full adder', 'arithmetic', 'carry'],
-    guideOverview: 'The 74x283 is a 4 bit binary full adder with fast carry one of the most widely used 74 series arithmetic chips. It adds two 4 bit numbers (A1 A4 and B1 B4) plus a carry-in (C0), producing a 4 bit sum (S1 S4) and a carry-out (S5, sometimes labeled CO or C4). Multiple 74x283s can be cascaded by connecting S5 of the lower chip to C0 of the next for wider adders.',
+    guideOverview: 'The 74x283 adds two 4 bit binary numbers plus a carry in, producing a 4 bit sum (S1 to S4) and a carry out (C4). It is one of the most common 74 series arithmetic chips, and it is purely combinational: with no clock, the outputs settle as soon as the inputs are stable. What sets it apart from a hand-built adder is fast carry. A plain adder lets the carry ripple up one bit at a time, so the top sum bit is the slowest to appear; the 74x283 computes all four carries in parallel with a look-ahead network, so the whole sum is ready sooner. Two things surprise beginners: the power pins sit on the corners (VCC=16, GND=8) instead of the usual places, and the operand and sum pins are interleaved down the package rather than grouped by name, so check the pinout before wiring. To add wider numbers, chain chips by wiring C4 of one stage to C0 of the next.',
     guidePinDescriptions: {
-      'A2':  'Addend A bit 2.',
-      'B2':  'Addend B bit 2.',
-      'S2':  'Sum output bit 2.',
-      'A3':  'Addend A bit 3.',
-      'B3':  'Addend B bit 3.',
-      'S3':  'Sum output bit 3.',
-      'S4':  'Sum output bit 4.',
-      'GND': 'Ground reference (pin 8).',
-      'C0':  'Carry input. Connect to GND for the least-significant 74x283; connect to S5 of lower chip when cascading.',
-      'S1':  'Sum output bit 1 (LSB of sum).',
-      'A1':  'Addend A bit 1 (LSB of A).',
-      'B1':  'Addend B bit 1 (LSB of B).',
-      'A4':  'Addend A bit 4 (MSB of A).',
-      'B4':  'Addend B bit 4 (MSB of B).',
-      'S5':  'Carry output (carry-out from MSB). Connect to C0 of next stage when cascading.',
-      'VCC': 'Positive supply (+5 V, pin 16).',
+      'S2':  'Bit 2 of the sum output.',
+      'B2':  'Bit 2 of input number B.',
+      'A2':  'Bit 2 of input number A.',
+      'S1':  'Bit 1 (LSB) of the sum output.',
+      'A1':  'Bit 1 (LSB) of input number A.',
+      'B1':  'Bit 1 (LSB) of input number B.',
+      'C0':  'Carry in. Tie to GND for a standalone adder or the lowest stage; drive it from C4 of the stage below when cascading.',
+      'GND': 'Ground reference (pin 8, on the corner).',
+      'C4':  'Carry out of the top bit. Wire to C0 of the next stage when cascading. It is effectively the fifth, most significant bit of the sum.',
+      'S4':  'Bit 4 (MSB) of the sum output.',
+      'B4':  'Bit 4 (MSB) of input number B.',
+      'A4':  'Bit 4 (MSB) of input number A.',
+      'S3':  'Bit 3 of the sum output.',
+      'A3':  'Bit 3 of input number A.',
+      'B3':  'Bit 3 of input number B.',
+      'VCC': 'Positive supply, +5 V (pin 16, on the corner).',
     },
+    // Pinout verified against TI SDLS095A, D/N package top view (read as PDF page
+    // images, issues.md C4): operand, sum and carry pins are interleaved down the
+    // package (NOT grouped by name), and power sits on the corners (VCC=16, GND=8).
+    // Pin 9 is the carry out C4 (this entry previously mis-named it 'S5'; the
+    // physical assignment was correct, only the label was wrong — see issues.md).
     pinout: [
-      { pin:  1, name: 'A2',   type: 'input' },
+      { pin:  1, name: 'S2',   type: 'output' },
       { pin:  2, name: 'B2',   type: 'input' },
-      { pin:  3, name: 'S2',   type: 'output' },
-      { pin:  4, name: 'A3',   type: 'input' },
-      { pin:  5, name: 'B3',   type: 'input' },
-      { pin:  6, name: 'S3',   type: 'output' },
-      { pin:  7, name: 'S4',   type: 'output' },
+      { pin:  3, name: 'A2',   type: 'input' },
+      { pin:  4, name: 'S1',   type: 'output' },
+      { pin:  5, name: 'A1',   type: 'input' },
+      { pin:  6, name: 'B1',   type: 'input' },
+      { pin:  7, name: 'C0',   type: 'input' },
       { pin:  8, name: 'GND',  type: 'power' },
-      { pin:  9, name: 'C0',   type: 'input' },
-      { pin: 10, name: 'S1',   type: 'output' },
-      { pin: 11, name: 'A1',   type: 'input' },
-      { pin: 12, name: 'B1',   type: 'input' },
-      { pin: 13, name: 'A4',   type: 'input' },
-      { pin: 14, name: 'B4',   type: 'input' },
-      { pin: 15, name: 'S5',   type: 'output' },
+      { pin:  9, name: 'C4',   type: 'output' },
+      { pin: 10, name: 'S4',   type: 'output' },
+      { pin: 11, name: 'B4',   type: 'input' },
+      { pin: 12, name: 'A4',   type: 'input' },
+      { pin: 13, name: 'S3',   type: 'output' },
+      { pin: 14, name: 'A3',   type: 'input' },
+      { pin: 15, name: 'B3',   type: 'input' },
       { pin: 16, name: 'VCC',  type: 'power' },
     ],
     gates: [
-      { type: 'ADDER_4BIT', inputs: ['A1','A2','A3','A4','B1','B2','B3','B4','C0'], outputs: ['S1','S2','S3','S4','S5'] },
+      { type: 'ADDER_4BIT', inputs: ['A1','A2','A3','A4','B1','B2','B3','B4','C0'], outputs: ['S1','S2','S3','S4','C4'] },
     ],
     guideSections: [
       {
-        title: 'Binary Addition and Cascading',
+        title: 'How a full adder works',
         paragraphs: [
-          'Binary addition follows the same column-by-column rules as decimal: add bit by bit, carrying 1 when the sum exceeds 1. A full adder handles one bit with a carry-in and produces a sum bit and a carry-out. The 74x283 chains four full adders internally with a fast carry network.',
-          'To build an 8 bit adder: connect S5 of the first 74x283 (bits 1 4) to C0 of the second (bits 5 8). The second chip’s S5 is the final carry-out.',
+          'Binary addition works column by column, exactly like decimal: add the two bits in a column, and if the result is too big for one bit, carry a 1 into the next column. A full adder is the circuit for one column. It takes two bits plus a carry in, and produces a sum bit and a carry out.',
+          'The 74x283 stacks four of these, one per bit, and drives the carry chain with a look-ahead network so the carries do not have to ripple through in sequence. Because it is combinational you do not clock it: present A, B, and C0, wait for the propagation delay (on the order of 10 to 25 ns for LS parts, depending on logic family, temperature, and load; this is a simplification), then read the answer.',
         ],
         formulas: [
-          'S[4:1] + S5 = A[4:1] + B[4:1] + C0',
+          'One bit:  Sum = A XOR B XOR Cin;   Cout = 1 when two or more of A, B, Cin are 1',
+          'A B Cin -> Sum Cout:  000 -> 0 0 | 001 -> 1 0 | 010 -> 1 0 | 011 -> 0 1 | 100 -> 1 0 | 101 -> 0 1 | 110 -> 0 1 | 111 -> 1 1',
         ],
-        note: 'Tie C0 to GND (not floating) for the least-significant adder stage.',
+      },
+      {
+        title: 'A worked example',
+        paragraphs: [
+          'Put A = 1001 (9) on A4 A3 A2 A1, and B = 0111 (7) on B4 B3 B2 B1, with C0 = 0. The chip adds 9 + 7 = 16, which does not fit in four bits: the sum pins read S4 S3 S2 S1 = 0000 and C4 = 1, giving the full 5 bit answer 10000 (16). That extra bit is why C4 is best read as the top bit of the sum, not a separate signal.',
+        ],
+        formulas: [
+          '(C4, S4, S3, S2, S1) = A + B + C0     — a 5 bit result from two 4 bit inputs plus C0',
+        ],
+      },
+      {
+        title: 'Cascading and gotchas',
+        paragraphs: [
+          'To add numbers wider than four bits, chain chips: wire C4 of the low stage into C0 of the next stage, and so on. Two 74x283s make an 8 bit adder, and the C4 of the top chip is the final carry out. Because the carry logic is non-inverting (the datasheet calls it "true form"), you can cascade directly with no inverters between stages.',
+        ],
+        list: [
+          'Tie C0 of the lowest stage to GND, not floating. A floating carry in gives wrong sums.',
+          'Power is on the corner pins (VCC=16, GND=8), unlike most 16-pin logic. Double-check before powering up.',
+          'The pins are interleaved (S2, B2, A2, S1, A1, B1 down one side), not grouped by signal. Read the pinout, do not guess.',
+          'It is the same logic as the 74x83, but not a drop-in replacement: the 74x83 has a different pinout, with power at pins 5 and 12.',
+        ],
+        note: 'The 283 and LS283 are functionally identical to the older 83A/LS83A; TI rearranged only the terminals to put power and ground on the corner pins.',
       },
     ],
   },
 
-  // ── 74284: 4×4 bit Binary Multiplier (High-Order Product Bits) ────────────
+  // ── 74284: 4×4 bit Binary Multiplier (High Order Product Bits) ────────────
   /* Primary source: Texas Instruments, SN74284 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74284.pdf */
-  '74284': {
+  '74x284': {
     name: '74x284',
     simpleName: '4×4 Multiplier (High)',
-    description: '4 bit by 4 bit parallel binary multiplier: high-order 4 bits of product (16-pin)',
+    description: '4x4-bit parallel binary multiplier: high 4 bits of product (16-pin)',
     pins: 16,
     vcc: 16,
     gnd: 8,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74284.pdf',
     tags: ['multiplier', 'binary', '4 bit', 'arithmetic', 'high-order'],
-    guideOverview: 'The 74x284 produces the high-order four bits (P4 P7) of an 8 bit product from a 4×4 bit unsigned multiplication. It is always used in combination with the 74x285 (which produces P0 P3). Together the pair creates a complete 4×4 bit multiplier. A0 A3 is the multiplier and B0 B3 is the multiplicand.',
+    guideOverview: 'The 74x284 produces the high order four bits (P4 P7) of an 8 bit product from a 4×4 bit unsigned multiplication. It is always used in combination with the 74x285 (which produces P0 P3). Together the pair creates a complete 4×4 bit multiplier. A0 A3 is the multiplier and B0 B3 is the multiplicand.',
     guidePinDescriptions: {
       'B0':  'Multiplicand bit 0 (LSB).',
       'B1':  'Multiplicand bit 1.',
@@ -884,7 +922,7 @@ export const CHIPS_BLOCK_18 = {
       'A2':  'Multiplier bit 2.',
       'GND': 'Ground reference (pin 8).',
       'A3':  'Multiplier bit 3 (MSB).',
-      'P4':  'Product bit 4 (high-order half LSB).',
+      'P4':  'Product bit 4 (high order half LSB).',
       'P5':  'Product bit 5.',
       'P6':  'Product bit 6.',
       'P7':  'Product bit 7 (MSB).',
@@ -921,24 +959,24 @@ export const CHIPS_BLOCK_18 = {
       {
         title: '74x284 + 74x285 = 4×4 Multiplier',
         paragraphs: [
-          'These two chips form a matched pair: connect the same A and B inputs to both. The 74x285 output provides P0 P3 (low-order nibble) and 74x284 provides P4 P7 (high-order nibble). Together they produce the full 8 bit product of two 4 bit unsigned values.',
+          'These two chips form a matched pair: connect the same A and B inputs to both. The 74x285 output provides P0 P3 (low order nibble) and 74x284 provides P4 P7 (high order nibble). Together they produce the full 8 bit product of two 4 bit unsigned values.',
         ],
       },
     ],
   },
 
-  // ── 74285: 4×4 bit Binary Multiplier (Low-Order Product Bits) ─────────────
+  // ── 74285: 4×4 bit Binary Multiplier (Low Order Product Bits) ─────────────
   /* Primary source: Texas Instruments, SN74285 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74285.pdf */
-  '74285': {
+  '74x285': {
     name: '74x285',
     simpleName: '4×4 Multiplier (Low)',
-    description: '4 bit by 4 bit parallel binary multiplier: low-order 4 bits of product (16-pin)',
+    description: '4x4-bit parallel binary multiplier: low 4 bits of product (16-pin)',
     pins: 16,
     vcc: 16,
     gnd: 8,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74285.pdf',
     tags: ['multiplier', 'binary', '4 bit', 'arithmetic', 'low-order'],
-    guideOverview: 'The 74x285 produces the low-order four bits (P0 P3) of an 8 bit product from a 4×4 bit unsigned multiplication. It is always paired with the 74x284 (which produces P4 P7). Both chips receive the same A0 A3 (multiplier) and B0 B3 (multiplicand) inputs; their outputs P0 P7 together form the full 8 bit result.',
+    guideOverview: 'The 74x285 produces the low order four bits (P0 P3) of an 8 bit product from a 4×4 bit unsigned multiplication. It is always paired with the 74x284 (which produces P4 P7). Both chips receive the same A0 A3 (multiplier) and B0 B3 (multiplicand) inputs; their outputs P0 P7 together form the full 8 bit result.',
     guidePinDescriptions: {
       'B0':  'Multiplicand bit 0 (LSB).',
       'B1':  'Multiplicand bit 1.',
@@ -952,7 +990,7 @@ export const CHIPS_BLOCK_18 = {
       'P0':  'Product bit 0 (LSB).',
       'P1':  'Product bit 1.',
       'P2':  'Product bit 2.',
-      'P3':  'Product bit 3 (low-order half MSB).',
+      'P3':  'Product bit 3 (low order half MSB).',
       'NC1': 'Not connected.',
       'NC2': 'Not connected.',
       'VCC': 'Positive supply (+5 V, pin 16).',
@@ -984,9 +1022,9 @@ export const CHIPS_BLOCK_18 = {
     ],
     guideSections: [
       {
-        title: 'Low-Order Product Bits',
+        title: 'Low Order Product Bits',
         paragraphs: [
-          'P0 is always the AND of A0 and B0 (partial product of the two LSBs). P1 P3 involve XOR and carry logic from the partial product columns. The 74x285 computes these lower bits using a carry-save adder tree, ensuring they are available at the same time as P4 P7 from the companion 74x284.',
+          'P0 is always the AND of A0 and B0 (partial product of the two LSBs). P1 P3 involve XOR and carry logic from the partial product columns. The 74x285 computes these lower bits using a carry save adder tree, ensuring they are available at the same time as P4 P7 from the companion 74x284.',
         ],
       },
     ],

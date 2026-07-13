@@ -3,12 +3,12 @@ export const CHIPS_BLOCK_28 = {
 
   // ── 74480: Burst Error Recovery (stub), 24-pin ─────────────────────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits */
-  '74480': {
+  '74x480': {
     name: '74x480', simpleName: 'Burst Error Recovery (stub)',
-    description: 'Single burst error recovery circuit; specialized error-correction (logic stub) (24-pin)',
+    description: 'Single burst error recovery circuit (logic stub) (24-pin)',
     pins: 24, vcc: 24, gnd: 12,
     tags: ['error-recovery', 'stub'],
-    guideOverview: 'The 74x480 is a single burst error recovery circuit used in data storage and communications to correct single burst errors in serial data streams. It implements a specialized polynomial-based correction algorithm. Due to its analog and complex digital nature, it is represented as a logic stub in the simulator.',
+    guideOverview: 'The 74x480 is a single burst error recovery circuit used in data storage and communications to correct single burst errors in serial data streams. It implements a specialized polynomial based correction algorithm. Due to its analog and complex digital nature, it is represented as a logic stub in the simulator.',
     guidePinDescriptions: {
       'D0':    'Data input bit 0.',
       'D1':    'Data input bit 1.',
@@ -65,7 +65,7 @@ export const CHIPS_BLOCK_28 = {
 
   // ── 74482: 4 bit Control Slice (stub), 20-pin ──────────────────────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits */
-  '74482': {
+  '74x482': {
     name: '74x482', simpleName: '4 bit Control Slice (stub)',
     description: '4 bit slice expandable pipeline control element (logic stub) (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
@@ -118,15 +118,15 @@ export const CHIPS_BLOCK_28 = {
       outputs: ['Y0','Y1','Y2','Y3','Y4','Y5','Y6','Y7','Y8'] }],
   },
 
-  // ── 74484: BCD-to-Binary Converter, 20-pin ─────────────────────────────────
+  // ── 74484: BCD to Binary Converter, 20-pin ─────────────────────────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic */
-  '74484': {
-    name: '74x484', simpleName: 'BCD-to-Binary Converter',
-    description: '7 bit BCD-to-binary converter with tri-state outputs (20-pin)',
+  '74x484': {
+    name: '74x484', simpleName: 'BCD to Binary Converter',
+    description: '7 bit BCD to binary converter with tri state outputs (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
-    tags: ['converter', 'bcd', 'binary', 'tri-state'],
-    guideOverview: 'The 74x484 converts a 2-digit BCD number (up to 99 decimal) to a 7 bit pure binary output. Two BCD digits (units D1 and tens D2, each A-D) are presented in parallel; the chip combinationally converts the BCD-encoded value to its binary equivalent on Y0-Y6. OEn tri-states the outputs.',
+    tags: ['converter', 'bcd', 'binary', 'tri state'],
+    guideOverview: 'The 74x484 converts a 2-digit BCD number (up to 99 decimal) to a 7 bit pure binary output. Two BCD digits (units D1 and tens D2, each A-D) are presented in parallel; the chip combinationally converts the BCD encoded value to its binary equivalent on Y0-Y6. OEn tri states the outputs.',
     guidePinDescriptions: {
       'C1':  'BCD units digit input bit C (weight 4).',
       'B1':  'BCD units digit input bit B (weight 2).',
@@ -175,15 +175,15 @@ export const CHIPS_BLOCK_28 = {
       outputs: ['Y0','Y1','Y2','Y3','Y4','Y5','Y6'] }],
   },
 
-  // ── 74485: Binary-to-BCD Converter, 20-pin ─────────────────────────────────
+  // ── 74485: Binary to BCD Converter, 20-pin ─────────────────────────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic */
-  '74485': {
-    name: '74x485', simpleName: 'Binary-to-BCD Converter',
-    description: '7 bit binary-to-BCD converter with tri-state outputs (20-pin)',
+  '74x485': {
+    name: '74x485', simpleName: 'Binary to BCD Converter',
+    description: '7 bit binary to BCD converter with tri state outputs (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
-    tags: ['converter', 'binary', 'bcd', 'tri-state'],
-    guideOverview: 'The 74x485 is the inverse of the 74x484: it converts a 7 bit binary number to a 2-digit BCD output. Given a binary value 0-99 on I0-I6, it outputs the tens digit on D2/C2/B2/A2 and the units digit on D1/C1/B1/A1. OEn tri-states all outputs.',
+    tags: ['converter', 'binary', 'bcd', 'tri state'],
+    guideOverview: 'The 74x485 is the inverse of the 74x484: it converts a 7 bit binary number to a 2-digit BCD output. Given a binary value 0-99 on I0-I6, it outputs the tens digit on D2/C2/B2/A2 and the units digit on D1/C1/B1/A1. OEn tri states all outputs.',
     guidePinDescriptions: {
       'I0':  'Binary input bit 0 (LSB).',
       'I1':  'Binary input bit 1.',
@@ -210,7 +210,7 @@ export const CHIPS_BLOCK_28 = {
       {
         title: 'Binary to BCD Conversion',
         paragraphs: [
-          'Connecting 74x485 output to a BCD 7-segment decoder (like 74x447) allows direct display of a binary counter value in decimal digits. The chain is: binary counter → 74x485 → two 74x447s → two 7-segment displays.',
+          'Connecting 74x485 output to a BCD 7 segment decoder (like 74x447) allows direct display of a binary counter value in decimal digits. The chain is: binary counter → 74x485 → two 74x447s → two 7 segment displays.',
         ],
       },
     ],
@@ -234,12 +234,12 @@ export const CHIPS_BLOCK_28 = {
   // ── 74490: Dual Decade Counter, 16-pin ─────────────────────────────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Counter_(digital) */
-  '74490': {
+  '74x490': {
     name: '74x490', simpleName: 'Dual Decade Counter',
-    description: 'Dual decade counter, two independent sections each with async clear (16-pin)',
+    description: 'Dual decade counter, two independent sections, async clear (16-pin)',
     pins: 16, vcc: 16, gnd: 8, sequential: true,
     tags: ['counter', 'decade', 'dual', 'asynchronous'],
-    guideOverview: 'The 74x490 contains two independent BCD decade counters with asynchronous (active HIGH) clear. Each counter has a divide-by-2 clock (CKA) and a divide-by-5 clock (CKB). Connect CKB to QA for a 0-9 BCD counter. This is functionally equivalent to the 74x390 with slight pin ordering differences.',
+    guideOverview: 'The 74x490 contains two independent BCD decade counters with asynchronous (active HIGH) clear. Each counter has a divide by-2 clock (CKA) and a divide by-5 clock (CKB). Connect CKB to QA for a 0-9 BCD counter. This is functionally equivalent to the 74x390 with slight pin ordering differences.',
     guidePinDescriptions: {
       'CKA1': 'Clock A (÷2 stage) for counter 1. Falls on negative edge.',
       'CLR1': 'Clear for counter 1 (active HIGH). Asynchronously resets to 0.',
@@ -285,12 +285,12 @@ export const CHIPS_BLOCK_28 = {
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Counter_(digital)
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic */
-  '74491': {
+  '74x491': {
     name: '74x491', simpleName: '10 bit Up/Down Counter',
-    description: '10 bit synchronous binary up/down counter with limited preset and tri-state outputs (24-pin)',
+    description: '10 bit sync binary up/down counter, preset, tri state outputs (24-pin)',
     pins: 24, vcc: 24, gnd: 12, sequential: true,
-    tags: ['counter', '10 bit', 'up-down', 'synchronous', 'tri-state'],
-    guideOverview: 'The 74x491 is a 10 bit synchronous binary up/down counter with parallel preset (P0-P9), direction select (U_Dn), enable (ENn), clear (CLRn), parallel load (LOADn), and tri-state outputs (OEn). Its 10 bit width (count 0-1023) makes it useful for address generation in 1K memory systems.',
+    tags: ['counter', '10 bit', 'up-down', 'synchronous', 'tri state'],
+    guideOverview: 'The 74x491 is a 10 bit synchronous binary up/down counter with parallel preset (P0-P9), direction select (U_Dn), enable (ENn), clear (CLRn), parallel load (LOADn), and tri state outputs (OEn). Its 10 bit width (count 0-1023) makes it useful for address generation in 1K memory systems.',
     guidePinDescriptions: {
       'CLK':   'Clock (rising edge).',
       'U_Dn':  'Direction. HIGH = up; LOW = down.',
@@ -321,7 +321,7 @@ export const CHIPS_BLOCK_28 = {
       {
         title: '10 bit Address Counter',
         paragraphs: [
-          'A 10 bit counter can directly address 1024 (1K) memory locations (0x000-0x3FF). Load an arbitrary start address via P0-P9 for non-zero starting DMA or memory scan operations.',
+          'A 10 bit counter can directly address 1024 (1K) memory locations (0x000-0x3FF). Load an arbitrary start address via P0-P9 for non zero starting DMA or memory scan operations.',
         ],
       },
     ],
@@ -348,19 +348,19 @@ export const CHIPS_BLOCK_28 = {
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Shift_register
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic */
-  '74498': {
+  '74x498': {
     name: '74x498', simpleName: '8 bit Bidirectional Shift Register',
-    description: '8 bit bidirectional shift register with parallel inputs and tri-state outputs (24-pin)',
+    description: '8 bit bidirectional shift register, parallel load, 3-state (24-pin)',
     pins: 24, vcc: 24, gnd: 12, sequential: true,
-    tags: ['shift-register', '8 bit', 'bidirectional', 'parallel-load', 'tri-state'],
-    guideOverview: 'The 74x498 is an 8 bit bidirectional shift register with parallel load, tri-state outputs, and independent left/right serial inputs (SRL, SRR). Two mode-select bits (S0, S1) choose from: hold (00), shift right (01), shift left (10), or parallel load (11). OEn tri-states Q0-Q7.',
+    tags: ['shift-register', '8 bit', 'bidirectional', 'parallel-load', 'tri state'],
+    guideOverview: 'The 74x498 is an 8 bit bidirectional shift register with parallel load, tri state outputs, and independent left/right serial inputs (SRL, SRR). Two mode select bits (S0, S1) choose from: hold (00), shift right (01), shift left (10), or parallel load (11). OEn tri states Q0-Q7.',
     guidePinDescriptions: {
       'S0':  'Mode select bit 0. See mode table.',
       'S1':  'Mode select bit 1.',
       'CLK': 'Clock (rising edge).',
       'OEn': 'Output Enable (active LOW).',
-      'SRL': 'Serial input for shift-left mode. Data enters at Q7.',
-      'SRR': 'Serial input for shift-right mode. Data enters at Q0.',
+      'SRL': 'Serial input for shift left mode. Data enters at Q7.',
+      'SRR': 'Serial input for shift right mode. Data enters at Q0.',
       'P0':  'Parallel data input bit 0.',
       'P1':  'Parallel data input bit 1.',
       'P2':  'Parallel data input bit 2.',
@@ -410,15 +410,15 @@ export const CHIPS_BLOCK_28 = {
   // ── 74500: 6 bit Flash ADC (stub), 24-pin ──────────────────────────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Digital_comparator */
-  '74500': {
-    name: '74x500', simpleName: '6 bit Flash ADC (stub)',
-    description: '6 bit flash analog-to-digital converter; analog device (logic stub) (24-pin)',
+  '74x500': {
+    name: '74x500', simpleName: '6 bit Flash ADC',
+    description: '6 bit flash analog to digital converter; behavioral model (24-pin)',
     pins: 24, vcc: 24, gnd: 12,
-    tags: ['adc', 'analog', 'flash', 'stub'],
-    guideOverview: 'The 74x500 is a 6 bit flash (parallel) analog-to-digital converter. Flash ADCs compare the input voltage against 2^N reference voltages simultaneously using a resistor ladder and comparator array, making them the fastest ADC topology. Simulated as a logic stub due to analog content.',
+    tags: ['adc', 'analog', 'flash'],
+    guideOverview: 'The 74x500 is a 6 bit flash (parallel) analog to digital converter. Flash ADCs compare the input voltage against 2^N reference voltages simultaneously using a resistor ladder and comparator array, making them the fastest ADC topology. 74Sim models it with a behavioral linear converter: it reads the analog VIN and VREF net voltages and drives the data pins with the corresponding digital code (see the note below).',
     guidePinDescriptions: {
       'VIN':  'Analog voltage input.',
-      'VREF': 'Reference voltage input. Defines full-scale range.',
+      'VREF': 'Reference voltage input. Defines full scale range.',
       'OEn':  'Output Enable (active LOW).',
       'CLK':  'Conversion clock.',
       'NC1':  'No connect.',
@@ -446,9 +446,9 @@ export const CHIPS_BLOCK_28 = {
       {
         title: 'Flash ADC Architecture',
         paragraphs: [
-          'A flash ADC uses 2^N-1 comparators in parallel to convert an analog input in a single clock cycle. The 6 bit version requires 63 comparators. This makes it extremely fast but power-hungry and expensive compared to SAR or delta-sigma ADCs.',
+          'A flash ADC uses 2^N-1 comparators in parallel to convert an analog input in a single clock cycle. The 6 bit version requires 63 comparators. This makes it extremely fast but power hungry and expensive compared to SAR or delta sigma ADCs.',
         ],
-        note: 'Logic stub analog conversion is not simulated.',
+        note: 'Behavioral model. The simulator reads the analog VIN and VREF net voltages and drives D0..D5 with code = round((VIN / VREF) * 63), clipped to 0..63. The conversion is treated as instantaneous (CLK is not stepped), VREF defaults to VCC if unconnected, and CC is held HIGH ("ready"). OEn=HIGH places D0..D5 in HiZ. The internal resistor-ladder/comparator array is not modelled at the transistor level.',
       },
     ],
     pinout: [
@@ -470,174 +470,15 @@ export const CHIPS_BLOCK_28 = {
       outputs: ['D0','D1','D2','D3','D4','D5','CC'] }],
   },
 
-  // ── 74502: 8 bit Successive Approx Register, 16-pin ────────────────────────
-  /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits */
-  '74502': {
-    name: '74x502', simpleName: '8 bit Successive Approx Register',
-    description: '8 bit successive approximation register (SAR) for ADC use (16-pin)',
-    pins: 16, vcc: 16, gnd: 8, sequential: true,
-    tags: ['sar', 'successive-approximation', '8 bit', 'adc'],
-    guideOverview: 'The 74x502 is an 8 bit successive approximation register (SAR) the digital control core of a SAR ADC. A SAR performs binary search: it starts from the MSB, tentatively sets each bit, compares the resulting DAC output against the analog input via COMP, and keeps or clears the bit based on the result. The process repeats for 8 clock cycles producing the 8 bit result.',
-    guidePinDescriptions: {
-      'CLK':    'Clock input. Each rising edge performs one bit trial.',
-      'EOCn':   'End-Of-Conversion reset (active LOW). Hold LOW during conversion; release to start next cycle.',
-      'STARTn': 'Start conversion (active LOW pulse).',
-      'COMP':   'Comparator input. HIGH = DAC output > VIN (clear bit); LOW = keep bit.',
-      'Q0':     'SAR output bit 0.',
-      'Q1':     'SAR output bit 1.',
-      'Q2':     'SAR output bit 2.',
-      'GND':    'Ground reference (pin 8).',
-      'Q3':     'SAR output bit 3.',
-      'Q4':     'SAR output bit 4.',
-      'Q5':     'SAR output bit 5.',
-      'Q6':     'SAR output bit 6.',
-      'Q7':     'SAR output bit 7 (MSB).',
-      'EOC':    'End-Of-Conversion output. Pulses HIGH when 8 bit result is ready.',
-      'SC':     'Start-of-Conversion output.',
-      'VCC':    'Positive supply (+5 V, pin 16).',
-    },
-    guideSections: [
-      {
-        title: 'Successive Approximation Algorithm',
-        paragraphs: [
-          'The SAR tests each bit from MSB to LSB. On each clock: set the trial bit, output Q[7:0] to a DAC, compare DAC output vs VIN. If DAC > VIN, clear the bit; else keep it. After 8 clocks, Q[7:0] holds the converted result.',
-        ],
-      },
-    ],
-    pinout: [
-      { pin:  1, name: 'CLK',    type: 'input' },  { pin:  2, name: 'EOCn',   type: 'input' },
-      { pin:  3, name: 'STARTn', type: 'input' },  { pin:  4, name: 'COMP',   type: 'input' },
-      { pin:  5, name: 'Q0',     type: 'output' }, { pin:  6, name: 'Q1',     type: 'output' },
-      { pin:  7, name: 'Q2',     type: 'output' }, { pin:  8, name: 'GND',    type: 'power' },
-      { pin:  9, name: 'Q3',     type: 'output' }, { pin: 10, name: 'Q4',     type: 'output' },
-      { pin: 11, name: 'Q5',     type: 'output' }, { pin: 12, name: 'Q6',     type: 'output' },
-      { pin: 13, name: 'Q7',     type: 'output' }, { pin: 14, name: 'EOC',    type: 'output' },
-      { pin: 15, name: 'SC',     type: 'output' }, { pin: 16, name: 'VCC',    type: 'power' },
-    ],
-    gates: [{ type: 'SAR_8BIT',
-      inputs: ['CLK','STARTn','COMP','EOCn'],
-      outputs: ['Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7','EOC','SC'] }],
-  },
-
-  // ── 74503: 8 bit SAR (with expansion), 16-pin ──────────────────────────────
-  /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits */
-  '74503': {
-    name: '74x503', simpleName: '8 bit SAR (with expansion)',
-    description: '8 bit successive approximation register with expansion control for ADC use (16-pin)',
-    pins: 16, vcc: 16, gnd: 8, sequential: true,
-    tags: ['sar', 'successive-approximation', '8 bit', 'adc', 'expansion'],
-    guideOverview: 'The 74x503 is an 8 bit SAR with an expansion output (EXP) that allows cascading two devices for higher resolution. EXP feeds the cascade input of a second SAR to extend the conversion to 16 bits using a two-stage SAR + DAC chain.',
-    guidePinDescriptions: {
-      'CLK':    'Clock (rising edge, one bit trial per cycle).',
-      'EOCn':   'End-Of-Conversion reset (active LOW).',
-      'STARTn': 'Start conversion (active LOW pulse).',
-      'COMP':   'Comparator result input.',
-      'Q0':     'SAR bit 0.',
-      'Q1':     'SAR bit 1.',
-      'Q2':     'SAR bit 2.',
-      'GND':    'Ground reference (pin 8).',
-      'Q3':     'SAR bit 3.',
-      'Q4':     'SAR bit 4.',
-      'Q5':     'SAR bit 5.',
-      'Q6':     'SAR bit 6.',
-      'Q7':     'SAR bit 7 (MSB).',
-      'EOC':    'End-Of-Conversion output.',
-      'EXP':    'Expansion output. Triggers a second-stage SAR for higher-resolution cascading.',
-      'VCC':    'Positive supply (+5 V, pin 16).',
-    },
-    guideSections: [
-      {
-        title: 'Cascading for Higher Resolution',
-        paragraphs: [
-          'Connect EXP of the first 74x503 to STARTn of a second 74x503. The first handles the high byte, the second the low byte, together producing a 16 bit result in two successive 8-cycle conversions.',
-        ],
-      },
-    ],
-    pinout: [
-      { pin:  1, name: 'CLK',    type: 'input' },  { pin:  2, name: 'EOCn',   type: 'input' },
-      { pin:  3, name: 'STARTn', type: 'input' },  { pin:  4, name: 'COMP',   type: 'input' },
-      { pin:  5, name: 'Q0',     type: 'output' }, { pin:  6, name: 'Q1',     type: 'output' },
-      { pin:  7, name: 'Q2',     type: 'output' }, { pin:  8, name: 'GND',    type: 'power' },
-      { pin:  9, name: 'Q3',     type: 'output' }, { pin: 10, name: 'Q4',     type: 'output' },
-      { pin: 11, name: 'Q5',     type: 'output' }, { pin: 12, name: 'Q6',     type: 'output' },
-      { pin: 13, name: 'Q7',     type: 'output' }, { pin: 14, name: 'EOC',    type: 'output' },
-      { pin: 15, name: 'EXP',    type: 'output' }, { pin: 16, name: 'VCC',    type: 'power' },
-    ],
-    gates: [{ type: 'SAR_8BIT_EXP',
-      inputs: ['CLK','STARTn','COMP','EOCn'],
-      outputs: ['Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7','EOC','EXP'] }],
-  },
-
-  // ── 74504: 12 bit SAR (with expansion), 24-pin ─────────────────────────────
-  /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits */
-  '74504': {
-    name: '74x504', simpleName: '12 bit SAR (with expansion)',
-    description: '12 bit successive approximation register with expansion control for ADC use (24-pin)',
-    pins: 24, vcc: 24, gnd: 12, sequential: true,
-    tags: ['sar', 'successive-approximation', '12 bit', 'adc', 'expansion'],
-    guideOverview: 'The 74x504 is a 12 bit SAR register that performs a 12-cycle successive approximation conversion, producing Q0-Q11. Like the 74x503 it includes an EXP cascade output for multi-chip high-resolution systems.',
-    guidePinDescriptions: {
-      'CLK':    'Clock (one bit trial per rising edge).',
-      'EOCn':   'End-Of-Conversion reset (active LOW).',
-      'STARTn': 'Start conversion (active LOW pulse).',
-      'COMP':   'Comparator result.',
-      'Q0':     'SAR output bit 0 (LSB).',
-      'Q1':     'SAR output bit 1.',
-      'Q2':     'SAR output bit 2.',
-      'Q3':     'SAR output bit 3.',
-      'Q4':     'SAR output bit 4.',
-      'Q5':     'SAR output bit 5.',
-      'Q6':     'SAR output bit 6.',
-      'GND':    'Ground reference (pin 12).',
-      'Q7':     'SAR output bit 7.',
-      'Q8':     'SAR output bit 8.',
-      'Q9':     'SAR output bit 9.',
-      'Q10':    'SAR output bit 10.',
-      'Q11':    'SAR output bit 11 (MSB).',
-      'EOC':    'End-Of-Conversion output.',
-      'EXP':    'Expansion cascade output.',
-      'NC1':    'No connect.',
-      'NC2':    'No connect.',
-      'NC3':    'No connect.',
-      'NC4':    'No connect.',
-      'VCC':    'Positive supply (+5 V, pin 24).',
-    },
-    guideSections: [
-      {
-        title: '12 bit SAR',
-        paragraphs: [
-          'A 12 bit SAR provides 4096 steps of resolution (0-4095), adequate for most precision measurement applications. Conversion takes 12 clock cycles.',
-        ],
-      },
-    ],
-    pinout: [
-      { pin:  1, name: 'CLK',    type: 'input' },  { pin:  2, name: 'EOCn',   type: 'input' },
-      { pin:  3, name: 'STARTn', type: 'input' },  { pin:  4, name: 'COMP',   type: 'input' },
-      { pin:  5, name: 'Q0',     type: 'output' }, { pin:  6, name: 'Q1',     type: 'output' },
-      { pin:  7, name: 'Q2',     type: 'output' }, { pin:  8, name: 'Q3',     type: 'output' },
-      { pin:  9, name: 'Q4',     type: 'output' }, { pin: 10, name: 'Q5',     type: 'output' },
-      { pin: 11, name: 'Q6',     type: 'output' }, { pin: 12, name: 'GND',    type: 'power' },
-      { pin: 13, name: 'Q7',     type: 'output' }, { pin: 14, name: 'Q8',     type: 'output' },
-      { pin: 15, name: 'Q9',     type: 'output' }, { pin: 16, name: 'Q10',    type: 'output' },
-      { pin: 17, name: 'Q11',    type: 'output' }, { pin: 18, name: 'EOC',    type: 'output' },
-      { pin: 19, name: 'EXP',    type: 'output' }, { pin: 20, name: 'NC1',    type: 'nc' },
-      { pin: 21, name: 'NC2',    type: 'nc' },  { pin: 22, name: 'NC3',    type: 'nc' },
-      { pin: 23, name: 'NC4',    type: 'nc' },  { pin: 24, name: 'VCC',    type: 'power' },
-    ],
-    gates: [{ type: 'SAR_12BIT_EXP',
-      inputs: ['CLK','STARTn','COMP','EOCn'],
-      outputs: ['Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7','Q8','Q9','Q10','Q11','EOC','EXP'] }],
-  },
-
   // ── 74505: 8 bit SAR ADC (stub), 24-pin ────────────────────────────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Digital_comparator */
-  '74505': {
-    name: '74x505', simpleName: '8 bit SAR ADC (stub)',
-    description: '8 bit successive approximation ADC; analog device (logic stub) (24-pin)',
+  '74x505': {
+    name: '74x505', simpleName: '8 bit SAR ADC',
+    description: '8 bit successive approximation ADC; behavioral model (24-pin)',
     pins: 24, vcc: 24, gnd: 12,
-    tags: ['adc', 'analog', 'successive-approximation', 'stub'],
-    guideOverview: 'The 74x505 is a complete 8 bit successive approximation ADC integrating analog comparator, internal DAC, and SAR logic into one package. Unlike the 74x502/503 which are SAR-only chips requiring an external DAC and comparator, the 74x505 is a self-contained converter. Simulated as a logic stub due to analog content.',
+    tags: ['adc', 'analog', 'successive-approximation'],
+    guideOverview: 'The 74x505 is a complete 8 bit successive approximation ADC integrating analog comparator, internal DAC, and SAR logic into one package. As a self contained converter it needs only VIN and VREF — no external DAC/comparator feedback loop. 74Sim models it with a behavioral linear converter: it reads the analog VIN and VREF net voltages and drives the data pins with the corresponding digital code (see the note below).',
     guidePinDescriptions: {
       'VIN':    'Analog voltage input.',
       'VREF':   'Reference voltage.',
@@ -659,7 +500,7 @@ export const CHIPS_BLOCK_28 = {
       'D5':     'Digital output bit 5.',
       'D6':     'Digital output bit 6.',
       'D7':     'Digital output bit 7 (MSB).',
-      'EOC':    'End-Of-Conversion output.',
+      'EOC':    'End Of Conversion output.',
       'NC7':    'No connect.',
       'NC8':    'No connect.',
       'VCC':    'Positive supply (+5 V, pin 24).',
@@ -670,7 +511,7 @@ export const CHIPS_BLOCK_28 = {
         paragraphs: [
           'The 74x505 packages the entire SAR ADC signal chain on a single chip. Apply VIN, assert STARTn, clock 8 cycles, and read D0-D7 when EOC asserts.',
         ],
-        note: 'Logic stub analog conversion not simulated.',
+        note: 'Behavioral model. The simulator reads the analog VIN and VREF net voltages and drives D0..D7 with code = round((VIN / VREF) * 255), clipped to 0..255. The conversion is treated as instantaneous (CLK and STARTn are not stepped), VREF defaults to VCC if unconnected, and EOC is held HIGH ("ready"). OEn=HIGH places D0..D7 in HiZ. The internal DAC/comparator successive-approximation loop is not modelled cycle-by-cycle.',
       },
     ],
     pinout: [
@@ -694,7 +535,7 @@ export const CHIPS_BLOCK_28 = {
 
   // ── 74508: 8 bit Multiplier, 24-pin ────────────────────────────────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits */
-  '74508': {
+  '74x508': {
     name: '74x508', simpleName: '8 bit Multiplier',
     description: "8 bit two's complement parallel multiplier (8x8) (24-pin)",
     pins: 24, vcc: 24, gnd: 12,
@@ -723,14 +564,14 @@ export const CHIPS_BLOCK_28 = {
       'P2':  'Product bit 2.',
       'P3':  'Product bit 3.',
       'P4':  'Product bit 4.',
-      'P5':  'Product bit 5 (MSB available on-chip).',
+      'P5':  'Product bit 5 (MSB available on chip).',
       'VCC': 'Positive supply (+5 V, pin 24).',
     },
     guideSections: [
       {
         title: 'Parallel Multiplication',
         paragraphs: [
-          "Multiplying two N-bit numbers produces a 2N-bit product. Two's complement encoding handles signed operands. The chip internally forms all partial products and sums them in a single combinational pass much faster than shift-and-add approaches.",
+          "Multiplying two N-bit numbers produces a 2N-bit product. Two's complement encoding handles signed operands. The chip internally forms all partial products and sums them in a single combinational pass much faster than shift and add approaches.",
         ],
       },
     ],
@@ -756,9 +597,9 @@ export const CHIPS_BLOCK_28 = {
   // ── 74515: Programmable Mapping Decoder, 20-pin ────────────────────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Multiplexer */
-  '74515': {
+  '74x515': {
     name: '74x515', simpleName: 'Programmable Mapping Decoder',
-    description: '2-to-4 line decoder with 9 programmable enable inputs for memory mapping (20-pin)',
+    description: '2-to-4 decoder with 9 programmable enables for memory mapping (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
     tags: ['decoder', 'programmable', 'address-decoder'],
     guideOverview: 'The 74x515 is a 2-to-4 decoder with nine programmable enable inputs (E0-E8), intended for memory address decoding. The nine enables allow very specific address patterns to be decoded without external glue logic. A0/A1 select one of four active LOW outputs; all nine enables must be satisfied simultaneously.',
@@ -811,7 +652,7 @@ export const CHIPS_BLOCK_28 = {
 
   // ── 74516: 4x4 bit Multiplier, 24-pin ──────────────────────────────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits */
-  '74516': {
+  '74x516': {
     name: '74x516', simpleName: '4x4 bit Multiplier',
     description: "4x4 bit two's complement parallel multiplier (24-pin)",
     pins: 24, vcc: 24, gnd: 12,

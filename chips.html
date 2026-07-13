@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>74Sim 74 Series Chips</title>
+  <link rel="icon" type="image/png" href="assets/Logo74Sim.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/tokens.css">
+  <link rel="stylesheet" href="/css/chips-page.css">
+</head>
+<body>
+
+  <header class="topbar">
+    <a href="/" class="topbar-brand">
+      <img src="/assets/Logo74Sim.png" alt="74Sim" class="topbar-logo">
+    </a>
+  </header>
+
+  <div class="page">
+
+    <aside>
+      <ul class="nav-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/docs">Docs</a></li>
+        <li><a href="/chips" class="active">74 Series Chips</a></li>
+        <!-- lesson comment123 — lessons/courses hidden for this push; un-comment to restore
+        <li><a href="/onramp/lessons">Introduction to Digital Hardware</a></li>
+        -->
+      </ul>
+    </aside>
+
+    <main>
+      <h2>74 Series Logic Chips</h2>
+
+      <p>The 74 series is a family of transistor to transistor logic (TTL) and CMOS integrated circuits
+      that have been an industry standard since the 1960s. Each part number encodes the chip's
+      logic function, making it easy to find a component that does exactly what you need.</p>
+
+      <h2>Part Number Format</h2>
+
+      <p>A typical part number looks like 74HC00:</p>
+
+      <ul class="features">
+        <li>74 identifies the part as a member of the 74 series family.</li>
+        <li>HC the logic subfamily (see table below).</li>
+        <li>00 the function code (quad 2 input NAND gates in this case).</li>
+      </ul>
+
+      <h2>Logic Subfamilies</h2>
+
+      <table class="chip-table">
+        <thead>
+          <tr>
+            <th>Subfamily</th>
+            <th>Full name</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>LS</td>
+            <td>Low power Schottky TTL</td>
+            <td>Classic TTL replacement; 5 V supply, moderate speed</td>
+          </tr>
+          <tr>
+            <td>HC</td>
+            <td>High speed CMOS</td>
+            <td>Wide supply range (2 to 6 V), low power, CMOS level inputs</td>
+          </tr>
+          <tr>
+            <td>HCT</td>
+            <td>High speed CMOS, TTL compatible inputs</td>
+            <td>Same as HC but accepts TTL logic levels; easy LS drop in replacement</td>
+          </tr>
+          <tr>
+            <td>AHC</td>
+            <td>Advanced high speed CMOS</td>
+            <td>Faster than HC with lower output impedance</td>
+          </tr>
+          <tr>
+            <td>LV</td>
+            <td>Low voltage CMOS</td>
+            <td>3.3 V operation</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>Common Function Groups</h2>
+
+      <table class="chip-table">
+        <thead>
+          <tr>
+            <th>Number range</th>
+            <th>Category</th>
+            <th>Examples</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>00 to 09</td>
+            <td>Basic gates</td>
+            <td>7400 NAND, 7402 NOR, 7404 Inverter, 7408 AND</td>
+          </tr>
+          <tr>
+            <td>10 to 29</td>
+            <td>Gates &amp; buffers</td>
+            <td>7410 3 input NAND, 7414 Schmitt trigger, 7421 AND</td>
+          </tr>
+          <tr>
+            <td>30 to 59</td>
+            <td>Encoders, decoders, MUX</td>
+            <td>7447 BCD to 7seg, 7448 decoder, 7451 AND OR INVERT</td>
+          </tr>
+          <tr>
+            <td>70 to 79</td>
+            <td>Flip flops &amp; latches</td>
+            <td>7474 D flip flop, 7476 JK flip flop</td>
+          </tr>
+          <tr>
+            <td>80 to 99</td>
+            <td>Adders &amp; comparators</td>
+            <td>7483 4 bit adder, 7485 magnitude comparator</td>
+          </tr>
+          <tr>
+            <td>160 to 179</td>
+            <td>Counters</td>
+            <td>74160 BCD counter, 74163 binary counter, 74169 up/down</td>
+          </tr>
+          <tr>
+            <td>190 to 199</td>
+            <td>Up/down counters</td>
+            <td>74190 BCD up/down, 74191 binary up/down</td>
+          </tr>
+          <tr>
+            <td>240 to 245</td>
+            <td>Bus transceivers &amp; buffers</td>
+            <td>74240 octal inverting buffer, 74245 octal transceiver</td>
+          </tr>
+          <tr>
+            <td>273 to 377</td>
+            <td>Registers &amp; shift registers</td>
+            <td>74273 octal D flip flop, 74595 shift register</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>Datasheets &amp; References</h2>
+
+      <p>Chip logic and pinouts in 74Sim reference datasheets from three major manufacturers
+      that still produce and document the full 74 series lineup:</p>
+
+      <ul class="features">
+        <li>
+          <a href="https://www.ti.com/logic-circuit/gates/overview.html" target="_blank" rel="noopener">Texas Instruments</a>
+          the original 74 series inventor; comprehensive datasheets for every subfamily.
+        </li>
+        <li>
+          <a href="https://www.nxp.com/products/interfaces/logic-and-bus:MC_71619" target="_blank" rel="noopener">NXP Semiconductors</a>
+          detailed application notes and HC/HCT family coverage.
+        </li>
+        <li>
+          <a href="https://www.onsemi.com/products/discretes-drivers/logic/74 series-logic" target="_blank" rel="noopener">onsemi</a>
+          LS, HC, and HCT variants with cross reference tables.
+        </li>
+      </ul>
+
+      <p class="attr-simple">
+        Backend built with <a href="https://fastapi.tiangolo.com/" target="_blank" rel="noopener">FastAPI</a>,
+        <a href="https://www.sqlalchemy.org/" target="_blank" rel="noopener">SQLAlchemy</a>.
+      </p>
+    </main>
+
+  </div>
+
+<!-- 100% privacy-first analytics -->
+<script async src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
+</body>
+</html>

@@ -1,21 +1,20 @@
 // test-chips57.mjs - Tests for all chips defined in js/chips/chips57.js
 // Chips under test:
-//   74x3893  : Quad Futurebus transceiver (bidir, 20-pin)
-//   74x4002  : Dual 4 input NOR gate (real NOR logic, 14-pin)
-//   74x4015  : Dual 4 bit shift register (GENERIC_STUB, 16-pin)
-//   74x4016  : Quad bilateral switch analog (bidir, 14-pin)
-//   74x4017  : ÷10 Johnson counter (GENERIC_STUB, 16-pin)
-//   74x4020  : 14-stage binary counter (GENERIC_STUB, 16-pin)
-//   74x4022  : ÷8 Johnson counter (GENERIC_STUB, 14-pin)
-//   74x4024  : 7-stage ripple counter (GENERIC_STUB, 14-pin)
-//   74x4028  : BCD-to-decimal decoder (GENERIC_STUB, 16-pin)
-//   74x4040  : 12-stage binary counter (GENERIC_STUB, 16-pin)
-//   74x4046  : PLL/VCO (GENERIC_STUB, 16-pin)
-//   74x4049  : Hex inverting buffer NOT (real NOT, vcc=pin1, 16-pin)
-//   74x4050  : Hex non-inverting buffer (real BUFFER, vcc=pin1, 16-pin)
-//   74x4051  : 8-ch analog mux (bidir, 16-pin)
-//   74x4052  : Dual 4-ch analog mux (bidir, 16-pin)
-//   74x4053  : Triple 2-ch analog mux (bidir, 16-pin)
+//   74x3893  : Quad Futurebus transceiver (bidir, 20 pin)
+//   74x4002  : Dual 4 input NOR gate (real NOR logic, 14 pin)
+//   74x4015  : Dual 4 bit shift register (GENERIC_STUB, 16 pin)
+//   74x4016  : Quad bilateral switch analog (bidir, 14 pin)
+//   74x4017  : ÷10 Johnson counter (COUNTER_DECADE_DECODED, 16 pin)
+//   74x4020  : 14-stage binary counter (GENERIC_STUB, 16 pin)
+//   74x4022  : ÷8 Johnson counter (GENERIC_STUB, 14 pin)
+//   74x4024  : 7-stage ripple counter (GENERIC_STUB, 14 pin)
+//   74x4028  : BCD to-decimal decoder (GENERIC_STUB, 16 pin)
+//   74x4040  : 12-stage binary counter (GENERIC_STUB, 16 pin)
+//   74x4049  : Hex inverting buffer NOT (real NOT, vcc=pin1, 16 pin)
+//   74x4050  : Hex non inverting buffer (real BUFFER, vcc=pin1, 16 pin)
+//   74x4051  : 8-ch analog mux (bidir, 16 pin)
+//   74x4052  : Dual 4-ch analog mux (bidir, 16 pin)
+//   74x4053  : Triple 2-ch analog mux (bidir, 16 pin)
 
 import { CHIPS_BLOCK_57 } from '../chips/chips57.js';
 import { BreadboardWorld, holeId } from '../breadboard.js';
@@ -93,7 +92,7 @@ function connectLow(wm, chip, name)  { connectPinToGnd(wm, findPin(chip, name));
 const EXPECTED_IDS = [
   '74x3893', '74x4002', '74x4015', '74x4016', '74x4017',
   '74x4020', '74x4022', '74x4024', '74x4028', '74x4040',
-  '74x4046', '74x4049', '74x4050', '74x4051', '74x4052', '74x4053',
+  '74x4049', '74x4050', '74x4051', '74x4052', '74x4053',
 ];
 
 const EXPECTED_SPECS = {
@@ -107,7 +106,6 @@ const EXPECTED_SPECS = {
   '74x4024': { pins: 14, gnd:  7, vcc: 14 },
   '74x4028': { pins: 16, gnd:  8, vcc: 16 },
   '74x4040': { pins: 16, gnd:  8, vcc: 16 },
-  '74x4046': { pins: 16, gnd:  8, vcc: 16 },
   '74x4049': { pins: 16, gnd:  8, vcc:  1 },
   '74x4050': { pins: 16, gnd:  8, vcc:  1 },
   '74x4051': { pins: 16, gnd:  8, vcc: 16 },
@@ -118,7 +116,7 @@ const EXPECTED_SPECS = {
 console.log('\n=== SECTION S: Structure ===');
 
 assert(typeof CHIPS_BLOCK_57 === 'object', 'CHIPS_BLOCK_57 is exported object');
-assert(Object.keys(CHIPS_BLOCK_57).length === 16, 'CHIPS_BLOCK_57 has 16 chips');
+assert(Object.keys(CHIPS_BLOCK_57).length === 15, 'CHIPS_BLOCK_57 has 15 chips');
 
 for (const id of EXPECTED_IDS) {
   const cd = CHIPS_BLOCK_57[id];
@@ -172,9 +170,10 @@ for (const id of BIDIR_ONLY) {
   assert(true, `${id}: no driven outputs (bidir) - HiZ OK`);
 }
 
-// Stub chips with output pins
-const STUB_OUT_IDS = ['74x4015', '74x4017', '74x4020', '74x4022', '74x4024',
-                      '74x4028', '74x4040', '74x4046'];
+// Stub chips with output pins (4017 used to be a stub but is now
+// implemented as COUNTER_DECADE_DECODED; its outputs drive)
+const STUB_OUT_IDS = ['74x4015', '74x4020', '74x4022', '74x4024',
+                      '74x4028', '74x4040'];
 
 for (const id of STUB_OUT_IDS) {
   const cd = CHIPS_BLOCK_57[id];

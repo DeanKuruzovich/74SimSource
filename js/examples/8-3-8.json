@@ -63,7 +63,7 @@
       "tileY": 0,
       "col": 13,
       "row": 4,
-      "chipId": "74148"
+      "chipId": "74x148"
     },
     {
       "id": 126,
@@ -149,7 +149,7 @@
       "tileY": 0,
       "col": 27,
       "row": 4,
-      "chipId": "74237",
+      "chipId": "74x237",
       "ffState": {
         "Y0_dl8hi": {
           "addr": 7
@@ -409,7 +409,7 @@
       "y": -60,
       "w": 600,
       "h": 70,
-      "text": "Description: Eight switches get converted to 3 data wires, get outputted back to 1 of 8 yellow LEDs.",
+      "text": "Description: Eight switches get converted to 3 data wires, get output back to 1 of 8 yellow LEDs.",
       "v": 2
     },
     {

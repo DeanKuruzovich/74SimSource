@@ -8,37 +8,37 @@ export const CHIPS_BLOCK_16 = {
      Wikipedia: https://en.wikipedia.org/wiki/Parity_bit
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic
      Wikipedia: https://en.wikipedia.org/wiki/Random-access_memory */
-  '74225': {
+  '74x225': {
     name: '74x225',
     simpleName: '80 bit FIFO (16x5) Async',
-    description: '80 bit asynchronous FIFO memory (16 words x 5 bits) with 3-state outputs (20-pin)',
+    description: '80-bit async FIFO (16x5) with 3-state outputs (20-pin)',
     pins: 20,
     vcc: 20,
     gnd: 10,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74s225.pdf',
-    tags: ['fifo', 'memory', '16x5', 'asynchronous', 'tri-state'],
-    guideOverview: 'The 74x225 is an 80 bit asynchronous FIFO organized as 16 words of 5 bits each. The extra fifth bit (DIN4/DOUT4) can carry a parity, flag, or status bit alongside a 4 bit nibble. WR pulses push data in; RD pulses pop data out. EF goes HIGH when empty; FF goes HIGH when full. An OE pin tri-states all five outputs when HIGH. No clocks are required write and read are controlled directly by WR and RD strobe signals.',
+    tags: ['fifo', 'memory', '16x5', 'asynchronous', 'tri state'],
+    guideOverview: 'The 74x225 is an 80 bit asynchronous FIFO organized as 16 words of 5 bits each. The extra fifth bit (DIN4/DOUT4) can carry a parity, flag, or status bit alongside a 4 bit nibble. WR pulses push data in; RD pulses pop data out. EF goes HIGH when empty; FF goes HIGH when full. An OE pin tri states all five outputs when HIGH. No clocks are required write and read are controlled directly by WR and RD strobe signals.',
     guidePinDescriptions: {
-      'DIN0':  'Data input bit 0.',
-      'DIN1':  'Data input bit 1.',
-      'DIN2':  'Data input bit 2.',
-      'DIN3':  'Data input bit 3.',
-      'DIN4':  'Data input bit 4 (fifth bit, often used for parity or a flag).',
-      'WR':    'Write strobe. A LOW-to-HIGH (or active) edge pushes DIN0 DIN4 into the FIFO when FF is LOW.',
-      'RD':    'Read strobe. An active edge pops the oldest word to DOUT0 DOUT4 when EF is LOW.',
-      'EF':    'Empty Flag. HIGH when the FIFO contains no data.',
-      'FF':    'Full Flag. HIGH when all 16 locations are occupied.',
-      'GND':   'Ground reference (pin 10).',
+      'DIN0': 'Data input bit 0.',
+      'DIN1': 'Data input bit 1.',
+      'DIN2': 'Data input bit 2.',
+      'DIN3': 'Data input bit 3.',
+      'DIN4': 'Data input bit 4 (fifth bit, often used for parity or a flag).',
+      'WR': 'Write strobe. A LOW to HIGH (or active) edge pushes DIN0-DIN4 into the FIFO when FF is LOW.',
+      'RD': 'Read strobe. An active edge pops the oldest word to DOUT0-DOUT4 when EF is LOW.',
+      'EF': 'Empty Flag. HIGH when the FIFO contains no data.',
+      'FF': 'Full Flag. HIGH when all 16 locations are occupied.',
+      'GND': 'Ground reference (pin 10).',
       'DOUT0': 'Data output bit 0 (3-state).',
       'DOUT1': 'Data output bit 1.',
       'DOUT2': 'Data output bit 2.',
       'DOUT3': 'Data output bit 3.',
       'DOUT4': 'Data output bit 4 (fifth bit).',
-      'OE':    'Output Enable (active LOW). When asserted (LOW), drives DOUT pins; when HIGH, tri-states them.',
-      'NC1':   'Not connected.',
-      'NC2':   'Not connected.',
-      'NC3':   'Not connected.',
-      'VCC':   'Positive supply (+5 V, pin 20).',
+      'OE': 'Output Enable (active LOW). When asserted (LOW), drives DOUT pins; when HIGH, tri states them.',
+      'NC1': 'Not connected.',
+      'NC2': 'Not connected.',
+      'NC3': 'Not connected.',
+      'VCC': 'Positive supply (+5 V, pin 20).',
     },
     pinout: [
       { pin:  1, name: 'DIN0',  type: 'input' },
@@ -70,7 +70,7 @@ export const CHIPS_BLOCK_16 = {
       {
         title: '5 bit Wide FIFO',
         paragraphs: [
-          'The fifth data bit (DIN4/DOUT4) is not connected to any internal addressing or control logic it flows through the FIFO alongside the four main data bits. Use it for parity checking, a priority flag, an end-of-packet marker, or any side-channel information that must stay aligned with each nibble.',
+          'The fifth data bit (DIN4/DOUT4) is not connected to any internal addressing or control logic it flows through the FIFO alongside the four main data bits. Use it for parity checking, a priority flag, an end of packet marker, or any side channel information that must stay aligned with each nibble.',
         ],
         note: 'Always check FF before writing and EF before reading to avoid data corruption from overflow or underflow.',
       },
@@ -82,7 +82,7 @@ export const CHIPS_BLOCK_16 = {
      Wikipedia: https://en.wikipedia.org/wiki/Flip-flop_(electronics)
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic
      Wikipedia: https://en.wikipedia.org/wiki/Bus_transceiver */
-  '74226': {
+  '74x226': {
     name: '74x226',
     simpleName: '4 bit Latched Bus Transceiver',
     description: '4 bit parallel latched bus transceiver with 3-state outputs (16-pin)',
@@ -90,8 +90,8 @@ export const CHIPS_BLOCK_16 = {
     vcc: 16,
     gnd: 8,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74s226.pdf',
-    tags: ['transceiver', 'bus', 'latch', '4 bit', 'tri-state'],
-    guideOverview: 'The 74x226 is a 4 bit latched bus transceiver with 3-state outputs. It contains four bidirectional data channels (A1 A4 and B1 B4) each with an internal latch. DIR controls the transfer direction: when DIR is HIGH, data flows from B to A; when LOW, from A to B. LE (Latch Enable) captures data into the latch when HIGH and holds it when LOW. Separate OEA and OEB pins independently tri-state the A and B sides.',
+    tags: ['transceiver', 'bus', 'latch', '4 bit', 'tri state'],
+    guideOverview: 'The 74x226 is a 4 bit latched bus transceiver with 3-state outputs. It contains four bidirectional data channels (A1 A4 and B1 B4) each with an internal latch. DIR controls the transfer direction: when DIR is HIGH, data flows from B to A; when LOW, from A to B. LE (Latch Enable) captures data into the latch when HIGH and holds it when LOW. Separate OEA and OEB pins independently tri state the A and B sides.',
     guidePinDescriptions: {
       'A1':  'Port A channel 1. Source or destination depending on DIR.',
       'B1':  'Port B channel 1. Source or destination depending on DIR.',
@@ -102,8 +102,8 @@ export const CHIPS_BLOCK_16 = {
       'A4':  'Port A channel 4.',
       'GND': 'Ground reference (pin 8).',
       'B4':  'Port B channel 4.',
-      'OEA': 'Output Enable for A side (active LOW). When asserted (LOW), drives A1 A4; when HIGH, tri-states them.',
-      'OEB': 'Output Enable for B side (active LOW). When asserted (LOW), drives B1 B4; when HIGH, tri-states them.',
+      'OEA': 'Output Enable for A side (active LOW). When asserted (LOW), drives A1 A4; when HIGH, tri states them.',
+      'OEB': 'Output Enable for B side (active LOW). When asserted (LOW), drives B1 B4; when HIGH, tri states them.',
       'DIR': 'Direction control. HIGH = B→A transfer; LOW = A→B transfer.',
       'LE':  'Latch Enable. HIGH = transparent (data passes through); LOW = latch holds last data.',
       'NC1': 'Not connected.',
@@ -147,17 +147,17 @@ export const CHIPS_BLOCK_16 = {
   /* Primary source: Texas Instruments, SN74LS227 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls227.pdf
      Wikipedia: https://en.wikipedia.org/wiki/Open_collector
      Wikipedia: https://en.wikipedia.org/wiki/Random-access_memory */
-  '74227': {
+  '74x227': {
     name: '74x227',
     simpleName: '64 bit FIFO (16x4) Sync OC+IR/OR',
-    description: '64 bit synchronous FIFO (16x4) with open-collector outputs and input/output ready signals (20-pin)',
+    description: '64-bit sync FIFO (16x4), open-collector outputs, I/O ready (20-pin)',
     pins: 20,
     vcc: 20,
     gnd: 10,
     openCollector: true,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls227.pdf',
-    tags: ['fifo', 'memory', '16x4', 'synchronous', 'open-collector'],
-    guideOverview: 'The 74x227 is a 64 bit synchronous FIFO (16×4) with open-collector data outputs and four status flags (EF, FF, IR, OR). It is the open-collector equivalent of the 74x222. Open-collector DOUT lines require external pull up resistors and allow multiple FIFOs to share a common output bus using wired AND logic. Independent WR_CLK and RD_CLK support asynchronous write and read clocks.',
+    tags: ['fifo', 'memory', '16x4', 'synchronous', 'open collector'],
+    guideOverview: 'The 74x227 is a 64 bit synchronous FIFO (16×4) with open collector data outputs and four status flags (EF, FF, IR, OR). It is the open collector equivalent of the 74x222. Open collector DOUT lines require external pull up resistors and allow multiple FIFOs to share a common output bus using wired AND logic. Independent WR_CLK and RD_CLK support asynchronous write and read clocks.',
     guidePinDescriptions: {
       'DIN0':   'Data input bit 0.',
       'DIN1':   'Data input bit 1.',
@@ -167,15 +167,15 @@ export const CHIPS_BLOCK_16 = {
       'RD_CLK': 'Read clock. The oldest word is popped and presented on DOUT when RD_EN is asserted.',
       'WR_EN':  'Write Enable. Assert during WR_CLK edge to write data.',
       'RD_EN':  'Read Enable. Assert during RD_CLK edge to read and pop data.',
-      'IR':     'Input Ready (open-collector). LOW when the FIFO is not full and can accept data.',
+      'IR':     'Input Ready (open collector). LOW when the FIFO is not full and can accept data.',
       'GND':    'Ground reference (pin 10).',
-      'OR':     'Output Ready (open-collector). LOW when data is available to read.',
-      'EF':     'Empty Flag (open-collector). LOW when FIFO is empty.',
-      'FF':     'Full Flag (open-collector). LOW when FIFO is full.',
-      'DOUT0':  'Data output bit 0 (open-collector). Needs pull up resistor.',
-      'DOUT1':  'Data output bit 1 (open-collector).',
-      'DOUT2':  'Data output bit 2 (open-collector).',
-      'DOUT3':  'Data output bit 3 (open-collector, MSB).',
+      'OR':     'Output Ready (open collector). LOW when data is available to read.',
+      'EF':     'Empty Flag (open collector). LOW when FIFO is empty.',
+      'FF':     'Full Flag (open collector). LOW when FIFO is full.',
+      'DOUT0':  'Data output bit 0 (open collector). Needs pull up resistor.',
+      'DOUT1':  'Data output bit 1 (open collector).',
+      'DOUT2':  'Data output bit 2 (open collector).',
+      'DOUT3':  'Data output bit 3 (open collector, MSB).',
       'NC1':    'Not connected.',
       'NC2':    'Not connected.',
       'VCC':    'Positive supply (+5 V, pin 20).',
@@ -210,7 +210,7 @@ export const CHIPS_BLOCK_16 = {
       {
         title: 'Open Collector Bus Sharing',
         paragraphs: [
-          'Open-collector outputs can only pull LOW; a HIGH requires an external pull up resistor. This allows multiple 74x227 outputs to share the same wire: the bus goes LOW if any chip drives it LOW (wired AND). All flags and data outputs are open-collector.',
+          'Open collector outputs can only pull LOW; a HIGH requires an external pull up resistor. This allows multiple 74x227 outputs to share the same wire: the bus goes LOW if any chip drives it LOW (wired AND). All flags and data outputs are open collector.',
         ],
         note: 'Note that flag polarity is inverted vs. the 74x222: IR=LOW means input ready (not full), OR=LOW means output ready (not empty).',
       },
@@ -221,17 +221,17 @@ export const CHIPS_BLOCK_16 = {
   /* Primary source: Texas Instruments, SN74LS228 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls228.pdf
      Wikipedia: https://en.wikipedia.org/wiki/Open_collector
      Wikipedia: https://en.wikipedia.org/wiki/Random-access_memory */
-  '74228': {
+  '74x228': {
     name: '74x228',
     simpleName: '64 bit FIFO (16x4) Sync OC',
-    description: '64 bit synchronous FIFO (16x4) with open-collector outputs and EF/FF flags (20-pin)',
+    description: '64-bit sync FIFO (16x4), open-collector outputs, EF/FF flags (20-pin)',
     pins: 20,
     vcc: 20,
     gnd: 10,
     openCollector: true,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls228.pdf',
-    tags: ['fifo', 'memory', '16x4', 'synchronous', 'open-collector'],
-    guideOverview: 'The 74x228 is a 64 bit synchronous FIFO (16×4) with open-collector outputs and EF/FF status flags only (no IR/OR). It is the open-collector, simpler-flag variant of the 74x224. External pull up resistors are required on all open-collector outputs. Independent WR_CLK and RD_CLK allow cross-domain data transfer.',
+    tags: ['fifo', 'memory', '16x4', 'synchronous', 'open collector'],
+    guideOverview: 'The 74x228 is a 64 bit synchronous FIFO (16×4) with open collector outputs and EF/FF status flags only (no IR/OR). It is the open collector, simpler flag variant of the 74x224. External pull up resistors are required on all open collector outputs. Independent WR_CLK and RD_CLK allow cross domain data transfer.',
     guidePinDescriptions: {
       'DIN0':   'Data input bit 0.',
       'DIN1':   'Data input bit 1.',
@@ -241,13 +241,13 @@ export const CHIPS_BLOCK_16 = {
       'RD_CLK': 'Read clock. Pops oldest word on active edge when RD_EN asserted and FIFO not empty.',
       'WR_EN':  'Write Enable.',
       'RD_EN':  'Read Enable.',
-      'EF':     'Empty Flag (open-collector). LOW when FIFO is empty.',
+      'EF':     'Empty Flag (open collector). LOW when FIFO is empty.',
       'GND':    'Ground reference (pin 10).',
-      'FF':     'Full Flag (open-collector). LOW when FIFO is full.',
-      'DOUT0':  'Data output bit 0 (open-collector).',
-      'DOUT1':  'Data output bit 1 (open-collector).',
-      'DOUT2':  'Data output bit 2 (open-collector).',
-      'DOUT3':  'Data output bit 3 (open-collector, MSB).',
+      'FF':     'Full Flag (open collector). LOW when FIFO is full.',
+      'DOUT0':  'Data output bit 0 (open collector).',
+      'DOUT1':  'Data output bit 1 (open collector).',
+      'DOUT2':  'Data output bit 2 (open collector).',
+      'DOUT3':  'Data output bit 3 (open collector, MSB).',
       'NC1':    'Not connected.',
       'NC2':    'Not connected.',
       'NC3':    'Not connected.',
@@ -284,7 +284,7 @@ export const CHIPS_BLOCK_16 = {
       {
         title: 'Simplified OC FIFO',
         paragraphs: [
-          'For status monitoring, check EF before reading and FF before writing. EF=LOW means empty (do not read); FF=LOW means full (do not write). Both flags are open-collector and require pull up resistors.',
+          'For status monitoring, check EF before reading and FF before writing. EF=LOW means empty (do not read); FF=LOW means full (do not write). Both flags are open collector and require pull up resistors.',
         ],
       },
     ],
@@ -295,37 +295,37 @@ export const CHIPS_BLOCK_16 = {
      Wikipedia: https://en.wikipedia.org/wiki/Parity_bit
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic
      Wikipedia: https://en.wikipedia.org/wiki/Random-access_memory */
-  '74229': {
+  '74x229': {
     name: '74x229',
     simpleName: '80 bit FIFO (16x5) Async',
-    description: '80 bit asynchronous FIFO memory (16 words x 5 bits) with 3-state outputs (20-pin)',
+    description: '80-bit async FIFO (16x5) with 3-state outputs (20-pin)',
     pins: 20,
     vcc: 20,
     gnd: 10,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74als229b.pdf',
-    tags: ['fifo', 'memory', '16x5', 'asynchronous', 'tri-state'],
-    guideOverview: 'The 74x229 is an 80 bit asynchronous FIFO organized as 16 words of 5 bits with 3-state outputs, functionally equivalent to the 74x225. Five-bit words allow a byte nibble plus a parity or control bit. WR and RD are asynchronous strobes; no shared clock is needed. EF and FF indicate empty and full status. OE (active LOW): when asserted (LOW), drives outputs; when HIGH, tri-states them.',
+    tags: ['fifo', 'memory', '16x5', 'asynchronous', 'tri state'],
+    guideOverview: 'The 74x229 is an 80 bit asynchronous FIFO organized as 16 words of 5 bits with 3-state outputs, functionally equivalent to the 74x225. Five bit words allow a byte nibble plus a parity or control bit. WR and RD are asynchronous strobes; no shared clock is needed. EF and FF indicate empty and full status. OE (active LOW): when asserted (LOW), drives outputs; when HIGH, tri states them.',
     guidePinDescriptions: {
-      'DIN0':  'Data input bit 0.',
-      'DIN1':  'Data input bit 1.',
-      'DIN2':  'Data input bit 2.',
-      'DIN3':  'Data input bit 3.',
-      'DIN4':  'Data input bit 4 (fifth bit).',
-      'WR':    'Write strobe. Active edge pushes DIN0 DIN4 into FIFO when FF is HIGH (not full).',
-      'RD':    'Read strobe. Active edge pops oldest word to DOUT when EF is LOW.',
-      'EF':    'Empty Flag. HIGH when FIFO is empty.',
-      'FF':    'Full Flag. HIGH when all 16 locations are occupied.',
-      'GND':   'Ground reference (pin 10).',
+      'DIN0': 'Data input bit 0.',
+      'DIN1': 'Data input bit 1.',
+      'DIN2': 'Data input bit 2.',
+      'DIN3': 'Data input bit 3.',
+      'DIN4': 'Data input bit 4 (fifth bit).',
+      'WR': 'Write strobe. Active edge pushes DIN0-DIN4 into FIFO when FF is HIGH (not full).',
+      'RD': 'Read strobe. Active edge pops oldest word to DOUT when EF is LOW.',
+      'EF': 'Empty Flag. HIGH when FIFO is empty.',
+      'FF': 'Full Flag. HIGH when all 16 locations are occupied.',
+      'GND': 'Ground reference (pin 10).',
       'DOUT0': 'Data output bit 0 (3-state).',
       'DOUT1': 'Data output bit 1.',
       'DOUT2': 'Data output bit 2.',
       'DOUT3': 'Data output bit 3.',
       'DOUT4': 'Data output bit 4 (fifth bit).',
-      'OE':    'Output Enable (active LOW). When asserted (LOW), drives DOUT pins; when HIGH, tri-states them.',
-      'NC1':   'Not connected.',
-      'NC2':   'Not connected.',
-      'NC3':   'Not connected.',
-      'VCC':   'Positive supply (+5 V, pin 20).',
+      'OE': 'Output Enable (active LOW). When asserted (LOW), drives DOUT pins; when HIGH, tri states them.',
+      'NC1': 'Not connected.',
+      'NC2': 'Not connected.',
+      'NC3': 'Not connected.',
+      'VCC': 'Positive supply (+5 V, pin 20).',
     },
     pinout: [
       { pin:  1, name: 'DIN0',  type: 'input' },
@@ -355,7 +355,7 @@ export const CHIPS_BLOCK_16 = {
     sequential: true,
     guideSections: [
       {
-        title: 'Equivalent to 74225',
+        title: 'Equivalent to 74x225',
         paragraphs: [
           'The 74x229 and 74x225 are functionally identical 16×5 asynchronous FIFOs. They differ in manufacturer and minor timing characteristics. See the 74x225 guide entry for detailed operational notes.',
         ],
@@ -363,19 +363,19 @@ export const CHIPS_BLOCK_16 = {
     ],
   },
 
-  // ── 74230: Dual 4 bit Buffer (Inv+Non-Inv), 20-pin ─────────────────────────
+  // ── 74230: Dual 4 bit Buffer (Inv+Non Inv), 20-pin ─────────────────────────
   /* Primary source: Texas Instruments, SN74AS230 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74as230.pdf
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic */
-  '74230': {
+  '74x230': {
     name: '74x230',
-    simpleName: 'Dual 4 bit Buffer (Inv+Non-Inv)',
-    description: 'Dual 4 bit buffer: one inverting group and one non-inverting group with active LOW output enables (20-pin)',
+    simpleName: 'Dual 4 bit Buffer (Inv+Non Inv)',
+    description: 'Dual 4-bit buffer: inverting + non-inverting, active-LOW OE (20-pin)',
     pins: 20,
     vcc: 20,
     gnd: 10,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74as230.pdf',
-    tags: ['buffer', 'driver', 'dual', '4 bit', 'tri-state', 'inverting'],
-    guideOverview: 'The 74x230 is a dual 4 bit buffer in a single 20-pin package where the two 4 bit groups have different output types. Group 1 (1A1 1A4 → 1Y1 1Y4) uses inverting outputs; group 2 (2A1 2A4 → 2Y1 2Y4) uses non-inverting outputs. Both groups have independent output enables (OE, active LOW). When OE is asserted (LOW), outputs drive the bus; when HIGH, outputs are tri-stated.',
+    tags: ['buffer', 'driver', 'dual', '4 bit', 'tri state', 'inverting'],
+    guideOverview: 'The 74x230 is a dual 4 bit buffer in a single 20-pin package where the two 4 bit groups have different output types. Group 1 (1A1 1A4 → 1Y1 1Y4) uses inverting outputs; group 2 (2A1 2A4 → 2Y1 2Y4) uses non inverting outputs. Both groups have independent output enables (OE, active LOW). When OE is asserted (LOW), outputs drive the bus; when HIGH, outputs are tri stated.',
     guidePinDescriptions: {
       '1OE':  'Output Enable for group 1 (active LOW). When LOW, 1Y1 1Y4 are driven (inverted inputs).',
       '1A1':  'Input channel 1 of the inverting group.',
@@ -387,15 +387,15 @@ export const CHIPS_BLOCK_16 = {
       '1A4':  'Input channel 4 of the inverting group.',
       '1Y4':  'Inverted output of 1A4.',
       'GND':  'Ground reference (pin 10).',
-      '2A1':  'Input channel 1 of the non-inverting group.',
-      '2Y1':  'Non-inverted output of 2A1. Follows 2A1 when 2OE=LOW.',
-      '2A2':  'Input channel 2 of the non-inverting group.',
-      '2Y2':  'Non-inverted output of 2A2.',
-      '2A3':  'Input channel 3 of the non-inverting group.',
-      '2Y3':  'Non-inverted output of 2A3.',
-      '2A4':  'Input channel 4 of the non-inverting group.',
-      '2Y4':  'Non-inverted output of 2A4.',
-      '2OE':  'Output Enable for group 2 (active LOW). When LOW, 2Y1 2Y4 are driven (non-inverted inputs).',
+      '2A1':  'Input channel 1 of the non inverting group.',
+      '2Y1':  'Non inverted output of 2A1. Follows 2A1 when 2OE=LOW.',
+      '2A2':  'Input channel 2 of the non inverting group.',
+      '2Y2':  'Non inverted output of 2A2.',
+      '2A3':  'Input channel 3 of the non inverting group.',
+      '2Y3':  'Non inverted output of 2A3.',
+      '2A4':  'Input channel 4 of the non inverting group.',
+      '2Y4':  'Non inverted output of 2A4.',
+      '2OE':  'Output Enable for group 2 (active LOW). When LOW, 2Y1 2Y4 are driven (non inverted inputs).',
       'VCC':  'Positive supply (+5 V, pin 20).',
     },
     pinout: [
@@ -434,7 +434,7 @@ export const CHIPS_BLOCK_16 = {
       {
         title: 'Mixed Buffer Groups',
         paragraphs: [
-          'Combining an inverting and a non-inverting group in one package is useful for signal conditioning where some signals need polarity inversion and others do not. Both groups can be independently disabled with their respective OE pins.',
+          'Combining an inverting and a non inverting group in one package is useful for signal conditioning where some signals need polarity inversion and others do not. Both groups can be independently disabled with their respective OE pins.',
         ],
       },
     ],
@@ -443,20 +443,20 @@ export const CHIPS_BLOCK_16 = {
   // ── 74231: Dual 4 bit Inv Buffer (Pos+Neg OE), 20-pin ──────────────────────
   /* Primary source: Texas Instruments, SN74AS231 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74as231.pdf
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic */
-  '74231': {
+  '74x231': {
     name: '74x231',
     simpleName: 'Dual 4 bit Inv Buffer (Pos+Neg OE)',
-    description: 'Dual 4 bit inverting buffer with one positive-enable and one negative-enable group (20-pin)',
+    description: 'Dual 4-bit inverting buffer, one active-HIGH + one active-LOW OE (20-pin)',
     pins: 20,
     vcc: 20,
     gnd: 10,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74as231.pdf',
-    tags: ['buffer', 'driver', 'dual', '4 bit', 'tri-state', 'inverting'],
-    guideOverview: 'The 74x231 is a dual 4 bit inverting buffer where both groups invert their inputs but have opposite-polarity output enables. Group 1 (1OE active LOW): when 1OE=LOW, 1Y outputs are driven as inverted inputs. Group 2 (2OE active HIGH): when 2OE=HIGH, 2Y outputs are driven as inverted inputs. The split-polarity enables simplify control logic when one side needs active HIGH and the other active LOW enables.',
+    tags: ['buffer', 'driver', 'dual', '4 bit', 'tri state', 'inverting'],
+    guideOverview: 'The 74x231 is a dual 4 bit inverting buffer where both groups invert their inputs but have opposite polarity output enables. Group 1 (1OE active LOW): when 1OE=LOW, 1Y outputs are driven as inverted inputs. Group 2 (2OE active HIGH): when 2OE=HIGH, 2Y outputs are driven as inverted inputs. The split polarity enables simplify control logic when one side needs active HIGH and the other active LOW enables.',
     guidePinDescriptions: {
       '1OE':  'Output Enable for group 1 (active LOW). LOW = group 1 outputs driven (inverted).',
       '1A1':  'Input channel 1, inverting group 1.',
-      '1Y1':  'Inverted output of 1A1. Tri-stated when 1OE=HIGH.',
+      '1Y1':  'Inverted output of 1A1. Tri stated when 1OE=HIGH.',
       '1A2':  'Input channel 2, inverting group 1.',
       '1Y2':  'Inverted output of 1A2.',
       '1A3':  'Input channel 3, inverting group 1.',
@@ -465,7 +465,7 @@ export const CHIPS_BLOCK_16 = {
       '1Y4':  'Inverted output of 1A4.',
       'GND':  'Ground reference (pin 10).',
       '2A1':  'Input channel 1, inverting group 2.',
-      '2Y1':  'Inverted output of 2A1. Tri-stated when 2OE=LOW.',
+      '2Y1':  'Inverted output of 2A1. Tri stated when 2OE=LOW.',
       '2A2':  'Input channel 2, inverting group 2.',
       '2Y2':  'Inverted output of 2A2.',
       '2A3':  'Input channel 3, inverting group 2.',
@@ -509,9 +509,9 @@ export const CHIPS_BLOCK_16 = {
     ],
     guideSections: [
       {
-        title: 'Split-Polarity Enables',
+        title: 'Split Polarity Enables',
         paragraphs: [
-          'Group 1 enable is active LOW; group 2 enable is active HIGH. Drive 1OE LOW and 2OE HIGH simultaneously to enable both groups at once from the same control signal useful when a single bus-enable pin needs to activate both halves.',
+          'Group 1 enable is active LOW; group 2 enable is active HIGH. Drive 1OE LOW and 2OE HIGH simultaneously to enable both groups at once from the same control signal useful when a single bus enable pin needs to activate both halves.',
         ],
       },
     ],
@@ -521,33 +521,33 @@ export const CHIPS_BLOCK_16 = {
   /* Primary source: Texas Instruments, SN74ALS232B datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74als232b.pdf
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic
      Wikipedia: https://en.wikipedia.org/wiki/Random-access_memory */
-  '74232': {
+  '74x232': {
     name: '74x232',
     simpleName: '64 bit FIFO (16x4) Async',
-    description: '64 bit asynchronous FIFO memory (16 words x 4 bits) with 3-state outputs (16-pin)',
+    description: '64-bit async FIFO (16x4) with 3-state outputs (16-pin)',
     pins: 16,
     vcc: 16,
     gnd: 8,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74als232b.pdf',
-    tags: ['fifo', 'memory', '16x4', 'asynchronous', 'tri-state'],
-    guideOverview: 'The 74x232 is a 64 bit asynchronous FIFO organized as 16 words of 4 bits in a compact 16-pin package. WR and RD are direct control strobes requiring no shared clock. EF (Empty Flag) indicates when the FIFO is empty; FF (Full Flag) indicates when full. OE tri-states all four data outputs. The small 16-word depth is suitable for short elastic buffers between a fast burst source and a slower consumer.',
+    tags: ['fifo', 'memory', '16x4', 'asynchronous', 'tri state'],
+    guideOverview: 'The 74x232 is a 64 bit asynchronous FIFO organized as 16 words of 4 bits in a compact 16-pin package. WR and RD are direct control strobes requiring no shared clock. EF (Empty Flag) indicates when the FIFO is empty; FF (Full Flag) indicates when full. OE tri states all four data outputs. The small 16 word depth is suitable for short elastic buffers between a fast burst source and a slower consumer.',
     guidePinDescriptions: {
-      'DIN0':  'Data input bit 0.',
-      'DIN1':  'Data input bit 1.',
-      'DIN2':  'Data input bit 2.',
-      'DIN3':  'Data input bit 3 (MSB).',
-      'WR':    'Write strobe. Active edge pushes DIN0 DIN3 into FIFO when FF is LOW.',
-      'RD':    'Read strobe. Active edge pops oldest word to DOUT when EF is LOW.',
-      'EF':    'Empty Flag. HIGH when the FIFO is empty.',
-      'GND':   'Ground reference (pin 8).',
-      'FF':    'Full Flag. HIGH when all 16 locations are occupied.',
+      'DIN0': 'Data input bit 0.',
+      'DIN1': 'Data input bit 1.',
+      'DIN2': 'Data input bit 2.',
+      'DIN3': 'Data input bit 3 (MSB).',
+      'WR': 'Write strobe. Active edge pushes DIN0-DIN3 into FIFO when FF is LOW.',
+      'RD': 'Read strobe. Active edge pops oldest word to DOUT when EF is LOW.',
+      'EF': 'Empty Flag. HIGH when the FIFO is empty.',
+      'GND': 'Ground reference (pin 8).',
+      'FF': 'Full Flag. HIGH when all 16 locations are occupied.',
       'DOUT0': 'Data output bit 0 (3-state). Valid when OE=LOW.',
       'DOUT1': 'Data output bit 1.',
       'DOUT2': 'Data output bit 2.',
       'DOUT3': 'Data output bit 3 (MSB).',
-      'OE':    'Output Enable, active LOW. HIGH tri-states all DOUT pins.',
-      'NC1':   'Not connected.',
-      'VCC':   'Positive supply (+5 V, pin 16).',
+      'OE': 'Output Enable, active LOW. HIGH tri states all DOUT pins.',
+      'NC1': 'Not connected.',
+      'VCC': 'Positive supply (+5 V, pin 16).',
     },
     pinout: [
       { pin:  1, name: 'DIN0',  type: 'input' },
@@ -575,7 +575,7 @@ export const CHIPS_BLOCK_16 = {
       {
         title: 'Asynchronous FIFO',
         paragraphs: [
-          'Unlike synchronous FIFOs that require separate clock edges, the 74x232 uses direct WR and RD strobes. Assert WR to write; assert RD to read. No clock signal is needed, making it straightforward to integrate with pulse-controlled circuits or glue logic designs.',
+          'Unlike synchronous FIFOs that require separate clock edges, the 74x232 uses direct WR and RD strobes. Assert WR to write; assert RD to read. No clock signal is needed, making it straightforward to integrate with pulse controlled circuits or glue logic designs.',
         ],
       },
     ],
@@ -586,16 +586,16 @@ export const CHIPS_BLOCK_16 = {
      Wikipedia: https://en.wikipedia.org/wiki/Parity_bit
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic
      Wikipedia: https://en.wikipedia.org/wiki/Random-access_memory */
-  '74233': {
+  '74x233': {
     name: '74x233',
     simpleName: '80 bit FIFO (16x5) Async',
-    description: '80 bit asynchronous FIFO memory (16 words x 5 bits) with 3-state outputs (20-pin)',
+    description: '80-bit async FIFO (16x5) with 3-state outputs (20-pin)',
     pins: 20,
     vcc: 20,
     gnd: 10,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74als233b.pdf',
-    tags: ['fifo', 'memory', '16x5', 'asynchronous', 'tri-state'],
-    guideOverview: 'The 74x233 is an 80 bit asynchronous FIFO (16×5) with 3-state outputs, equivalent to the 74x229 (ALS speed grade variant). Five-bit wide words allow byte nibble plus parity or flag storage. Operation is identical to the 74x229 and 74x225.',
+    tags: ['fifo', 'memory', '16x5', 'asynchronous', 'tri state'],
+    guideOverview: 'The 74x233 is an 80 bit asynchronous FIFO (16×5) with 3-state outputs, equivalent to the 74x229 (ALS speed grade variant). Five bit wide words allow byte nibble plus parity or flag storage. Operation is identical to the 74x229 and 74x225.',
     guidePinDescriptions: {
       'DIN0':  'Data input bit 0.',
       'DIN1':  'Data input bit 1.',
@@ -646,7 +646,7 @@ export const CHIPS_BLOCK_16 = {
     sequential: true,
     guideSections: [
       {
-        title: 'ALS Equivalent of 74229',
+        title: 'ALS Equivalent of 74x229',
         paragraphs: [
           'The 74x233 is the ALS (Advanced Low power Schottky) speed/power variant of the 74x229. Operation, pin assignment, and flag behavior are identical. Use whichever part number is available for your speed grade requirements.',
         ],
@@ -658,16 +658,16 @@ export const CHIPS_BLOCK_16 = {
   /* Primary source: Texas Instruments, SN74ALS234 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74als234.pdf
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic
      Wikipedia: https://en.wikipedia.org/wiki/Random-access_memory */
-  '74234': {
+  '74x234': {
     name: '74x234',
     simpleName: '256 bit FIFO (64x4) Async',
-    description: '256 bit asynchronous FIFO memory (64 words x 4 bits) with 3-state outputs (16-pin)',
+    description: '256-bit async FIFO (64x4) with 3-state outputs (16-pin)',
     pins: 16,
     vcc: 16,
     gnd: 8,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74als234.pdf',
-    tags: ['fifo', 'memory', '64x4', 'asynchronous', 'tri-state'],
-    guideOverview: 'The 74x234 is a 256 bit asynchronous FIFO organized as 64 words of 4 bits each four times deeper than the 74x232. The 64-word depth provides more elastic buffering for bursty data sources. Operation is identical to the 74x232: WR and RD strobes push/pop data; EF and FF indicate empty/full status; OE tri-states the outputs.',
+    tags: ['fifo', 'memory', '64x4', 'asynchronous', 'tri state'],
+    guideOverview: 'The 74x234 is a 256 bit asynchronous FIFO organized as 64 words of 4 bits each four times deeper than the 74x232. The 64 word depth provides more elastic buffering for bursty data sources. Operation is identical to the 74x232: WR and RD strobes push/pop data; EF and FF indicate empty/full status; OE tri states the outputs.',
     guidePinDescriptions: {
       'DIN0':  'Data input bit 0.',
       'DIN1':  'Data input bit 1.',
@@ -710,9 +710,9 @@ export const CHIPS_BLOCK_16 = {
     sequential: true,
     guideSections: [
       {
-        title: '64-Word Depth',
+        title: '64 word Depth',
         paragraphs: [
-          'The 64-location depth allows four times more data to be buffered compared to the 16-word 74x232. This is useful when the write rate can burst significantly faster than the read rate the 74x234 absorbs larger data bursts before FF asserts.',
+          'The 64-location depth allows four times more data to be buffered compared to the 16 word 74x232. This is useful when the write rate can burst significantly faster than the read rate the 74x234 absorbs larger data bursts before FF asserts.',
         ],
       },
     ],
@@ -723,16 +723,16 @@ export const CHIPS_BLOCK_16 = {
      Wikipedia: https://en.wikipedia.org/wiki/Parity_bit
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic
      Wikipedia: https://en.wikipedia.org/wiki/Random-access_memory */
-  '74235': {
+  '74x235': {
     name: '74x235',
     simpleName: '320 bit FIFO (64x5) Async',
-    description: '320 bit asynchronous FIFO memory (64 words x 5 bits) with 3-state outputs (20-pin)',
+    description: '320-bit async FIFO (64x5) with 3-state outputs (20-pin)',
     pins: 20,
     vcc: 20,
     gnd: 10,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74als235.pdf',
-    tags: ['fifo', 'memory', '64x5', 'asynchronous', 'tri-state'],
-    guideOverview: 'The 74x235 is a 320 bit asynchronous FIFO organized as 64 words of 5 bits each combining the 64-word depth of the 74x234 with the 5 bit word width of the 74x225. The extra fifth bit per word allows a nibble plus a parity or flag bit to be buffered together. EF, FF, WR, RD, and OE operate identically to other members of the async FIFO family.',
+    tags: ['fifo', 'memory', '64x5', 'asynchronous', 'tri state'],
+    guideOverview: 'The 74x235 is a 320 bit asynchronous FIFO organized as 64 words of 5 bits each combining the 64 word depth of the 74x234 with the 5 bit word width of the 74x225. The extra fifth bit per word allows a nibble plus a parity or flag bit to be buffered together. EF, FF, WR, RD, and OE operate identically to other members of the async FIFO family.',
     guidePinDescriptions: {
       'DIN0':  'Data input bit 0.',
       'DIN1':  'Data input bit 1.',
@@ -783,9 +783,9 @@ export const CHIPS_BLOCK_16 = {
     sequential: true,
     guideSections: [
       {
-        title: '5 bit Wide, 64-word Deep',
+        title: '5 bit Wide, 64 word Deep',
         paragraphs: [
-          'The 74x235 is the largest-capacity chip in the 5 bit async FIFO family, combining the depth of 74x234 with the word width of 74x225. Use it when long bursts of nibble+parity data need buffering.',
+          'The 74x235 is the largest capacity chip in the 5 bit async FIFO family, combining the depth of 74x234 with the word width of 74x225. Use it when long bursts of nibble+parity data need buffering.',
         ],
       },
     ],
@@ -795,16 +795,16 @@ export const CHIPS_BLOCK_16 = {
   /* Primary source: Texas Instruments, SN74ALS236 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74als236.pdf
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic
      Wikipedia: https://en.wikipedia.org/wiki/Random-access_memory */
-  '74236': {
+  '74x236': {
     name: '74x236',
     simpleName: '256 bit FIFO (64x4) Async',
-    description: '256 bit asynchronous FIFO memory (64 words x 4 bits) with 3-state outputs (16-pin)',
+    description: '256-bit async FIFO (64x4) with 3-state outputs (16-pin)',
     pins: 16,
     vcc: 16,
     gnd: 8,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74als236.pdf',
-    tags: ['fifo', 'memory', '64x4', 'asynchronous', 'tri-state'],
-    guideOverview: 'The 74x236 is a 256 bit asynchronous FIFO (64×4) in a 16-pin package, functionally equivalent to the 74x234 but potentially differing in speed grade or manufacturer. The 64-word depth, 4 bit wide WR/RD strobe interface, EF/FF status flags, and OE output enable are identical to the 74x234.',
+    tags: ['fifo', 'memory', '64x4', 'asynchronous', 'tri state'],
+    guideOverview: 'The 74x236 is a 256 bit asynchronous FIFO (64×4) in a 16-pin package, functionally equivalent to the 74x234 but potentially differing in speed grade or manufacturer. The 64 word depth, 4 bit wide WR/RD strobe interface, EF/FF status flags, and OE output enable are identical to the 74x234.',
     guidePinDescriptions: {
       'DIN0':  'Data input bit 0.',
       'DIN1':  'Data input bit 1.',
@@ -847,28 +847,28 @@ export const CHIPS_BLOCK_16 = {
     sequential: true,
     guideSections: [
       {
-        title: 'Equivalent to 74234',
+        title: 'Equivalent to 74x234',
         paragraphs: [
-          'The 74x236 is a second-source or speed-grade variant of the 74x234. Both are 64×4 asynchronous FIFOs with identical pinouts and operation. Choose based on speed grade or availability.',
+          'The 74x236 is a second source or speed grade variant of the 74x234. Both are 64×4 asynchronous FIFOs with identical pinouts and operation. Choose based on speed grade or availability.',
         ],
       },
     ],
   },
 
-  // ── 74237: 3-to-8 Decoder (latch, active HIGH), 16-pin ─────────────────────
+  // ── 74237: 3 to 8 Decoder (latch, active HIGH), 16-pin ─────────────────────
   /* Primary source: Texas Instruments, CD74HC237 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/cd74hc237.pdf
      Wikipedia: https://en.wikipedia.org/wiki/Multiplexer
      Wikipedia: https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
-  '74237': {
+  '74x237': {
     name: '74x237',
-    simpleName: '3-to-8 Decoder (latch, active HIGH)',
-    description: '3-to-8 line decoder/demultiplexer with address latch and active HIGH outputs. (16-pin)',
+    simpleName: '3 to 8 Decoder (latch, active HIGH)',
+    description: '3-to-8 decoder/demux with address latch, active-HIGH outputs. (16-pin)',
     pins: 16,
     vcc: 16,
     gnd: 8,
     datasheet: 'https://www.ti.com/lit/ds/symlink/cd74hc237.pdf',
-    tags: ['decoder', 'demultiplexer', '3-to-8', 'latch', 'active high'],
-    guideOverview: 'The 74237 is a 3-to-8 decoder with active HIGH outputs and a built in address latch. It has two enable inputs (E1n active LOW and E2 active HIGH) that must both be satisfied for any output to go HIGH. The LE (latch enable) input freezes the address: when LE=HIGH the selected address flows straight through; when LE=LOW the last address is held regardless of A0 A2 changes. This makes it useful for address decoding in memory bus systems where the address must be stable while CS signals are active.',
+    tags: ['decoder', 'demultiplexer', '3 to 8', 'latch', 'active high'],
+    guideOverview: 'The 74x237 is a 3 to 8 decoder with active HIGH outputs and a built in address latch. It has two enable inputs (E1n active LOW and E2 active HIGH) that must both be satisfied for any output to go HIGH. The LE (latch enable) input freezes the address: when LE=HIGH the selected address flows straight through; when LE=LOW the last address is held regardless of A0 A2 changes. This makes it useful for address decoding in memory bus systems where the address must be stable while CS signals are active.',
     guidePinDescriptions: {
       'A0':  'Address select bit 0 (LSB). Selects which of the eight outputs goes HIGH when enabled.',
       'A1':  'Address select bit 1.',
@@ -920,19 +920,19 @@ export const CHIPS_BLOCK_16 = {
     ],
   },
 
-  // ── 74238: 3-to-8 Decoder (active HIGH), 16-pin ────────────────────────────
+  // ── 74238: 3 to 8 Decoder (active HIGH), 16-pin ────────────────────────────
   /* Primary source: Texas Instruments, CD74HC238 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/cd74hc238.pdf
      Wikipedia: https://en.wikipedia.org/wiki/Multiplexer */
-  '74238': {
+  '74x238': {
     name: '74x238',
-    simpleName: '3-to-8 Decoder (active HIGH)',
-    description: '3-to-8 line decoder/demultiplexer with active HIGH outputs. (16-pin)',
+    simpleName: '3 to 8 Decoder (active HIGH)',
+    description: '3 to 8 line decoder/demultiplexer with active HIGH outputs. (16-pin)',
     pins: 16,
     vcc: 16,
     gnd: 8,
     datasheet: 'https://www.ti.com/lit/ds/symlink/cd74hc238.pdf',
-    tags: ['decoder', 'demultiplexer', '3-to-8', 'active high'],
-    guideOverview: 'The 74238 is the active HIGH output version of the 74138. It decodes a 3 bit address (A0 A2) into one of eight active HIGH outputs (Y0 Y7). Three enable inputs must all be in the correct state: G1 (active HIGH) must be HIGH, and both G2A# and G2B# (active LOW) must be LOW. When disabled, all outputs are LOW. The 74238 is commonly used for memory address decoding and I/O port selection.',
+    tags: ['decoder', 'demultiplexer', '3 to 8', 'active high'],
+    guideOverview: 'The 74x238 is the active HIGH output version of the 74x138. It decodes a 3 bit address (A0 A2) into one of eight active HIGH outputs (Y0 Y7). Three enable inputs must all be in the correct state: G1 (active HIGH) must be HIGH, and both G2A# and G2B# (active LOW) must be LOW. When disabled, all outputs are LOW. The 74x238 is commonly used for memory address decoding and I/O port selection.',
     guidePinDescriptions: {
       'A0':  'Address select bit 0 (LSB). Combines with A1 and A2 to select the active output.',
       'A1':  'Address select bit 1.',
@@ -976,7 +976,7 @@ export const CHIPS_BLOCK_16 = {
       {
         title: 'Active HIGH vs Active LOW Decoder',
         paragraphs: [
-          'The 74238 is the active HIGH complement to the 74138 (active LOW outputs). Use the 74238 when the downstream logic (e.g., positive-logic address decoding) requires a HIGH signal to select a device, and the 74138 when active LOW selects are needed.',
+          'The 74x238 is the active HIGH complement to the 74x138 (active LOW outputs). Use the 74x238 when the downstream logic (e.g., positive logic address decoding) requires a HIGH signal to select a device, and the 74x138 when active LOW selects are needed.',
         ],
       },
     ],
@@ -985,7 +985,7 @@ export const CHIPS_BLOCK_16 = {
   // ── 74239: Dual 2-to-4 Decoder (active HIGH), 16-pin ───────────────────────
   /* Primary source: Texas Instruments, SN74HC239 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74hc239.pdf
      Wikipedia: https://en.wikipedia.org/wiki/Multiplexer */
-  '74239': {
+  '74x239': {
     name: '74x239',
     simpleName: 'Dual 2-to-4 Decoder (active HIGH)',
     description: 'Dual 2-to-4 line decoder/demultiplexer with active HIGH outputs. (16-pin)',
@@ -994,7 +994,7 @@ export const CHIPS_BLOCK_16 = {
     gnd: 8,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74hc239.pdf',
     tags: ['decoder', 'demultiplexer', '2-to-4', 'dual', 'active high'],
-    guideOverview: 'The 74239 contains two independent 2-to-4 decoders with active HIGH outputs, making it the active HIGH complement to the 74139. Each section takes a 2 bit address (A0, A1) and drives exactly one of four outputs (Y0 Y3) HIGH when the section is enabled. The enable pin for each section is active LOW pulling it HIGH disables all outputs of that section. The two sections share the same package but are completely independent, each with its own address inputs, enable, and outputs.',
+    guideOverview: 'The 74x239 contains two independent 2-to-4 decoders with active HIGH outputs, making it the active HIGH complement to the 74x139. Each section takes a 2 bit address (A0, A1) and drives exactly one of four outputs (Y0 Y3) HIGH when the section is enabled. The enable pin for each section is active LOW pulling it HIGH disables all outputs of that section. The two sections share the same package but are completely independent, each with its own address inputs, enable, and outputs.',
     guidePinDescriptions: {
       '1En': 'Enable for section 1 (active LOW). LOW = section active, HIGH = all section 1 outputs LOW.',
       '1A0': 'Address bit 0 for section 1 (LSB).',
@@ -1039,67 +1039,81 @@ export const CHIPS_BLOCK_16 = {
       {
         title: 'Active HIGH Dual 2-to-4 Decoder',
         paragraphs: [
-          'Each section independently decodes a 2 bit address into one active HIGH output. This is the complement to the 74139 (active LOW). Useful when cascading with active HIGH logic or when a HIGH select pulse is required to enable a downstream device.',
+          'Each section independently decodes a 2 bit address into one active HIGH output. This is the complement to the 74x139 (active LOW). Useful when cascading with active HIGH logic or when a HIGH select pulse is required to enable a downstream device.',
         ],
       },
     ],
   },
 
   // ── 74241: Octal Buffer/Driver (split OE, 3-state), 20-pin ─────────────────
-  /* Primary source: Texas Instruments, SN74LS241 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls241.pdf
-     Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic */
-  '74241': {
+  /* Sources:
+     [1] Texas Instruments, "SNx4LS24x, SNx4S24x Octal Buffers and Line Drivers
+         With 3-State Outputs," datasheet SDLS144D, Apr. 1985 [rev. Oct. 2016].
+         [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls241.pdf.
+         Verified: terminal assignment (Pin Configuration and Functions, p. 3),
+         '241 logic diagram (Fig. 17, p. 11), and '241 function table (Table 2,
+         p. 13), read as rendered PDF page images. Confirms non-inverting
+         outputs, group-1 enable 1G active LOW on pin 1, group-2 enable 2G
+         active HIGH on pin 19 (datasheet footnote: pin 19 is 2G for the '241,
+         2G-bar for the '240/'244); pin map matches pinout[] below exactly, and
+         Table 2 matches gates[] (TRI_BUFFER_LO group 1, TRI_BUFFER_HI group 2).
+         Overview p. 11 also gives the power-up pull-resistor guidance cited in
+         the guide.
+     [2] Wikipedia, "Three-state logic." [Online]. Available:
+         https://en.wikipedia.org/wiki/Three-state_logic. Verified: general
+         high-impedance / bus-sharing background only, not pin data. */
+  '74x241': {
     name: '74x241',
     simpleName: 'Octal Buffer/Driver (split OE, 3-state)',
-    description: 'Octal non-inverting tri-state buffer with split output enables. (20-pin)',
+    description: 'Octal non-inverting 3-state buffer/driver, 1OE LOW, 2OE HIGH (20-pin)',
     pins: 20,
     vcc: 20,
     gnd: 10,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls241.pdf',
-    tags: ['buffer', 'driver', 'octal', 'tri-state', 'non-inverting', 'split-oe'],
-    guideOverview: 'The 74241 is an octal non-inverting tri-state buffer similar to the 74244, but with a key difference: the two 4 bit groups use opposite-polarity output enables. Group 1 is enabled by 1OE# LOW (active LOW), while group 2 is enabled by 2OE HIGH (active HIGH). This split-enable design simplifies bus control in circuits where one side sources and the other sinks. When disabled, outputs are high impedance.',
+    tags: ['buffer', 'driver', 'octal', 'tri state', 'non inverting', 'split-oe'],
+    guideOverview: 'The 74x241 is an octal (eight line) buffer and line driver with tri state outputs. The eight buffers are split into two groups of four, and each group has its own output enable pin. What makes the 241 unusual is that the two enables are opposite polarity: group 1 turns on when 1OE is LOW, group 2 turns on when 2OE is HIGH. The buffers are non inverting, so an enabled output just copies its input; a disabled group\'s outputs go to high impedance (Hi Z), electrically disconnected so other chips can drive the same wires. Tie both enables to one control line and that single wire steers which group is live. That is the reason to reach for a 241 instead of the all active LOW 74x244.',
     guidePinDescriptions: {
-      '1OE': 'Output enable for group 1 (active LOW). Drive LOW to activate 1Y1 1Y4 as non-inverting buffers; HIGH = Hi-Z.',
-      '1A1': 'Data input to buffer 1A (group 1). 1Y1 follows 1A1 when 1OE=LOW.',
-      '2Y4': 'Non-inverting output 4 from group 2. Active when 2OE=HIGH.',
-      '1A2': 'Data input to buffer 1B (group 1).',
-      '2Y3': 'Non-inverting output 3 from group 2.',
-      '1A3': 'Data input to buffer 1C (group 1).',
-      '2Y2': 'Non-inverting output 2 from group 2.',
-      '1A4': 'Data input to buffer 1D (group 1).',
-      '2Y1': 'Non-inverting output 1 from group 2.',
+      '1OE': 'Group 1 output enable, active LOW (labelled 1G on the datasheet). LOW switches all four group 1 buffers on; HIGH forces outputs 1Y1 through 1Y4 to Hi Z.',
+      '1A1': 'Group 1 input 1. Output 1Y1 copies this pin while 1OE is LOW.',
+      '2Y4': 'Group 2 output 4. Copies 2A4 when 2OE is HIGH; Hi Z when 2OE is LOW.',
+      '1A2': 'Group 1 input 2. Output 1Y2 copies this pin while 1OE is LOW.',
+      '2Y3': 'Group 2 output 3. Copies 2A3 when 2OE is HIGH; Hi Z when 2OE is LOW.',
+      '1A3': 'Group 1 input 3. Output 1Y3 copies this pin while 1OE is LOW.',
+      '2Y2': 'Group 2 output 2. Copies 2A2 when 2OE is HIGH; Hi Z when 2OE is LOW.',
+      '1A4': 'Group 1 input 4. Output 1Y4 copies this pin while 1OE is LOW.',
+      '2Y1': 'Group 2 output 1. Copies 2A1 when 2OE is HIGH; Hi Z when 2OE is LOW.',
       'GND': 'Ground reference (pin 10).',
-      '2A1': 'Data input to buffer 2A (group 2). 2Y1 follows 2A1 when 2OE=HIGH.',
-      '1Y4': 'Non-inverting output 4 from group 1. Active when 1OE=LOW.',
-      '2A2': 'Data input to buffer 2B (group 2).',
-      '1Y3': 'Non-inverting output 3 from group 1.',
-      '2A3': 'Data input to buffer 2C (group 2).',
-      '1Y2': 'Non-inverting output 2 from group 1.',
-      '2A4': 'Data input to buffer 2D (group 2).',
-      '1Y1': 'Non-inverting output 1 from group 1.',
-      '2OE': 'Output enable for group 2 (active HIGH). Drive HIGH to activate 2Y1 2Y4; LOW = Hi-Z.',
-      'VCC': 'Positive supply (+5 V, pin 20).',
+      '2A1': 'Group 2 input 1. Output 2Y1 copies this pin while 2OE is HIGH.',
+      '1Y4': 'Group 1 output 4. Copies 1A4 when 1OE is LOW; Hi Z when 1OE is HIGH.',
+      '2A2': 'Group 2 input 2. Output 2Y2 copies this pin while 2OE is HIGH.',
+      '1Y3': 'Group 1 output 3. Copies 1A3 when 1OE is LOW; Hi Z when 1OE is HIGH.',
+      '2A3': 'Group 2 input 3. Output 2Y3 copies this pin while 2OE is HIGH.',
+      '1Y2': 'Group 1 output 2. Copies 1A2 when 1OE is LOW; Hi Z when 1OE is HIGH.',
+      '2A4': 'Group 2 input 4. Output 2Y4 copies this pin while 2OE is HIGH.',
+      '1Y1': 'Group 1 output 1. Copies 1A1 when 1OE is LOW; Hi Z when 1OE is HIGH.',
+      '2OE': 'Group 2 output enable, active HIGH (labelled 2G on the datasheet). HIGH switches all four group 2 buffers on; LOW forces outputs 2Y1 through 2Y4 to Hi Z.',
+      'VCC': 'Positive supply, +5 V (pin 20).',
     },
     pinout: [
-      { pin:  1, name: '1OE',  type: 'input',  description: 'Output enable for group 1 (active LOW). LOW = 1Y1 1Y4 active (non-inverting); HIGH = Hi-Z.' },
+      { pin:  1, name: '1OE',  type: 'input',  description: 'Output enable for group 1 (active LOW). LOW = 1Y1 1Y4 active (non inverting); HIGH = Hi Z.' },
       { pin:  2, name: '1A1',  type: 'input',  description: 'Input to buffer 1A (group 1, active LOW OE side).' },
-      { pin:  3, name: '2Y4',  type: 'output', description: 'Non-inverting output 4 from group 2 (active HIGH OE). Active when 2OE=HIGH.' },
+      { pin:  3, name: '2Y4',  type: 'output', description: 'Non inverting output 4 from group 2 (active HIGH OE). Active when 2OE=HIGH.' },
       { pin:  4, name: '1A2',  type: 'input',  description: 'Input to buffer 1B (group 1).' },
-      { pin:  5, name: '2Y3',  type: 'output', description: 'Non-inverting output 3 from group 2. Active when 2OE=HIGH.' },
+      { pin:  5, name: '2Y3',  type: 'output', description: 'Non inverting output 3 from group 2. Active when 2OE=HIGH.' },
       { pin:  6, name: '1A3',  type: 'input',  description: 'Input to buffer 1C (group 1).' },
-      { pin:  7, name: '2Y2',  type: 'output', description: 'Non-inverting output 2 from group 2. Active when 2OE=HIGH.' },
+      { pin:  7, name: '2Y2',  type: 'output', description: 'Non inverting output 2 from group 2. Active when 2OE=HIGH.' },
       { pin:  8, name: '1A4',  type: 'input',  description: 'Input to buffer 1D (group 1).' },
-      { pin:  9, name: '2Y1',  type: 'output', description: 'Non-inverting output 1 from group 2. Active when 2OE=HIGH.' },
+      { pin:  9, name: '2Y1',  type: 'output', description: 'Non inverting output 1 from group 2. Active when 2OE=HIGH.' },
       { pin: 10, name: 'GND',  type: 'power' },
       { pin: 11, name: '2A1',  type: 'input',  description: 'Input to buffer 2A (group 2, active HIGH OE side).' },
-      { pin: 12, name: '1Y4',  type: 'output', description: 'Non-inverting output 4 from group 1. Active when 1OE=LOW.' },
+      { pin: 12, name: '1Y4',  type: 'output', description: 'Non inverting output 4 from group 1. Active when 1OE=LOW.' },
       { pin: 13, name: '2A2',  type: 'input',  description: 'Input to buffer 2B (group 2).' },
-      { pin: 14, name: '1Y3',  type: 'output', description: 'Non-inverting output 3 from group 1. Active when 1OE=LOW.' },
+      { pin: 14, name: '1Y3',  type: 'output', description: 'Non inverting output 3 from group 1. Active when 1OE=LOW.' },
       { pin: 15, name: '2A3',  type: 'input',  description: 'Input to buffer 2C (group 2).' },
-      { pin: 16, name: '1Y2',  type: 'output', description: 'Non-inverting output 2 from group 1. Active when 1OE=LOW.' },
+      { pin: 16, name: '1Y2',  type: 'output', description: 'Non inverting output 2 from group 1. Active when 1OE=LOW.' },
       { pin: 17, name: '2A4',  type: 'input',  description: 'Input to buffer 2D (group 2).' },
-      { pin: 18, name: '1Y1',  type: 'output', description: 'Non-inverting output 1 from group 1. Active when 1OE=LOW.' },
-      { pin: 19, name: '2OE',  type: 'input',  description: 'Output enable for group 2 (active HIGH). HIGH = 2Y1 2Y4 active (non-inverting); LOW = Hi-Z.' },
+      { pin: 18, name: '1Y1',  type: 'output', description: 'Non inverting output 1 from group 1. Active when 1OE=LOW.' },
+      { pin: 19, name: '2OE',  type: 'input',  description: 'Output enable for group 2 (active HIGH). HIGH = 2Y1 2Y4 active (non inverting); LOW = Hi Z.' },
       { pin: 20, name: 'VCC',  type: 'power' },
     ],
     gates: [
@@ -1114,9 +1128,48 @@ export const CHIPS_BLOCK_16 = {
     ],
     guideSections: [
       {
-        title: 'Split-Polarity Enable for Bus Control',
+        title: 'Buffers, drivers, and tri state outputs',
         paragraphs: [
-          'By using opposite-polarity enables, the 74x241 simplifies bidirectional bus buffer control. In a typical scheme, 1OE and 2OE are driven by complementary signals from the bus direction logic: when the CPU reads (drives the bus), 1OE=LOW enables the input buffers; when the CPU writes, 2OE=HIGH enables the output buffers using only a single direction signal.',
+          'A buffer copies its input straight to its output: same logic level, nothing changed. You use one when a signal has to drive a heavier load than its source can handle: more current, more connected inputs, or a long PCB trace. The "driver" in the name means these outputs are built to push and pull harder than an ordinary gate, so they hold up when wired to a bus.',
+          'Each of the eight buffers has a tri state output. On top of the usual HIGH and LOW, it has a third state: high impedance, written Hi Z. In Hi Z the output is effectively unplugged: it drives neither HIGH nor LOW, so another chip can drive that same wire without a conflict. This is what lets many devices share one set of bus lines: only the enabled buffer drives, everyone else sits in Hi Z.',
+          'The 241\'s eight buffers are non inverting: an enabled output equals its input, HIGH for HIGH and LOW for LOW. (The closely related 74x240 is the inverting version; the 74x244 is non inverting like the 241 but enables both halves the same way; more on that below.)',
+        ],
+      },
+      {
+        title: 'Function table',
+        paragraphs: [
+          'The two groups are identical except for enable polarity. Group 1 conducts when its enable is LOW; group 2 conducts when its enable is HIGH. When a group is disabled, all four of its outputs are Hi Z regardless of the inputs.',
+        ],
+        formulas: [
+          'Group 1: 1OE=L, 1A=L → 1Y=L | 1OE=L, 1A=H → 1Y=H | 1OE=H, 1A=X → 1Y=Hi-Z',
+          'Group 2: 2OE=H, 2A=L → 2Y=L | 2OE=H, 2A=H → 2Y=H | 2OE=L, 2A=X → 2Y=Hi-Z',
+          '(X = don\'t care; Hi-Z = high impedance, output disconnected)',
+        ],
+      },
+      {
+        title: 'The split enable, and why it is there',
+        paragraphs: [
+          'Most octal buffers (the 74x244, for one) enable both halves with the same active LOW polarity. The 241 flips group 2: 1OE is active LOW, 2OE is active HIGH. The payoff is direction control from a single wire. Tie 1OE and 2OE together to one control line. When that line is LOW, group 1 is enabled and group 2 is Hi Z; when it is HIGH, group 2 is enabled and group 1 is Hi Z. One signal, two paths that are never on at once.',
+          'Look at the pin layout and the two groups face opposite ways: group 1\'s inputs (1A) sit on the left with its outputs (1Y) on the right, while group 2\'s inputs (2A) sit on the right with its outputs (2Y) on the left. Wire the two groups back to back between two buses and that single control line now sets which way four bits flow: a simple bidirectional buffer. (For a true shared pin bus transceiver, the purpose built part is the 74x245; the 241 keeps each buffer\'s input and output on separate pins.)',
+        ],
+      },
+      {
+        title: 'Common uses',
+        list: [
+          'Driving a shared data or address bus: only the enabled buffer drives, the rest stay in Hi Z.',
+          'Boosting a weak signal so it can fan out to many inputs or drive a long trace.',
+          'Steering four bits one of two directions from a single control line, using the split enable.',
+          'Isolating part of a circuit: disable the buffer to electrically disconnect it without unsoldering anything.',
+        ],
+      },
+      {
+        title: 'Gotchas',
+        list: [
+          'Two enabled drivers on the same wire fight each other (bus contention) and can overheat. Make sure only one buffer drives any given line at a time. In a single control line direction scheme the split enable enforces this for you.',
+          'At power up the enable pins can float to the wrong state and briefly drive the bus. TI\'s datasheet suggests holding each group off until the system is ready: pull 1OE HIGH toward VCC and 2OE LOW toward GND through a resistor so both groups start in Hi Z.',
+          'A Hi Z output is not the same as LOW. Nothing holds the wire, so its voltage floats until something drives it. If a downstream input must read a defined level while every driver is off, add a pull up or pull down resistor.',
+          'The 241 is non inverting. If you need inverted outputs that is the 74x240; if you want both halves enabled the same active LOW way, that is the 74x244. Same pinout family, different behavior: pick by part number, not by pinout.',
+          'Real timing (propagation delay, enable and disable time) depends on the logic family (LS, S, HC, HCT, AC) and runs from a few nanoseconds up to roughly 15 ns. The simulator treats switching as instant; that is a simplification.',
         ],
       },
     ],

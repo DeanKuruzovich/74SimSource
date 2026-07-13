@@ -84,36 +84,36 @@ function evalGate(comp, gateIdx = 0) {
 }
 
 // ─────────────────────────────────────────────────────
-// 74347: BCD → 7-segment decoder (same as 7447)
+// 74347: BCD → 7 segment decoder (same as 7447)
 // ─────────────────────────────────────────────────────
 test('74347 exists in CHIPS_BLOCK_22', () => {
-  assert(CHIPS_BLOCK_22['74347'], 'chip missing');
+  assert(CHIPS_BLOCK_22['74x347'], 'chip missing');
 });
 test('74347 has BCD_7SEG gate', () => {
-  assertEqual(CHIPS_BLOCK_22['74347'].gates[0].type, 'BCD_7SEG');
+  assertEqual(CHIPS_BLOCK_22['74x347'].gates[0].type, 'BCD_7SEG');
 });
 test('74347 has correct inputs A,B,C,D', () => {
-  const inputs = CHIPS_BLOCK_22['74347'].gates[0].inputs;
+  const inputs = CHIPS_BLOCK_22['74x347'].gates[0].inputs;
   assert(inputs.includes('A'), 'has A');
   assert(inputs.includes('B'), 'has B');
   assert(inputs.includes('C'), 'has C');
   assert(inputs.includes('D'), 'has D');
 });
-test('74347 has correct 7-segment outputs', () => {
-  const outputs = CHIPS_BLOCK_22['74347'].gates[0].outputs;
+test('74347 has correct 7 segment outputs', () => {
+  const outputs = CHIPS_BLOCK_22['74x347'].gates[0].outputs;
   for (const seg of ['a','b','c','d','e','f','g']) {
     assert(outputs.includes(seg), `has ${seg}`);
   }
 });
 
 // ─────────────────────────────────────────────────────
-// 74348: 8-to-3 priority encoder, tri-state
+// 74348: 8 to 3 priority encoder, tri state
 // ─────────────────────────────────────────────────────
 test('74348 exists in CHIPS_BLOCK_22', () => {
-  assert(CHIPS_BLOCK_22['74348'], 'chip missing');
+  assert(CHIPS_BLOCK_22['74x348'], 'chip missing');
 });
 test('74348 EIn=1 → all outputs HiZ', () => {
-  const comp = makeComp('74348');
+  const comp = makeComp('74x348');
   setPins(comp, { I0:0,I1:1,I2:1,I3:1,I4:1,I5:1,I6:1,I7:1, EIn:1 });
   evalGate(comp);
   assertEqual(getPin(comp,'A0n'), null, 'A0n should be HiZ');
@@ -123,14 +123,14 @@ test('74348 EIn=1 → all outputs HiZ', () => {
   assertEqual(getPin(comp,'EO'),  null, 'EO should be HiZ');
 });
 test('74348 EIn=0, all inputs inactive (all high) → EO=0, GS=1', () => {
-  const comp = makeComp('74348');
+  const comp = makeComp('74x348');
   setPins(comp, { I0:1,I1:1,I2:1,I3:1,I4:1,I5:1,I6:1,I7:1, EIn:0 });
   evalGate(comp);
   assertEqual(getPin(comp,'GS'), 1, 'GS=1 when no input');
   assertEqual(getPin(comp,'EO'), 0, 'EO=0 when no input (enable output)');
 });
 test('74348 EIn=0, I0=0 (lowest priority) → A=000, GS=0', () => {
-  const comp = makeComp('74348');
+  const comp = makeComp('74x348');
   setPins(comp, { I0:0,I1:1,I2:1,I3:1,I4:1,I5:1,I6:1,I7:1, EIn:0 });
   evalGate(comp);
   assertEqual(getPin(comp,'A0n'), 1, 'A0n=1 (000 inverted → 111)');
@@ -140,7 +140,7 @@ test('74348 EIn=0, I0=0 (lowest priority) → A=000, GS=0', () => {
   assertEqual(getPin(comp,'EO'),  1, 'EO=1');
 });
 test('74348 EIn=0, I7=0 (highest priority) → A=111 inverted', () => {
-  const comp = makeComp('74348');
+  const comp = makeComp('74x348');
   setPins(comp, { I0:0,I1:0,I2:0,I3:0,I4:0,I5:0,I6:0,I7:0, EIn:0 });
   evalGate(comp);
   // Priority: I7=0 → encode 7=111, outputs active low: A0n=0,A1n=0,A2n=0
@@ -150,7 +150,7 @@ test('74348 EIn=0, I7=0 (highest priority) → A=111 inverted', () => {
   assertEqual(getPin(comp,'GS'),  0, 'GS=0');
 });
 test('74348 priority: I3=0 (higher than I0) takes precedence', () => {
-  const comp = makeComp('74348');
+  const comp = makeComp('74x348');
   setPins(comp, { I0:0,I1:1,I2:1,I3:0,I4:1,I5:1,I6:1,I7:1, EIn:0 });
   evalGate(comp);
   // I3=0 (pri=3=011): A0n = !(3&1)=0 → 0, A1n = !(3>>1&1)=0 → 0, A2n = !(3>>2)=1 → 1
@@ -160,13 +160,13 @@ test('74348 priority: I3=0 (higher than I0) takes precedence', () => {
 });
 
 // ─────────────────────────────────────────────────────
-// 74350: 4 bit shifter, tri-state
+// 74350: 4 bit shifter, tri state
 // ─────────────────────────────────────────────────────
 test('74350 exists in CHIPS_BLOCK_22', () => {
-  assert(CHIPS_BLOCK_22['74350'], 'chip missing');
+  assert(CHIPS_BLOCK_22['74x350'], 'chip missing');
 });
 test('74350 OEn=1 → all outputs HiZ', () => {
-  const comp = makeComp('74350');
+  const comp = makeComp('74x350');
   setPins(comp, { S0:0,S1:0,DIR:0,D0:1,D1:1,D2:1,D3:1,OEn:1 });
   evalGate(comp);
   assertEqual(getPin(comp,'Y0'), null, 'Y0 HiZ');
@@ -175,7 +175,7 @@ test('74350 OEn=1 → all outputs HiZ', () => {
   assertEqual(getPin(comp,'Y3'), null, 'Y3 HiZ');
 });
 test('74350 OEn=0, shift=0, DIR=0 → Y=D unchanged', () => {
-  const comp = makeComp('74350');
+  const comp = makeComp('74x350');
   // S0=0,S1=0 → shift=0; data=1010
   setPins(comp, { S0:0,S1:0,DIR:0,D0:0,D1:1,D2:0,D3:1,OEn:0 });
   evalGate(comp);
@@ -185,7 +185,7 @@ test('74350 OEn=0, shift=0, DIR=0 → Y=D unchanged', () => {
   assertEqual(getPin(comp,'Y3'), 1, 'Y3=1');
 });
 test('74350 right shift by 1 (DIR=0,S0=1,S1=0): 1111 >> 1 → 0111', () => {
-  const comp = makeComp('74350');
+  const comp = makeComp('74x350');
   setPins(comp, { S0:1,S1:0,DIR:0,D0:1,D1:1,D2:1,D3:1,OEn:0 });
   evalGate(comp);
   // 1111=0xF >> 1 = 0x7 (0111)
@@ -195,7 +195,7 @@ test('74350 right shift by 1 (DIR=0,S0=1,S1=0): 1111 >> 1 → 0111', () => {
   assertEqual(getPin(comp,'Y3'), 0, 'Y3=0');
 });
 test('74350 left shift by 2 (DIR=1,S0=0,S1=1): 0001 << 2 → 0100', () => {
-  const comp = makeComp('74350');
+  const comp = makeComp('74x350');
   setPins(comp, { S0:0,S1:1,DIR:1,D0:1,D1:0,D2:0,D3:0,OEn:0 });
   evalGate(comp);
   // 0001=1 << 2 = 4 & 0xF = 0100
@@ -206,27 +206,27 @@ test('74350 left shift by 2 (DIR=1,S0=0,S1=1): 0001 << 2 → 0100', () => {
 });
 
 // ─────────────────────────────────────────────────────
-// 74351: dual 8-to-1 mux, complementary tri-state
+// 74351: dual 8-to-1 mux, complementary tri state
 // ─────────────────────────────────────────────────────
 test('74351 exists in CHIPS_BLOCK_22', () => {
-  assert(CHIPS_BLOCK_22['74351'], 'chip missing');
+  assert(CHIPS_BLOCK_22['74x351'], 'chip missing');
 });
 test('74351 1Gn=1 → gate 0 HiZ', () => {
-  const comp = makeComp('74351');
+  const comp = makeComp('74x351');
   setPins(comp, { D0:0,D1:0,D2:0,D3:0,D4:0,D5:0,D6:0,D7:0,S0:0,S1:0,S2:0,'1Gn':1,'2Gn':0 });
   evalGate(comp, 0);
   assertEqual(getPin(comp,'1W'),  null, '1W HiZ');
   assertEqual(getPin(comp,'1Wn'), null, '1Wn HiZ');
 });
 test('74351 gate 0 enabled: sel=3,D3=1 → 1W=1,1Wn=0', () => {
-  const comp = makeComp('74351');
+  const comp = makeComp('74x351');
   setPins(comp, { D0:0,D1:0,D2:0,D3:1,D4:0,D5:0,D6:0,D7:0,S0:1,S1:1,S2:0,'1Gn':0,'2Gn':1 });
   evalGate(comp, 0);
   assertEqual(getPin(comp,'1W'),  1, '1W=1');
   assertEqual(getPin(comp,'1Wn'), 0, '1Wn=0');
 });
 test('74351 gate 1 enabled: sel=5,D5=1 → 2W=1,2Wn=0', () => {
-  const comp = makeComp('74351');
+  const comp = makeComp('74x351');
   setPins(comp, { D0:0,D1:0,D2:0,D3:0,D4:0,D5:1,D6:0,D7:0,S0:1,S1:0,S2:1,'1Gn':1,'2Gn':0 });
   evalGate(comp, 1);
   assertEqual(getPin(comp,'2W'),  1, '2W=1');
@@ -237,34 +237,34 @@ test('74351 gate 1 enabled: sel=5,D5=1 → 2W=1,2Wn=0', () => {
 // 74352: dual 4-to-1 mux, inverting
 // ─────────────────────────────────────────────────────
 test('74352 exists in CHIPS_BLOCK_22', () => {
-  assert(CHIPS_BLOCK_22['74352'], 'chip missing');
+  assert(CHIPS_BLOCK_22['74x352'], 'chip missing');
 });
 test('74352 1Gn=1 → 1Y=1 (disabled, pullup)', () => {
-  const comp = makeComp('74352');
+  const comp = makeComp('74x352');
   setPins(comp, { '1Gn':1, A:0, B:0, '1C0':0,'1C1':0,'1C2':0,'1C3':0 });
   evalGate(comp, 0);
   assertEqual(getPin(comp,'1Y'), 1, '1Y=1 when disabled');
 });
 test('74352 gate0: Gn=0,A=0,B=0,C0=1 → 1Y=0 (inverted)', () => {
-  const comp = makeComp('74352');
+  const comp = makeComp('74x352');
   setPins(comp, { '1Gn':0, A:0, B:0, '1C0':1,'1C1':0,'1C2':0,'1C3':0 });
   evalGate(comp, 0);
   assertEqual(getPin(comp,'1Y'), 0, '1Y=0 (inverted C0=1)');
 });
 test('74352 gate0: Gn=0,A=1,B=0,C1=1 → 1Y=0', () => {
-  const comp = makeComp('74352');
+  const comp = makeComp('74x352');
   setPins(comp, { '1Gn':0, A:1, B:0, '1C0':0,'1C1':1,'1C2':0,'1C3':0 });
   evalGate(comp, 0);
   assertEqual(getPin(comp,'1Y'), 0, '1Y=0 (inverted C1=1)');
 });
 test('74352 gate0: Gn=0,A=0,B=0,C0=0 → 1Y=1 (inverted C0=0)', () => {
-  const comp = makeComp('74352');
+  const comp = makeComp('74x352');
   setPins(comp, { '1Gn':0, A:0, B:0, '1C0':0,'1C1':0,'1C2':0,'1C3':0 });
   evalGate(comp, 0);
   assertEqual(getPin(comp,'1Y'), 1, '1Y=1 (inverted C0=0)');
 });
 test('74352 gate1: Gn=0,A=0,B=1 → 2C2 selected', () => {
-  const comp = makeComp('74352');
+  const comp = makeComp('74x352');
   setPins(comp, { '2Gn':0, A:0, B:1, '2C0':0,'2C1':0,'2C2':1,'2C3':0 });
   evalGate(comp, 1);
   // sel = A|(B<<1) = 0|(1<<1)=2 → C2=1, inverted → 2Y=0
@@ -272,55 +272,55 @@ test('74352 gate1: Gn=0,A=0,B=1 → 2C2 selected', () => {
 });
 
 // ─────────────────────────────────────────────────────
-// 74353: dual 4-to-1 mux, inverting, tri-state
+// 74353: dual 4-to-1 mux, inverting, tri state
 // ─────────────────────────────────────────────────────
 test('74353 exists in CHIPS_BLOCK_22', () => {
-  assert(CHIPS_BLOCK_22['74353'], 'chip missing');
+  assert(CHIPS_BLOCK_22['74x353'], 'chip missing');
 });
 test('74353 uses MUX_4TO1_TRI_INV gate type', () => {
-  assertEqual(CHIPS_BLOCK_22['74353'].gates[0].type, 'MUX_4TO1_TRI_INV');
+  assertEqual(CHIPS_BLOCK_22['74x353'].gates[0].type, 'MUX_4TO1_TRI_INV');
 });
 test('74353 1Gn=1 → 1Y=HiZ', () => {
-  const comp = makeComp('74353');
+  const comp = makeComp('74x353');
   setPins(comp, { '1Gn':1, A:0, B:0, '1C0':1,'1C1':1,'1C2':1,'1C3':1 });
   evalGate(comp, 0);
   assertEqual(getPin(comp,'1Y'), null, '1Y HiZ');
 });
 test('74353 gate0: Gn=0,A=0,B=0,C0=1 → 1Y=0 (inverted)', () => {
-  const comp = makeComp('74353');
+  const comp = makeComp('74x353');
   setPins(comp, { '1Gn':0, A:0, B:0, '1C0':1,'1C1':0,'1C2':0,'1C3':0 });
   evalGate(comp, 0);
   assertEqual(getPin(comp,'1Y'), 0, '1Y=0 (inverted C0=1)');
 });
 test('74353 gate0: Gn=0,A=1,B=0,C1=0 → 1Y=1', () => {
-  const comp = makeComp('74353');
+  const comp = makeComp('74x353');
   setPins(comp, { '1Gn':0, A:1, B:0, '1C0':0,'1C1':0,'1C2':0,'1C3':0 });
   evalGate(comp, 0);
   assertEqual(getPin(comp,'1Y'), 1, '1Y=1 (inverted C1=0)');
 });
 
 // ─────────────────────────────────────────────────────
-// 74354: 8→1 mux with transparent latch, tri-state
+// 74354: 8→1 mux with transparent latch, tri state
 // ─────────────────────────────────────────────────────
 test('74354 exists in CHIPS_BLOCK_22', () => {
-  assert(CHIPS_BLOCK_22['74354'], 'chip missing');
+  assert(CHIPS_BLOCK_22['74x354'], 'chip missing');
 });
 test('74354 OEn=1 → W and Wn HiZ', () => {
-  const comp = makeComp('74354');
+  const comp = makeComp('74x354');
   setPins(comp, { I0:1,I1:0,I2:0,I3:0,I4:0,I5:0,I6:0,I7:0,S0:0,S1:0,S2:0,LE:1,OEn:1 });
   evalGate(comp);
   assertEqual(getPin(comp,'W'),  null, 'W HiZ');
   assertEqual(getPin(comp,'Wn'), null, 'Wn HiZ');
 });
 test('74354 LE=1 (transparent): sel=0,I0=1 → W=1,Wn=0', () => {
-  const comp = makeComp('74354');
+  const comp = makeComp('74x354');
   setPins(comp, { I0:1,I1:0,I2:0,I3:0,I4:0,I5:0,I6:0,I7:0,S0:0,S1:0,S2:0,LE:1,OEn:0 });
   evalGate(comp);
   assertEqual(getPin(comp,'W'),  1, 'W=1');
   assertEqual(getPin(comp,'Wn'), 0, 'Wn=0');
 });
 test('74354 latch hold: LE=1 captures, LE=0 holds', () => {
-  const comp = makeComp('74354');
+  const comp = makeComp('74x354');
   // Capture I2=1 at sel=2
   setPins(comp, { I0:0,I1:0,I2:1,I3:0,I4:0,I5:0,I6:0,I7:0,S0:0,S1:1,S2:0,LE:1,OEn:0 });
   evalGate(comp);
@@ -336,10 +336,10 @@ test('74354 latch hold: LE=1 captures, LE=0 holds', () => {
 // 74355: 8→1 mux with transparent latch, OC (same logic)
 // ─────────────────────────────────────────────────────
 test('74355 exists in CHIPS_BLOCK_22', () => {
-  assert(CHIPS_BLOCK_22['74355'], 'chip missing');
+  assert(CHIPS_BLOCK_22['74x355'], 'chip missing');
 });
 test('74355 LE=1: sel=5,I5=1 → W=1,Wn=0', () => {
-  const comp = makeComp('74355');
+  const comp = makeComp('74x355');
   setPins(comp, { I0:0,I1:0,I2:0,I3:0,I4:0,I5:1,I6:0,I7:0,S0:1,S1:0,S2:1,LE:1,OEn:0 });
   evalGate(comp);
   assertEqual(getPin(comp,'W'),  1, 'W=1');
@@ -347,20 +347,20 @@ test('74355 LE=1: sel=5,I5=1 → W=1,Wn=0', () => {
 });
 
 // ─────────────────────────────────────────────────────
-// 74356: 8→1 mux with edge-triggered register, tri-state
+// 74356: 8→1 mux with edge triggered register, tri state
 // ─────────────────────────────────────────────────────
 test('74356 exists in CHIPS_BLOCK_22', () => {
-  assert(CHIPS_BLOCK_22['74356'], 'chip missing');
+  assert(CHIPS_BLOCK_22['74x356'], 'chip missing');
 });
 test('74356 OEn=1 → HiZ', () => {
-  const comp = makeComp('74356');
+  const comp = makeComp('74x356');
   setPins(comp, { I0:1,I1:0,I2:0,I3:0,I4:0,I5:0,I6:0,I7:0,S0:0,S1:0,S2:0,CLK:0,OEn:1 });
   evalGate(comp);
   assertEqual(getPin(comp,'W'),  null, 'W HiZ');
   assertEqual(getPin(comp,'Wn'), null, 'Wn HiZ');
 });
 test('74356 rising CLK captures sel=0,I0=1 → W=1', () => {
-  const comp = makeComp('74356');
+  const comp = makeComp('74x356');
   setPins(comp, { I0:1,I1:0,I2:0,I3:0,I4:0,I5:0,I6:0,I7:0,S0:0,S1:0,S2:0,CLK:0,OEn:0 });
   evalGate(comp); // CLK=0, state initialized
   setPin(comp,'CLK', 1);
@@ -369,7 +369,7 @@ test('74356 rising CLK captures sel=0,I0=1 → W=1', () => {
   assertEqual(getPin(comp,'Wn'), 0, 'Wn=0');
 });
 test('74356 register holds after CLK goes low again', () => {
-  const comp = makeComp('74356');
+  const comp = makeComp('74x356');
   setPins(comp, { I0:1,I1:0,I2:0,I3:0,I4:0,I5:0,I6:0,I7:0,S0:0,S1:0,S2:0,CLK:0,OEn:0 });
   evalGate(comp);
   setPin(comp,'CLK', 1);
@@ -382,13 +382,13 @@ test('74356 register holds after CLK goes low again', () => {
 });
 
 // ─────────────────────────────────────────────────────
-// 74357: 8→1 mux with edge-triggered register, OC
+// 74357: 8→1 mux with edge triggered register, OC
 // ─────────────────────────────────────────────────────
 test('74357 exists in CHIPS_BLOCK_22', () => {
-  assert(CHIPS_BLOCK_22['74357'], 'chip missing');
+  assert(CHIPS_BLOCK_22['74x357'], 'chip missing');
 });
 test('74357 rising CLK captures sel=7,I7=0 → W=0,Wn=1', () => {
-  const comp = makeComp('74357');
+  const comp = makeComp('74x357');
   setPins(comp, { I0:0,I1:0,I2:0,I3:0,I4:0,I5:0,I6:0,I7:0,S0:1,S1:1,S2:1,CLK:0,OEn:0 });
   evalGate(comp);
   setPin(comp,'CLK', 1);
@@ -401,10 +401,10 @@ test('74357 rising CLK captures sel=7,I7=0 → W=0,Wn=1', () => {
 // 74362: four-phase clock generator (stub)
 // ─────────────────────────────────────────────────────
 test('74362 exists in CHIPS_BLOCK_22', () => {
-  assert(CHIPS_BLOCK_22['74362'], 'chip missing');
+  assert(CHIPS_BLOCK_22['74x362'], 'chip missing');
 });
 test('74362 RST=1 → phase=0 → only Ph1=1', () => {
-  const comp = makeComp('74362');
+  const comp = makeComp('74x362');
   setPins(comp, { CLK:0,RST:1,HOLD:0,IDLE:0 });
   evalGate(comp);
   assertEqual(getPin(comp,'Ph1'), 1, 'Ph1=1 at phase 0');
@@ -413,7 +413,7 @@ test('74362 RST=1 → phase=0 → only Ph1=1', () => {
   assertEqual(getPin(comp,'Ph4'), 0, 'Ph4=0');
 });
 test('74362 rising edge advances phase', () => {
-  const comp = makeComp('74362');
+  const comp = makeComp('74x362');
   setPins(comp, { CLK:0,RST:1,HOLD:0,IDLE:0 });
   evalGate(comp); // phase=0 (RST)
   setPin(comp,'RST', 0);
@@ -424,39 +424,39 @@ test('74362 rising edge advances phase', () => {
 });
 
 // ─────────────────────────────────────────────────────
-// 74363: octal transparent latch, tri-state
+// 74363: octal transparent latch, tri state
 // (Same function as 74373; uses D_LATCH_OCTAL_TRI gate type)
 // ─────────────────────────────────────────────────────
 test('74363 exists in CHIPS_BLOCK_22', () => {
-  assert(CHIPS_BLOCK_22['74363'], 'chip missing');
+  assert(CHIPS_BLOCK_22['74x363'], 'chip missing');
 });
 test('74363 uses D_LATCH_OCTAL_TRI gate', () => {
-  assertEqual(CHIPS_BLOCK_22['74363'].gates[0].type, 'D_LATCH_OCTAL_TRI');
+  assertEqual(CHIPS_BLOCK_22['74x363'].gates[0].type, 'D_LATCH_OCTAL_TRI');
 });
 test('74363 has 8 D inputs and 8 Q outputs', () => {
-  const gate = CHIPS_BLOCK_22['74363'].gates[0];
+  const gate = CHIPS_BLOCK_22['74x363'].gates[0];
   // 8 data inputs + OEn + LE = 10 inputs
   assertEqual(gate.inputs.length, 10, 'inputs count');
   assertEqual(gate.outputs.length, 8, 'outputs count');
 });
 test('74363 inputs include OEn and LE', () => {
-  const inputs = CHIPS_BLOCK_22['74363'].gates[0].inputs;
+  const inputs = CHIPS_BLOCK_22['74x363'].gates[0].inputs;
   assert(inputs.includes('OEn'), 'OEn present');
   assert(inputs.includes('LE'),  'LE present');
 });
 
 // ─────────────────────────────────────────────────────
-// 74364: octal edge-triggered D flip-flop, tri-state
+// 74364: octal edge triggered D flip flop, tri state
 // (Same function as 74374; uses D_FF_OCTAL_TRI gate type)
 // ─────────────────────────────────────────────────────
 test('74364 exists in CHIPS_BLOCK_22', () => {
-  assert(CHIPS_BLOCK_22['74364'], 'chip missing');
+  assert(CHIPS_BLOCK_22['74x364'], 'chip missing');
 });
 test('74364 uses D_FF_OCTAL_TRI gate', () => {
-  assertEqual(CHIPS_BLOCK_22['74364'].gates[0].type, 'D_FF_OCTAL_TRI');
+  assertEqual(CHIPS_BLOCK_22['74x364'].gates[0].type, 'D_FF_OCTAL_TRI');
 });
 test('74364 has 8 D inputs, CLK and OEn', () => {
-  const gate = CHIPS_BLOCK_22['74364'].gates[0];
+  const gate = CHIPS_BLOCK_22['74x364'].gates[0];
   assertEqual(gate.inputs.length, 10, 'inputs count');
   assert(gate.inputs.includes('CLK'), 'CLK present');
   assert(gate.inputs.includes('OEn'), 'OEn present');
@@ -464,13 +464,13 @@ test('74364 has 8 D inputs, CLK and OEn', () => {
 });
 
 // ─────────────────────────────────────────────────────
-// 74365: hex buffer, non-inverting, tri-state
+// 74365: hex buffer, non inverting, tri state
 // ─────────────────────────────────────────────────────
 test('74365 exists in CHIPS_BLOCK_22', () => {
-  assert(CHIPS_BLOCK_22['74365'], 'chip missing');
+  assert(CHIPS_BLOCK_22['74x365'], 'chip missing');
 });
 test('74365 G1n=1 → all Y HiZ', () => {
-  const comp = makeComp('74365');
+  const comp = makeComp('74x365');
   setPins(comp, { A1:1,A2:1,A3:1,A4:1,A5:1,A6:1,G1n:1,G2n:0 });
   evalGate(comp);
   for (let i = 1; i <= 6; i++) {
@@ -478,13 +478,13 @@ test('74365 G1n=1 → all Y HiZ', () => {
   }
 });
 test('74365 G2n=1 → all Y HiZ', () => {
-  const comp = makeComp('74365');
+  const comp = makeComp('74x365');
   setPins(comp, { A1:1,A2:1,A3:1,A4:1,A5:1,A6:1,G1n:0,G2n:1 });
   evalGate(comp);
   assertEqual(getPin(comp,'Y1'), null, 'Y1 HiZ');
 });
 test('74365 G1n=0,G2n=0: Y follows A', () => {
-  const comp = makeComp('74365');
+  const comp = makeComp('74x365');
   setPins(comp, { A1:1,A2:0,A3:1,A4:0,A5:1,A6:0,G1n:0,G2n:0 });
   evalGate(comp);
   assertEqual(getPin(comp,'Y1'), 1, 'Y1=A1=1');
@@ -496,19 +496,19 @@ test('74365 G1n=0,G2n=0: Y follows A', () => {
 });
 
 // ─────────────────────────────────────────────────────
-// 74366: hex buffer, inverting, tri-state
+// 74366: hex buffer, inverting, tri state
 // ─────────────────────────────────────────────────────
 test('74366 exists in CHIPS_BLOCK_22', () => {
-  assert(CHIPS_BLOCK_22['74366'], 'chip missing');
+  assert(CHIPS_BLOCK_22['74x366'], 'chip missing');
 });
 test('74366 G1n=1 → all Y HiZ', () => {
-  const comp = makeComp('74366');
+  const comp = makeComp('74x366');
   setPins(comp, { A1:1,A2:1,A3:1,A4:1,A5:1,A6:1,G1n:1,G2n:0 });
   evalGate(comp);
   assertEqual(getPin(comp,'Y1'), null, 'Y1 HiZ');
 });
 test('74366 G1n=0,G2n=0: Y inverts A', () => {
-  const comp = makeComp('74366');
+  const comp = makeComp('74x366');
   setPins(comp, { A1:1,A2:0,A3:1,A4:0,A5:1,A6:0,G1n:0,G2n:0 });
   evalGate(comp);
   assertEqual(getPin(comp,'Y1'), 0, 'Y1=!A1=0');

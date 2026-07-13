@@ -4,9 +4,10 @@
 // Single-click selects, double-click enters text-edit mode, body-drag to move.
 
 export class TextBoxManager {
-  constructor(layer, onChanged) {
+  constructor(layer, onChanged, onBeforeDelete) {
     this.layer    = layer;      // DOM element: #textbox-layer
     this.onChanged = onChanged; // callback when boxes change (for save)
+    this.onBeforeDelete = onBeforeDelete; // callback to push undo before delete
 
     this._nextId  = 1;
     this._boxes   = new Map();  // id → { el, data, content }
@@ -267,7 +268,10 @@ export class TextBoxManager {
   }
 
   _deleteSelected() {
-    if (this._selected) this._delete(this._selected.data.id);
+    if (this._selected) {
+      this.onBeforeDelete?.();
+      this._delete(this._selected.data.id);
+    }
   }
 
   _startDrag(e, entry) {

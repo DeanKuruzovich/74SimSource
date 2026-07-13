@@ -80,6 +80,12 @@ SIM._drivePinHighZ = function(comp, name) {
   else comp.pins[name].voltage = null;
   return old !== null;
 };
+SIM._drivePinOC = function(comp, name, bit) {
+  // Open collector drive: bit=0 sinks LOW; bit=1 releases the pin, which on a
+  // real OC bus reads HIGH through the pull-up (the engine adds an implicit
+  // 4.7 kΩ). Model the pulled-up level directly so reads stay meaningful.
+  return SIM._drivePinBit(comp, name, bit);
+};
 
 function evalGate(comp, gateIdx = 0) {
   const gate = comp.spec.gates[gateIdx];
@@ -91,10 +97,9 @@ function evalGate(comp, gateIdx = 0) {
     case 'FREQ_DIV_PROG':          SIM._evaluateFreqDivProg(comp, gate); break;
     case 'COUNTER_4BIT_DIV':       SIM._evaluateCounter4BitDiv(comp, gate); break;
     case 'SHIFT_REG_4BIT_BIDIR_TRI': SIM._evaluateShiftReg4BitBidirTri(comp, gate); break;
-    case 'PLL_FILTER':             SIM._evaluatePllFilter(comp, gate); break;
     case 'MUX_QUAD_2TO1_STORED':   SIM._evaluateMuxQuad2to1Stored(comp, gate); break;
     case 'SHIFT_REG_8BIT_UNIV_TRI': SIM._evaluateShiftReg8BitUnivTri(comp, gate); break;
-    case 'RAM_256X1_OC':           SIM._evaluateRam256x1OC(comp, gate); break;
+    case 'RAM_256X1_OC_N':         SIM._evaluateRam256x1OCN(comp, gate); break;
     case 'CLK_DIV2_OCT':           SIM._evaluateClkDiv2Oct(comp, gate); break;
     default: throw new Error(`Unknown gate type: ${type}`);
   }
@@ -117,10 +122,10 @@ function risingEdge(comp, clkPin, gateIdx = 0) {
 // ═══════════════════════════════════════════════════════════════════════════════
 // 74286 - 9 bit Parity PE
 // ═══════════════════════════════════════════════════════════════════════════════
-test('74286 exists', () => assert(CHIPS_BLOCK_19['74286']));
+test('74286 exists', () => assert(CHIPS_BLOCK_19['74x286']));
 
 test('74286 even parity: 0 inputs, PE=0 → EVEN=1 ODD=0', () => {
-  const c = makeComp('74286');
+  const c = makeComp('74x286');
   setPins(c, {A:0,B:0,C:0,D:0,E:0,F:0,G:0,H:0,I:0,PE:0});
   evalGate(c);
   assertEqual(getPin(c,'EVEN'), 1, 'EVEN');
@@ -128,7 +133,7 @@ test('74286 even parity: 0 inputs, PE=0 → EVEN=1 ODD=0', () => {
 });
 
 test('74286 odd parity: 1 input, PE=0 → EVEN=0 ODD=1', () => {
-  const c = makeComp('74286');
+  const c = makeComp('74x286');
   setPins(c, {A:1,B:0,C:0,D:0,E:0,F:0,G:0,H:0,I:0,PE:0});
   evalGate(c);
   assertEqual(getPin(c,'EVEN'), 0, 'EVEN');
@@ -136,14 +141,14 @@ test('74286 odd parity: 1 input, PE=0 → EVEN=0 ODD=1', () => {
 });
 
 test('74286 4 inputs (even), PE=0 → EVEN=1', () => {
-  const c = makeComp('74286');
+  const c = makeComp('74x286');
   setPins(c, {A:1,B:1,C:1,D:1,E:0,F:0,G:0,H:0,I:0,PE:0});
   evalGate(c);
   assertEqual(getPin(c,'EVEN'), 1, 'EVEN');
 });
 
 test('74286 PE=1 flips parity: 0 inputs, PE=1 → EVEN=0 ODD=1', () => {
-  const c = makeComp('74286');
+  const c = makeComp('74x286');
   setPins(c, {A:0,B:0,C:0,D:0,E:0,F:0,G:0,H:0,I:0,PE:1});
   evalGate(c);
   assertEqual(getPin(c,'EVEN'), 0, 'EVEN');
@@ -151,7 +156,7 @@ test('74286 PE=1 flips parity: 0 inputs, PE=1 → EVEN=0 ODD=1', () => {
 });
 
 test('74286 9 inputs all 1 (odd), PE=0 → EVEN=0 ODD=1', () => {
-  const c = makeComp('74286');
+  const c = makeComp('74x286');
   setPins(c, {A:1,B:1,C:1,D:1,E:1,F:1,G:1,H:1,I:1,PE:0});
   evalGate(c);
   assertEqual(getPin(c,'EVEN'), 0, 'EVEN');
@@ -159,7 +164,7 @@ test('74286 9 inputs all 1 (odd), PE=0 → EVEN=0 ODD=1', () => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 74287 - PROM 256×4 Tri-state
+// 74287 - PROM 256×4 Tri state
 // ═══════════════════════════════════════════════════════════════════════════════
 test('74287 exists', () => assert(CHIPS_BLOCK_19['74287']));
 
@@ -202,7 +207,7 @@ test('74287 programmed ROM returns stored value', () => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 74288 - PROM 32×8 Tri-state
+// 74288 - PROM 32×8 Tri state
 // ═══════════════════════════════════════════════════════════════════════════════
 test('74288 exists', () => assert(CHIPS_BLOCK_19['74288']));
 
@@ -237,17 +242,17 @@ test('74288 programmed value', () => {
 // ═══════════════════════════════════════════════════════════════════════════════
 // 74289 - RAM 16×4 OC Inverted
 // ═══════════════════════════════════════════════════════════════════════════════
-test('74289 exists', () => assert(CHIPS_BLOCK_19['74289']));
+test('74289 exists', () => assert(CHIPS_BLOCK_19['74x289']));
 
 test('74289 CSn=1 → HiZ', () => {
-  const c = makeComp('74289');
+  const c = makeComp('74x289');
   setPins(c, {A0:0,A1:0,A2:0,A3:0,CSn:1,WEn:1,D0:0,D1:0,D2:0,D3:0});
   evalGate(c);
   assertEqual(getPin(c,'Q0n'), null, 'Q0n HiZ');
 });
 
 test('74289 write then read back (inverted)', () => {
-  const c = makeComp('74289');
+  const c = makeComp('74x289');
   // Write 0b1010 to addr 0: D0=0,D1=1,D2=0,D3=1
   setPins(c, {A0:0,A1:0,A2:0,A3:0, CSn:0, WEn:0, D0:0,D1:1,D2:0,D3:1});
   evalGate(c);
@@ -262,7 +267,7 @@ test('74289 write then read back (inverted)', () => {
 });
 
 test('74289 fresh RAM reads all-inverted-0 (all 1)', () => {
-  const c = makeComp('74289');
+  const c = makeComp('74x289');
   setPins(c, {A0:0,A1:0,A2:0,A3:0, CSn:0, WEn:1, D0:0,D1:0,D2:0,D3:0});
   evalGate(c);
   // Unwritten → stored 0 → inverted outputs all 1
@@ -273,10 +278,10 @@ test('74289 fresh RAM reads all-inverted-0 (all 1)', () => {
 // ═══════════════════════════════════════════════════════════════════════════════
 // 74290 - Decade Counter (÷2 + ÷5)
 // ═══════════════════════════════════════════════════════════════════════════════
-test('74290 exists', () => assert(CHIPS_BLOCK_19['74290']));
+test('74290 exists', () => assert(CHIPS_BLOCK_19['74x290']));
 
 test('74290 R01+R02 reset → QA=QB=QC=QD=0', () => {
-  const c = makeComp('74290');
+  const c = makeComp('74x290');
   setPins(c, {CLK_A:0,CLK_B:0,R01:1,R02:1,R91:0,R92:0});
   evalGate(c);
   assertEqual(getPin(c,'QA'), 0, 'QA');
@@ -286,7 +291,7 @@ test('74290 R01+R02 reset → QA=QB=QC=QD=0', () => {
 });
 
 test('74290 R91+R92 set to 9 → QA=1 QD=1 QB=QC=0', () => {
-  const c = makeComp('74290');
+  const c = makeComp('74x290');
   setPins(c, {CLK_A:0,CLK_B:0,R01:0,R02:0,R91:1,R92:1});
   evalGate(c);
   assertEqual(getPin(c,'QA'), 1, 'QA');
@@ -296,7 +301,7 @@ test('74290 R91+R92 set to 9 → QA=1 QD=1 QB=QC=0', () => {
 });
 
 test('74290 ÷2: CLK_A toggles QA', () => {
-  const c = makeComp('74290');
+  const c = makeComp('74x290');
   // Reset first
   setPins(c, {CLK_A:0,CLK_B:0,R01:1,R02:1,R91:0,R92:0});
   evalGate(c);
@@ -311,7 +316,7 @@ test('74290 ÷2: CLK_A toggles QA', () => {
 });
 
 test('74290 ÷5: CLK_B cycles QB,QC,QD through 0..4', () => {
-  const c = makeComp('74290');
+  const c = makeComp('74x290');
   setPins(c, {CLK_A:0,CLK_B:0,R01:1,R02:1,R91:0,R92:0});
   evalGate(c);
   setPins(c, {R01:0,R02:0});
@@ -328,10 +333,10 @@ test('74290 ÷5: CLK_B cycles QB,QC,QD through 0..4', () => {
 // ═══════════════════════════════════════════════════════════════════════════════
 // 74292 - Programmable Frequency Divider
 // ═══════════════════════════════════════════════════════════════════════════════
-test('74292 exists', () => assert(CHIPS_BLOCK_19['74292']));
+test('74292 exists', () => assert(CHIPS_BLOCK_19['74x292']));
 
 test('74292 ÷2: S0=1 rest 0 → OUT toggles every 2 CLK edges', () => {
-  const c = makeComp('74292');
+  const c = makeComp('74x292');
   // S=1 → divisor=2, OUT toggles after 2 CLK falling edges
   setPins(c, {CLK:0,S0:1,S1:0,S2:0,S3:0,S4:0,S5:0,S6:0,S7:0,S8:0,S9:0});
   evalGate(c);
@@ -343,7 +348,7 @@ test('74292 ÷2: S0=1 rest 0 → OUT toggles every 2 CLK edges', () => {
 });
 
 test('74292 ÷1: S0=0 → OUT toggles every CLK edge', () => {
-  const c = makeComp('74292');
+  const c = makeComp('74x292');
   setPins(c, {CLK:0,S0:0,S1:0,S2:0,S3:0,S4:0,S5:0,S6:0,S7:0,S8:0,S9:0});
   evalGate(c);
   const init = getPin(c,'OUT');
@@ -354,10 +359,10 @@ test('74292 ÷1: S0=0 → OUT toggles every CLK edge', () => {
 // ═══════════════════════════════════════════════════════════════════════════════
 // 74293 - 4 bit Binary Counter (÷2 + ÷8)
 // ═══════════════════════════════════════════════════════════════════════════════
-test('74293 exists', () => assert(CHIPS_BLOCK_19['74293']));
+test('74293 exists', () => assert(CHIPS_BLOCK_19['74x293']));
 
 test('74293 reset → all 0', () => {
-  const c = makeComp('74293');
+  const c = makeComp('74x293');
   setPins(c, {CLK_A:0,CLK_B:0,R01:1,R02:1});
   evalGate(c);
   assertEqual(getPin(c,'QA'), 0, 'QA');
@@ -367,7 +372,7 @@ test('74293 reset → all 0', () => {
 });
 
 test('74293 ÷2: QA toggles on CLK_A falling edge', () => {
-  const c = makeComp('74293');
+  const c = makeComp('74x293');
   setPins(c, {CLK_A:0,CLK_B:0,R01:1,R02:1});
   evalGate(c);
   setPins(c, {R01:0,R02:0});
@@ -379,7 +384,7 @@ test('74293 ÷2: QA toggles on CLK_A falling edge', () => {
 });
 
 test('74293 ÷8: QB,QC,QD count 0-7 on CLK_B', () => {
-  const c = makeComp('74293');
+  const c = makeComp('74x293');
   setPins(c, {CLK_A:0,CLK_B:0,R01:1,R02:1});
   evalGate(c);
   setPins(c, {R01:0,R02:0});
@@ -398,10 +403,10 @@ test('74293 ÷8: QB,QC,QD count 0-7 on CLK_B', () => {
 // ═══════════════════════════════════════════════════════════════════════════════
 // 74294 - Programmable Frequency Divider (same gate type as 74292)
 // ═══════════════════════════════════════════════════════════════════════════════
-test('74294 exists', () => assert(CHIPS_BLOCK_19['74294']));
+test('74294 exists', () => assert(CHIPS_BLOCK_19['74x294']));
 
 test('74294 ÷2: OUT toggles every 2 CLK edges', () => {
-  const c = makeComp('74294');
+  const c = makeComp('74x294');
   setPins(c, {CLK:0,S0:1,S1:0,S2:0,S3:0,S4:0,S5:0,S6:0,S7:0,S8:0,S9:0});
   evalGate(c);
   const init = getPin(c,'OUT');
@@ -412,12 +417,12 @@ test('74294 ÷2: OUT toggles every 2 CLK edges', () => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 74295 - 4 bit Bidirectional Shift Register, Tri-state
+// 74295 - 4 bit Bidirectional Shift Register, Tri state
 // ═══════════════════════════════════════════════════════════════════════════════
-test('74295 exists', () => assert(CHIPS_BLOCK_19['74295']));
+test('74295 exists', () => assert(CHIPS_BLOCK_19['74x295']));
 
 test('74295 OEn=1 → HiZ', () => {
-  const c = makeComp('74295');
+  const c = makeComp('74x295');
   setPins(c, {SER:0,A:0,B:0,C:0,D:0,MODE:0,CLK:0,OEn:1});
   evalGate(c);
   assertEqual(getPin(c,'QA'), null, 'QA HiZ');
@@ -425,7 +430,7 @@ test('74295 OEn=1 → HiZ', () => {
 });
 
 test('74295 parallel load MODE=1', () => {
-  const c = makeComp('74295');
+  const c = makeComp('74x295');
   setPins(c, {SER:0,A:1,B:0,C:1,D:0,MODE:1,CLK:0,OEn:0});
   risingEdge(c, 'CLK');
   assertEqual(getPin(c,'QA'), 1, 'QA');
@@ -435,7 +440,7 @@ test('74295 parallel load MODE=1', () => {
 });
 
 test('74295 shift right MODE=0: SER enters MSB', () => {
-  const c = makeComp('74295');
+  const c = makeComp('74x295');
   // Load 0b1010
   setPins(c, {SER:0,A:0,B:1,C:0,D:1,MODE:1,CLK:0,OEn:0});
   risingEdge(c, 'CLK');
@@ -451,38 +456,12 @@ test('74295 shift right MODE=0: SER enters MSB', () => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 74297 - Digital PLL Filter (stub)
-// ═══════════════════════════════════════════════════════════════════════════════
-test('74297 exists', () => assert(CHIPS_BLOCK_19['74297']));
-
-test('74297 outputs reachable (no crash)', () => {
-  const c = makeComp('74297');
-  setPins(c, {CLK_IN:0,REF:0,K1:0,K2:0,K3:0,K4:0,N1:0,N2:0,N3:0,N4:0,V_IN:0});
-  evalGate(c);
-  // Just verify outputs are defined (stub)
-  const out = getPin(c,'CLK_OUT');
-  assert(out === 0 || out === 1, 'CLK_OUT should be digital');
-});
-
-test('74297 ÷2 by K: CLK_OUT toggles after 2 CLK_IN falling edges', () => {
-  const c = makeComp('74297');
-  // K=1 (K1=1, rest 0) → divisor = 1+1 = 2
-  setPins(c, {CLK_IN:0,REF:0,K1:1,K2:0,K3:0,K4:0,N1:0,N2:0,N3:0,N4:0,V_IN:0});
-  evalGate(c);
-  const init = getPin(c,'CLK_OUT');
-  fallingEdge(c, 'CLK_IN');
-  assertEqual(getPin(c,'CLK_OUT'), init, 'no change after 1');
-  fallingEdge(c, 'CLK_IN');
-  assertEqual(getPin(c,'CLK_OUT'), init ^ 1, 'toggle after 2');
-});
-
-// ═══════════════════════════════════════════════════════════════════════════════
 // 74298 - Quad 2:1 MUX with Storage
 // ═══════════════════════════════════════════════════════════════════════════════
-test('74298 exists', () => assert(CHIPS_BLOCK_19['74298']));
+test('74298 exists', () => assert(CHIPS_BLOCK_19['74x298']));
 
 test('74298 SEL=0: selects A inputs on rising CLK', () => {
-  const c = makeComp('74298');
+  const c = makeComp('74x298');
   setPins(c, {A1:1,B1:0, A2:0,B2:1, A3:1,B3:0, A4:0,B4:1, SEL:0, CLK:0});
   risingEdge(c, 'CLK');
   assertEqual(getPin(c,'Q1'), 1, 'Q1=A1=1');
@@ -492,7 +471,7 @@ test('74298 SEL=0: selects A inputs on rising CLK', () => {
 });
 
 test('74298 SEL=1: selects B inputs on rising CLK', () => {
-  const c = makeComp('74298');
+  const c = makeComp('74x298');
   setPins(c, {A1:1,B1:0, A2:0,B2:1, A3:1,B3:0, A4:0,B4:1, SEL:1, CLK:0});
   risingEdge(c, 'CLK');
   assertEqual(getPin(c,'Q1'), 0, 'Q1=B1=0');
@@ -502,7 +481,7 @@ test('74298 SEL=1: selects B inputs on rising CLK', () => {
 });
 
 test('74298 holds output between clocks', () => {
-  const c = makeComp('74298');
+  const c = makeComp('74x298');
   setPins(c, {A1:1,B1:0,A2:0,B2:0,A3:0,B3:0,A4:0,B4:0,SEL:0,CLK:0});
   risingEdge(c, 'CLK');
   assertEqual(getPin(c,'Q1'), 1, 'Q1 stored');
@@ -513,12 +492,12 @@ test('74298 holds output between clocks', () => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 74299 - 8 bit Universal Shift/Storage, Tri-state
+// 74299 - 8 bit Universal Shift/Storage, Tri state
 // ═══════════════════════════════════════════════════════════════════════════════
-test('74299 exists', () => assert(CHIPS_BLOCK_19['74299']));
+test('74299 exists', () => assert(CHIPS_BLOCK_19['74x299']));
 
 test('74299 OEAn=1 → HiZ', () => {
-  const c = makeComp('74299');
+  const c = makeComp('74x299');
   setPins(c, {S0:0,S1:0,SR:0,SL:0,OEAn:1,OEBn:0,
     QA:0,QB:0,QC:0,QD:0,QE:0,QF:0,QG:0,QH:0,CLK:0});
   risingEdge(c, 'CLK');
@@ -526,12 +505,12 @@ test('74299 OEAn=1 → HiZ', () => {
 });
 
 test('74299 parallel load S0=1,S1=1', () => {
-  const c = makeComp('74299');
+  const c = makeComp('74x299');
   // Load 0b10110011 = 179
   setPins(c, {S0:1,S1:1,SR:0,SL:0,OEAn:0,OEBn:0,
     QA:1,QB:1,QC:0,QD:0,QE:1,QF:1,QG:0,QH:1,CLK:0});
   risingEdge(c, 'CLK');
-  // Switch to hold mode to read outputs (load mode tri-states I/O pins)
+  // Switch to hold mode to read outputs (load mode tri states I/O pins)
   setPins(c, {S0:0,S1:0});
   evalGate(c);
   assertEqual(getPin(c,'QA'), 1, 'QA');
@@ -543,7 +522,7 @@ test('74299 parallel load S0=1,S1=1', () => {
 });
 
 test('74299 hold S0=0,S1=0: outputs unchanged', () => {
-  const c = makeComp('74299');
+  const c = makeComp('74x299');
   // Load all 1s, then switch to hold to read outputs
   setPins(c, {S0:1,S1:1,SR:0,SL:0,OEAn:0,OEBn:0,
     QA:1,QB:1,QC:1,QD:1,QE:1,QF:1,QG:1,QH:1,CLK:0});
@@ -556,7 +535,7 @@ test('74299 hold S0=0,S1=0: outputs unchanged', () => {
 });
 
 test('74299 shift right S0=1,S1=0: SR enters QH', () => {
-  const c = makeComp('74299');
+  const c = makeComp('74x299');
   // Load 0b00000000
   setPins(c, {S0:1,S1:1,SR:1,SL:0,OEAn:0,OEBn:0,
     QA:0,QB:0,QC:0,QD:0,QE:0,QF:0,QG:0,QH:0,CLK:0});
@@ -569,7 +548,7 @@ test('74299 shift right S0=1,S1=0: SR enters QH', () => {
 });
 
 test('74299 shift left S0=0,S1=1: SL enters QA', () => {
-  const c = makeComp('74299');
+  const c = makeComp('74x299');
   // Load all 0
   setPins(c, {S0:1,S1:1,SR:0,SL:0,OEAn:0,OEBn:0,
     QA:0,QB:0,QC:0,QD:0,QE:0,QF:0,QG:0,QH:0,CLK:0});
@@ -584,17 +563,17 @@ test('74299 shift left S0=0,S1=1: SL enters QA', () => {
 // ═══════════════════════════════════════════════════════════════════════════════
 // 74300 - RAM 256×1 OC
 // ═══════════════════════════════════════════════════════════════════════════════
-test('74300 exists', () => assert(CHIPS_BLOCK_19['74300']));
+test('74300 exists', () => assert(CHIPS_BLOCK_19['74x300']));
 
 test('74300 CSn=1 → HiZ', () => {
-  const c = makeComp('74300');
+  const c = makeComp('74x300');
   setPins(c, {A0:0,A1:0,A2:0,A3:0,A4:0,A5:0,A6:0,A7:0,WEn:1,CSn:1,DI:0});
   evalGate(c);
   assertEqual(getPin(c,'DO'), null, 'DO HiZ');
 });
 
 test('74300 write then read', () => {
-  const c = makeComp('74300');
+  const c = makeComp('74x300');
   // Write 1 to addr 0
   setPins(c, {A0:0,A1:0,A2:0,A3:0,A4:0,A5:0,A6:0,A7:0,WEn:0,CSn:0,DI:1});
   evalGate(c);
@@ -605,7 +584,7 @@ test('74300 write then read', () => {
 });
 
 test('74300 fresh address reads 0', () => {
-  const c = makeComp('74300');
+  const c = makeComp('74x300');
   setPins(c, {A0:1,A1:0,A2:0,A3:0,A4:0,A5:0,A6:0,A7:0,WEn:1,CSn:0,DI:0});
   evalGate(c);
   assertEqual(getPin(c,'DO'), 0, 'DO=0');
@@ -614,10 +593,10 @@ test('74300 fresh address reads 0', () => {
 // ═══════════════════════════════════════════════════════════════════════════════
 // 74301 - RAM 256×1 OC (same behavior as 74300)
 // ═══════════════════════════════════════════════════════════════════════════════
-test('74301 exists', () => assert(CHIPS_BLOCK_19['74301']));
+test('74301 exists', () => assert(CHIPS_BLOCK_19['74x301']));
 
 test('74301 write then read', () => {
-  const c = makeComp('74301');
+  const c = makeComp('74x301');
   setPins(c, {A0:1,A1:0,A2:0,A3:0,A4:0,A5:0,A6:0,A7:0,WEn:0,CSn:0,DI:1});
   evalGate(c);
   setPin(c,'WEn',1);
@@ -628,10 +607,10 @@ test('74301 write then read', () => {
 // ═══════════════════════════════════════════════════════════════════════════════
 // 74302 - RAM 256×1 OC (same behavior)
 // ═══════════════════════════════════════════════════════════════════════════════
-test('74302 exists', () => assert(CHIPS_BLOCK_19['74302']));
+test('74302 exists', () => assert(CHIPS_BLOCK_19['74x302']));
 
 test('74302 write then read', () => {
-  const c = makeComp('74302');
+  const c = makeComp('74x302');
   setPins(c, {A0:0,A1:1,A2:0,A3:0,A4:0,A5:0,A6:0,A7:0,WEn:0,CSn:0,DI:1});
   evalGate(c);
   setPin(c,'WEn',1);
@@ -642,10 +621,10 @@ test('74302 write then read', () => {
 // ═══════════════════════════════════════════════════════════════════════════════
 // 74303 - Octal ÷2 Clock Driver
 // ═══════════════════════════════════════════════════════════════════════════════
-test('74303 exists', () => assert(CHIPS_BLOCK_19['74303']));
+test('74303 exists', () => assert(CHIPS_BLOCK_19['74x303']));
 
 test('74303 Q3 toggles on CLK3 falling edge', () => {
-  const c = makeComp('74303');
+  const c = makeComp('74x303');
   setPins(c, {CLK1:0,CLK2:0,CLK3:0,CLK4:0,CLK5:0,CLK6:0,CLK7:0,CLK8:0});
   evalGate(c);
   const init = getPin(c,'Q3');
@@ -656,7 +635,7 @@ test('74303 Q3 toggles on CLK3 falling edge', () => {
 });
 
 test('74303 Q7n is inverted: toggles on CLK7 falling edge', () => {
-  const c = makeComp('74303');
+  const c = makeComp('74x303');
   setPins(c, {CLK1:0,CLK2:0,CLK3:0,CLK4:0,CLK5:0,CLK6:0,CLK7:0,CLK8:0});
   evalGate(c);
   const init = getPin(c,'Q7n');
@@ -666,7 +645,7 @@ test('74303 Q7n is inverted: toggles on CLK7 falling edge', () => {
 });
 
 test('74303 channels independent', () => {
-  const c = makeComp('74303');
+  const c = makeComp('74x303');
   setPins(c, {CLK1:0,CLK2:0,CLK3:0,CLK4:0,CLK5:0,CLK6:0,CLK7:0,CLK8:0});
   evalGate(c);
   const q3_0 = getPin(c,'Q3');
@@ -678,7 +657,7 @@ test('74303 channels independent', () => {
 });
 
 test('74303 Q8 toggles on CLK8', () => {
-  const c = makeComp('74303');
+  const c = makeComp('74x303');
   setPins(c, {CLK1:0,CLK2:0,CLK3:0,CLK4:0,CLK5:0,CLK6:0,CLK7:0,CLK8:0});
   evalGate(c);
   const init = getPin(c,'Q8');

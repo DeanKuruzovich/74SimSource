@@ -167,7 +167,7 @@ function testAndGatedJKChip(chipId) {
     const sim = new CircuitSimulator();
     sim.evaluate(world, [chip], wm);
     pulseClock(sim, world, chip, wm, 'CLK');
-    assertPinBit(sim, chip, 'Q', 0, `${chipId} J inputs are AND-gated`);
+    assertPinBit(sim, chip, 'Q', 0, `${chipId} J inputs are AND gated`);
   }
 
   console.log(`  ${chipId}d: J=K=1 toggles on successive edges`);
@@ -184,7 +184,7 @@ function testAndGatedJKChip(chipId) {
 }
 
 function testAdderCase(a, b, c0, label) {
-  const { world, chip, wm } = setupChipWithPower('7483');
+  const { world, chip, wm } = setupChipWithPower('74x83');
   setPinsFromValue(wm, chip, ['A1', 'A2', 'A3', 'A4'], a);
   setPinsFromValue(wm, chip, ['B1', 'B2', 'B3', 'B4'], b);
   if (c0) connectPinToVcc(wm, findPin(chip, 'C0'));
@@ -202,11 +202,11 @@ function testAdderCase(a, b, c0, label) {
 }
 
 const EXPECTED_CHIP_IDS = [
-  '7446', '7451', '7454', '7470', '7472', '7473',
-  '7475', '7476', '7483', '7485', '7489',
+  '74x46', '74x51', '74x54', '74x70', '74x72', '74x73',
+  '74x75', '74x76', '74x83', '74x85', '74x89',
 ];
 
-const SEQUENTIAL_CHIP_IDS = ['7470', '7472', '7473', '7475', '7476', '7489'];
+const SEQUENTIAL_CHIP_IDS = ['74x70', '74x72', '74x73', '74x75', '74x76', '74x89'];
 
 console.log('\nS1: All 11 chip IDs present in CHIPS_BLOCK_3');
 {
@@ -266,12 +266,12 @@ console.log('\nS4: Sequential chips are marked sequential');
   }
 }
 
-console.log('\nG1: 7446 - BCD to 7-segment decoder (representative digits)');
+console.log('\nG1: 7446 - BCD to 7 segment decoder (representative digits)');
 {
   const digits = [0, 2, 9];
   const segNames = ['a', 'b', 'c', 'd', 'e', 'f', 'g'];
   for (const digit of digits) {
-    const { world, chip, wm } = setupChipWithPower('7446');
+    const { world, chip, wm } = setupChipWithPower('74x46');
     setPinsFromValue(wm, chip, ['A', 'B', 'C', 'D'], digit);
     const sim = new CircuitSimulator();
     sim.evaluate(world, [chip], wm);
@@ -284,22 +284,22 @@ console.log('\nG1: 7446 - BCD to 7-segment decoder (representative digits)');
 }
 
 console.log('\nG2: 7451 - Dual AOI gate');
-testAOI2WideGate('7451', ['1A1', '1A2', '1B1', '1B2'], '1Y');
-testAOI2WideGate('7451', ['2A1', '2A2', '2B1', '2B2'], '2Y');
+testAOI2WideGate('74x51', ['1A1', '1A2', '1B1', '1B2'], '1Y');
+testAOI2WideGate('74x51', ['2A1', '2A2', '2B1', '2B2'], '2Y');
 
 console.log('\nG3: 7454 - 4-wide AOI gate');
-testAOI4WideGate('7454', ['A1', 'A2', 'B1', 'B2', 'C1', 'C2', 'D1', 'D2'], 'Y');
+testAOI4WideGate('74x54', ['A1', 'A2', 'B1', 'B2', 'C1', 'C2', 'D1', 'D2'], 'Y');
 
-console.log('\nG4: 7470 - AND-gated JK flip-flop');
-testAndGatedJKChip('7470');
+console.log('\nG4: 7470 - AND gated JK flip flop');
+testAndGatedJKChip('74x70');
 
-console.log('\nG5: 7472 - AND-gated JK controller-device flip-flop (simplified behavior)');
-testAndGatedJKChip('7472');
+console.log('\nG5: 7472 - AND gated JK controller device flip flop (simplified behavior)');
+testAndGatedJKChip('74x72');
 
-console.log('\nG6: 7473 - Dual JK flip-flop with clear');
+console.log('\nG6: 7473 - Dual JK flip flop with clear');
 console.log('  7473a: clear holds FF1 low when wired to GND');
 {
-  const { world, chip, wm } = setupChipWithPower('7473');
+  const { world, chip, wm } = setupChipWithPower('74x73');
   connectPinToVcc(wm, findPin(chip, '1J'));
   connectPinToGnd(wm, findPin(chip, '1CLR'));  // CLR=LOW (active)
   const sim = new CircuitSimulator();
@@ -308,9 +308,9 @@ console.log('  7473a: clear holds FF1 low when wired to GND');
   assertPinBit(sim, chip, '1Qn', 1, '7473 FF1 clear active drives Qn high');
 }
 
-console.log('  7473b: both flip-flops update independently on their own inputs');
+console.log('  7473b: both flip flops update independently on their own inputs');
 {
-  const { world, chip, wm } = setupChipWithPower('7473');
+  const { world, chip, wm } = setupChipWithPower('74x73');
   connectPinsHigh(wm, chip, ['1CLR', '2CLR', '1J', '2J']);
   const sim = new CircuitSimulator();
   sim.evaluate(world, [chip], wm);
@@ -329,7 +329,7 @@ console.log('  7473b: both flip-flops update independently on their own inputs')
 console.log('\nG7: 7475 - 4 bit latch');
 console.log('  7475a: enabled latches are transparent');
 {
-  const { world, chip, wm } = setupChipWithPower('7475');
+  const { world, chip, wm } = setupChipWithPower('74x75');
   connectPinToVcc(wm, findPin(chip, '1D'));
   connectPinToGnd(wm, findPin(chip, '2D'));    // 2D=LOW explicitly
   connectPinToVcc(wm, findPin(chip, '12E'));
@@ -341,7 +341,7 @@ console.log('  7475a: enabled latches are transparent');
 
 console.log('  7475b: disabled latches hold their previous value');
 {
-  const { world, chip, wm } = setupChipWithPower('7475');
+  const { world, chip, wm } = setupChipWithPower('74x75');
   const d1Wire = connectPinToVcc(wm, findPin(chip, '1D'));
   const enableWire = connectPinToVcc(wm, findPin(chip, '12E'));
   const sim = new CircuitSimulator();
@@ -354,7 +354,7 @@ console.log('  7475b: disabled latches hold their previous value');
 
 console.log('  7475c: 34E controls only the second latch pair');
 {
-  const { world, chip, wm } = setupChipWithPower('7475');
+  const { world, chip, wm } = setupChipWithPower('74x75');
   connectPinToVcc(wm, findPin(chip, '1D'));
   connectPinToVcc(wm, findPin(chip, '3D'));
   connectPinToGnd(wm, findPin(chip, '12E'));   // 12E=LOW → latches 1,2 hold
@@ -365,10 +365,10 @@ console.log('  7475c: 34E controls only the second latch pair');
   assertPinBit(sim, chip, '3Q', 1, '7475 3Q follows 3D when 34E is high');
 }
 
-console.log('\nG8: 7476 - Dual JK flip-flop with preset and clear');
+console.log('\nG8: 7476 - Dual JK flip flop with preset and clear');
 console.log('  7476a: async preset forces FF1 high');
 {
-  const { world, chip, wm } = setupChipWithPower('7476');
+  const { world, chip, wm } = setupChipWithPower('74x76');
   connectPinToVcc(wm, findPin(chip, '1CLR'));
   connectPinToGnd(wm, findPin(chip, '1PRE'));  // PRE=LOW (active)
   const sim = new CircuitSimulator();
@@ -377,9 +377,9 @@ console.log('  7476a: async preset forces FF1 high');
   assertPinBit(sim, chip, '1Qn', 0, '7476 PRE active drives 1Qn low');
 }
 
-console.log('  7476b: both flip-flops respond independently when controls are disabled');
+console.log('  7476b: both flip flops respond independently when controls are disabled');
 {
-  const { world, chip, wm } = setupChipWithPower('7476');
+  const { world, chip, wm } = setupChipWithPower('74x76');
   connectPinsHigh(wm, chip, ['1PRE', '1CLR', '2PRE', '2CLR', '1J', '2J']);
   const sim = new CircuitSimulator();
   sim.evaluate(world, [chip], wm);
@@ -411,7 +411,7 @@ console.log('\nG10: 7485 - 4 bit comparator');
   ];
 
   for (const tc of cases) {
-    const { world, chip, wm } = setupChipWithPower('7485');
+    const { world, chip, wm } = setupChipWithPower('74x85');
     setPinsFromValue(wm, chip, ['A0', 'A1', 'A2', 'A3'], tc.a);
     setPinsFromValue(wm, chip, ['B0', 'B1', 'B2', 'B3'], tc.b);
     for (const [pinName, bit] of Object.entries(tc.cascade)) {
@@ -429,7 +429,7 @@ console.log('\nG10: 7485 - 4 bit comparator');
 console.log('\nG11: 7489 - 16x4 RAM');
 console.log('  7489a: write then read back the stored word');
 {
-  const { world, chip, wm } = setupChipWithPower('7489');
+  const { world, chip, wm } = setupChipWithPower('74x89');
   let addressWires = setPinsFromValue(wm, chip, ['A0', 'A1', 'A2', 'A3'], 0x3);
   let dataWires = setPinsFromValue(wm, chip, ['D1', 'D2', 'D3', 'D4'], 0xA);
   const sim = new CircuitSimulator();

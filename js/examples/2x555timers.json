@@ -181,7 +181,7 @@
       "y": -60,
       "w": 634.0678481539336,
       "h": 90,
-      "text": "Details: LEFT   press the button to trigger a one-shot pulse (monostable). RIGHT   LED blinks automatically at ~1 Hz (astable). Both use external RC networks for timing.",
+      "text": "Details: LEFT   press the button to trigger a one shot pulse (monostable). RIGHT   LED blinks automatically at ~1 Hz (astable). Both use external RC networks for timing.",
       "v": 2
     }
   ]

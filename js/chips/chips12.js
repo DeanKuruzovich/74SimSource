@@ -4,20 +4,20 @@
 
 export const CHIPS_BLOCK_12 = {
 
-  // ── 74x137: 3-to-8 decoder/demux with address latch, 16-pin ──────────────
+  // ── 74x137: 3 to 8 decoder/demux with address latch, 16-pin ──────────────
   /* Primary source: Texas Instruments, SN74LS137 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls137.pdf
      Wikipedia: https://en.wikipedia.org/wiki/Multiplexer
      Wikipedia: https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
-  '74137': {
+  '74x137': {
     name: '74x137',
-    simpleName: '3-to-8 Decoder with Latch',
-    description: '3-to-8 line decoder/demultiplexer with built in address latch. (16-pin)',
+    simpleName: '3 to 8 Decoder with Latch',
+    description: '3 to 8 line decoder/demultiplexer with built in address latch. (16-pin)',
     pins: 16,
     vcc: 16,
     gnd: 8,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls137.pdf',
-    tags: ['decoder', 'demultiplexer', '3-to-8', 'latch', 'inverting'],
-    guideOverview: 'The 74137 is a 3-to-8 line decoder/demultiplexer with a built in address latch. Address inputs A, B, and C are latched when LE goes LOW, holding the selected output stable even if the address lines change afterward. When both enable inputs are asserted (G1n=0 and G2=1) exactly one of the eight active LOW outputs Y0 Y7 goes LOW based on the latched address.',
+    tags: ['decoder', 'demultiplexer', '3 to 8', 'latch', 'inverting'],
+    guideOverview: 'The 74x137 is a 3 to 8 line decoder/demultiplexer with a built in address latch. Address inputs A, B, and C are latched when LE goes LOW, holding the selected output stable even if the address lines change afterward. When both enable inputs are asserted (G1n=0 and G2=1) exactly one of the eight active LOW outputs Y0 Y7 goes LOW based on the latched address.',
     guidePinDescriptions: {
       A:   'Address input bit 0 (LSB); combined with B and C to select one of eight outputs.',
       B:   'Address input bit 1; middle weight of the 3 bit address.',
@@ -47,7 +47,7 @@ export const CHIPS_BLOCK_12 = {
       {
         title: 'Enable Control and Output Decoding',
         paragraphs: [
-          'Both enable inputs must be asserted (G1n=0 AND G2=1) for any output to go LOW. If either enable is de-asserted all outputs go HIGH. The binary value CBA selects output Yi: Y0 for 000 through Y7 for 111.',
+          'Both enable inputs must be asserted (G1n=0 AND G2=1) for any output to go LOW. If either enable is de asserted all outputs go HIGH. The binary value CBA selects output Yi: Y0 for 000 through Y7 for 111.',
         ],
         list: [
           'CBA=000 → Y0 LOW',
@@ -87,7 +87,7 @@ export const CHIPS_BLOCK_12 = {
 
   // ── 74x140: dual 4 input NAND gate, 50Ω line driver, 14-pin ──────────────
   /* Primary source: Texas Instruments, SN74S140 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74s140.pdf */
-  '74140': {
+  '74x140': {
     name: '74x140',
     simpleName: 'Dual 4 input NAND (50Ω)',
     description: 'Dual 4 input NAND gate with 50 ohm line driver outputs (14-pin)',
@@ -96,7 +96,7 @@ export const CHIPS_BLOCK_12 = {
     gnd: 7,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74s140.pdf',
     tags: ['logic gate', 'nand', 'combinational', '4 input', 'driver'],
-    guideOverview: 'The 74140 contains two independent 4 input NAND gates optimised for driving 50-ohm transmission lines. Each gate asserts its output LOW only when all four inputs are HIGH; any LOW input forces the output HIGH. The enhanced output drive current allows direct connection to coaxial cables without external matching resistors.',
+    guideOverview: 'The 74x140 contains two independent 4 input NAND gates optimised for driving 50-ohm transmission lines. Each gate asserts its output LOW only when all four inputs are HIGH; any LOW input forces the output HIGH. The enhanced output drive current allows direct connection to coaxial cables without external matching resistors.',
     guidePinDescriptions: {
       '1A':  'Gate 1 input A; one of four inputs to NAND gate 1.',
       '1B':  'Gate 1 input B; one of four inputs to NAND gate 1.',
@@ -127,7 +127,7 @@ export const CHIPS_BLOCK_12 = {
       {
         title: '50-Ohm Line Driver',
         paragraphs: [
-          'The 74140 output stage is designed to drive 50-ohm transmission lines directly. The increased sink/source current capability reduces reflections compared to standard TTL gates when used in wired-backplane or cable-interconnect environments.',
+          'The 74x140 output stage is designed to drive 50-ohm transmission lines directly. The increased sink/source current capability reduces reflections compared to standard TTL gates when used in wired backplane or cable interconnect environments.',
         ],
       },
     ],
@@ -160,16 +160,20 @@ export const CHIPS_BLOCK_12 = {
      Wikipedia: https://en.wikipedia.org/wiki/Counter_(digital)
      Wikipedia: https://en.wikipedia.org/wiki/Multiplexer
      Wikipedia: https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
-  '74143': {
+  '74x143': {
     name: '74x143',
     simpleName: 'Decade Counter/7-Seg Driver (CC)',
-    description: 'Decade counter / latch / 7-segment decoder / constant-current driver (15 mA) (24-pin)',
+    description: 'Decade counter/latch/7-seg decoder, 15 mA constant-current driver (24-pin)',
     pins: 24,
     vcc: 24,
     gnd: 12,
+    // Segments are driven by a ~15 mA constant-current source, not push-pull. Modelled
+    // as DRIVE.CURRENT_SOURCE so direct-driven LED segments self-limit (no series R needed).
+    currentSourceOutputs: ['a', 'b', 'c', 'd', 'e', 'f', 'g'],
+    currentSourceAmps: 0.015,
     datasheet: 'https://en.wikipedia.org/wiki/7400-series_integrated_circuits',
-    tags: ['counter', 'decoder', '7-segment', 'bcd', 'latch', 'sequential'],
-    guideOverview: 'The 74143 is a fully integrated BCD decade counter with an internal output latch, BCD-to-7-segment decoder, and constant-current (15 mA) segment drivers. The counter advances on each rising CLK edge when ENP and ENT are both HIGH. Asserting STROBE HIGH captures the current count in the latch, holding the 7-segment outputs stable while counting continues.',
+    tags: ['counter', 'decoder', '7 segment', 'bcd', 'latch', 'sequential'],
+    guideOverview: 'The 74x143 is a fully integrated BCD decade counter with an internal output latch, BCD to-7 segment decoder, and constant current (15 mA) segment drivers. The counter advances on each rising CLK edge when ENP and ENT are both HIGH. Asserting STROBE HIGH captures the current count in the latch, holding the 7 segment outputs stable while counting continues.',
     guidePinDescriptions: {
       CLK:    'Clock input; the counter increments on the rising edge when ENP and ENT are HIGH.',
       CLR:    'Synchronous clear; when HIGH at the rising CLK edge the counter resets to 0000.',
@@ -186,13 +190,13 @@ export const CHIPS_BLOCK_12 = {
       QB:     'BCD counter output bit 1 (weight 2).',
       QC:     'BCD counter output bit 2 (weight 4).',
       QD:     'BCD counter output bit 3 (MSB, weight 8).',
-      a:      '7-segment driver output a (top horizontal segment).',
-      b:      '7-segment driver output b (upper-right vertical segment).',
-      c:      '7-segment driver output c (lower-right vertical segment).',
-      d:      '7-segment driver output d (bottom horizontal segment).',
-      e:      '7-segment driver output e (lower-left vertical segment).',
-      f:      '7-segment driver output f (upper-left vertical segment).',
-      g:      '7-segment driver output g (middle horizontal segment).',
+      a:      '7 segment driver output a (top horizontal segment).',
+      b:      '7 segment driver output b (upper right vertical segment).',
+      c:      '7 segment driver output c (lower right vertical segment).',
+      d:      '7 segment driver output d (bottom horizontal segment).',
+      e:      '7 segment driver output e (lower left vertical segment).',
+      f:      '7 segment driver output f (upper left vertical segment).',
+      g:      '7 segment driver output g (middle horizontal segment).',
       NC1:    'No connection; internally unconnected.',
       VCC:    'Positive supply (+5 V).',
     },
@@ -200,14 +204,14 @@ export const CHIPS_BLOCK_12 = {
       {
         title: 'Counter and Latch Operation',
         paragraphs: [
-          'The internal decade counter counts 0 9 and resets on the next clock after 9, producing a carry on RCO. When STROBE goes HIGH the current count is transferred to the latch; the 7-segment outputs then display the latched digit while the counter may continue running behind it.',
+          'The internal decade counter counts 0-9 and resets on the next clock after 9, producing a carry on RCO. When STROBE goes HIGH the current count is transferred to the latch; the 7 segment outputs then display the latched digit while the counter may continue running behind it.',
         ],
         note: 'CLR is synchronous it resets the counter only on the next rising CLK edge, not immediately.',
       },
       {
         title: 'Segment Driver Interface',
         paragraphs: [
-          'Outputs a g are constant-current drivers suitable for direct connection to common-cathode LED displays. The 74143 provides approximately 15 mA per segment, eliminating the need for external current-limiting resistors in many designs.',
+          'Outputs a g are constant current drivers suitable for direct connection to common cathode LED displays. The 74x143 provides approximately 15 mA per segment, eliminating the need for external current limiting resistors in many designs.',
         ],
       },
     ],
@@ -249,17 +253,17 @@ export const CHIPS_BLOCK_12 = {
      Wikipedia: https://en.wikipedia.org/wiki/Multiplexer
      Wikipedia: https://en.wikipedia.org/wiki/Flip-flop_(electronics)
      Wikipedia: https://en.wikipedia.org/wiki/Open_collector */
-  '74144': {
+  '74x144': {
     name: '74x144',
     simpleName: 'Decade Counter/7-Seg Driver (OC)',
-    description: 'Decade counter / latch / 7-segment decoder / open-collector driver (15V, 25mA) (24-pin)',
+    description: 'Decade counter/latch/7-seg decoder, open-collector 15V/25mA driver (24-pin)',
     pins: 24,
     vcc: 24,
     gnd: 12,
     openCollector: true,
     datasheet: 'https://en.wikipedia.org/wiki/7400-series_integrated_circuits',
-    tags: ['counter', 'decoder', '7-segment', 'bcd', 'latch', 'open-collector', 'sequential'],
-    guideOverview: 'The 74144 is functionally identical to the 74143 but its segment drivers use open-collector outputs rated at 15V and 25mA per segment. This makes it suitable for driving gas-discharge, incandescent, or other high-voltage displays that require an external supply voltage above 5V. An external pull up resistor is required on each segment output.',
+    tags: ['counter', 'decoder', '7 segment', 'bcd', 'latch', 'open collector', 'sequential'],
+    guideOverview: 'The 74x144 is functionally identical to the 74x143 but its segment drivers use open collector outputs rated at 15V and 25mA per segment. This makes it suitable for driving gas discharge, incandescent, or other high voltage displays that require an external supply voltage above 5V. An external pull up resistor is required on each segment output.',
     guidePinDescriptions: {
       CLK:    'Clock input; the counter increments on the rising edge when ENP and ENT are HIGH.',
       CLR:    'Synchronous clear; when HIGH at the rising CLK edge the counter resets to 0000.',
@@ -276,13 +280,13 @@ export const CHIPS_BLOCK_12 = {
       QB:     'BCD counter output bit 1 (weight 2).',
       QC:     'BCD counter output bit 2 (weight 4).',
       QD:     'BCD counter output bit 3 (MSB, weight 8).',
-      a:      'Open-collector segment driver output a; connect via pull up to the display supply.',
-      b:      'Open-collector segment driver output b.',
-      c:      'Open-collector segment driver output c.',
-      d:      'Open-collector segment driver output d.',
-      e:      'Open-collector segment driver output e.',
-      f:      'Open-collector segment driver output f.',
-      g:      'Open-collector segment driver output g.',
+      a:      'Open collector segment driver output a; connect via pull up to the display supply.',
+      b:      'Open collector segment driver output b.',
+      c:      'Open collector segment driver output c.',
+      d:      'Open collector segment driver output d.',
+      e:      'Open collector segment driver output e.',
+      f:      'Open collector segment driver output f.',
+      g:      'Open collector segment driver output g.',
       NC1:    'No connection; internally unconnected.',
       VCC:    'Positive supply (+5 V).',
     },
@@ -290,15 +294,15 @@ export const CHIPS_BLOCK_12 = {
       {
         title: 'Counter and Latch Operation',
         paragraphs: [
-          'Identical to the 74143: the decade counter advances on CLK rising edges when ENP and ENT are HIGH, STROBE latches the count for stable display, and CLR synchronously resets on the next clock edge.',
+          'Identical to the 74x143: the decade counter advances on CLK rising edges when ENP and ENT are HIGH, STROBE latches the count for stable display, and CLR synchronously resets on the next clock edge.',
         ],
       },
       {
-        title: 'Open Collector High-Voltage Driver',
+        title: 'Open Collector High Voltage Driver',
         paragraphs: [
-          'Unlike the 74143, segment outputs are open-collector and can switch up to 15V. Connect an external pull up resistor from each segment output to the display supply voltage. The outputs can sink 25 mA, allowing direct drive of higher-power segment types.',
+          'Unlike the 74x143, segment outputs are open collector and can switch up to 15V. Connect an external pull up resistor from each segment output to the display supply voltage. The outputs can sink 25 mA, allowing direct drive of higher power segment types.',
         ],
-        note: 'Do not connect the segment supply directly to VCC (+5V) if using a higher-voltage display; the open-collector structure isolates the display voltage from the logic supply.',
+        note: 'Do not connect the segment supply directly to VCC (+5V) if using a higher voltage display; the open collector structure isolates the display voltage from the logic supply.',
       },
     ],
     pinout: [
@@ -337,29 +341,29 @@ export const CHIPS_BLOCK_12 = {
   /* Primary source: Texas Instruments, SN74LS145 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls145.pdf
      Wikipedia: https://en.wikipedia.org/wiki/Multiplexer
      Wikipedia: https://en.wikipedia.org/wiki/Open_collector */
-  '74145': {
+  '74x145': {
     name: '74x145',
     simpleName: 'BCD to Decimal Decoder (OC)',
-    description: 'BCD-to-decimal (1-of-10) decoder with open-collector outputs. (16-pin)',
+    description: 'BCD to decimal (1-of-10) decoder with open collector outputs. (16-pin)',
     pins: 16,
     vcc: 16,
     gnd: 8,
     openCollector: true,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls145.pdf',
-    tags: ['decoder', 'bcd', 'decimal', 'driver', 'open-collector', '10-line', '1-of-10'],
-    guideOverview: 'The 74145 decodes a 4 bit BCD input (A=LSB, D=MSB) into one of ten active LOW open-collector outputs Y0 Y9. For invalid BCD codes (10 15) all outputs remain HIGH. The open-collector outputs can sink up to 80 mA at up to 15V, making them suitable for driving relays, indicator lamps, and high-current digit-selection lines.',
+    tags: ['decoder', 'bcd', 'decimal', 'driver', 'open collector', '10-line', '1-of-10'],
+    guideOverview: 'The 74x145 decodes a 4 bit BCD input (A=LSB, D=MSB) into one of ten active LOW open collector outputs Y0 Y9. For invalid BCD codes (10 15) all outputs remain HIGH. The open collector outputs can sink up to 80 mA at up to 15V, making them suitable for driving relays, indicator lamps, and high current digit selection lines.',
     guidePinDescriptions: {
-      Y0:  'Decimal output 0 (open-collector, active LOW); pulled LOW when BCD input = 0000.',
-      Y1:  'Decimal output 1 (open-collector, active LOW); pulled LOW when BCD input = 0001.',
-      Y2:  'Decimal output 2 (open-collector, active LOW); pulled LOW when BCD input = 0010.',
-      Y3:  'Decimal output 3 (open-collector, active LOW); pulled LOW when BCD input = 0011.',
-      Y4:  'Decimal output 4 (open-collector, active LOW); pulled LOW when BCD input = 0100.',
-      Y5:  'Decimal output 5 (open-collector, active LOW); pulled LOW when BCD input = 0101.',
-      Y6:  'Decimal output 6 (open-collector, active LOW); pulled LOW when BCD input = 0110.',
+      Y0:  'Decimal output 0 (open collector, active LOW); pulled LOW when BCD input = 0000.',
+      Y1:  'Decimal output 1 (open collector, active LOW); pulled LOW when BCD input = 0001.',
+      Y2:  'Decimal output 2 (open collector, active LOW); pulled LOW when BCD input = 0010.',
+      Y3:  'Decimal output 3 (open collector, active LOW); pulled LOW when BCD input = 0011.',
+      Y4:  'Decimal output 4 (open collector, active LOW); pulled LOW when BCD input = 0100.',
+      Y5:  'Decimal output 5 (open collector, active LOW); pulled LOW when BCD input = 0101.',
+      Y6:  'Decimal output 6 (open collector, active LOW); pulled LOW when BCD input = 0110.',
       GND: 'Ground (0 V) supply.',
-      Y7:  'Decimal output 7 (open-collector, active LOW); pulled LOW when BCD input = 0111.',
-      Y8:  'Decimal output 8 (open-collector, active LOW); pulled LOW when BCD input = 1000.',
-      Y9:  'Decimal output 9 (open-collector, active LOW); pulled LOW when BCD input = 1001.',
+      Y7:  'Decimal output 7 (open collector, active LOW); pulled LOW when BCD input = 0111.',
+      Y8:  'Decimal output 8 (open collector, active LOW); pulled LOW when BCD input = 1000.',
+      Y9:  'Decimal output 9 (open collector, active LOW); pulled LOW when BCD input = 1001.',
       D:   'BCD input bit 3 (MSB, weight 8); combined with A, B, C to form the BCD digit.',
       C:   'BCD input bit 2 (weight 4).',
       B:   'BCD input bit 1 (weight 2).',
@@ -368,37 +372,37 @@ export const CHIPS_BLOCK_12 = {
     },
     guideSections: [
       {
-        title: 'BCD-to-Decimal Decoding',
+        title: 'BCD to Decimal-Decoding',
         paragraphs: [
-          'The 4 bit input DCBA is interpreted as a BCD digit 0 9. The corresponding output Yi is pulled LOW while all others remain HIGH (open, requiring pull up resistors). BCD codes 1010 1111 are invalid; all outputs stay HIGH for these inputs.',
+          'The 4 bit input DCBA is interpreted as a BCD digit 0-9. The corresponding output Yi is pulled LOW while all others remain HIGH (open, requiring pull up resistors). BCD codes-1010-1111 are invalid; all outputs stay HIGH for these inputs.',
         ],
         list: [
           'DCBA = 0000 → Y0 LOW (digit 0)',
           'DCBA = 0001 → Y1 LOW (digit 1)',
           '... and so on through ...',
           'DCBA = 1001 → Y9 LOW (digit 9)',
-          'DCBA = 1010 1111 → all outputs HIGH (invalid)',
+          'DCBA =-1010-1111 → all outputs HIGH (invalid)',
         ],
       },
       {
         title: 'Open Collector Outputs',
         paragraphs: [
-          'Each output is an open-collector NPN transistor capable of sinking 80 mA and blocking up to 15V. Connect an external pull up resistor from each output to the load supply. This allows driving loads such as neon indicator lamps or relay coils directly.',
+          'Each output is an open collector NPN transistor capable of sinking 80 mA and blocking up to 15V. Connect an external pull up resistor from each output to the load supply. This allows driving loads such as neon indicator lamps or relay coils directly.',
         ],
       },
     ],
     pinout: [
-      { pin:  1, name: 'Y0',  type: 'output', description: 'Decimal output 0 (open-collector, active LOW)' },
-      { pin:  2, name: 'Y1',  type: 'output', description: 'Decimal output 1 (open-collector, active LOW)' },
-      { pin:  3, name: 'Y2',  type: 'output', description: 'Decimal output 2 (open-collector, active LOW)' },
-      { pin:  4, name: 'Y3',  type: 'output', description: 'Decimal output 3 (open-collector, active LOW)' },
-      { pin:  5, name: 'Y4',  type: 'output', description: 'Decimal output 4 (open-collector, active LOW)' },
-      { pin:  6, name: 'Y5',  type: 'output', description: 'Decimal output 5 (open-collector, active LOW)' },
-      { pin:  7, name: 'Y6',  type: 'output', description: 'Decimal output 6 (open-collector, active LOW)' },
+      { pin:  1, name: 'Y0',  type: 'output', description: 'Decimal output 0 (open collector, active LOW)' },
+      { pin:  2, name: 'Y1',  type: 'output', description: 'Decimal output 1 (open collector, active LOW)' },
+      { pin:  3, name: 'Y2',  type: 'output', description: 'Decimal output 2 (open collector, active LOW)' },
+      { pin:  4, name: 'Y3',  type: 'output', description: 'Decimal output 3 (open collector, active LOW)' },
+      { pin:  5, name: 'Y4',  type: 'output', description: 'Decimal output 4 (open collector, active LOW)' },
+      { pin:  6, name: 'Y5',  type: 'output', description: 'Decimal output 5 (open collector, active LOW)' },
+      { pin:  7, name: 'Y6',  type: 'output', description: 'Decimal output 6 (open collector, active LOW)' },
       { pin:  8, name: 'GND', type: 'power',  description: 'Ground (0V)' },
-      { pin:  9, name: 'Y7',  type: 'output', description: 'Decimal output 7 (open-collector, active LOW)' },
-      { pin: 10, name: 'Y8',  type: 'output', description: 'Decimal output 8 (open-collector, active LOW)' },
-      { pin: 11, name: 'Y9',  type: 'output', description: 'Decimal output 9 (open-collector, active LOW)' },
+      { pin:  9, name: 'Y7',  type: 'output', description: 'Decimal output 7 (open collector, active LOW)' },
+      { pin: 10, name: 'Y8',  type: 'output', description: 'Decimal output 8 (open collector, active LOW)' },
+      { pin: 11, name: 'Y9',  type: 'output', description: 'Decimal output 9 (open collector, active LOW)' },
       { pin: 12, name: 'D',   type: 'input',  description: 'BCD input bit 3 (MSB, weight 8)' },
       { pin: 13, name: 'C',   type: 'input',  description: 'BCD input bit 2 (weight 4)' },
       { pin: 14, name: 'B',   type: 'input',  description: 'BCD input bit 1 (weight 2)' },
@@ -410,19 +414,19 @@ export const CHIPS_BLOCK_12 = {
     ],
   },
 
-  // ── 74x146: 3-to-8 line decoder (H-family), 16-pin ───────────────────────
+  // ── 74x146: 3 to 8 line decoder (H-family), 16-pin ───────────────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Multiplexer */
-  '74146': {
+  '74x146': {
     name: '74x146',
-    simpleName: '3-to-8 Decoder',
-    description: '3-to-8 line decoder/demultiplexer (16-pin)',
+    simpleName: '3 to 8 Decoder',
+    description: '3 to 8 line decoder/demultiplexer (16-pin)',
     pins: 16,
     vcc: 16,
     gnd: 8,
     datasheet: 'https://en.wikipedia.org/wiki/7400-series_integrated_circuits',
-    tags: ['decoder', 'demultiplexer', '3-to-8', 'inverting'],
-    guideOverview: 'The 74146 is a 3-to-8 line decoder/demultiplexer similar to the 74138. The three address inputs A, B, and C select one of eight active LOW outputs Y0 Y7. All outputs are forced HIGH when enable input G1 is LOW or when either G2A or G2B is HIGH.',
+    tags: ['decoder', 'demultiplexer', '3 to 8', 'inverting'],
+    guideOverview: 'The 74x146 is a 3 to 8 line decoder/demultiplexer similar to the 74x138. The three address inputs A, B, and C select one of eight active LOW outputs Y0 Y7. All outputs are forced HIGH when enable input G1 is LOW or when either G2A or G2B is HIGH.',
     guidePinDescriptions: {
       A:   'Address input bit 0 (LSB); determines which output is selected.',
       B:   'Address input bit 1; middle weight address bit.',
@@ -488,93 +492,133 @@ export const CHIPS_BLOCK_12 = {
     ],
   },
 
-  // ── 74x147: 10-to-4-line BCD priority encoder, 16-pin ────────────────────
-  /* Primary source: Texas Instruments, SN74LS147 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls147.pdf
-     Wikipedia: https://en.wikipedia.org/wiki/Priority_encoder */
-  '74147': {
+  // ── 74x147: 10-line-to-4-line BCD priority encoder, 16-pin ───────────────
+  /* Source: Texas Instruments, "CD54HC147, CD74HC147, CD74HCT147 High-Speed CMOS
+     Logic 10- to 4-Line Priority Encoder," SCHS149G (Jan. 2025). [Online].
+     Available: https://www.ti.com/lit/ds/symlink/cd74hc147.pdf. Verified: terminal
+     assignment (Section 3 Pin Configuration + Table 3-1 Pin Functions and Figure
+     6-1 Functional Block Diagram) and the function/truth table (Table 6-1), all
+     read as rendered PDF page images (issues.md C4), NOT a text summary. Pinout and
+     inverted-BCD behavior confirmed against this sheet; engine left unchanged.
+     The '74x' entry is family-generic: the SN74LS147 has this exact pinout and
+     function, but its ti.com symlink (sn74ls147.pdf) now 404s, so the live
+     CD74HC147 sheet is cited in its place.
+     CAUTION for future editors: TI's Table 3-1 mislabels pin 9 as "I0 / active-low
+     input 0", but the DIP drawing and Figure 6-1 both show pin 9 = Y0 (an active-low
+     OUTPUT, the LSB — named A0n here). There is no I0 pin; pin 15 is NC, and decimal
+     0 is the implied all-inputs-HIGH state. Do not "fix" pin 9 into an input.
+     Also: Wikipedia contributors, "Priority encoder." [Online]. Available:
+     https://en.wikipedia.org/wiki/Priority_encoder. */
+  '74x147': {
     name: '74x147',
     simpleName: '10-to-4 Priority Encoder (BCD)',
-    description: '10-line to 4-line (decimal to BCD) priority encoder. (16-pin)',
+    description: '10-to-4 priority encoder, active-LOW inputs, active-LOW BCD out (16-pin)',
     pins: 16,
     vcc: 16,
     gnd: 8,
-    datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls147.pdf',
+    datasheet: 'https://www.ti.com/lit/ds/symlink/cd74hc147.pdf',
     tags: ['encoder', 'priority', 'bcd', '10-to-4', 'active low', 'decimal'],
-    guideOverview: 'The 74147 is a 9-line (I1 I9) to 4-line priority encoder that produces the active LOW BCD code of the highest-priority asserted input. Input I9 has the highest priority and I1 the lowest. Input I0 (representing decimal 0) is implicit when no input is asserted the outputs represent 0 (all HIGH in active LOW form).',
+    guideOverview: 'The 74x147 turns nine input lines into a 4-bit binary-coded-decimal (BCD) number. The inputs are active LOW: you assert one by pulling it to ground. If several inputs are LOW at once, the chip reports only the highest-numbered one, so I9 beats I8, I8 beats I7, and so on down to I1. The output is active LOW too, and it is the complement of the BCD digit, so to read a normal 0 to 9 value you invert all four output bits. There is no input pin for 0 and no enable pin: decimal 0 is the leftover case, encoded automatically when all nine inputs sit HIGH. It is the standard way to shrink a 9-key keypad, or nine priority-ranked request lines, down to a 4-wire code.',
     guidePinDescriptions: {
-      I4:  'Active LOW input 4 (decimal digit 4); assert LOW to encode value 4.',
-      I5:  'Active LOW input 5 (decimal digit 5); assert LOW to encode value 5.',
-      I6:  'Active LOW input 6 (decimal digit 6); assert LOW to encode value 6.',
-      I7:  'Active LOW input 7 (decimal digit 7); assert LOW to encode value 7.',
-      I8:  'Active LOW input 8 (decimal digit 8); assert LOW to encode value 8.',
-      A2n: 'BCD output bit 2 (active LOW, weight 4); complement of DCBA bit 2.',
-      A1n: 'BCD output bit 1 (active LOW, weight 2); complement of DCBA bit 1.',
-      GND: 'Ground (0 V) supply.',
-      A0n: 'BCD output bit 0 (active LOW, LSB, weight 1); complement of DCBA bit 0.',
-      I9:  'Active LOW input 9 (decimal digit 9, highest priority); assert LOW to encode value 9.',
-      I1:  'Active LOW input 1 (decimal digit 1, lowest priority); assert LOW to encode value 1.',
-      I2:  'Active LOW input 2 (decimal digit 2); assert LOW to encode value 2.',
-      I3:  'Active LOW input 3 (decimal digit 3); assert LOW to encode value 3.',
-      A3n: 'BCD output bit 3 (active LOW, MSB, weight 8); complement of DCBA bit 3.',
-      NC:  'No connection; internally unconnected.',
-      VCC: 'Positive supply (+5 V).',
+      I4:  'Input 4, active LOW. Pull LOW to encode decimal 4.',
+      I5:  'Input 5, active LOW. Pull LOW to encode decimal 5.',
+      I6:  'Input 6, active LOW. Pull LOW to encode decimal 6.',
+      I7:  'Input 7, active LOW. Pull LOW to encode decimal 7.',
+      I8:  'Input 8, active LOW. Pull LOW to encode decimal 8.',
+      A2n: 'Output bit 2, active LOW (weight 4). Datasheets also call this C or Y2.',
+      A1n: 'Output bit 1, active LOW (weight 2). Datasheets also call this B or Y1.',
+      GND: 'Ground, 0 V (pin 8).',
+      A0n: 'Output bit 0, the least-significant bit, active LOW (weight 1). Datasheets also call this A or Y0.',
+      I9:  'Input 9, active LOW, the highest priority. Pull LOW to encode decimal 9.',
+      I1:  'Input 1, active LOW, the lowest priority. Pull LOW to encode decimal 1.',
+      I2:  'Input 2, active LOW. Pull LOW to encode decimal 2.',
+      I3:  'Input 3, active LOW. Pull LOW to encode decimal 3.',
+      A3n: 'Output bit 3, the most-significant bit, active LOW (weight 8). Datasheets also call this D or Y3.',
+      NC:  'No connection. Pin 15 is not wired to anything inside the chip.',
+      VCC: 'Positive supply, +5 V (pin 16).',
     },
     guideSections: [
       {
-        title: 'Priority Encoding',
+        title: 'How it works',
         paragraphs: [
-          'All inputs are active LOW. When multiple inputs are asserted simultaneously, the highest-numbered asserted input takes priority. The 4 bit active LOW BCD output (A3n, A2n, A1n, A0n) reflects the encoded decimal value invert all four bits to obtain standard positive-logic BCD.',
+          'An encoder is the opposite of a decoder: it takes several input lines and reports which one is active as a binary number. A priority encoder adds a tie-break rule for when more than one input is active at the same time. Here the rule is simple: the highest-numbered LOW input always wins, and every lower one is ignored.',
+          'All nine inputs (I1 to I9) and all four outputs (A0 to A3, with A0 the least-significant bit) are active LOW. Active LOW means a line does its job at 0 V, not 5 V, so you assert an input by pulling it LOW and the outputs come back inverted. Because the output is inverted, decimal 0 reads as 1111 and decimal 9 reads as 0110.',
+          'It is called a 10-line-to-4-line encoder because it spans the ten digits 0 through 9, but only 1 through 9 have pins. Digit 0 is the implied case: when every input is HIGH the outputs are all HIGH, which is the inverted code for 0.',
         ],
-        list: [
-          'I9=0 (any others) → A3n A2n A1n A0n = 0110 (BCD 9)',
-          'I8=0, I9=1 → output = 0111 (BCD 8)',
-          'No inputs asserted → output = 1111 (BCD 0)',
-        ],
-        note: 'The chip has no enable input. Cascading requires external logic.',
       },
       {
-        title: 'Active LOW Output Convention',
+        title: 'Truth table',
         paragraphs: [
-          'Outputs A3n A0n are the complement of the standard BCD value. To obtain positive-logic BCD connect these outputs to inverters or to a device that accepts active LOW BCD inputs (such as the 74145 decoder).',
+          'Outputs are shown as A3 A2 A1 A0 (A3 the most-significant bit). Each row assumes no higher-numbered input is also LOW; once a higher input goes LOW it takes over and the lower ones no longer matter.',
         ],
+        list: [
+          'all inputs HIGH → 1111 = decimal 0',
+          'I1 LOW → 1110 = decimal 1',
+          'I2 LOW → 1101 = decimal 2',
+          'I3 LOW → 1100 = decimal 3',
+          'I4 LOW → 1011 = decimal 4',
+          'I5 LOW → 1010 = decimal 5',
+          'I6 LOW → 1001 = decimal 6',
+          'I7 LOW → 1000 = decimal 7',
+          'I8 LOW → 0111 = decimal 8',
+          'I9 LOW → 0110 = decimal 9 (I9 always wins)',
+        ],
+        note: 'Invert all four output bits to get plain BCD (for example decimal 9 becomes 1001).',
+      },
+      {
+        title: 'Common uses',
+        list: [
+          'Keypad or thumbwheel encoding: turn nine keys (1 to 9) into a 4-bit code, with 0 as the resting state.',
+          'Priority handling: nine devices raise active-LOW request lines, and the encoder outputs the number of the most urgent one that is asserted.',
+          'Driving an active-LOW BCD part directly, such as a 74x145 BCD-to-decimal driver, with no inverters in between.',
+        ],
+      },
+      {
+        title: 'Gotchas',
+        list: [
+          'No enable pin. Unlike the 74x148, this part is always on and has no EI, EO, or GS pins, so you cannot pause it or cascade two of them for more inputs without adding external gates.',
+          'Outputs are inverted BCD. If a counter or display expects normal active-HIGH BCD, add four inverters or feed an active-LOW-input device.',
+          'No digit-0 pin. Pin 15 is a real no-connect and pin 9 is the A0 output, not an input (some datasheet tables mislabel it). The only way to get decimal 0 is to leave every input HIGH.',
+        ],
+        note: 'The simulator treats the chip as instantaneous. A real 74x147 has a propagation delay (roughly 10 to 15 ns, depending on logic family) between an input changing and the outputs settling. That delay is left out here.',
       },
     ],
     pinout: [
-      { pin:  1, name: 'I4',  type: 'input',  description: 'Active LOW input 4 (decimal digit 4)' },
-      { pin:  2, name: 'I5',  type: 'input',  description: 'Active LOW input 5 (decimal digit 5)' },
-      { pin:  3, name: 'I6',  type: 'input',  description: 'Active LOW input 6 (decimal digit 6)' },
-      { pin:  4, name: 'I7',  type: 'input',  description: 'Active LOW input 7 (decimal digit 7)' },
-      { pin:  5, name: 'I8',  type: 'input',  description: 'Active LOW input 8 (decimal digit 8)' },
-      { pin:  6, name: 'A2n', type: 'output', description: 'BCD output bit 2 (active LOW, weight 4)' },
-      { pin:  7, name: 'A1n', type: 'output', description: 'BCD output bit 1 (active LOW, weight 2)' },
-      { pin:  8, name: 'GND', type: 'power',  description: 'Ground (0V)' },
-      { pin:  9, name: 'A0n', type: 'output', description: 'BCD output bit 0, LSB (active LOW, weight 1)' },
-      { pin: 10, name: 'I9',  type: 'input',  description: 'Active LOW input 9 (decimal digit 9, highest priority)' },
-      { pin: 11, name: 'I1',  type: 'input',  description: 'Active LOW input 1 (decimal digit 1)' },
-      { pin: 12, name: 'I2',  type: 'input',  description: 'Active LOW input 2 (decimal digit 2)' },
-      { pin: 13, name: 'I3',  type: 'input',  description: 'Active LOW input 3 (decimal digit 3)' },
-      { pin: 14, name: 'A3n', type: 'output', description: 'BCD output bit 3, MSB (active LOW, weight 8)' },
+      { pin:  1, name: 'I4',  displayName: 'I̅4̅', type: 'input',  description: 'Active-LOW input 4' },
+      { pin:  2, name: 'I5',  displayName: 'I̅5̅', type: 'input',  description: 'Active-LOW input 5' },
+      { pin:  3, name: 'I6',  displayName: 'I̅6̅', type: 'input',  description: 'Active-LOW input 6' },
+      { pin:  4, name: 'I7',  displayName: 'I̅7̅', type: 'input',  description: 'Active-LOW input 7' },
+      { pin:  5, name: 'I8',  displayName: 'I̅8̅', type: 'input',  description: 'Active-LOW input 8' },
+      { pin:  6, name: 'A2n', displayName: 'A̅2̅', type: 'output', description: 'Active-LOW output bit 2 (weight 4)' },
+      { pin:  7, name: 'A1n', displayName: 'A̅1̅', type: 'output', description: 'Active-LOW output bit 1 (weight 2)' },
+      { pin:  8, name: 'GND', type: 'power',  description: 'Ground (0 V)' },
+      { pin:  9, name: 'A0n', displayName: 'A̅0̅', type: 'output', description: 'Active-LOW output bit 0, LSB (weight 1)' },
+      { pin: 10, name: 'I9',  displayName: 'I̅9̅', type: 'input',  description: 'Active-LOW input 9 (highest priority)' },
+      { pin: 11, name: 'I1',  displayName: 'I̅1̅', type: 'input',  description: 'Active-LOW input 1 (lowest priority)' },
+      { pin: 12, name: 'I2',  displayName: 'I̅2̅', type: 'input',  description: 'Active-LOW input 2' },
+      { pin: 13, name: 'I3',  displayName: 'I̅3̅', type: 'input',  description: 'Active-LOW input 3' },
+      { pin: 14, name: 'A3n', displayName: 'A̅3̅', type: 'output', description: 'Active-LOW output bit 3, MSB (weight 8)' },
       { pin: 15, name: 'NC',  type: 'nc',     description: 'No connection' },
-      { pin: 16, name: 'VCC', type: 'power',  description: 'Positive supply (+5V)' },
+      { pin: 16, name: 'VCC', type: 'power',  description: 'Positive supply (+5 V)' },
     ],
     gates: [
       { type: 'PRIORITY_ENC_10TO4', inputs: ['I1', 'I2', 'I3', 'I4', 'I5', 'I6', 'I7', 'I8', 'I9'], outputs: ['A0n', 'A1n', 'A2n', 'A3n'] },
     ],
   },
 
-  // ── 74x149: 8-line cascadable 1-of-8 priority encoder, 20-pin ────────────
+  // ── 74x149: 8 line cascadable 1-of-8 priority encoder, 20-pin ────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Priority_encoder */
-  '74149': {
+  '74x149': {
     name: '74x149',
-    simpleName: '8-line Priority Encoder',
-    description: '8-line to 8-line cascadable priority encoder; each output LOW for highest-priority active input (20-pin)',
+    simpleName: '8 line Priority Encoder',
+    description: 'Cascadable 8-line priority encoder, active-LOW 1-of-8 outputs (20-pin)',
     pins: 20,
     vcc: 20,
     gnd: 10,
     datasheet: 'https://en.wikipedia.org/wiki/7400-series_integrated_circuits',
-    tags: ['encoder', 'priority', '8-line', 'cascadable'],
-    guideOverview: 'The 74149 is a cascadable 8-line priority encoder. When Enable Input EI is LOW the chip examines inputs X0 X7 and drives the output Yi LOW that corresponds to the highest-priority asserted input. Enable Output EO goes LOW when EI is LOW and no input is asserted, allowing multiple 74149s to be daisy-chained for wider priority encoders.',
+    tags: ['encoder', 'priority', '8 line', 'cascadable'],
+    guideOverview: 'The 74x149 is a cascadable 8 line priority encoder. When Enable Input EI is LOW the chip examines inputs X0 X7 and drives the output Yi LOW that corresponds to the highest priority asserted input. Enable Output EO goes LOW when EI is LOW and no input is asserted, allowing multiple 74149s to be daisy chained for wider priority encoders.',
     guidePinDescriptions: {
       X0:  'Priority input 0 (active LOW, lowest priority); assert LOW to select output Y0.',
       X1:  'Priority input 1 (active LOW); assert LOW to select output Y1.',
@@ -601,14 +645,14 @@ export const CHIPS_BLOCK_12 = {
       {
         title: 'Priority and Enable Operation',
         paragraphs: [
-          'When EI is LOW the chip scans X0 X7. The output Yi corresponding to the highest-priority asserted input goes LOW; all other outputs remain HIGH. X7 has the highest priority. When no input is asserted and EI=0, EO goes LOW.',
+          'When EI is LOW the chip scans X0 X7. The output Yi corresponding to the highest priority asserted input goes LOW; all other outputs remain HIGH. X7 has the highest priority. When no input is asserted and EI=0, EO goes LOW.',
         ],
-        note: 'Unlike the 74148, this encoder drives one output LOW per input rather than producing a binary code. Connect EO of a lower-priority device to EI of the next to cascade.',
+        note: 'Unlike the 74x148, this encoder drives one output LOW per input rather than producing a binary code. Connect EO of a lower priority device to EI of the next to cascade.',
       },
       {
         title: 'Cascading Multiple Devices',
         paragraphs: [
-          'To expand beyond 8 inputs, chain EO of the lower-priority 74149 to EI of the higher-priority 74149. The lower-priority device only activates (EO goes LOW) when no input on the higher-priority device is asserted.',
+          'To expand beyond 8 inputs, chain EO of the lower priority 74x149 to EI of the higher priority 74x149. The lower priority device only activates (EO goes LOW) when no input on the higher priority device is asserted.',
         ],
       },
     ],
@@ -642,25 +686,25 @@ export const CHIPS_BLOCK_12 = {
   // ── 74x152: 8-to-1 data selector/mux, complemented output, 14-pin ────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Multiplexer */
-  '74152': {
+  '74x152': {
     name: '74x152',
     simpleName: '8-to-1 MUX (inverted output)',
-    description: '8-line to 1-line data selector/multiplexer with inverted (complemented) output (14-pin)',
+    description: '8-to-1 data selector/mux with inverted (complemented) output (14-pin)',
     pins: 14,
     vcc: 14,
     gnd: 7,
     datasheet: 'https://en.wikipedia.org/wiki/7400-series_integrated_circuits',
     tags: ['multiplexer', 'mux', '8-to-1', 'selector', 'inverting'],
-    guideOverview: 'The 74152 is an 8-line to 1-line data selector/multiplexer. Three select inputs C (MSB), B, and A (LSB) choose one of eight data inputs D0 D7, and the selected data value appears inverted at output W. Unlike the 74151 there is no non-inverting output and no enable (strobe) input.',
+    guideOverview: 'The 74x152 is an 8 line to 1 line data selector/multiplexer. Three select inputs C (MSB), B, and A (LSB) choose one of eight data inputs D0-D7, and the selected data value appears inverted at output W. Unlike the 74x151 there is no non inverting output and no enable (strobe) input.',
     guidePinDescriptions: {
       D3:  'Data input 3; selected when CBA=011.',
       D2:  'Data input 2; selected when CBA=010.',
       D1:  'Data input 1; selected when CBA=001.',
       D0:  'Data input 0; selected when CBA=000.',
-      A:   'Select input bit 0 (LSB); least-significant address bit.',
+      A:   'Select input bit 0 (LSB); least significant address bit.',
       B:   'Select input bit 1; middle address bit.',
       GND: 'Ground (0 V) supply.',
-      C:   'Select input bit 2 (MSB); most-significant address bit.',
+      C:   'Select input bit 2 (MSB); most significant address bit.',
       W:   'Multiplexer output (inverted); W = NOT(D[CBA]).',
       D4:  'Data input 4; selected when CBA=100.',
       D5:  'Data input 5; selected when CBA=101.',
@@ -684,7 +728,7 @@ export const CHIPS_BLOCK_12 = {
           'CBA=110 → W = NOT D6',
           'CBA=111 → W = NOT D7',
         ],
-        note: 'Use a NOT gate after W or invert all data inputs to obtain a non-inverting output.',
+        note: 'Use a NOT gate after W or invert all data inputs to obtain a non inverting output.',
       },
     ],
     pinout: [
@@ -711,7 +755,7 @@ export const CHIPS_BLOCK_12 = {
   // ── 74x155: dual 2-to-4 decoder/demux, 16-pin ────────────────────────────
   /* Primary source: Texas Instruments, SN74LS155A datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls155a.pdf
      Wikipedia: https://en.wikipedia.org/wiki/Multiplexer */
-  '74155': {
+  '74x155': {
     name: '74x155',
     simpleName: 'Dual 2-to-4 Decoder/Demux',
     description: 'Dual 2-to-4 line decoder/demultiplexer. (16-pin)',
@@ -720,7 +764,7 @@ export const CHIPS_BLOCK_12 = {
     gnd: 8,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls155a.pdf',
     tags: ['decoder', 'demultiplexer', '2-to-4', 'dual', 'inverting'],
-    guideOverview: 'The 74155 contains two independent 2-to-4 line decoder/demultiplexer sections sharing the address inputs A and B. Section 1 is enabled when 1G=0 AND 1C=0 (both active LOW); Section 2 is enabled when 2G=0 AND 2Cn=1 (2Cn is active HIGH). The selected output in each section goes LOW; unselected outputs remain HIGH.',
+    guideOverview: 'The 74x155 contains two independent 2-to-4 line decoder/demultiplexer sections sharing the address inputs A and B. Section 1 is enabled when 1G=0 AND 1C=0 (both active LOW); Section 2 is enabled when 2G=0 AND 2Cn=1 (2Cn is active HIGH). The selected output in each section goes LOW; unselected outputs remain HIGH.',
     guidePinDescriptions: {
       '1C':  'Section 1 data/strobe (active LOW); must be LOW with 1G=LOW to enable Section 1.',
       '1G':  'Section 1 enable/gate (active LOW); must be LOW to enable Section 1 outputs.',
@@ -790,31 +834,31 @@ export const CHIPS_BLOCK_12 = {
   /* Primary source: Texas Instruments, SN74LS156 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls156.pdf
      Wikipedia: https://en.wikipedia.org/wiki/Multiplexer
      Wikipedia: https://en.wikipedia.org/wiki/Open_collector */
-  '74156': {
+  '74x156': {
     name: '74x156',
     simpleName: 'Dual 2-to-4 Decoder (OC)',
-    description: 'Dual 2-to-4 line decoder/demultiplexer with open-collector outputs; shared address inputs (16-pin)',
+    description: 'Dual 2-to-4 decoder/demux, open-collector outputs, shared address (16-pin)',
     pins: 16,
     vcc: 16,
     gnd: 8,
     openCollector: true,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls156.pdf',
-    tags: ['decoder', 'demultiplexer', '2-to-4', 'dual', 'inverting', 'open-collector'],
-    guideOverview: 'The 74156 is functionally identical to the 74155 but replaces the totem-pole output drivers with open-collector outputs. This allows multiple outputs to be wired AND (dot-AND) together or connected to loads operating at voltages higher than VCC. An external pull up resistor is required on each output.',
+    tags: ['decoder', 'demultiplexer', '2-to-4', 'dual', 'inverting', 'open collector'],
+    guideOverview: 'The 74x156 is functionally identical to the 74x155 but replaces the totem pole output drivers with open collector outputs. This allows multiple outputs to be wired AND (dot AND) together or connected to loads operating at voltages higher than VCC. An external pull up resistor is required on each output.',
     guidePinDescriptions: {
       '1G':  'Section 1 enable/gate (active LOW); must be LOW to enable Section 1 outputs.',
       '1C':  'Section 1 data/strobe (active LOW); must be LOW with 1G=LOW to enable Section 1.',
       A:     'Address bit 0, shared by both sections.',
       B:     'Address bit 1, shared by both sections.',
-      '1Y3': 'Section 1 open-collector output 3 (active LOW); sinks current when A=1, B=1 and Section 1 enabled.',
-      '1Y2': 'Section 1 open-collector output 2 (active LOW); sinks current when A=0, B=1 and Section 1 enabled.',
-      '1Y1': 'Section 1 open-collector output 1 (active LOW); sinks current when A=1, B=0 and Section 1 enabled.',
+      '1Y3': 'Section 1 open collector output 3 (active LOW); sinks current when A=1, B=1 and Section 1 enabled.',
+      '1Y2': 'Section 1 open collector output 2 (active LOW); sinks current when A=0, B=1 and Section 1 enabled.',
+      '1Y1': 'Section 1 open collector output 1 (active LOW); sinks current when A=1, B=0 and Section 1 enabled.',
       GND:   'Ground (0 V) supply.',
-      '1Y0': 'Section 1 open-collector output 0 (active LOW); sinks current when A=0, B=0 and Section 1 enabled.',
-      '2Y0': 'Section 2 open-collector output 0 (active LOW); sinks current when A=0, B=0 and Section 2 enabled.',
-      '2Y1': 'Section 2 open-collector output 1 (active LOW); sinks current when A=1, B=0 and Section 2 enabled.',
-      '2Y2': 'Section 2 open-collector output 2 (active LOW); sinks current when A=0, B=1 and Section 2 enabled.',
-      '2Y3': 'Section 2 open-collector output 3 (active LOW); sinks current when A=1, B=1 and Section 2 enabled.',
+      '1Y0': 'Section 1 open collector output 0 (active LOW); sinks current when A=0, B=0 and Section 1 enabled.',
+      '2Y0': 'Section 2 open collector output 0 (active LOW); sinks current when A=0, B=0 and Section 2 enabled.',
+      '2Y1': 'Section 2 open collector output 1 (active LOW); sinks current when A=1, B=0 and Section 2 enabled.',
+      '2Y2': 'Section 2 open collector output 2 (active LOW); sinks current when A=0, B=1 and Section 2 enabled.',
+      '2Y3': 'Section 2 open collector output 3 (active LOW); sinks current when A=1, B=1 and Section 2 enabled.',
       '2Cn': 'Section 2 data/strobe (active HIGH); must be HIGH with 2G=LOW to enable Section 2.',
       '2G':  'Section 2 enable/gate (active LOW); must be LOW to enable Section 2 outputs.',
       VCC:   'Positive supply (+5 V).',
@@ -823,9 +867,9 @@ export const CHIPS_BLOCK_12 = {
       {
         title: 'Open Collector Output Operation',
         paragraphs: [
-          'Each output is an open-collector NPN transistor. When selected and enabled the transistor turns on, sinking current to GND (output LOW). When not selected or disabled the transistor is off and the output is floating a pull up resistor to the load supply is required to obtain a HIGH output voltage.',
+          'Each output is an open collector NPN transistor. When selected and enabled the transistor turns on, sinking current to GND (output LOW). When not selected or disabled the transistor is off and the output is floating a pull up resistor to the load supply is required to obtain a HIGH output voltage.',
         ],
-        note: 'Outputs from multiple 74156 devices can be wired together to the same pull up, creating a wired AND bus.',
+        note: 'Outputs from multiple 74x156 devices can be wired together to the same pull up, creating a wired AND bus.',
       },
       {
         title: 'Enable and Address Decoding',
@@ -861,16 +905,16 @@ export const CHIPS_BLOCK_12 = {
   // ── 74x158: quad 2-to-1 data selector/mux, inverting output, 16-pin ──────
   /* Primary source: Texas Instruments, SN74LS158 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls158.pdf
      Wikipedia: https://en.wikipedia.org/wiki/Multiplexer */
-  '74158': {
+  '74x158': {
     name: '74x158',
     simpleName: 'Quad 2-to-1 MUX (inverting)',
-    description: 'Quad 2-line to 1-line data selector/multiplexer with inverting outputs (16-pin)',
+    description: 'Quad 2-to-1 data selector/mux with inverting outputs (16-pin)',
     pins: 16,
     vcc: 16,
     gnd: 8,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls158.pdf',
     tags: ['multiplexer', 'mux', '2-to-1', 'quad', 'inverting'],
-    guideOverview: 'The 74158 contains four 2-to-1 multiplexers with a common select input SEL and a common active LOW output enable G. When G is LOW, each output Yn is the complement of the data input selected by SEL: SEL=0 selects the A input and SEL=1 selects the B input. When G is HIGH all outputs are forced HIGH.',
+    guideOverview: 'The 74x158 contains four 2-to-1 multiplexers with a common select input SEL and a common active LOW output enable G. When G is LOW, each output Yn is the complement of the data input selected by SEL: SEL=0 selects the A input and SEL=1 selects the B input. When G is HIGH all outputs are forced HIGH.',
     guidePinDescriptions: {
       SEL: 'Common select input; LOW selects all A inputs, HIGH selects all B inputs.',
       '1A': 'Data input A of MUX 1; routed to 1Y (inverted) when SEL=0 and G=0.',
@@ -893,7 +937,7 @@ export const CHIPS_BLOCK_12 = {
       {
         title: 'Selection and Inversion',
         paragraphs: [
-          'All four multiplexers are controlled by a single SEL line. When G=0 and SEL=0 each output Yn = NOT(An). When G=0 and SEL=1 each output Yn = NOT(Bn). This inverted output is useful in complemented-bus applications or when a subsequent inverter is implied by the system design.',
+          'All four multiplexers are controlled by a single SEL line. When G=0 and SEL=0 each output Yn = NOT(An). When G=0 and SEL=1 each output Yn = NOT(Bn). This inverted output is useful in complemented bus applications or when a subsequent inverter is implied by the system design.',
         ],
         list: [
           'G=0, SEL=0 → Yn = NOT An (all four channels)',
@@ -904,7 +948,7 @@ export const CHIPS_BLOCK_12 = {
       {
         title: 'Bus Steering',
         paragraphs: [
-          'The 74158 is commonly used to steer one of two 4 bit data buses onto a single output bus while providing output-enable control. Pair it with inverters or use it with downstream logic designed to accept inverted inputs.',
+          'The 74x158 is commonly used to steer one of two 4 bit data buses onto a single output bus while providing output-enable control. Pair it with inverters or use it with downstream logic designed to accept inverted inputs.',
         ],
       },
     ],
@@ -939,41 +983,41 @@ export const CHIPS_BLOCK_12 = {
   /* Primary source: Texas Instruments, SN74159 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74159.pdf
      Wikipedia: https://en.wikipedia.org/wiki/Multiplexer
      Wikipedia: https://en.wikipedia.org/wiki/Open_collector */
-  '74159': {
+  '74x159': {
     name: '74x159',
     simpleName: '4-to-16 Decoder (OC)',
-    description: '4-to-16 line decoder/demultiplexer with open-collector outputs (24-pin)',
+    description: '4-to-16 line decoder/demultiplexer with open collector outputs (24-pin)',
     pins: 24,
     vcc: 24,
     gnd: 12,
     openCollector: true,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74159.pdf',
-    tags: ['decoder', 'demultiplexer', '4-to-16', 'open-collector', 'inverting'],
-    guideOverview: 'The 74159 is a 4-to-16 line decoder/demultiplexer with open-collector outputs. Address inputs A0 A3 select one of sixteen active LOW outputs Y0 Y15. The chip is enabled when both active LOW enables G1n and G2n are LOW; if either enable is HIGH all outputs float HIGH (off). Open-collector outputs allow wired AND connections and higher-voltage load driving.',
+    tags: ['decoder', 'demultiplexer', '4-to-16', 'open collector', 'inverting'],
+    guideOverview: 'The 74x159 is a 4-to-16 line decoder/demultiplexer with open collector outputs. Address inputs A0 A3 select one of sixteen active LOW outputs Y0 Y15. The chip is enabled when both active LOW enables G1n and G2n are LOW; if either enable is HIGH all outputs float HIGH (off). Open collector outputs allow wired AND connections and higher voltage load driving.',
     guidePinDescriptions: {
-      A0:  'Address input bit 0 (LSB); least-significant address bit.',
+      A0:  'Address input bit 0 (LSB); least significant address bit.',
       A1:  'Address input bit 1.',
       A2:  'Address input bit 2.',
-      A3:  'Address input bit 3 (MSB); most-significant address bit.',
+      A3:  'Address input bit 3 (MSB); most significant address bit.',
       G1n: 'Active LOW enable 1; must be LOW to enable any output.',
       G2n: 'Active LOW enable 2; must be LOW to enable any output.',
-      Y0:  'Open-collector output 0 (active LOW); sinks current when A3..A0=0000 and enabled.',
-      Y1:  'Open-collector output 1 (active LOW); sinks current when A3..A0=0001 and enabled.',
-      Y2:  'Open-collector output 2 (active LOW); sinks current when A3..A0=0010 and enabled.',
-      Y3:  'Open-collector output 3 (active LOW); sinks current when A3..A0=0011 and enabled.',
-      Y4:  'Open-collector output 4 (active LOW); sinks current when A3..A0=0100 and enabled.',
+      Y0:  'Open collector output 0 (active LOW); sinks current when A3..A0=0000 and enabled.',
+      Y1:  'Open collector output 1 (active LOW); sinks current when A3..A0=0001 and enabled.',
+      Y2:  'Open collector output 2 (active LOW); sinks current when A3..A0=0010 and enabled.',
+      Y3:  'Open collector output 3 (active LOW); sinks current when A3..A0=0011 and enabled.',
+      Y4:  'Open collector output 4 (active LOW); sinks current when A3..A0=0100 and enabled.',
       GND: 'Ground (0 V) supply.',
-      Y5:  'Open-collector output 5 (active LOW); sinks current when A3..A0=0101 and enabled.',
-      Y6:  'Open-collector output 6 (active LOW); sinks current when A3..A0=0110 and enabled.',
-      Y7:  'Open-collector output 7 (active LOW); sinks current when A3..A0=0111 and enabled.',
-      Y8:  'Open-collector output 8 (active LOW); sinks current when A3..A0=1000 and enabled.',
-      Y9:  'Open-collector output 9 (active LOW); sinks current when A3..A0=1001 and enabled.',
-      Y10: 'Open-collector output 10 (active LOW); sinks current when A3..A0=1010 and enabled.',
-      Y11: 'Open-collector output 11 (active LOW); sinks current when A3..A0=1011 and enabled.',
-      Y12: 'Open-collector output 12 (active LOW); sinks current when A3..A0=1100 and enabled.',
-      Y13: 'Open-collector output 13 (active LOW); sinks current when A3..A0=1101 and enabled.',
-      Y14: 'Open-collector output 14 (active LOW); sinks current when A3..A0=1110 and enabled.',
-      Y15: 'Open-collector output 15 (active LOW); sinks current when A3..A0=1111 and enabled.',
+      Y5:  'Open collector output 5 (active LOW); sinks current when A3..A0=0101 and enabled.',
+      Y6:  'Open collector output 6 (active LOW); sinks current when A3..A0=0110 and enabled.',
+      Y7:  'Open collector output 7 (active LOW); sinks current when A3..A0=0111 and enabled.',
+      Y8:  'Open collector output 8 (active LOW); sinks current when A3..A0=1000 and enabled.',
+      Y9:  'Open collector output 9 (active LOW); sinks current when A3..A0=1001 and enabled.',
+      Y10: 'Open collector output 10 (active LOW); sinks current when A3..A0=1010 and enabled.',
+      Y11: 'Open collector output 11 (active LOW); sinks current when A3..A0=1011 and enabled.',
+      Y12: 'Open collector output 12 (active LOW); sinks current when A3..A0=1100 and enabled.',
+      Y13: 'Open collector output 13 (active LOW); sinks current when A3..A0=1101 and enabled.',
+      Y14: 'Open collector output 14 (active LOW); sinks current when A3..A0=1110 and enabled.',
+      Y15: 'Open collector output 15 (active LOW); sinks current when A3..A0=1111 and enabled.',
       VCC: 'Positive supply (+5 V).',
     },
     guideSections: [
@@ -987,7 +1031,7 @@ export const CHIPS_BLOCK_12 = {
       {
         title: 'Open Collector Wired AND',
         paragraphs: [
-          'Because outputs are open-collector, multiple 74159 outputs can be connected together to the same pull up resistor to form a wired AND bus. This is commonly used in memory chip-select and priority interrupt schemes.',
+          'Because outputs are open collector, multiple 74x159 outputs can be connected together to the same pull up resistor to form a wired AND bus. This is commonly used in memory chip-select and priority interrupt schemes.',
         ],
       },
     ],
@@ -1026,16 +1070,16 @@ export const CHIPS_BLOCK_12 = {
   // ── 74x162: sync 4 bit decade counter, synchronous clear, 16-pin ──────────
   /* Primary source: Texas Instruments, SN74LS162A datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls162a.pdf
      Wikipedia: https://en.wikipedia.org/wiki/Counter_(digital) */
-  '74162': {
+  '74x162': {
     name: '74x162',
     simpleName: 'Sync BCD Counter (sync CLR)',
-    description: 'Synchronous presettable 4 bit decade counter with synchronous clear (16-pin)',
+    description: 'Sync presettable 4-bit decade counter with synchronous clear (16-pin)',
     pins: 16,
     vcc: 16,
     gnd: 8,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls162a.pdf',
     tags: ['counter', 'bcd', 'decade', 'synchronous', 'preset', 'sequential'],
-    guideOverview: 'The 74162 is a synchronous presettable 4 bit decade (BCD) counter that differs from the 74160 by having a synchronous clear: the CLR input takes effect on the next rising CLK edge rather than asynchronously. It counts 0 9 and rolls over, with RCO going HIGH when the count reaches 9 and ENT is HIGH, enabling ripple-carry cascading.',
+    guideOverview: 'The 74x162 is a synchronous presettable 4 bit decade (BCD) counter that differs from the 74x160 by having a synchronous clear: the CLR input takes effect on the next rising CLK edge rather than asynchronously. It counts 0-9 and rolls over, with RCO going HIGH when the count reaches 9 and ENT is HIGH, enabling ripple carry cascading.',
     guidePinDescriptions: {
       CLR:  'Synchronous clear (active LOW); resets the counter to 0000 on the next rising CLK edge when LOW.',
       CLK:  'Clock input; all synchronous operations occur on the rising edge.',
@@ -1051,16 +1095,16 @@ export const CHIPS_BLOCK_12 = {
       QB:   'Counter output bit 1 (weight 2).',
       QA:   'Counter output bit 0 (LSB, weight 1).',
       ENT:  'Count Enable T; also controls the RCO output RCO is only HIGH when ENT=1.',
-      LOAD: 'Synchronous parallel load (active LOW); loads A D into QA QD on the next rising CLK edge.',
+      LOAD: 'Synchronous parallel load (active LOW); loads A D into QA-QD on the next rising CLK edge.',
       VCC:  'Positive supply (+5 V).',
     },
     guideSections: [
       {
         title: 'Synchronous Clear vs. Asynchronous Clear',
         paragraphs: [
-          'The key distinction of the 74162 versus the 74160 is that CLR is synchronous: asserting CLR LOW does not immediately reset the counter the reset takes effect only on the next rising CLK edge. This keeps the entire counter change synchronous with the system clock and avoids glitches.',
+          'The key distinction of the 74x162 versus the 74x160 is that CLR is synchronous: asserting CLR LOW does not immediately reset the counter the reset takes effect only on the next rising CLK edge. This keeps the entire counter change synchronous with the system clock and avoids glitches.',
         ],
-        note: 'The 74163 is the binary (0 15) version; the 74162 counts only 0 9 (BCD). The 74160 is the asynchronous-clear BCD variant.',
+        note: 'The 74x163 is the binary (0 15) version; the 74x162 counts only 0 9 (BCD). The 74x160 is the asynchronous clear BCD variant.',
       },
       {
         title: 'Count Enable and Cascading',

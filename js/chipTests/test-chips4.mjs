@@ -4,18 +4,18 @@
 //
 // Chips under test:
 //   7490    Decade counter (BCD)
-//   7491    8 bit serial-in serial-out shift register
-//   7492    Divide-by-12 counter
+//   7491    8 bit serial in serial out shift register
+//   7492    Divide by-12 counter
 //   7493    4 bit binary counter
-//   7495    4 bit parallel-access shift register
-//   74107   Dual JK flip-flop with clear
+//   7495    4 bit parallel access shift register
+//   74107   Dual JK flip flop with clear
 //   74109   Dual JK positive-edge FF with preset & clear
 //   74121   Monostable multivibrator
 //   74123   Dual retriggerable monostable multivibrator
-//   74125   Quad tri-state bus buffer (active low enable)
-//   74126   Quad tri-state bus buffer (active high enable)
-//   74132   Quad 2 input NAND (Schmitt-trigger)
-//   74138   3-to-8 decoder / demultiplexer
+//   74125   Quad tri state bus buffer (active low enable)
+//   74126   Quad tri state bus buffer (active high enable)
+//   74132   Quad 2 input NAND (Schmitt trigger)
+//   74138   3 to 8 decoder / demultiplexer
 //   74139   Dual 2-to-4 decoder / demultiplexer
 
 import { CHIPS_BLOCK_4 } from '../chips/chips4.js';
@@ -80,7 +80,7 @@ function connectPinsHigh(wm, chip, pinNames) {
   return pinNames.map(name => connectPinToVcc(wm, findPin(chip, name)));
 }
 
-/** Pulse CLK: HIGH → evaluate → LOW → evaluate (simulator uses rising-edge trigger). */
+/** Pulse CLK: HIGH → evaluate → LOW → evaluate (simulator uses rising edge trigger). */
 function pulseClock(sim, world, chip, wm, clockPinName) {
   const clkWire = connectPinToVcc(wm, findPin(chip, clockPinName));
   sim.evaluate(world, [chip], wm);
@@ -90,7 +90,7 @@ function pulseClock(sim, world, chip, wm, clockPinName) {
   disconnectWire(wm, gndWire);
 }
 
-/** Falling-edge pulse for ripple counters: HIGH → evaluate → LOW → evaluate. */
+/** Falling edge pulse for ripple counters: HIGH → evaluate → LOW → evaluate. */
 function pulseClockFalling(sim, world, chip, wm, clockPinName) {
   // Connect HIGH first so we end with the falling edge
   const clkWire = connectPinToVcc(wm, findPin(chip, clockPinName));
@@ -114,14 +114,14 @@ function readPinsAsBits(sim, chip, pinNames) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const EXPECTED_CHIP_IDS = [
-  '7490', '7491', '7492', '7493', '7495',
-  '74107', '74109',
-  '74121', '74123',
-  '74125', '74126', '74132', '74138', '74139',
+  '74x90', '74x91', '74x92', '74x93', '74x95',
+  '74x107', '74x109',
+  '74x121', '74x123',
+  '74x125', '74x126', '74x132', '74x138', '74x139',
 ];
 
 const SEQUENTIAL_CHIP_IDS = [
-  '7490', '7491', '7492', '7493', '7495', '74107', '74109', '74121', '74123',
+  '74x90', '74x91', '74x92', '74x93', '74x95', '74x107', '74x109', '74x121', '74x123',
 ];
 
 console.log('\nS1: All 14 chip IDs present in CHIPS_BLOCK_4');
@@ -183,8 +183,8 @@ console.log('\nS4: Sequential chips are marked sequential');
 
 // ── G1: 7490 - Decade Counter ─────────────────────────────────────────────────
 // The 7490 has two independent sections:
-//   Section A: CKA → QA  (÷2, falling-edge)
-//   Section B: CKB → QB/QC/QD  (÷5 BCD, falling-edge)
+//   Section A: CKA → QA  (÷2, falling edge)
+//   Section B: CKB → QB/QC/QD  (÷5 BCD, falling edge)
 // Connecting QA→CKB externally creates a BCD 0 9 decade counter.
 // Reset inputs R01/R02 (both HIGH) → async reset to 0.
 // Set-to-9 inputs R91/R92 (both HIGH) → async set to 9 (QA=1,QD=1).
@@ -194,7 +194,7 @@ console.log('\nG1: 7490 - Decade Counter');
 
 console.log('  G1a: R0 resets all outputs to 0');
 {
-  const { world, chip, wm } = setupChipWithPower('7490');
+  const { world, chip, wm } = setupChipWithPower('74x90');
   connectPinsHigh(wm, chip, ['R01', 'R02']);
   connectPinToGnd(wm, findPin(chip, 'R91'));
   connectPinToGnd(wm, findPin(chip, 'R92'));
@@ -208,7 +208,7 @@ console.log('  G1a: R0 resets all outputs to 0');
 
 console.log('  G1b: R9 sets to 9 (QA=1, QB=0, QC=0, QD=1)');
 {
-  const { world, chip, wm } = setupChipWithPower('7490');
+  const { world, chip, wm } = setupChipWithPower('74x90');
   connectPinToGnd(wm, findPin(chip, 'R01'));
   connectPinToGnd(wm, findPin(chip, 'R02'));
   connectPinsHigh(wm, chip, ['R91', 'R92']);
@@ -222,7 +222,7 @@ console.log('  G1b: R9 sets to 9 (QA=1, QB=0, QC=0, QD=1)');
 
 console.log('  G1c: R0 takes priority over R9');
 {
-  const { world, chip, wm } = setupChipWithPower('7490');
+  const { world, chip, wm } = setupChipWithPower('74x90');
   connectPinsHigh(wm, chip, ['R01', 'R02', 'R91', 'R92']);
   const sim = new CircuitSimulator();
   sim.evaluate(world, [chip], wm);
@@ -232,7 +232,7 @@ console.log('  G1c: R0 takes priority over R9');
 
 console.log('  G1d: Section A - CKA falling edge toggles QA');
 {
-  const { world, chip, wm } = setupChipWithPower('7490');
+  const { world, chip, wm } = setupChipWithPower('74x90');
   // Reset first, then release by wiring to GND
   connectPinToVcc(wm, findPin(chip, 'R01'));
   connectPinToVcc(wm, findPin(chip, 'R02'));
@@ -245,7 +245,7 @@ console.log('  G1d: Section A - CKA falling edge toggles QA');
   // Simpler: just create fresh setup with R0 pins wired to GND
 }
 {
-  const { world, chip, wm } = setupChipWithPower('7490');
+  const { world, chip, wm } = setupChipWithPower('74x90');
   connectPinToGnd(wm, findPin(chip, 'R01'));
   connectPinToGnd(wm, findPin(chip, 'R02'));
   connectPinToGnd(wm, findPin(chip, 'R91'));
@@ -253,7 +253,7 @@ console.log('  G1d: Section A - CKA falling edge toggles QA');
   const sim = new CircuitSimulator();
   sim.evaluate(world, [chip], wm);
 
-  // Falling-edge pulse on CKA: QA should toggle 0→1
+  // Falling edge pulse on CKA: QA should toggle 0→1
   pulseClockFalling(sim, world, chip, wm, 'CKA');
   assertPinBit(sim, chip, 'QA', 1, '7490 CKA fall 1 → QA=1');
 
@@ -272,7 +272,7 @@ console.log('  G1e: Section B - CKB falling edge advances BCD ÷5 (QB/QC/QD) seq
     [1, 0, 0],  // after fall 4: QD=1
     [0, 0, 0],  // after fall 5: back to 0
   ];
-  const { world, chip, wm } = setupChipWithPower('7490');
+  const { world, chip, wm } = setupChipWithPower('74x90');
   connectPinToGnd(wm, findPin(chip, 'R01'));
   connectPinToGnd(wm, findPin(chip, 'R02'));
   connectPinToGnd(wm, findPin(chip, 'R91'));
@@ -293,7 +293,7 @@ console.log('  G1f: Full BCD 0 9 count with QA externally wired to CKB');
 {
   // Expected BCD count: each CKA falling edge advances the full count.
   // After every 2 CKA falls, CKB gets one falling edge (QA goes 0→1→0).
-  const { world, chip, wm } = setupChipWithPower('7490');
+  const { world, chip, wm } = setupChipWithPower('74x90');
   const r01w = connectPinToVcc(wm, findPin(chip, 'R01'));
   const r02w = connectPinToVcc(wm, findPin(chip, 'R02'));
   connectPinToGnd(wm, findPin(chip, 'R91'));
@@ -345,7 +345,7 @@ console.log('\nG2: 7491 - 8 bit SISO Shift Register');
 
 console.log('  G2a: Q=0 Qn=1 initially (empty register)');
 {
-  const { world, chip, wm } = setupChipWithPower('7491');
+  const { world, chip, wm } = setupChipWithPower('74x91');
   connectPinsHigh(wm, chip, ['A', 'B']);
   const sim = new CircuitSimulator();
   sim.evaluate(world, [chip], wm);
@@ -355,7 +355,7 @@ console.log('  G2a: Q=0 Qn=1 initially (empty register)');
 
 console.log('  G2b: A AND B gate - B=0 blocks data (Q stays 0 after 8 clocks)');
 {
-  const { world, chip, wm } = setupChipWithPower('7491');
+  const { world, chip, wm } = setupChipWithPower('74x91');
   connectPinToVcc(wm, findPin(chip, 'A')); // A=1, B=0 (wired to GND)
   connectPinToGnd(wm, findPin(chip, 'B'));
   const sim = new CircuitSimulator();
@@ -366,7 +366,7 @@ console.log('  G2b: A AND B gate - B=0 blocks data (Q stays 0 after 8 clocks)');
 
 console.log('  G2c: A=1, B=1 → 1 appears at Q after exactly 8 rising CP edges');
 {
-  const { world, chip, wm } = setupChipWithPower('7491');
+  const { world, chip, wm } = setupChipWithPower('74x91');
   connectPinsHigh(wm, chip, ['A', 'B']);
   const sim = new CircuitSimulator();
   sim.evaluate(world, [chip], wm);
@@ -381,7 +381,7 @@ console.log('  G2c: A=1, B=1 → 1 appears at Q after exactly 8 rising CP edges'
 
 console.log('  G2d: Pattern shifts through - 1 followed by 0s gives Q=1 then flushed');
 {
-  const { world, chip, wm } = setupChipWithPower('7491');
+  const { world, chip, wm } = setupChipWithPower('74x91');
   const aWire = connectPinToVcc(wm, findPin(chip, 'A'));
   const bWire = connectPinToVcc(wm, findPin(chip, 'B'));
   const sim = new CircuitSimulator();
@@ -402,17 +402,17 @@ console.log('  G2d: Pattern shifts through - 1 followed by 0s gives Q=1 then flu
 }
 
 
-// ── G3: 7492 - Divide-by-12 Counter ─────────────────────────────────────────
-// Section A (÷2): CKA → QA (falling-edge)
-// Section B (÷6): CKB → QB/QC/QD (falling-edge)
+// ── G3: 7492 - Divide by-12 Counter ─────────────────────────────────────────
+// Section A (÷2): CKA → QA (falling edge)
+// Section B (÷6): CKB → QB/QC/QD (falling edge)
 // R01 AND R02 = 1 → async reset all to 0.
 // With QA→CKB externally: total ÷12.
 
-console.log('\nG3: 7492 - Divide-by-12 Counter');
+console.log('\nG3: 7492 - Divide by-12 Counter');
 
 console.log('  G3a: R0 resets all outputs to 0');
 {
-  const { world, chip, wm } = setupChipWithPower('7492');
+  const { world, chip, wm } = setupChipWithPower('74x92');
   connectPinsHigh(wm, chip, ['R01', 'R02']);
   const sim = new CircuitSimulator();
   sim.evaluate(world, [chip], wm);
@@ -431,7 +431,7 @@ console.log('  G3b: Section B - ÷6 sequence on CKB falling edges');
     [1, 0, 1], // QD=1,QB=1
     [0, 0, 0], // wraps
   ];
-  const { world, chip, wm } = setupChipWithPower('7492');
+  const { world, chip, wm } = setupChipWithPower('74x92');
   connectPinToGnd(wm, findPin(chip, 'R01'));
   connectPinToGnd(wm, findPin(chip, 'R02'));
   const sim = new CircuitSimulator();
@@ -448,7 +448,7 @@ console.log('  G3b: Section B - ÷6 sequence on CKB falling edges');
 
 console.log('  G3c: Full ÷12 count with QA→CKB externally connected');
 {
-  const { world, chip, wm } = setupChipWithPower('7492');
+  const { world, chip, wm } = setupChipWithPower('74x92');
   const r01w = connectPinToVcc(wm, findPin(chip, 'R01'));
   const r02w = connectPinToVcc(wm, findPin(chip, 'R02'));
   const sim = new CircuitSimulator();
@@ -478,8 +478,8 @@ console.log('  G3c: Full ÷12 count with QA→CKB externally connected');
 
 
 // ── G4: 7493 - 4 bit Binary Counter ──────────────────────────────────────────
-// Section A (÷2): CKA → QA (falling-edge)
-// Section B (÷8 binary): CKB → QB/QC/QD (falling-edge)
+// Section A (÷2): CKA → QA (falling edge)
+// Section B (÷8 binary): CKB → QB/QC/QD (falling edge)
 // R01 AND R02 = 1 → async reset all to 0.
 // With QA→CKB externally: full 4 bit binary count 0 15.
 
@@ -487,7 +487,7 @@ console.log('\nG4: 7493 - 4 bit Binary Counter');
 
 console.log('  G4a: R0 resets all outputs to 0');
 {
-  const { world, chip, wm } = setupChipWithPower('7493');
+  const { world, chip, wm } = setupChipWithPower('74x93');
   connectPinsHigh(wm, chip, ['R01', 'R02']);
   const sim = new CircuitSimulator();
   sim.evaluate(world, [chip], wm);
@@ -497,7 +497,7 @@ console.log('  G4a: R0 resets all outputs to 0');
 
 console.log('  G4b: Section A - single CKA falling edge toggles QA');
 {
-  const { world, chip, wm } = setupChipWithPower('7493');
+  const { world, chip, wm } = setupChipWithPower('74x93');
   connectPinToGnd(wm, findPin(chip, 'R01'));
   connectPinToGnd(wm, findPin(chip, 'R02'));
   const sim = new CircuitSimulator();
@@ -511,7 +511,7 @@ console.log('  G4b: Section A - single CKA falling edge toggles QA');
 
 console.log('  G4c: Section B - binary 0 7 sequence on CKB falls');
 {
-  const { world, chip, wm } = setupChipWithPower('7493');
+  const { world, chip, wm } = setupChipWithPower('74x93');
   connectPinToGnd(wm, findPin(chip, 'R01'));
   connectPinToGnd(wm, findPin(chip, 'R02'));
   const sim = new CircuitSimulator();
@@ -532,7 +532,7 @@ console.log('  G4c: Section B - binary 0 7 sequence on CKB falls');
 
 console.log('  G4d: Full 4 bit binary count 0 15 with QA→CKB');
 {
-  const { world, chip, wm } = setupChipWithPower('7493');
+  const { world, chip, wm } = setupChipWithPower('74x93');
   const r01w = connectPinToVcc(wm, findPin(chip, 'R01'));
   const r02w = connectPinToVcc(wm, findPin(chip, 'R02'));
   const sim = new CircuitSimulator();
@@ -560,11 +560,11 @@ console.log('  G4d: Full 4 bit binary count 0 15 with QA→CKB');
 }
 
 
-// ── G5: 7495 - 4 bit Parallel-access Shift Register ──────────────────────────
+// ── G5: 7495 - 4 bit Parallel access Shift Register ──────────────────────────
 // MODE=0 + rising CLK1 → shift: SER→QA→QB→QC→QD
 // MODE=1 + rising CLK2 → parallel load: A→QA, B→QB, C→QC, D→QD
 
-console.log('\nG5: 7495 - 4 bit Parallel-access Shift Register');
+console.log('\nG5: 7495 - 4 bit Parallel access Shift Register');
 
 console.log('  G5a: Parallel load (MODE=1, CLK2 rising edge) loads all 4 bits');
 {
@@ -575,7 +575,7 @@ console.log('  G5a: Parallel load (MODE=1, CLK2 rising edge) loads all 4 bits');
     { A:0,B:1,C:0,D:1 },
   ];
   for (const tc of testCases) {
-    const { world, chip, wm } = setupChipWithPower('7495');
+    const { world, chip, wm } = setupChipWithPower('74x95');
     connectPinToVcc(wm, findPin(chip, 'MODE'));
     if (tc.A) connectPinToVcc(wm, findPin(chip, 'A'));
     else      connectPinToGnd(wm, findPin(chip, 'A'));
@@ -597,7 +597,7 @@ console.log('  G5a: Parallel load (MODE=1, CLK2 rising edge) loads all 4 bits');
 
 console.log('  G5b: Shift mode (MODE=0, CLK1 rising edge) shifts SER→QA→QB→QC→QD');
 {
-  const { world, chip, wm } = setupChipWithPower('7495');
+  const { world, chip, wm } = setupChipWithPower('74x95');
   // MODE stays LOW (wired to GND)
   connectPinToGnd(wm, findPin(chip, 'MODE'));
   const serGnd = connectPinToGnd(wm, findPin(chip, 'SER'));   // SER=0 initially
@@ -622,7 +622,7 @@ console.log('  G5b: Shift mode (MODE=0, CLK1 rising edge) shifts SER→QA→QB�
 console.log('  G5c: Shifting 0s after a loaded 1 propagates correctly');
 {
   // Parallel load ABCD=1010, then shift twice with SER=0 (wired GND)
-  const { world, chip, wm } = setupChipWithPower('7495');
+  const { world, chip, wm } = setupChipWithPower('74x95');
   const modeWire = connectPinToVcc(wm, findPin(chip, 'MODE'));
   const aWire = connectPinToVcc(wm, findPin(chip, 'A'));
   connectPinToGnd(wm, findPin(chip, 'B'));  // B=0
@@ -660,13 +660,13 @@ console.log('  G5c: Shifting 0s after a loaded 1 propagates correctly');
 //                   J=0,K=1 → reset on rising CLK
 //                   J=K=1   → toggle on rising CLK
 //                   J=K=0   → hold
-// (74107 is falling-edge in hardware; simulator uses rising-edge uniformly)
+// (74107 is falling edge in hardware; simulator uses rising edge uniformly)
 
 console.log('\nG6: 74107 - Dual JK FF with clear');
 
 console.log('  G6a: CLR=0 (wired to GND) → Q=0, Qn=1 for both FFs');
 {
-  const { world, chip, wm } = setupChipWithPower('74107');
+  const { world, chip, wm } = setupChipWithPower('74x107');
   connectPinToGnd(wm, findPin(chip, '1CLR'));
   connectPinToGnd(wm, findPin(chip, '2CLR'));
   const sim = new CircuitSimulator();
@@ -679,7 +679,7 @@ console.log('  G6a: CLR=0 (wired to GND) → Q=0, Qn=1 for both FFs');
 
 console.log('  G6b: FF1 - J=1 K=0 sets Q on clock pulse');
 {
-  const { world, chip, wm } = setupChipWithPower('74107');
+  const { world, chip, wm } = setupChipWithPower('74x107');
   connectPinsHigh(wm, chip, ['1CLR', '1J']);
   connectPinToGnd(wm, findPin(chip, '1K'));  // K=0
   const sim = new CircuitSimulator();
@@ -691,7 +691,7 @@ console.log('  G6b: FF1 - J=1 K=0 sets Q on clock pulse');
 
 console.log('  G6c: FF1 - J=K=1 toggles on successive clock edges');
 {
-  const { world, chip, wm } = setupChipWithPower('74107');
+  const { world, chip, wm } = setupChipWithPower('74x107');
   connectPinsHigh(wm, chip, ['1CLR', '1J', '1K']);
   const sim = new CircuitSimulator();
   sim.evaluate(world, [chip], wm);
@@ -703,7 +703,7 @@ console.log('  G6c: FF1 - J=K=1 toggles on successive clock edges');
 
 console.log('  G6d: FF2 - operates independently from FF1');
 {
-  const { world, chip, wm } = setupChipWithPower('74107');
+  const { world, chip, wm } = setupChipWithPower('74x107');
   connectPinsHigh(wm, chip, ['1CLR', '2CLR', '2J']);
   connectPinToGnd(wm, findPin(chip, '2K'));  // K=0
   connectPinToGnd(wm, findPin(chip, '1CLK'));  // FF1 CLK held LOW (no edge)
@@ -731,7 +731,7 @@ console.log('\nG7: 74109 - Dual JK positive-edge FF (PRE & CLR)');
 
 console.log('  G7a: CLR=0 (wired to GND) → Q=0, Qn=1');
 {
-  const { world, chip, wm } = setupChipWithPower('74109');
+  const { world, chip, wm } = setupChipWithPower('74x109');
   connectPinsHigh(wm, chip, ['1PRE', '2PRE']);
   connectPinToGnd(wm, findPin(chip, '1CLR'));
   connectPinToGnd(wm, findPin(chip, '2CLR'));
@@ -743,7 +743,7 @@ console.log('  G7a: CLR=0 (wired to GND) → Q=0, Qn=1');
 
 console.log('  G7b: PRE=0 (wired to GND) → Q=1, Qn=0');
 {
-  const { world, chip, wm } = setupChipWithPower('74109');
+  const { world, chip, wm } = setupChipWithPower('74x109');
   connectPinsHigh(wm, chip, ['1CLR', '2CLR']);
   connectPinToGnd(wm, findPin(chip, '1PRE'));
   connectPinToGnd(wm, findPin(chip, '2PRE'));
@@ -755,7 +755,7 @@ console.log('  G7b: PRE=0 (wired to GND) → Q=1, Qn=0');
 
 console.log('  G7c: CLR takes priority over PRE');
 {
-  const { world, chip, wm } = setupChipWithPower('74109');
+  const { world, chip, wm } = setupChipWithPower('74x109');
   connectPinToGnd(wm, findPin(chip, '1CLR'));
   connectPinToGnd(wm, findPin(chip, '1PRE'));
   const sim = new CircuitSimulator();
@@ -766,7 +766,7 @@ console.log('  G7c: CLR takes priority over PRE');
 
 console.log('  G7d: J=1, Kn=1 (K=0) on rising CLK sets Q');
 {
-  const { world, chip, wm } = setupChipWithPower('74109');
+  const { world, chip, wm } = setupChipWithPower('74x109');
   connectPinsHigh(wm, chip, ['1CLR', '1PRE', '1J', '1Kn']);
   const sim = new CircuitSimulator();
   sim.evaluate(world, [chip], wm);
@@ -776,7 +776,7 @@ console.log('  G7d: J=1, Kn=1 (K=0) on rising CLK sets Q');
 
 console.log('  G7e: J=1, Kn=0 (K=1) toggles Q on each CLK edge');
 {
-  const { world, chip, wm } = setupChipWithPower('74109');
+  const { world, chip, wm } = setupChipWithPower('74x109');
   connectPinsHigh(wm, chip, ['1CLR', '1PRE', '1J']); // Kn=0 (wired to GND)
   connectPinToGnd(wm, findPin(chip, '1Kn'));
   const sim = new CircuitSimulator();
@@ -789,7 +789,7 @@ console.log('  G7e: J=1, Kn=0 (K=1) toggles Q on each CLK edge');
 
 console.log('  G7f: Both FFs operate independently');
 {
-  const { world, chip, wm } = setupChipWithPower('74109');
+  const { world, chip, wm } = setupChipWithPower('74x109');
   connectPinsHigh(wm, chip, ['1CLR', '1PRE', '1J', '1Kn', '2CLR', '2PRE', '2Kn']);
   connectPinToGnd(wm, findPin(chip, '2J'));  // 2J=0 explicitly
   // FF1: J=1,Kn=1 → set; FF2: J=0,Kn=1 → hold (J=K=0)
@@ -809,7 +809,7 @@ console.log('\nG8: 74121 - Monostable Multivibrator (static trigger model)');
 
 console.log('  G8a: Non-trigger state (A1=1, A2=1) → Q=0, Qn=1');
 {
-  const { world, chip, wm } = setupChipWithPower('74121');
+  const { world, chip, wm } = setupChipWithPower('74x121');
   connectPinsHigh(wm, chip, ['A1', 'A2', 'B']);
   const sim = new CircuitSimulator();
   sim.evaluate(world, [chip], wm);
@@ -819,7 +819,7 @@ console.log('  G8a: Non-trigger state (A1=1, A2=1) → Q=0, Qn=1');
 
 console.log('  G8b: Trigger state (A1=0, A2=0, B=1) → Q=1, Qn=0');
 {
-  const { world, chip, wm } = setupChipWithPower('74121');
+  const { world, chip, wm } = setupChipWithPower('74x121');
   connectPinToVcc(wm, findPin(chip, 'B'));
   connectPinToGnd(wm, findPin(chip, 'A1')); // A1=0 explicitly
   connectPinToGnd(wm, findPin(chip, 'A2')); // A2=0 explicitly
@@ -831,7 +831,7 @@ console.log('  G8b: Trigger state (A1=0, A2=0, B=1) → Q=1, Qn=0');
 
 console.log('  G8c: B=0 (wired to GND) prevents trigger even with A inputs low');
 {
-  const { world, chip, wm } = setupChipWithPower('74121');
+  const { world, chip, wm } = setupChipWithPower('74x121');
   connectPinToGnd(wm, findPin(chip, 'B'));  // B=0
   connectPinToGnd(wm, findPin(chip, 'A1')); // A1=0
   connectPinToGnd(wm, findPin(chip, 'A2')); // A2=0
@@ -842,7 +842,7 @@ console.log('  G8c: B=0 (wired to GND) prevents trigger even with A inputs low')
 
 console.log('  G8d: A1=0, A2=1, B=1 → trigger (only one A needs to be low)');
 {
-  const { world, chip, wm } = setupChipWithPower('74121');
+  const { world, chip, wm } = setupChipWithPower('74x121');
   connectPinsHigh(wm, chip, ['A2', 'B']); // A1=0 (wired to GND)
   connectPinToGnd(wm, findPin(chip, 'A1'));
   const sim = new CircuitSimulator();
@@ -858,7 +858,7 @@ console.log('\nG9: 74123 - Dual Retriggerable Monostable (static trigger model)'
 
 console.log('  G9a: CLR=0 (wired to GND) forces Q=0 regardless of A and B');
 {
-  const { world, chip, wm } = setupChipWithPower('74123');
+  const { world, chip, wm } = setupChipWithPower('74x123');
   connectPinToVcc(wm, findPin(chip, '1B'));
   connectPinToGnd(wm, findPin(chip, '1CLR')); // CLR=0
   const sim = new CircuitSimulator();
@@ -869,7 +869,7 @@ console.log('  G9a: CLR=0 (wired to GND) forces Q=0 regardless of A and B');
 
 console.log('  G9b: Trigger state (CLR=1, A=0, B=1) → Q=1, Qn=0');
 {
-  const { world, chip, wm } = setupChipWithPower('74123');
+  const { world, chip, wm } = setupChipWithPower('74x123');
   connectPinsHigh(wm, chip, ['1CLR', '1B']); // 1A=0 (wired to GND)
   connectPinToGnd(wm, findPin(chip, '1A'));
   const sim = new CircuitSimulator();
@@ -880,7 +880,7 @@ console.log('  G9b: Trigger state (CLR=1, A=0, B=1) → Q=1, Qn=0');
 
 console.log('  G9c: Non-trigger (CLR=1, A=1, B=0) → Q=0, Qn=1');
 {
-  const { world, chip, wm } = setupChipWithPower('74123');
+  const { world, chip, wm } = setupChipWithPower('74x123');
   connectPinsHigh(wm, chip, ['1CLR', '1A']); // B=0 (wired to GND)
   connectPinToGnd(wm, findPin(chip, '1B'));
   const sim = new CircuitSimulator();
@@ -891,7 +891,7 @@ console.log('  G9c: Non-trigger (CLR=1, A=1, B=0) → Q=0, Qn=1');
 
 console.log('  G9d: FF2 operates independently (CLR=1, A=0, B=1 → Q=1)');
 {
-  const { world, chip, wm } = setupChipWithPower('74123');
+  const { world, chip, wm } = setupChipWithPower('74x123');
   connectPinsHigh(wm, chip, ['2CLR', '2B']); // 2A=0 (wired to GND)
   connectPinToGnd(wm, findPin(chip, '2A'));
   connectPinToGnd(wm, findPin(chip, '1CLR')); // FF1 CLR=0 → Q=0
@@ -902,10 +902,10 @@ console.log('  G9d: FF2 operates independently (CLR=1, A=0, B=1 → Q=1)');
 }
 
 
-// ── G10: 74125 - Quad Tri-state Bus Buffer (active low enable) ───────────────
+// ── G10: 74125 - Quad Tri state Bus Buffer (active low enable) ───────────────
 // OE=0 → Y=A (buffer enabled). OE=1 → Y=0 (HiZ modelled as 0V).
 
-console.log('\nG10: 74125 - Quad Tri-state Buffer (active low OE)');
+console.log('\nG10: 74125 - Quad Tri state Buffer (active low OE)');
 
 {
   const bufferGates = [
@@ -917,7 +917,7 @@ console.log('\nG10: 74125 - Quad Tri-state Buffer (active low OE)');
   for (const gate of bufferGates) {
     // OE=0 (wired GND), A=0 (wired GND): Y=0
     {
-      const { world, chip, wm } = setupChipWithPower('74125');
+      const { world, chip, wm } = setupChipWithPower('74x125');
       connectPinToGnd(wm, findPin(chip, gate.oe));  // OE=0 (active)
       connectPinToGnd(wm, findPin(chip, gate.a));   // A=0
       const sim = new CircuitSimulator();
@@ -927,7 +927,7 @@ console.log('\nG10: 74125 - Quad Tri-state Buffer (active low OE)');
     }
     // OE=0 (wired GND), A=1: Y=1
     {
-      const { world, chip, wm } = setupChipWithPower('74125');
+      const { world, chip, wm } = setupChipWithPower('74x125');
       connectPinToGnd(wm, findPin(chip, gate.oe));  // OE=0 (active)
       connectPinToVcc(wm, findPin(chip, gate.a));
       const sim = new CircuitSimulator();
@@ -937,7 +937,7 @@ console.log('\nG10: 74125 - Quad Tri-state Buffer (active low OE)');
     }
     // OE=1 (wired VCC), A=1: Y=HiZ (floating)
     {
-      const { world, chip, wm } = setupChipWithPower('74125');
+      const { world, chip, wm } = setupChipWithPower('74x125');
       connectPinToVcc(wm, findPin(chip, gate.a));
       connectPinToVcc(wm, findPin(chip, gate.oe));
       const sim = new CircuitSimulator();
@@ -950,10 +950,10 @@ console.log('\nG10: 74125 - Quad Tri-state Buffer (active low OE)');
 }
 
 
-// ── G11: 74126 - Quad Tri-state Bus Buffer (active high enable) ──────────────
+// ── G11: 74126 - Quad Tri state Bus Buffer (active high enable) ──────────────
 // OE=1 → Y=A (buffer enabled). OE=0 → Y=0 (HiZ modelled as 0V).
 
-console.log('\nG11: 74126 - Quad Tri-state Buffer (active high OE)');
+console.log('\nG11: 74126 - Quad Tri state Buffer (active high OE)');
 
 {
   const bufferGates = [
@@ -965,7 +965,7 @@ console.log('\nG11: 74126 - Quad Tri-state Buffer (active high OE)');
   for (const gate of bufferGates) {
     // OE=0 (wired GND), A=1: Y=HiZ (disabled, floating)
     {
-      const { world, chip, wm } = setupChipWithPower('74126');
+      const { world, chip, wm } = setupChipWithPower('74x126');
       connectPinToGnd(wm, findPin(chip, gate.oe));  // OE=0 (disabled)
       connectPinToVcc(wm, findPin(chip, gate.a));
       const sim = new CircuitSimulator();
@@ -975,7 +975,7 @@ console.log('\nG11: 74126 - Quad Tri-state Buffer (active high OE)');
     }
     // OE=1 (wired VCC), A=0 (wired GND): Y=0
     {
-      const { world, chip, wm } = setupChipWithPower('74126');
+      const { world, chip, wm } = setupChipWithPower('74x126');
       connectPinToVcc(wm, findPin(chip, gate.oe));
       connectPinToGnd(wm, findPin(chip, gate.a));   // A=0
       const sim = new CircuitSimulator();
@@ -985,7 +985,7 @@ console.log('\nG11: 74126 - Quad Tri-state Buffer (active high OE)');
     }
     // OE=1, A=1: Y=1
     {
-      const { world, chip, wm } = setupChipWithPower('74126');
+      const { world, chip, wm } = setupChipWithPower('74x126');
       connectPinToVcc(wm, findPin(chip, gate.a));
       connectPinToVcc(wm, findPin(chip, gate.oe));
       const sim = new CircuitSimulator();
@@ -997,10 +997,10 @@ console.log('\nG11: 74126 - Quad Tri-state Buffer (active high OE)');
 }
 
 
-// ── G12: 74132 - Quad 2 input NAND (Schmitt-trigger) ────────────────────────
+// ── G12: 74132 - Quad 2 input NAND (Schmitt trigger) ────────────────────────
 // Logic is identical to standard NAND; Schmitt hysteresis is not modelled.
 
-console.log('\nG12: 74132 - Quad 2 input NAND (Schmitt-trigger, full truth table)');
+console.log('\nG12: 74132 - Quad 2 input NAND (Schmitt trigger, full truth table)');
 
 {
   const nandTable = [[0,0,5],[0,1,5],[1,0,5],[1,1,0]];
@@ -1012,7 +1012,7 @@ console.log('\nG12: 74132 - Quad 2 input NAND (Schmitt-trigger, full truth table
   ];
   for (const gate of gates) {
     for (const [av, bv, expected] of nandTable) {
-      const { world, chip, wm } = setupChipWithPower('74132');
+      const { world, chip, wm } = setupChipWithPower('74x132');
       if (av) connectPinToVcc(wm, findPin(chip, gate.a));
       else    connectPinToGnd(wm, findPin(chip, gate.a));
       if (bv) connectPinToVcc(wm, findPin(chip, gate.b));
@@ -1027,16 +1027,16 @@ console.log('\nG12: 74132 - Quad 2 input NAND (Schmitt-trigger, full truth table
 }
 
 
-// ── G13: 74138 - 3-to-8 Decoder / Demultiplexer ──────────────────────────────
+// ── G13: 74138 - 3 to 8 Decoder / Demultiplexer ──────────────────────────────
 // Enable: G1=1, G2A=0, G2B=0 → selected output (Y0 Y7) goes LOW; others HIGH.
 // Disabled (any enable pin wrong): all outputs HIGH.
 // Address: C(MSB), B, A(LSB) → selects Yn where n = A+(B<<1)+(C<<2).
 
-console.log('\nG13: 74138 - 3-to-8 Decoder');
+console.log('\nG13: 74138 - 3 to 8 Decoder');
 
 console.log('  G13a: All outputs HIGH when disabled (G1=0)');
 {
-  const { world, chip, wm } = setupChipWithPower('74138');
+  const { world, chip, wm } = setupChipWithPower('74x138');
   // G1=0 (wired GND), G2A=0, G2B=0 (wired GND)
   connectPinToGnd(wm, findPin(chip, 'G1'));
   connectPinToGnd(wm, findPin(chip, 'G2A'));
@@ -1049,7 +1049,7 @@ console.log('  G13a: All outputs HIGH when disabled (G1=0)');
 
 console.log('  G13b: All outputs HIGH when G2A=1 (active low disabled)');
 {
-  const { world, chip, wm } = setupChipWithPower('74138');
+  const { world, chip, wm } = setupChipWithPower('74x138');
   connectPinsHigh(wm, chip, ['G1', 'G2A']);
   connectPinToGnd(wm, findPin(chip, 'G2B'));  // G2B=0
   const sim = new CircuitSimulator();
@@ -1061,7 +1061,7 @@ console.log('  G13b: All outputs HIGH when G2A=1 (active low disabled)');
 console.log('  G13c: Enabled - each address selects exactly one low output');
 {
   for (let addr = 0; addr <= 7; addr++) {
-    const { world, chip, wm } = setupChipWithPower('74138');
+    const { world, chip, wm } = setupChipWithPower('74x138');
     connectPinToVcc(wm, findPin(chip, 'G1')); // G2A=0, G2B=0 (wired GND)
     connectPinToGnd(wm, findPin(chip, 'G2A'));
     connectPinToGnd(wm, findPin(chip, 'G2B'));
@@ -1091,7 +1091,7 @@ console.log('\nG14: 74139 - Dual 2-to-4 Decoder');
 
 console.log('  G14a: All outputs HIGH when disabled (1G=1 high)');
 {
-  const { world, chip, wm } = setupChipWithPower('74139');
+  const { world, chip, wm } = setupChipWithPower('74x139');
   connectPinToVcc(wm, findPin(chip, '1G'));
   const sim = new CircuitSimulator();
   sim.evaluate(world, [chip], wm);
@@ -1102,7 +1102,7 @@ console.log('  G14a: All outputs HIGH when disabled (1G=1 high)');
 console.log('  G14b: Decoder 1 - enabled (1G=0) selects each output in turn');
 {
   for (let addr = 0; addr <= 3; addr++) {
-    const { world, chip, wm } = setupChipWithPower('74139');
+    const { world, chip, wm } = setupChipWithPower('74x139');
     // 1G=0 (wired to GND)
     connectPinToGnd(wm, findPin(chip, '1G'));
     if (addr & 1) connectPinToVcc(wm, findPin(chip, '1A'));
@@ -1122,7 +1122,7 @@ console.log('  G14b: Decoder 1 - enabled (1G=0) selects each output in turn');
 console.log('  G14c: Decoder 2 - enabled (2G=0) selects each output in turn');
 {
   for (let addr = 0; addr <= 3; addr++) {
-    const { world, chip, wm } = setupChipWithPower('74139');
+    const { world, chip, wm } = setupChipWithPower('74x139');
     // 2G=0 (wired to GND)
     connectPinToGnd(wm, findPin(chip, '2G'));
     if (addr & 1) connectPinToVcc(wm, findPin(chip, '2A'));
@@ -1142,7 +1142,7 @@ console.log('  G14c: Decoder 2 - enabled (2G=0) selects each output in turn');
 console.log('  G14d: Decoders operate independently');
 {
   // Enable dec1 only (1G=0, 2G=1); both inputs A=1,B=0 → dec1 selects 1Y1, dec2 all-high
-  const { world, chip, wm } = setupChipWithPower('74139');
+  const { world, chip, wm } = setupChipWithPower('74x139');
   connectPinsHigh(wm, chip, ['2G', '1A', '2A']);
   connectPinToGnd(wm, findPin(chip, '1G'));  // 1G=0 (enabled)
   connectPinToGnd(wm, findPin(chip, '1B'));  // 1B=0

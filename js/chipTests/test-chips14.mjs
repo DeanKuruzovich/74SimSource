@@ -98,8 +98,8 @@ function fallingEdge(world, chip, clkPinName, otherPins) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const EXPECTED_CHIP_IDS = [
-  '74185', '74189', '74190', '74192',
-  '74194', '74195', '74196', '74197', '74198', '74199', '74200', '74201', '74202',
+  '74x185', '74x189', '74x190', '74x192',
+  '74x194', '74x195', '74x196', '74x197', '74x198', '74x199', '74x200', '74x201', '74x202',
 ];
 
 console.log('\nS1: All chip IDs present in CHIPS_BLOCK_14');
@@ -132,7 +132,7 @@ for (const [id, def] of Object.entries(CHIPS_BLOCK_14)) {
 console.log('\nG1: 74185 - Binary-to-BCD Converter');
 {
   // G=1 → all outputs HiZ → OC pull up → HIGH
-  const { world, chip, wm } = setupChipWithPower('74185');
+  const { world, chip, wm } = setupChipWithPower('74x185');
   applyInputs(wm, chip, { G:1, B1:0, B2:0, B3:0, B4:0, B5:0, B6:0 });
   const sim = simulate(world, chip, wm);
   assert(isHigh(getPinVoltage(sim, findPin(chip, 'Y2'))), '74185: G=1 → Y2=HIGH (OC pull up)');
@@ -140,7 +140,7 @@ console.log('\nG1: 74185 - Binary-to-BCD Converter');
 }
 {
   // G=0, B1-B6=0 → binVal=0 → BCD=0x00 → all Y=0 → OC sinks → LOW
-  const { world, chip, wm } = setupChipWithPower('74185');
+  const { world, chip, wm } = setupChipWithPower('74x185');
   applyInputs(wm, chip, { G:0, B1:0, B2:0, B3:0, B4:0, B5:0, B6:0 });
   const sim = simulate(world, chip, wm);
   assert(isLow(getPinVoltage(sim, findPin(chip, 'Y2'))), '74185: G=0, 0 → Y2=LOW');
@@ -148,7 +148,7 @@ console.log('\nG1: 74185 - Binary-to-BCD Converter');
 }
 {
   // G=0, B1=1 (binVal=1) → BCD=0x01 → bit0=1→Y2=HIGH; bits 1-6=0→Y3-Y8=LOW
-  const { world, chip, wm } = setupChipWithPower('74185');
+  const { world, chip, wm } = setupChipWithPower('74x185');
   applyInputs(wm, chip, { G:0, B1:1, B2:0, B3:0, B4:0, B5:0, B6:0 });
   const sim = simulate(world, chip, wm);
   assert(isHigh(getPinVoltage(sim, findPin(chip, 'Y2'))), '74185: binVal=1 → Y2=HIGH (bit0=1)');
@@ -158,7 +158,7 @@ console.log('\nG1: 74185 - Binary-to-BCD Converter');
   // G=0, binVal=25 (B1=1,B2:0,B3=0,B4=1,B5=1,B6=0 → 1+8+16=25)
   // BCD: tens=2(0010), units=5(0101) → packed=0x25=0b00100101
   // Y2=bit0=1, Y3=bit1=0, Y4=bit2=1, Y5=bit3=0, Y6=bit4=0, Y7=bit5=1, Y8=bit6=0
-  const { world, chip, wm } = setupChipWithPower('74185');
+  const { world, chip, wm } = setupChipWithPower('74x185');
   applyInputs(wm, chip, { G:0, B1:1, B2:0, B3:0, B4:1, B5:1, B6:0 });
   const sim = simulate(world, chip, wm);
   assert(isHigh(getPinVoltage(sim, findPin(chip, 'Y2'))), '74185: binVal=25 → Y2=HIGH (bit0=1)');
@@ -171,7 +171,7 @@ console.log('\nG1: 74185 - Binary-to-BCD Converter');
 }
 {
   // binVal=9 → BCD=0x09 → bits 0,3 set: Y2=1 Y3=0 Y4=0 Y5=1 Y6-Y8=0
-  const { world, chip, wm } = setupChipWithPower('74185');
+  const { world, chip, wm } = setupChipWithPower('74x185');
   applyInputs(wm, chip, { G:0, B1:1, B2:0, B3:0, B4:1, B5:0, B6:0 }); // 1+8=9
   const sim = simulate(world, chip, wm);
   assert(isHigh(getPinVoltage(sim, findPin(chip, 'Y2'))), '74185: binVal=9 → Y2=HIGH');
@@ -228,7 +228,7 @@ console.log('\nG1: 74185 - Binary-to-BCD Converter');
 console.log('\nG5: 74189 - 16x4 RAM (inverted outputs)');
 {
   // CS=1 → all outputs HiZ (non-OC) → isLow
-  const { world, chip, wm } = setupChipWithPower('74189');
+  const { world, chip, wm } = setupChipWithPower('74x189');
   applyInputs(wm, chip, { A0:0, A1:0, A2:0, A3:0, D1:0, D2:0, D3:0, D4:0, CS:1, WE:1 });
   const sim = simulate(world, chip, wm);
   assert(isLow(getPinVoltage(sim, findPin(chip, 'Q1'))), '74189: CS=1 → Q1=HiZ (isLow)');
@@ -236,7 +236,7 @@ console.log('\nG5: 74189 - 16x4 RAM (inverted outputs)');
 }
 {
   // Write D1=1,D2=0,D3=1,D4=0 to addr 0; then read → Q1=0(inv 1),Q2=1(inv 0),Q3=0(inv 1),Q4=1(inv 0)
-  const { world, chip } = setupChipWithPower('74189');
+  const { world, chip } = setupChipWithPower('74x189');
   // Write phase
   const wmW = new WireManager(); resetWireCounter();
   wirePinToVcc(wmW, findPin(chip, 'VCC'));
@@ -257,7 +257,7 @@ console.log('\nG5: 74189 - 16x4 RAM (inverted outputs)');
 }
 {
   // Write to addr 5, read back
-  const { world, chip } = setupChipWithPower('74189');
+  const { world, chip } = setupChipWithPower('74x189');
   const wmW = new WireManager(); resetWireCounter();
   wirePinToVcc(wmW, findPin(chip, 'VCC'));
   wirePinToGnd(wmW, findPin(chip, 'GND'));
@@ -279,7 +279,7 @@ console.log('\nG5: 74189 - 16x4 RAM (inverted outputs)');
 console.log('\nG6: 74190 - Sync Up/Down Decade Counter');
 {
   // LOAD=0 (async preset): A=1,B=1,C=0,D=0 → count=3
-  const { world, chip, wm } = setupChipWithPower('74190');
+  const { world, chip, wm } = setupChipWithPower('74x190');
   applyInputs(wm, chip, { CLK:0, UD:0, CTEN:0, LOAD:0, A:1, B:1, C:0, D:0 });
   const sim = simulate(world, chip, wm);
   assert(isHigh(getPinVoltage(sim, findPin(chip, 'QA'))), '74190: LOAD=0, A=1 → QA=HIGH');
@@ -289,7 +289,7 @@ console.log('\nG6: 74190 - Sync Up/Down Decade Counter');
 }
 {
   // Count up: preset to 8, 1 clock → count=9 (terminal for up)
-  const { world, chip } = setupChipWithPower('74190');
+  const { world, chip } = setupChipWithPower('74x190');
   // Preset to 8 (A=0,B=0,C=0,D=1)
   const wmP = new WireManager(); resetWireCounter();
   wirePinToVcc(wmP, findPin(chip, 'VCC'));
@@ -309,7 +309,7 @@ console.log('\nG6: 74190 - Sync Up/Down Decade Counter');
 }
 {
   // Count up wraps: preset to 9, 1 more clock → count wraps to 0 → QA-QD=0
-  const { world, chip } = setupChipWithPower('74190');
+  const { world, chip } = setupChipWithPower('74x190');
   const wmP = new WireManager(); resetWireCounter();
   wirePinToVcc(wmP, findPin(chip, 'VCC'));
   wirePinToGnd(wmP, findPin(chip, 'GND'));
@@ -321,7 +321,7 @@ console.log('\nG6: 74190 - Sync Up/Down Decade Counter');
 }
 {
   // Count down: preset to 1, 1 clock down → count=0 (terminal for down)
-  const { world, chip } = setupChipWithPower('74190');
+  const { world, chip } = setupChipWithPower('74x190');
   const wmP = new WireManager(); resetWireCounter();
   wirePinToVcc(wmP, findPin(chip, 'VCC'));
   wirePinToGnd(wmP, findPin(chip, 'GND'));
@@ -334,7 +334,7 @@ console.log('\nG6: 74190 - Sync Up/Down Decade Counter');
 }
 {
   // CTEN=1 (disabled) → counting inhibited
-  const { world, chip } = setupChipWithPower('74190');
+  const { world, chip } = setupChipWithPower('74x190');
   const wmP = new WireManager(); resetWireCounter();
   wirePinToVcc(wmP, findPin(chip, 'VCC'));
   wirePinToGnd(wmP, findPin(chip, 'GND'));
@@ -350,7 +350,7 @@ console.log('\nG6: 74190 - Sync Up/Down Decade Counter');
 console.log('\nG7: 74192 - BCD Up/Down Counter (dual clk)');
 {
   // CLR=1 (active HIGH) → all outputs LOW
-  const { world, chip, wm } = setupChipWithPower('74192');
+  const { world, chip, wm } = setupChipWithPower('74x192');
   applyInputs(wm, chip, { A:0, B:0, C:0, D:0, CLK_UP:0, CLK_DOWN:1, CLR:1, LOAD:1 });
   const sim = simulate(world, chip, wm);
   assert(isLow(getPinVoltage(sim, findPin(chip, 'QA'))), '74192: CLR=1 → QA=LOW');
@@ -358,7 +358,7 @@ console.log('\nG7: 74192 - BCD Up/Down Counter (dual clk)');
 }
 {
   // LOAD=0 (active LOW async): A=1,B=0,C=1,D=0 → preset count=5
-  const { world, chip, wm } = setupChipWithPower('74192');
+  const { world, chip, wm } = setupChipWithPower('74x192');
   applyInputs(wm, chip, { A:1, B:0, C:1, D:0, CLK_UP:0, CLK_DOWN:1, CLR:0, LOAD:0 });
   const sim = simulate(world, chip, wm);
   assert(isHigh(getPinVoltage(sim, findPin(chip, 'QA'))), '74192: LOAD preset A=1 → QA=HIGH');
@@ -368,7 +368,7 @@ console.log('\nG7: 74192 - BCD Up/Down Counter (dual clk)');
 }
 {
   // Count up: start at 8, CLK_UP rising → count=9; CO fires
-  const { world, chip } = setupChipWithPower('74192');
+  const { world, chip } = setupChipWithPower('74x192');
   // Preset to 8
   const wmP = new WireManager(); resetWireCounter();
   wirePinToVcc(wmP, findPin(chip, 'VCC'));
@@ -387,7 +387,7 @@ console.log('\nG7: 74192 - BCD Up/Down Counter (dual clk)');
 }
 {
   // Count down from 0 → wraps to 9; BO fires when count=0 and CLK_DOWN=0
-  const { world, chip } = setupChipWithPower('74192');
+  const { world, chip } = setupChipWithPower('74x192');
   // CLR to 0
   const wmC = new WireManager(); resetWireCounter();
   wirePinToVcc(wmC, findPin(chip, 'VCC'));
@@ -407,7 +407,7 @@ console.log('\nG7: 74192 - BCD Up/Down Counter (dual clk)');
 console.log('\nG8: 74194 - 4 bit Bidirectional Shift Register');
 {
   // CLR=0 → async clear → all Q=LOW
-  const { world, chip, wm } = setupChipWithPower('74194');
+  const { world, chip, wm } = setupChipWithPower('74x194');
   applyInputs(wm, chip, { CLR:0, CLK:0, S0:0, S1:0, SER_R:0, SER_L:0, A:1, B:1, C:1, D:1 });
   const sim = simulate(world, chip, wm);
   assert(isLow(getPinVoltage(sim, findPin(chip, 'QA'))), '74194: CLR=0 → QA=LOW');
@@ -415,7 +415,7 @@ console.log('\nG8: 74194 - 4 bit Bidirectional Shift Register');
 }
 {
   // Parallel load (S1=1, S0=1): A=1,B=0,C=1,D=0
-  const { world, chip } = setupChipWithPower('74194');
+  const { world, chip } = setupChipWithPower('74x194');
   const { sim } = clockEdge(world, chip, 'CLK', { CLR:1, S0:1, S1:1, SER_R:0, SER_L:0, A:1, B:0, C:1, D:0 });
   assert(isHigh(getPinVoltage(sim, findPin(chip, 'QA'))), '74194: parallel load A=1 → QA=HIGH');
   assert(isLow(getPinVoltage(sim, findPin(chip, 'QB'))),  '74194: parallel load B=0 → QB=LOW');
@@ -424,7 +424,7 @@ console.log('\nG8: 74194 - 4 bit Bidirectional Shift Register');
 }
 {
   // Shift right (S1=0, S0=1): SER_R=1 → after 1 clock QA=1, QB=old-QA
-  const { world, chip } = setupChipWithPower('74194');
+  const { world, chip } = setupChipWithPower('74x194');
   // First load A=0,B=1,C=0,D=0
   clockEdge(world, chip, 'CLK', { CLR:1, S0:1, S1:1, SER_R:0, SER_L:0, A:0, B:1, C:0, D:0 });
   // Shift right with SER_R=1
@@ -435,7 +435,7 @@ console.log('\nG8: 74194 - 4 bit Bidirectional Shift Register');
 }
 {
   // Shift left (S1=1, S0=0): SER_L=1 → after 1 clock QD=1
-  const { world, chip } = setupChipWithPower('74194');
+  const { world, chip } = setupChipWithPower('74x194');
   clockEdge(world, chip, 'CLK', { CLR:1, S0:1, S1:1, SER_R:0, SER_L:0, A:0, B:0, C:0, D:0 });
   const { sim } = clockEdge(world, chip, 'CLK', { CLR:1, S0:0, S1:1, SER_R:0, SER_L:1, A:0, B:0, C:0, D:0 });
   assert(isHigh(getPinVoltage(sim, findPin(chip, 'QD'))), '74194: shift-left SER_L=1 → QD=HIGH');
@@ -443,7 +443,7 @@ console.log('\nG8: 74194 - 4 bit Bidirectional Shift Register');
 }
 {
   // Hold mode (S1=0, S0=0): no change after clock
-  const { world, chip } = setupChipWithPower('74194');
+  const { world, chip } = setupChipWithPower('74x194');
   clockEdge(world, chip, 'CLK', { CLR:1, S0:1, S1:1, SER_R:0, SER_L:0, A:1, B:1, C:0, D:0 });
   const { sim } = clockEdge(world, chip, 'CLK', { CLR:1, S0:0, S1:0, SER_R:0, SER_L:0, A:0, B:0, C:0, D:0 });
   assert(isHigh(getPinVoltage(sim, findPin(chip, 'QA'))), '74194: hold mode → QA unchanged (still HIGH)');
@@ -451,12 +451,12 @@ console.log('\nG8: 74194 - 4 bit Bidirectional Shift Register');
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// G9: 74195 - 4 bit Shift Register with J-K̄ input
+// G9: 74195 - 4 bit Shift Register with JK̄ input
 // ─────────────────────────────────────────────────────────────────────────────
-console.log('\nG9: 74195 - 4 bit Shift Register (J-K input)');
+console.log('\nG9: 74195 - 4 bit Shift Register (JK input)');
 {
   // CLR=0 → async clear → QA-QD=LOW, QDn=HIGH
-  const { world, chip, wm } = setupChipWithPower('74195');
+  const { world, chip, wm } = setupChipWithPower('74x195');
   applyInputs(wm, chip, { CLR:0, CLK:0, J:0, Kn:0, PE:1, A:1, B:1, C:1, D:1 });
   const sim = simulate(world, chip, wm);
   assert(isLow(getPinVoltage(sim, findPin(chip, 'QA'))),  '74195: CLR=0 → QA=LOW');
@@ -465,7 +465,7 @@ console.log('\nG9: 74195 - 4 bit Shift Register (J-K input)');
 }
 {
   // Parallel load (PE=0): A=1,B=0,C=1,D=1
-  const { world, chip } = setupChipWithPower('74195');
+  const { world, chip } = setupChipWithPower('74x195');
   const { sim } = clockEdge(world, chip, 'CLK', { CLR:1, J:0, Kn:0, PE:0, A:1, B:0, C:1, D:1 });
   assert(isHigh(getPinVoltage(sim, findPin(chip, 'QA'))), '74195: PE=0 load A=1 → QA=HIGH');
   assert(isLow(getPinVoltage(sim, findPin(chip, 'QB'))),  '74195: PE=0 load B=0 → QB=LOW');
@@ -475,7 +475,7 @@ console.log('\nG9: 74195 - 4 bit Shift Register (J-K input)');
 }
 {
   // Shift with JK: J=1,Kn=1 → QA_next=1 (set), shift right
-  const { world, chip } = setupChipWithPower('74195');
+  const { world, chip } = setupChipWithPower('74x195');
   // Load all zeros first
   clockEdge(world, chip, 'CLK', { CLR:1, J:0, Kn:0, PE:0, A:0, B:0, C:0, D:0 });
   // Shift: J=1,Kn=1 → QA sets to 1
@@ -485,7 +485,7 @@ console.log('\nG9: 74195 - 4 bit Shift Register (J-K input)');
 }
 {
   // J=0,Kn=0 → QA_next=0 (reset), regardless of old QA
-  const { world, chip } = setupChipWithPower('74195');
+  const { world, chip } = setupChipWithPower('74x195');
   // Load QA=1
   clockEdge(world, chip, 'CLK', { CLR:1, J:0, Kn:0, PE:0, A:1, B:0, C:0, D:0 });
   // Shift: J=0,Kn=0 → QA resets to 0
@@ -495,19 +495,19 @@ console.log('\nG9: 74195 - 4 bit Shift Register (J-K input)');
 }
 {
   // QDn: load D=0 → QD=0 → QDn=HIGH
-  const { world, chip } = setupChipWithPower('74195');
+  const { world, chip } = setupChipWithPower('74x195');
   const { sim } = clockEdge(world, chip, 'CLK', { CLR:1, J:0, Kn:0, PE:0, A:0, B:0, C:0, D:0 });
   assert(isLow(getPinVoltage(sim, findPin(chip, 'QD'))),  '74195: QD=0');
   assert(isHigh(getPinVoltage(sim, findPin(chip, 'QDn'))), '74195: QD=0 → QDn=HIGH');
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// G10: 74196 - Presettable Bi-Quinary Counter (same as 74176, falling edge)
+// G10: 74196 - Presettable Bi Quinary Counter (same as 74176, falling edge)
 // ─────────────────────────────────────────────────────────────────────────────
-console.log('\nG10: 74196 - Presettable Bi-Quinary Counter');
+console.log('\nG10: 74196 - Presettable Bi Quinary Counter');
 {
   // CLR=0 → all LOW
-  const { world, chip, wm } = setupChipWithPower('74196');
+  const { world, chip, wm } = setupChipWithPower('74x196');
   applyInputs(wm, chip, { CLK1:0, CLK2:0, CLR:0, LOAD:1, A:0, B:0, C:0, D:0 });
   const sim = simulate(world, chip, wm);
   assert(isLow(getPinVoltage(sim, findPin(chip, 'QA'))), '74196: CLR=0 → QA=LOW');
@@ -515,7 +515,7 @@ console.log('\nG10: 74196 - Presettable Bi-Quinary Counter');
 }
 {
   // LOAD=0 (async preset): B=1 → QB=HIGH
-  const { world, chip, wm } = setupChipWithPower('74196');
+  const { world, chip, wm } = setupChipWithPower('74x196');
   applyInputs(wm, chip, { CLK1:0, CLK2:0, CLR:1, LOAD:0, A:0, B:1, C:0, D:0 });
   const sim = simulate(world, chip, wm);
   assert(isHigh(getPinVoltage(sim, findPin(chip, 'QB'))), '74196: LOAD preset B=1 → QB=HIGH');
@@ -523,7 +523,7 @@ console.log('\nG10: 74196 - Presettable Bi-Quinary Counter');
 }
 {
   // Falling CLK1 toggles QA
-  const { world, chip } = setupChipWithPower('74196');
+  const { world, chip } = setupChipWithPower('74x196');
   const base = { CLR:1, LOAD:1, A:0, B:0, C:0, D:0, CLK2:0 };
   const { sim: s1 } = fallingEdge(world, chip, 'CLK1', base);
   assert(isHigh(getPinVoltage(s1, findPin(chip, 'QA'))), '74196: 1st falling CLK1 → QA=HIGH');
@@ -532,7 +532,7 @@ console.log('\nG10: 74196 - Presettable Bi-Quinary Counter');
 }
 {
   // Falling CLK2: cnt5 advances
-  const { world, chip } = setupChipWithPower('74196');
+  const { world, chip } = setupChipWithPower('74x196');
   const base = { CLR:1, LOAD:1, A:0, B:0, C:0, D:0, CLK1:0 };
   const { sim: s1 } = fallingEdge(world, chip, 'CLK2', base);
   assert(isHigh(getPinVoltage(s1, findPin(chip, 'QB'))), '74196: CLK2 fall 1 → QB=HIGH (cnt5=1)');
@@ -544,7 +544,7 @@ console.log('\nG10: 74196 - Presettable Bi-Quinary Counter');
 console.log('\nG11: 74197 - Presettable Binary Counter');
 {
   // CLR=0 → all LOW
-  const { world, chip, wm } = setupChipWithPower('74197');
+  const { world, chip, wm } = setupChipWithPower('74x197');
   applyInputs(wm, chip, { CLK1:0, CLK2:0, CLR:0, LOAD:1, A:0, B:0, C:0, D:0 });
   const sim = simulate(world, chip, wm);
   assert(isLow(getPinVoltage(sim, findPin(chip, 'QA'))), '74197: CLR=0 → QA=LOW');
@@ -552,7 +552,7 @@ console.log('\nG11: 74197 - Presettable Binary Counter');
 }
 {
   // LOAD=0 preset: A=1,C=1
-  const { world, chip, wm } = setupChipWithPower('74197');
+  const { world, chip, wm } = setupChipWithPower('74x197');
   applyInputs(wm, chip, { CLK1:0, CLK2:0, CLR:1, LOAD:0, A:1, B:0, C:1, D:0 });
   const sim = simulate(world, chip, wm);
   assert(isHigh(getPinVoltage(sim, findPin(chip, 'QA'))), '74197: preset A=1 → QA=HIGH');
@@ -561,14 +561,14 @@ console.log('\nG11: 74197 - Presettable Binary Counter');
 }
 {
   // Falling CLK1 toggles QA
-  const { world, chip } = setupChipWithPower('74197');
+  const { world, chip } = setupChipWithPower('74x197');
   const base = { CLR:1, LOAD:1, A:0, B:0, C:0, D:0, CLK2:0 };
   const { sim: s1 } = fallingEdge(world, chip, 'CLK1', base);
   assert(isHigh(getPinVoltage(s1, findPin(chip, 'QA'))), '74197: 1st falling CLK1 → QA=HIGH');
 }
 {
   // Falling CLK2 7 times → cnt8=7
-  const { world, chip } = setupChipWithPower('74197');
+  const { world, chip } = setupChipWithPower('74x197');
   const base = { CLR:1, LOAD:1, A:0, B:0, C:0, D:0, CLK1:0 };
   let r;
   for (let i = 0; i < 7; i++) r = fallingEdge(world, chip, 'CLK2', base);
@@ -583,7 +583,7 @@ console.log('\nG11: 74197 - Presettable Binary Counter');
 console.log('\nG12: 74198 - 8 bit Bidirectional Shift Register');
 {
   // CLR=0 → all Q=LOW
-  const { world, chip, wm } = setupChipWithPower('74198');
+  const { world, chip, wm } = setupChipWithPower('74x198');
   applyInputs(wm, chip, { CLR:0, CLK:0, S0:0, S1:0, SER_R:0, SER_L:0,
     A:1, B:1, C:1, D:1, E:1, F:1, G:1, H:1 });
   const sim = simulate(world, chip, wm);
@@ -592,7 +592,7 @@ console.log('\nG12: 74198 - 8 bit Bidirectional Shift Register');
 }
 {
   // Parallel load (S1=1, S0=1): A=1,B=0,C=0,D=0,E=0,F=0,G=0,H=1
-  const { world, chip } = setupChipWithPower('74198');
+  const { world, chip } = setupChipWithPower('74x198');
   const { sim } = clockEdge(world, chip, 'CLK',
     { CLR:1, S0:1, S1:1, SER_R:0, SER_L:0, A:1, B:0, C:0, D:0, E:0, F:0, G:0, H:1 });
   assert(isHigh(getPinVoltage(sim, findPin(chip, 'QA'))), '74198: parallel load A=1 → QA=HIGH');
@@ -601,7 +601,7 @@ console.log('\nG12: 74198 - 8 bit Bidirectional Shift Register');
 }
 {
   // Shift right (S1=0, S0=1): SER_R=1 → QA=1, other bits shift
-  const { world, chip } = setupChipWithPower('74198');
+  const { world, chip } = setupChipWithPower('74x198');
   // Load all 0
   clockEdge(world, chip, 'CLK',
     { CLR:1, S0:1, S1:1, SER_R:0, SER_L:0, A:0, B:0, C:0, D:0, E:0, F:0, G:0, H:0 });
@@ -612,7 +612,7 @@ console.log('\nG12: 74198 - 8 bit Bidirectional Shift Register');
 }
 {
   // Shift left (S1=1, S0=0): SER_L=1 → QH=1
-  const { world, chip } = setupChipWithPower('74198');
+  const { world, chip } = setupChipWithPower('74x198');
   clockEdge(world, chip, 'CLK',
     { CLR:1, S0:1, S1:1, SER_R:0, SER_L:0, A:0, B:0, C:0, D:0, E:0, F:0, G:0, H:0 });
   const { sim } = clockEdge(world, chip, 'CLK',
@@ -622,12 +622,12 @@ console.log('\nG12: 74198 - 8 bit Bidirectional Shift Register');
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// G13: 74199 - 8 bit Shift Register with J-K̄ input
+// G13: 74199 - 8 bit Shift Register with JK̄ input
 // ─────────────────────────────────────────────────────────────────────────────
-console.log('\nG13: 74199 - 8 bit Shift Register (J-K input)');
+console.log('\nG13: 74199 - 8 bit Shift Register (JK input)');
 {
   // CLR=0 → all Q=LOW
-  const { world, chip, wm } = setupChipWithPower('74199');
+  const { world, chip, wm } = setupChipWithPower('74x199');
   applyInputs(wm, chip, { CLR:0, CLK:0, J:0, Kn:0, PE:1,
     A:1, B:1, C:1, D:1, E:1, F:1, G2:1, H:1, NC1:0 });
   const sim = simulate(world, chip, wm);
@@ -636,7 +636,7 @@ console.log('\nG13: 74199 - 8 bit Shift Register (J-K input)');
 }
 {
   // Parallel load (PE=0): A=1,B=0,C=1,D=0,E=0,F=0,G2=0,H=0
-  const { world, chip } = setupChipWithPower('74199');
+  const { world, chip } = setupChipWithPower('74x199');
   const { sim } = clockEdge(world, chip, 'CLK',
     { CLR:1, J:0, Kn:0, PE:0, A:1, B:0, C:1, D:0, E:0, F:0, G2:0, H:0, NC1:0 });
   assert(isHigh(getPinVoltage(sim, findPin(chip, 'QA'))), '74199: PE=0 load A=1 → QA=HIGH');
@@ -645,7 +645,7 @@ console.log('\nG13: 74199 - 8 bit Shift Register (J-K input)');
 }
 {
   // Shift with J=1,Kn=1 → QA sets to 1
-  const { world, chip } = setupChipWithPower('74199');
+  const { world, chip } = setupChipWithPower('74x199');
   // Load all zeros
   clockEdge(world, chip, 'CLK',
     { CLR:1, J:0, Kn:0, PE:0, A:0, B:0, C:0, D:0, E:0, F:0, G2:0, H:0, NC1:0 });
@@ -656,7 +656,7 @@ console.log('\nG13: 74199 - 8 bit Shift Register (J-K input)');
 }
 {
   // Shift with J=0,Kn=0 → QA resets to 0
-  const { world, chip } = setupChipWithPower('74199');
+  const { world, chip } = setupChipWithPower('74x199');
   clockEdge(world, chip, 'CLK',
     { CLR:1, J:0, Kn:0, PE:0, A:1, B:0, C:0, D:0, E:0, F:0, G2:0, H:0, NC1:0 });
   const { sim } = clockEdge(world, chip, 'CLK',
@@ -671,7 +671,7 @@ console.log('\nG13: 74199 - 8 bit Shift Register (J-K input)');
 console.log('\nG14: 74200 - 256x1 RAM');
 {
   // CS=1 → HiZ (non-OC) → isLow
-  const { world, chip, wm } = setupChipWithPower('74200');
+  const { world, chip, wm } = setupChipWithPower('74x200');
   applyInputs(wm, chip, { A0:0, A1:0, A2:0, A3:0, A4:0, A5:0, A6:0, A7:0,
     DIN:0, CS:1, WE:1, NC1:0, NC2:0 });
   const sim = simulate(world, chip, wm);
@@ -679,7 +679,7 @@ console.log('\nG14: 74200 - 256x1 RAM');
 }
 {
   // Write DIN=1 to addr 0, then read back
-  const { world, chip } = setupChipWithPower('74200');
+  const { world, chip } = setupChipWithPower('74x200');
   const wmW = new WireManager(); resetWireCounter();
   wirePinToVcc(wmW, findPin(chip, 'VCC'));
   wirePinToGnd(wmW, findPin(chip, 'GND'));
@@ -698,7 +698,7 @@ console.log('\nG14: 74200 - 256x1 RAM');
 }
 {
   // Unwritten address → DOUT=0
-  const { world, chip, wm } = setupChipWithPower('74200');
+  const { world, chip, wm } = setupChipWithPower('74x200');
   applyInputs(wm, chip, { A0:1, A1:1, A2:1, A3:1, A4:1, A5:1, A6:1, A7:1,
     DIN:0, CS:0, WE:1, NC1:0, NC2:0 });
   const sim = simulate(world, chip, wm);
@@ -706,7 +706,7 @@ console.log('\nG14: 74200 - 256x1 RAM');
 }
 {
   // Write to addr 127 (A0-A6=1, A7=0), read back
-  const { world, chip } = setupChipWithPower('74200');
+  const { world, chip } = setupChipWithPower('74x200');
   const wmW = new WireManager(); resetWireCounter();
   wirePinToVcc(wmW, findPin(chip, 'VCC'));
   wirePinToGnd(wmW, findPin(chip, 'GND'));
@@ -729,7 +729,7 @@ console.log('\nG14: 74200 - 256x1 RAM');
 console.log('\nG15: 74201 - 256x1 RAM (same as 74200)');
 {
   // CS=1 → HiZ
-  const { world, chip, wm } = setupChipWithPower('74201');
+  const { world, chip, wm } = setupChipWithPower('74x201');
   applyInputs(wm, chip, { A0:0, A1:0, A2:0, A3:0, A4:0, A5:0, A6:0, A7:0,
     DIN:0, CS:1, WE:1, NC1:0, NC2:0 });
   const sim = simulate(world, chip, wm);
@@ -737,7 +737,7 @@ console.log('\nG15: 74201 - 256x1 RAM (same as 74200)');
 }
 {
   // Write DIN=1 to addr 200 (A0-A7 = 11001000 = 200), read back
-  const { world, chip } = setupChipWithPower('74201');
+  const { world, chip } = setupChipWithPower('74x201');
   // 200 = 0b11001000: A0=0,A1=0,A2=0,A3=1,A4=0,A5=0,A6=1,A7=1
   const wmW = new WireManager(); resetWireCounter();
   wirePinToVcc(wmW, findPin(chip, 'VCC'));
@@ -761,7 +761,7 @@ console.log('\nG15: 74201 - 256x1 RAM (same as 74200)');
 console.log('\nG16: 74202 - 256x1 RAM with power-down');
 {
   // PD=1 → HiZ regardless of CS/WE
-  const { world, chip, wm } = setupChipWithPower('74202');
+  const { world, chip, wm } = setupChipWithPower('74x202');
   applyInputs(wm, chip, { A0:0, A1:0, A2:0, A3:0, A4:0, A5:0, A6:0, A7:0,
     DIN:0, CS:0, WE:1, PD:1, NC1:0 });
   const sim = simulate(world, chip, wm);
@@ -769,7 +769,7 @@ console.log('\nG16: 74202 - 256x1 RAM with power-down');
 }
 {
   // CS=1 → HiZ
-  const { world, chip, wm } = setupChipWithPower('74202');
+  const { world, chip, wm } = setupChipWithPower('74x202');
   applyInputs(wm, chip, { A0:0, A1:0, A2:0, A3:0, A4:0, A5:0, A6:0, A7:0,
     DIN:0, CS:1, WE:1, PD:0, NC1:0 });
   const sim = simulate(world, chip, wm);
@@ -777,7 +777,7 @@ console.log('\nG16: 74202 - 256x1 RAM with power-down');
 }
 {
   // Normal write/read (PD=0, CS=0)
-  const { world, chip } = setupChipWithPower('74202');
+  const { world, chip } = setupChipWithPower('74x202');
   const wmW = new WireManager(); resetWireCounter();
   wirePinToVcc(wmW, findPin(chip, 'VCC'));
   wirePinToGnd(wmW, findPin(chip, 'GND'));
@@ -795,7 +795,7 @@ console.log('\nG16: 74202 - 256x1 RAM with power-down');
 }
 {
   // PD=1 blocks read even after write
-  const { world, chip } = setupChipWithPower('74202');
+  const { world, chip } = setupChipWithPower('74x202');
   const wmW = new WireManager(); resetWireCounter();
   wirePinToVcc(wmW, findPin(chip, 'VCC'));
   wirePinToGnd(wmW, findPin(chip, 'GND'));

@@ -1,21 +1,19 @@
 // test-chips41.mjs - Tests for all chips defined in js/chips/chips41.js
 // Chips under test:
-//   74826        : 8 bit D-FF, CLRn+CEN, inv in, TRI       (GENERIC_STUB, 24-pin)
-//   74827        : 10 bit buffer, non-inv, TRI              (GENERIC_STUB, 24-pin)
-//   74828        : 10 bit buffer, inv, TRI                  (GENERIC_STUB, 24-pin)
-//   74832        : Hex 2 input OR driver                    (GENERIC_STUB, 20-pin)
-//   74833        : 8-to-9 transceiver w/ parity (TRI)       (GENERIC_STUB, 24-pin)
-//   74834        : 8-to-9 transceiver w/ parity, inv (TRI)  (GENERIC_STUB, 24-pin)
-//   74835        : 8 bit shift reg w/ 2:1 MUX               (GENERIC_STUB, 24-pin)
-//   74839        : PLA 14×32×6, TRI                         (GENERIC_STUB, 24-pin)
-//   74840        : PLA 14×32×6, OC                          (GENERIC_STUB + OC, 24-pin)
-//   74841        : 10 bit D-FF, TRI                         (GENERIC_STUB, 24-pin)
-//   74842        : 10 bit D-FF, inv in, TRI                 (GENERIC_STUB, 24-pin)
-//   74843        : 9 bit D-FF, CLRn+SET, TRI                (GENERIC_STUB, 24-pin)
-//   74844        : 9 bit D-FF, CLRn+SET, inv in, TRI        (GENERIC_STUB, 24-pin)
-//   74845        : 8 bit D-FF, CLRn+SET, TRI                (GENERIC_STUB, 24-pin)
-//   74846        : 8 bit D-FF, CLRn+SET, inv in, TRI        (GENERIC_STUB, 24-pin)
-//   74848        : 8-to-3 priority encoder (glitch-less), TRI (PRIORITY_ENC_8TO3_TRI, 16-pin)
+//   74826        : 8 bit D-FF, CLRn+CEN, inv in, TRI       (GENERIC_STUB, 24 pin)
+//   74827        : 10 bit buffer, non-inv, TRI              (GENERIC_STUB, 24 pin)
+//   74828        : 10 bit buffer, inv, TRI                  (GENERIC_STUB, 24 pin)
+//   74832        : Hex 2 input OR driver                    (GENERIC_STUB, 20 pin)
+//   74833        : 8-to-9 transceiver w/ parity (TRI)       (GENERIC_STUB, 24 pin)
+//   74834        : 8-to-9 transceiver w/ parity, inv (TRI)  (GENERIC_STUB, 24 pin)
+//   74835        : 8 bit shift reg w/ 2:1 MUX               (GENERIC_STUB, 24 pin)
+//   74841        : 10 bit D-FF, TRI                         (GENERIC_STUB, 24 pin)
+//   74842        : 10 bit D-FF, inv in, TRI                 (GENERIC_STUB, 24 pin)
+//   74843        : 9 bit D-FF, CLRn+SET, TRI                (GENERIC_STUB, 24 pin)
+//   74844        : 9 bit D-FF, CLRn+SET, inv in, TRI        (GENERIC_STUB, 24 pin)
+//   74845        : 8 bit D-FF, CLRn+SET, TRI                (GENERIC_STUB, 24 pin)
+//   74846        : 8 bit D-FF, CLRn+SET, inv in, TRI        (GENERIC_STUB, 24 pin)
+//   74848        : 8 to 3 priority encoder (glitch-less), TRI (PRIORITY_ENC_8TO3_TRI, 16 pin)
 
 import { CHIPS_BLOCK_41 } from '../chips/chips41.js';
 import { BreadboardWorld, holeId } from '../breadboard.js';
@@ -91,37 +89,34 @@ function connectPinLow(wm, chip, name) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const EXPECTED_IDS = [
-  '74826',
-  '74827','74828',
-  '74832',
-  '74833','74834','74835',
-  '74839','74840',
-  '74841','74842',
-  '74843','74844',
-  '74845','74846',
-  '74848',
+  '74x826',
+  '74x827','74x828',
+  '74x832',
+  '74x833','74x834','74x835',
+  '74x841','74x842',
+  '74x843','74x844',
+  '74x845','74x846',
+  '74x848',
 ];
 
 const EXPECTED_SPECS = {
-  '74826': { pins: 24, gnd: 12, vcc: 24 },
-  '74827': { pins: 24, gnd: 12, vcc: 24 },
-  '74828': { pins: 24, gnd: 12, vcc: 24 },
-  '74832': { pins: 20, gnd: 10, vcc: 20 },
-  '74833': { pins: 24, gnd: 12, vcc: 24 },
-  '74834': { pins: 24, gnd: 12, vcc: 24 },
-  '74835': { pins: 24, gnd: 12, vcc: 24 },
-  '74839': { pins: 24, gnd: 12, vcc: 24 },
-  '74840': { pins: 24, gnd: 12, vcc: 24 },
-  '74841': { pins: 24, gnd: 12, vcc: 24 },
-  '74842': { pins: 24, gnd: 12, vcc: 24 },
-  '74843': { pins: 24, gnd: 12, vcc: 24 },
-  '74844': { pins: 24, gnd: 12, vcc: 24 },
-  '74845': { pins: 24, gnd: 12, vcc: 24 },
-  '74846': { pins: 24, gnd: 12, vcc: 24 },
-  '74848': { pins: 16, gnd:  8, vcc: 16 },
+  '74x826': { pins: 24, gnd: 12, vcc: 24 },
+  '74x827': { pins: 24, gnd: 12, vcc: 24 },
+  '74x828': { pins: 24, gnd: 12, vcc: 24 },
+  '74x832': { pins: 20, gnd: 10, vcc: 20 },
+  '74x833': { pins: 24, gnd: 12, vcc: 24 },
+  '74x834': { pins: 24, gnd: 12, vcc: 24 },
+  '74x835': { pins: 24, gnd: 12, vcc: 24 },
+  '74x841': { pins: 24, gnd: 12, vcc: 24 },
+  '74x842': { pins: 24, gnd: 12, vcc: 24 },
+  '74x843': { pins: 24, gnd: 12, vcc: 24 },
+  '74x844': { pins: 24, gnd: 12, vcc: 24 },
+  '74x845': { pins: 24, gnd: 12, vcc: 24 },
+  '74x846': { pins: 24, gnd: 12, vcc: 24 },
+  '74x848': { pins: 16, gnd:  8, vcc: 16 },
 };
 
-const OC_IDS = ['74840'];
+const OC_IDS = [];
 
 console.log('\n=== SECTION S: Structure ===');
 
@@ -159,18 +154,17 @@ for (const id of EXPECTED_IDS) {
 console.log('\n=== SECTION A: Stub chips (HiZ outputs) ===');
 
 const STUB_CONFIGS = [
-  { id: '74826', outputs: ['Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7'] },
-  { id: '74827', outputs: ['Y0','Y1','Y2','Y3','Y4','Y5','Y6','Y7','Y8','Y9'] },
-  { id: '74828', outputs: ['Y0','Y1','Y2','Y3','Y4','Y5','Y6','Y7','Y8','Y9'] },
-  { id: '74832', outputs: ['Y0','Y1','Y2','Y3','Y4','Y5'] },
-  { id: '74835', outputs: ['QSER'] },
-  { id: '74839', outputs: ['O0','O1','O2','O3','O4','O5'] },
-  { id: '74841', outputs: ['Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7','Q8','Q9'] },
-  { id: '74842', outputs: ['Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7','Q8','Q9'] },
-  { id: '74843', outputs: ['Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7','Q8'] },
-  { id: '74844', outputs: ['Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7','Q8'] },
-  { id: '74845', outputs: ['Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7'] },
-  { id: '74846', outputs: ['Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7'] },
+  { id: '74x826', outputs: ['Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7'] },
+  { id: '74x827', outputs: ['Y0','Y1','Y2','Y3','Y4','Y5','Y6','Y7','Y8','Y9'] },
+  { id: '74x828', outputs: ['Y0','Y1','Y2','Y3','Y4','Y5','Y6','Y7','Y8','Y9'] },
+  { id: '74x832', outputs: ['Y0','Y1','Y2','Y3','Y4','Y5'] },
+  { id: '74x835', outputs: ['QSER'] },
+  { id: '74x841', outputs: ['Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7','Q8','Q9'] },
+  { id: '74x842', outputs: ['Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7','Q8','Q9'] },
+  { id: '74x843', outputs: ['Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7','Q8'] },
+  { id: '74x844', outputs: ['Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7','Q8'] },
+  { id: '74x845', outputs: ['Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7'] },
+  { id: '74x846', outputs: ['Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7'] },
 ];
 
 for (const { id, outputs } of STUB_CONFIGS) {
@@ -183,33 +177,14 @@ for (const { id, outputs } of STUB_CONFIGS) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SECTION B - OC stub chips: outputs pulled HIGH via pull up
+// SECTION C - 74848: 8 to 3 priority encoder (same pinout/behavior as 74348/74748)
 // ─────────────────────────────────────────────────────────────────────────────
 
-console.log('\n=== SECTION B: OC stub chips (outputs pulled HIGH) ===');
-
-const OC_STUB_CONFIGS = [
-  { id: '74840', outputs: ['O0','O1','O2','O3','O4','O5'] },
-];
-
-for (const { id, outputs } of OC_STUB_CONFIGS) {
-  const { world, chip, wm } = setupChipWithPower(id);
-  const sim = new CircuitSimulator();
-  sim.evaluate(world, [chip], wm);
-  for (const out of outputs) {
-    assertPinBit(sim, chip, out, 1, `${id} OC stub: ${out} pulled HIGH`);
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// SECTION C - 74848: 8-to-3 priority encoder (same pinout/behavior as 74348/74748)
-// ─────────────────────────────────────────────────────────────────────────────
-
-console.log('\n=== SECTION C: 74848 - 8-to-3 Priority Encoder ===');
+console.log('\n=== SECTION C: 74848 - 8 to 3 Priority Encoder ===');
 
 // C1: EIn=1 (disabled) → all outputs HiZ
 {
-  const { world, chip, wm } = setupChipWithPower('74848');
+  const { world, chip, wm } = setupChipWithPower('74x848');
   connectPinHigh(wm, chip, 'EIn');
   for (let i = 0; i < 8; i++) connectPinHigh(wm, chip, `I${i}`);
   const sim = new CircuitSimulator();
@@ -221,7 +196,7 @@ console.log('\n=== SECTION C: 74848 - 8-to-3 Priority Encoder ===');
 
 // C2: EIn=0, all inputs HIGH (no request) → GS=HIGH, EO=LOW, Axn=HIGH
 {
-  const { world, chip, wm } = setupChipWithPower('74848');
+  const { world, chip, wm } = setupChipWithPower('74x848');
   connectPinLow(wm, chip, 'EIn');
   for (let i = 0; i < 8; i++) connectPinHigh(wm, chip, `I${i}`);
   const sim = new CircuitSimulator();
@@ -235,7 +210,7 @@ console.log('\n=== SECTION C: 74848 - 8-to-3 Priority Encoder ===');
 
 // C3: EIn=0, I7=LOW (highest priority) → A2n=0, A1n=0, A0n=0 (binary 7 inverted), GS=LOW
 {
-  const { world, chip, wm } = setupChipWithPower('74848');
+  const { world, chip, wm } = setupChipWithPower('74x848');
   connectPinLow(wm, chip, 'EIn');
   connectPinLow(wm, chip, 'I7');
   for (let i = 0; i < 7; i++) connectPinHigh(wm, chip, `I${i}`);
@@ -249,7 +224,7 @@ console.log('\n=== SECTION C: 74848 - 8-to-3 Priority Encoder ===');
 
 // C4: EIn=0, I0=LOW only → A2n=1, A1n=1, A0n=1 (binary 0 inverted), GS=LOW
 {
-  const { world, chip, wm } = setupChipWithPower('74848');
+  const { world, chip, wm } = setupChipWithPower('74x848');
   connectPinLow(wm, chip, 'EIn');
   connectPinLow(wm, chip, 'I0');
   for (let i = 1; i < 8; i++) connectPinHigh(wm, chip, `I${i}`);

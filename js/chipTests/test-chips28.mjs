@@ -52,6 +52,16 @@ SIM._drivePinHighZ = function(comp, name) {
   comp.pins[name].voltage = 2.5;
   return true;
 };
+SIM._readPinVoltage = function(comp, name) {
+  if (!comp.pins[name]) return null;
+  return comp.pins[name].voltage;
+};
+SIM._readPinBit = function(comp, name, options = {}) {
+  if (!comp.pins[name]) return 0;
+  const v = comp.pins[name].voltage;
+  const bit = (v > 2.5) ? 1 : 0;
+  return options.invert ? (bit ? 0 : 1) : bit;
+};
 
 function runGate(comp, gate) {
   switch (gate.type) {
@@ -63,9 +73,6 @@ function runGate(comp, gate) {
     case 'COUNTER_10BIT_UPDOWN':SIM._evaluateCounter10BitUpdown(comp, gate); break;
     case 'SHIFT_REG_8BIT_BIDI': SIM._evaluateShiftReg8BitBidi(comp, gate); break;
     case 'ADC_6BIT_FLASH':      SIM._evaluateAdc6BitFlash(comp, gate); break;
-    case 'SAR_8BIT':            SIM._evaluateSar8Bit(comp, gate); break;
-    case 'SAR_8BIT_EXP':        SIM._evaluateSar8BitExp(comp, gate); break;
-    case 'SAR_12BIT_EXP':       SIM._evaluateSar12BitExp(comp, gate); break;
     case 'ADC_8BIT_SAR':        SIM._evaluateAdc8BitSar(comp, gate); break;
     case 'MULTIPLIER_8BIT':     SIM._evaluateMultiplier8Bit(comp, gate); break;
     case 'DECODER_PROG_2TO4':   SIM._evaluateDecoderProg2to4(comp, gate); break;
@@ -85,10 +92,10 @@ function expect(label, actual, expected) {
 
 // ── 74480: BURST_ERR_RECOVERY (stub) ────────────────────────────────────────
 {
-  const spec = CHIPS_BLOCK_28['74480'];
+  const spec = CHIPS_BLOCK_28['74x480'];
   const gate = spec.gates[0];
   expect('74480 gate type', gate.type, 'BURST_ERR_RECOVERY');
-  const { comp } = makeComp('74480');
+  const { comp } = makeComp('74x480');
   for (const p of ['D0','D1','D2','D3','D4','D5','D6','D7','CLK','LOADn','OEn']) setPin(comp, p, 0);
   runGate(comp, gate);
   expect('74480 stub ERR=0', getPin(comp, 'ERR'), 0);
@@ -98,10 +105,10 @@ function expect(label, actual, expected) {
 
 // ── 74482: CONTROL_SLICE_4BIT (stub) ────────────────────────────────────────
 {
-  const spec = CHIPS_BLOCK_28['74482'];
+  const spec = CHIPS_BLOCK_28['74x482'];
   const gate = spec.gates[0];
   expect('74482 gate type', gate.type, 'CONTROL_SLICE_4BIT');
-  const { comp } = makeComp('74482');
+  const { comp } = makeComp('74x482');
   for (const p of ['I0','I1','I2','I3','I4','I5','I6','I7','I8']) setPin(comp, p, 0);
   runGate(comp, gate);
   expect('74482 stub Y0=0', getPin(comp, 'Y0'), 0);
@@ -111,10 +118,10 @@ function expect(label, actual, expected) {
 
 // ── 74484: BCD_TO_BIN ───────────────────────────────────────────────────────
 {
-  const spec = CHIPS_BLOCK_28['74484'];
+  const spec = CHIPS_BLOCK_28['74x484'];
   const gate = spec.gates[0];
   expect('74484 gate type', gate.type, 'BCD_TO_BIN');
-  const { comp } = makeComp('74484');
+  const { comp } = makeComp('74x484');
 
   function setBCD484(ones, tens) {
     setPin(comp, 'A1', (ones >> 0) & 1);
@@ -161,10 +168,10 @@ function expect(label, actual, expected) {
 
 // ── 74485: BIN_TO_BCD ───────────────────────────────────────────────────────
 {
-  const spec = CHIPS_BLOCK_28['74485'];
+  const spec = CHIPS_BLOCK_28['74x485'];
   const gate = spec.gates[0];
   expect('74485 gate type', gate.type, 'BIN_TO_BCD');
-  const { comp } = makeComp('74485');
+  const { comp } = makeComp('74x485');
 
   function setBin485(val) {
     for (let i = 0; i < 7; i++) setPin(comp, `I${i}`, (val >> i) & 1);
@@ -207,10 +214,10 @@ function expect(label, actual, expected) {
 
 // ── 74490: COUNTER_DECADE_DUAL ──────────────────────────────────────────────
 {
-  const spec = CHIPS_BLOCK_28['74490'];
+  const spec = CHIPS_BLOCK_28['74x490'];
   const gate = spec.gates[0];
   expect('74490 gate type', gate.type, 'COUNTER_DECADE_DUAL');
-  const { comp } = makeComp('74490');
+  const { comp } = makeComp('74x490');
 
   setPin(comp, 'CLR1', 1); setPin(comp, 'CLR2', 0);
   setPin(comp, 'CKA1', 0); setPin(comp, 'CKB1', 0);
@@ -230,10 +237,10 @@ function expect(label, actual, expected) {
 
 // ── 74491: COUNTER_10BIT_UPDOWN ─────────────────────────────────────────────
 {
-  const spec = CHIPS_BLOCK_28['74491'];
+  const spec = CHIPS_BLOCK_28['74x491'];
   const gate = spec.gates[0];
   expect('74491 gate type', gate.type, 'COUNTER_10BIT_UPDOWN');
-  const { comp } = makeComp('74491');
+  const { comp } = makeComp('74x491');
 
   for (let i = 0; i < 10; i++) setPin(comp, `P${i}`, 0);
   setPin(comp, 'OEn', 0); setPin(comp, 'ENn', 0); setPin(comp, 'U_Dn', 0);
@@ -283,10 +290,10 @@ function expect(label, actual, expected) {
 
 // ── 74498: SHIFT_REG_8BIT_BIDI ──────────────────────────────────────────────
 {
-  const spec = CHIPS_BLOCK_28['74498'];
+  const spec = CHIPS_BLOCK_28['74x498'];
   const gate = spec.gates[0];
   expect('74498 gate type', gate.type, 'SHIFT_REG_8BIT_BIDI');
-  const { comp } = makeComp('74498');
+  const { comp } = makeComp('74x498');
 
   function readReg498() {
     let v = 0;
@@ -334,62 +341,22 @@ function expect(label, actual, expected) {
 
 // ── 74500: ADC_6BIT_FLASH (stub) ────────────────────────────────────────────
 {
-  const spec = CHIPS_BLOCK_28['74500'];
+  const spec = CHIPS_BLOCK_28['74x500'];
   const gate = spec.gates[0];
   expect('74500 gate type', gate.type, 'ADC_6BIT_FLASH');
-  const { comp } = makeComp('74500');
+  const { comp } = makeComp('74x500');
   setPin(comp, 'VIN', 0); setPin(comp, 'VREF', 0); setPin(comp, 'OEn', 0); setPin(comp, 'CLK', 0);
   runGate(comp, gate);
   expect('74500 stub D0=0', getPin(comp, 'D0'), 0);
-  expect('74500 stub CC=0', getPin(comp, 'CC'), 0);
-}
-
-// ── 74502: SAR_8BIT (stub) ──────────────────────────────────────────────────
-{
-  const spec = CHIPS_BLOCK_28['74502'];
-  const gate = spec.gates[0];
-  expect('74502 gate type', gate.type, 'SAR_8BIT');
-  const { comp } = makeComp('74502');
-  setPin(comp, 'CLK', 0); setPin(comp, 'EOCn', 1); setPin(comp, 'STARTn', 1); setPin(comp, 'COMP', 0);
-  runGate(comp, gate);
-  expect('74502 stub Q0=0', getPin(comp, 'Q0'), 0);
-  expect('74502 stub EOC=1', getPin(comp, 'EOC'), 1);
-  expect('74502 stub SC=1', getPin(comp, 'SC'), 1);
-}
-
-// ── 74503: SAR_8BIT_EXP (stub) ──────────────────────────────────────────────
-{
-  const spec = CHIPS_BLOCK_28['74503'];
-  const gate = spec.gates[0];
-  expect('74503 gate type', gate.type, 'SAR_8BIT_EXP');
-  const { comp } = makeComp('74503');
-  setPin(comp, 'CLK', 0); setPin(comp, 'EOCn', 1); setPin(comp, 'STARTn', 1); setPin(comp, 'COMP', 0);
-  runGate(comp, gate);
-  expect('74503 stub Q0=0', getPin(comp, 'Q0'), 0);
-  expect('74503 stub EOC=1', getPin(comp, 'EOC'), 1);
-  expect('74503 stub EXP=1', getPin(comp, 'EXP'), 1);
-}
-
-// ── 74504: SAR_12BIT_EXP (stub) ─────────────────────────────────────────────
-{
-  const spec = CHIPS_BLOCK_28['74504'];
-  const gate = spec.gates[0];
-  expect('74504 gate type', gate.type, 'SAR_12BIT_EXP');
-  const { comp } = makeComp('74504');
-  setPin(comp, 'CLK', 0); setPin(comp, 'EOCn', 1); setPin(comp, 'STARTn', 1); setPin(comp, 'COMP', 0);
-  runGate(comp, gate);
-  expect('74504 stub Q0=0', getPin(comp, 'Q0'), 0);
-  expect('74504 stub Q11=0', getPin(comp, 'Q11'), 0);
-  expect('74504 stub EOC=1', getPin(comp, 'EOC'), 1);
-  expect('74504 stub EXP=1', getPin(comp, 'EXP'), 1);
+  expect('74500 stub CC=1', getPin(comp, 'CC'), 1);
 }
 
 // ── 74505: ADC_8BIT_SAR (stub) ──────────────────────────────────────────────
 {
-  const spec = CHIPS_BLOCK_28['74505'];
+  const spec = CHIPS_BLOCK_28['74x505'];
   const gate = spec.gates[0];
   expect('74505 gate type', gate.type, 'ADC_8BIT_SAR');
-  const { comp } = makeComp('74505');
+  const { comp } = makeComp('74x505');
   setPin(comp, 'VIN', 0); setPin(comp, 'VREF', 0); setPin(comp, 'OEn', 0);
   setPin(comp, 'CLK', 0); setPin(comp, 'STARTn', 1);
   runGate(comp, gate);
@@ -399,10 +366,10 @@ function expect(label, actual, expected) {
 
 // ── 74508: MULTIPLIER_8BIT ──────────────────────────────────────────────────
 {
-  const spec = CHIPS_BLOCK_28['74508'];
+  const spec = CHIPS_BLOCK_28['74x508'];
   const gate = spec.gates[0];
   expect('74508 gate type', gate.type, 'MULTIPLIER_8BIT');
-  const { comp } = makeComp('74508');
+  const { comp } = makeComp('74x508');
 
   function setMul508(a, b) {
     const aVal = (a < 0) ? (a + 256) : a;
@@ -439,10 +406,10 @@ function expect(label, actual, expected) {
 
 // ── 74515: DECODER_PROG_2TO4 ────────────────────────────────────────────────
 {
-  const spec = CHIPS_BLOCK_28['74515'];
+  const spec = CHIPS_BLOCK_28['74x515'];
   const gate = spec.gates[0];
   expect('74515 gate type', gate.type, 'DECODER_PROG_2TO4');
-  const { comp } = makeComp('74515');
+  const { comp } = makeComp('74x515');
 
   function setEnables515(val) {
     for (let i = 0; i < 9; i++) setPin(comp, `E${i}`, val);
@@ -478,10 +445,10 @@ function expect(label, actual, expected) {
 
 // ── 74516: MULTIPLIER_16BIT ─────────────────────────────────────────────────
 {
-  const spec = CHIPS_BLOCK_28['74516'];
+  const spec = CHIPS_BLOCK_28['74x516'];
   const gate = spec.gates[0];
   expect('74516 gate type', gate.type, 'MULTIPLIER_16BIT');
-  const { comp } = makeComp('74516');
+  const { comp } = makeComp('74x516');
 
   function setMul516(a, b) {
     const aVal = (a < 0) ? (a + 16) : a;

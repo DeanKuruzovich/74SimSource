@@ -5,10 +5,10 @@ export const CHIPS_BLOCK_25 = {
 
   // ── 74414: Interrupt priority controller (Intel 8214 equiv) ──────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits */
-  '74414': {
+  '74x414': {
     name: '74x414',
     simpleName: 'Interrupt Priority Ctrl (8214)',
-    description: 'Interrupt priority controller for Intel 8080, equivalent to Intel 8214 (24-pin)',
+    description: 'Interrupt priority controller for 8080, equiv Intel 8214 (24-pin)',
     pins: 24, vcc: 24, gnd: 12,
     sequential: true,
     tags: ['interrupt', 'priority', 'intel-8214', 'complex'],
@@ -43,7 +43,7 @@ export const CHIPS_BLOCK_25 = {
       {
         title: 'Intel 8214 Equivalent',
         paragraphs: [
-          'The Intel 8214 was used in 8080 systems to manage up to eight interrupt sources. The highest asserted request wins and its 3 bit code is placed on B0-B2 for the CPU to read via INTA. S0-S2 communicate the currently-servicing level to support priority masking.',
+          'The Intel 8214 was used in 8080 systems to manage up to eight interrupt sources. The highest asserted request wins and its 3 bit code is placed on B0-B2 for the CPU to read via INTA. S0-S2 communicate the currently servicing level to support priority masking.',
         ],
       },
     ],
@@ -84,26 +84,26 @@ export const CHIPS_BLOCK_25 = {
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic
      Wikipedia: https://en.wikipedia.org/wiki/Bus_transceiver */
-  '74416': {
+  '74x416': {
     name: '74x416',
     simpleName: '4 bit Bus Xcvr (8216)',
-    description: '4 bit bidirectional bus transceiver (Intel 8216 equiv), tri-state (16-pin)',
+    description: '4 bit bidirectional bus transceiver (Intel 8216 equiv), tri state (16-pin)',
     pins: 16, vcc: 16, gnd: 8,
-    tags: ['bus transceiver', '4 bit', 'tri-state', 'bidirectional', 'intel-8216'],
-    guideOverview: 'The 74x416 is a 4 bit bidirectional bus transceiver with tri-state outputs, equivalent to the Intel 8216. DIR controls the data direction: DIR=HIGH drives A→B, DIR=LOW drives B→A. OEn (active LOW) enables the outputs; when HIGH, all outputs are high-impedance. Used to interface the Intel 8080 data bus.',
+    tags: ['bus transceiver', '4 bit', 'tri state', 'bidirectional', 'intel-8216'],
+    guideOverview: 'The 74x416 is a 4 bit bidirectional bus transceiver with tri state outputs, equivalent to the Intel 8216. DIR controls the data direction: DIR=HIGH drives A→B, DIR=LOW drives B→A. OEn (active LOW) enables the outputs; when HIGH, all outputs are high impedance. Used to interface the Intel 8080 data bus.',
     guidePinDescriptions: {
-      'OEn': 'Output Enable (active LOW). When HIGH, all outputs are tri-stated.',
+      'OEn': 'Output Enable (active LOW). When HIGH, all outputs are tri stated.',
       'DIR': 'Direction. HIGH = A to B; LOW = B to A.',
-      'A1':  'Side-A data pin 1.',
-      'A2':  'Side-A data pin 2.',
-      'A3':  'Side-A data pin 3.',
-      'A4':  'Side-A data pin 4.',
+      'A1':  'Side A data pin 1.',
+      'A2':  'Side A data pin 2.',
+      'A3':  'Side A data pin 3.',
+      'A4':  'Side A data pin 4.',
       'NC':  'No connect.',
       'GND': 'Ground reference (pin 8).',
-      'B4':  'Side-B data pin 4.',
-      'B3':  'Side-B data pin 3.',
-      'B2':  'Side-B data pin 2.',
-      'B1':  'Side-B data pin 1.',
+      'B4':  'Side B data pin 4.',
+      'B3':  'Side B data pin 3.',
+      'B2':  'Side B data pin 2.',
+      'B1':  'Side B data pin 1.',
       'NC2': 'No connect.',
       'NC3': 'No connect.',
       'NC4': 'No connect.',
@@ -145,13 +145,13 @@ export const CHIPS_BLOCK_25 = {
   // ── 74417: Modulo 2 and modulo 5 counters, shared preload/clear ──────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Counter_(digital) */
-  '74417': {
+  '74x417': {
     name: '74x417',
     simpleName: 'Modulo 2 & 5 Counters',
-    description: 'Modulo 2 and modulo 5 counters with shared preload and clear inputs (16-pin)',
+    description: 'Modulo 2 and modulo 5 counters, shared preload/clear (16-pin)',
     pins: 16, vcc: 16, gnd: 8,
     sequential: true,
-    tags: ['counter', 'modulo', 'divide-by-2', 'divide-by-5'],
+    tags: ['counter', 'modulo', 'divide by-2', 'divide by-5'],
     guideOverview: 'The 74x417 contains a modulo-2 (÷2) and a modulo-5 (÷5) counter stage driven by separate clocks (CLK2, CLK5) with shared parallel load (P0-P2, LD) and asynchronous clear (CLRn). Connecting CLK5 to the ÷2 output creates a ÷10 (decade) counter. The preload allows setting an arbitrary starting count.',
     guidePinDescriptions: {
       'CLK2':  'Clock for the ÷2 stage. Counts on falling edge.',
@@ -204,16 +204,16 @@ export const CHIPS_BLOCK_25 = {
     ],
   },
 
-  // ── 74424: Two-phase clock generator (Intel 8224 equiv) ─────────────────
+  // ── 74424: Two phase clock generator (Intel 8224 equiv) ─────────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits */
-  '74424': {
+  '74x424': {
     name: '74x424',
-    simpleName: 'Two-Phase Clock Gen (8224)',
-    description: 'Two-phase clock generator/driver for Intel 8080 (equivalent to Intel 8224) (16-pin)',
+    simpleName: 'Two Phase Clock Gen (8224)',
+    description: 'Two phase clock generator/driver for 8080, equiv Intel 8224 (16-pin)',
     pins: 16, vcc: 16, gnd: 8,
     sequential: true,
     tags: ['clock', 'two-phase', 'intel-8224', 'driver', 'complex'],
-    guideOverview: 'The 74x424 is a two-phase clock generator and driver equivalent to the Intel 8224. It takes a crystal oscillator (XTAL1/XTAL2) and generates the non-overlapping two-phase clocks (PHI1, PHI2) required by the Intel 8080 CPU. It also buffers the RESET and READY signals from the 8080 system.',
+    guideOverview: 'The 74x424 is a two phase clock generator and driver equivalent to the Intel 8224. It takes a crystal oscillator (XTAL1/XTAL2) and generates the non overlapping two phase clocks (PHI1, PHI2) required by the Intel 8080 CPU. It also buffers the RESET and READY signals from the 8080 system.',
     guidePinDescriptions: {
       'XTAL1':  'Crystal input 1 (or external clock input).',
       'XTAL2':  'Crystal input 2.',
@@ -227,16 +227,16 @@ export const CHIPS_BLOCK_25 = {
       'PHI1':   'Phase-1 clock output to 8080.',
       'RESETn': 'Synchronized reset output (active LOW) to 8080.',
       'RDYIN':  'Ready output to 8080 CPU READY pin.',
-      'OSC':    'Oscillator output (non-inverted).',
+      'OSC':    'Oscillator output (non inverted).',
       'NC1':    'No connect.',
       'NC2':    'No connect.',
       'VCC':    'Positive supply (+5 V, pin 16).',
     },
     guideSections: [
       {
-        title: 'Two-Phase 8080 Clock',
+        title: 'Two Phase 8080 Clock',
         paragraphs: [
-          'The Intel 8080 requires two non-overlapping clocks (PHI1 and PHI2) to sequence its internal pipeline. The 8224 (74x424) generates these from a crystal and ensures they never overlap if both were HIGH simultaneously, bus contention would destroy data.',
+          'The Intel 8080 requires two non overlapping clocks (PHI1 and PHI2) to sequence its internal pipeline. The 8224 (74x424) generates these from a crystal and ensures they never overlap if both were HIGH simultaneously, bus contention would destroy data.',
         ],
       },
     ],
@@ -265,37 +265,37 @@ export const CHIPS_BLOCK_25 = {
     ],
   },
 
-  // ── 74425: Quad bus buffers, active LOW enables, tri-state ───────────────
+  // ── 74425: Quad bus buffers, active LOW enables, tri state ───────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic */
-  '74425': {
+  '74x425': {
     name: '74x425',
     simpleName: 'Quad Buffer (active LOW En)',
-    description: 'Quad bus buffers with active low enables, tri-state outputs (14-pin)',
+    description: 'Quad bus buffers with active low enables, tri state outputs (14-pin)',
     pins: 14, vcc: 14, gnd: 7,
-    tags: ['buffer', 'quad', 'tri-state', 'active low'],
-    guideOverview: 'The 74x425 contains four non-inverting tri-state buffers. Each buffer has its own independent active LOW enable (E1n-E4n). When an enable is HIGH, that output is high-impedance. Commonly used to selectively drive shared bus lines.',
+    tags: ['buffer', 'quad', 'tri state', 'active low'],
+    guideOverview: 'The 74x425 contains four non inverting tri state buffers. Each buffer has its own independent active LOW enable (E1n-E4n). When an enable is HIGH, that output is high impedance. Commonly used to selectively drive shared bus lines.',
     guidePinDescriptions: {
-      'E1n': 'Enable for buffer 1 (active LOW). When HIGH, Y1 is tri-stated.',
+      'E1n': 'Enable for buffer 1 (active LOW). When HIGH, Y1 is tri stated.',
       'A1':  'Input for buffer 1.',
-      'Y1':  'Tri-state output 1.',
+      'Y1':  'Tri state output 1.',
       'E2n': 'Enable for buffer 2 (active LOW).',
       'A2':  'Input for buffer 2.',
-      'Y2':  'Tri-state output 2.',
+      'Y2':  'Tri state output 2.',
       'GND': 'Ground reference (pin 7).',
-      'Y3':  'Tri-state output 3.',
+      'Y3':  'Tri state output 3.',
       'A3':  'Input for buffer 3.',
       'E3n': 'Enable for buffer 3 (active LOW).',
-      'Y4':  'Tri-state output 4.',
+      'Y4':  'Tri state output 4.',
       'A4':  'Input for buffer 4.',
       'E4n': 'Enable for buffer 4 (active LOW).',
       'VCC': 'Positive supply (+5 V, pin 14).',
     },
     guideSections: [
       {
-        title: 'Independent-Enable Buffers',
+        title: 'Independent Enable Buffers',
         paragraphs: [
-          'Each buffer can be independently enabled or tri-stated. This is useful when four different bus lines need gating control from four separate signals rather than sharing a single OEn.',
+          'Each buffer can be independently enabled or tri stated. This is useful when four different bus lines need gating control from four separate signals rather than sharing a single OEn.',
         ],
       },
     ],
@@ -322,28 +322,28 @@ export const CHIPS_BLOCK_25 = {
     ],
   },
 
-  // ── 74426: Quad bus buffers, active HIGH enables, tri-state ─────────────
+  // ── 74426: Quad bus buffers, active HIGH enables, tri state ─────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic */
-  '74426': {
+  '74x426': {
     name: '74x426',
     simpleName: 'Quad Buffer (active HIGH En)',
-    description: 'Quad bus buffers with active high enables, tri-state outputs (14-pin)',
+    description: 'Quad bus buffers with active high enables, tri state outputs (14-pin)',
     pins: 14, vcc: 14, gnd: 7,
-    tags: ['buffer', 'quad', 'tri-state', 'active high'],
-    guideOverview: 'The 74x426 is the active HIGH enable counterpart of the 74x425. Each of the four tri-state non-inverting buffers is independently enabled by an active HIGH enable input (E1-E4). When an enable is LOW, that output is high-impedance.',
+    tags: ['buffer', 'quad', 'tri state', 'active high'],
+    guideOverview: 'The 74x426 is the active HIGH enable counterpart of the 74x425. Each of the four tri state non inverting buffers is independently enabled by an active HIGH enable input (E1-E4). When an enable is LOW, that output is high impedance.',
     guidePinDescriptions: {
-      'E1':  'Enable for buffer 1 (active HIGH). When LOW, Y1 is tri-stated.',
+      'E1':  'Enable for buffer 1 (active HIGH). When LOW, Y1 is tri stated.',
       'A1':  'Input for buffer 1.',
-      'Y1':  'Tri-state output 1.',
+      'Y1':  'Tri state output 1.',
       'E2':  'Enable for buffer 2 (active HIGH).',
       'A2':  'Input for buffer 2.',
-      'Y2':  'Tri-state output 2.',
+      'Y2':  'Tri state output 2.',
       'GND': 'Ground reference (pin 7).',
-      'Y3':  'Tri-state output 3.',
+      'Y3':  'Tri state output 3.',
       'A3':  'Input for buffer 3.',
       'E3':  'Enable for buffer 3 (active HIGH).',
-      'Y4':  'Tri-state output 4.',
+      'Y4':  'Tri state output 4.',
       'A4':  'Input for buffer 4.',
       'E4':  'Enable for buffer 4 (active HIGH).',
       'VCC': 'Positive supply (+5 V, pin 14).',
@@ -379,19 +379,19 @@ export const CHIPS_BLOCK_25 = {
     ],
   },
 
-  // ── 74432: 8 bit multi-mode buffered latch, tri-state ───────────────────
+  // ── 74432: 8 bit multi mode buffered latch, tri state ───────────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Flip-flop_(electronics)
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic
      Wikipedia: https://en.wikipedia.org/wiki/Open_collector */
-  '74432': {
+  '74x432': {
     name: '74x432',
-    simpleName: '8 bit Multi-Mode Latch (3-state)',
-    description: '8 bit multi-mode buffered latch, tri-state (24-pin)',
+    simpleName: '8 bit Multi Mode Latch (3-state)',
+    description: '8 bit multi mode buffered latch, tri state (24-pin)',
     pins: 24, vcc: 24, gnd: 12,
     sequential: true,
-    tags: ['latch', '8 bit', 'tri-state', 'multi-mode'],
-    guideOverview: 'The 74x432 is the tri-state output version of the 74x412 multi-mode 8 bit latch. Like the 74x412 it replicates Intel 8212 behavior (strobe-loaded, mode-selectable, interrupt-generating), but instead of open-collector outputs it provides full totem-pole tri-state outputs controlled by OEn.',
+    tags: ['latch', '8 bit', 'tri state', 'multi-mode'],
+    guideOverview: 'The 74x432 is the tri state output version of the 74x412 multi mode 8 bit latch. Like the 74x412 it replicates Intel 8212 behavior (strobe loaded, mode selectable, interrupt generating), but instead of open collector outputs it provides full totem pole tri state outputs controlled by OEn.',
     guidePinDescriptions: {
       'DS1':  'Device Select 1 (active HIGH). Assert to enable the device.',
       'DI0':  'Data input bit 0.',
@@ -405,7 +405,7 @@ export const CHIPS_BLOCK_25 = {
       'STB':  'Strobe. Rising edge captures DI0-DI7 and asserts INT.',
       'MD':   'Mode. LOW = output port mode, HIGH = input port mode.',
       'GND':  'Ground reference (pin 12).',
-      'OEn':  'Output Enable (active LOW tri-state). When HIGH, DO outputs are high-impedance.',
+      'OEn':  'Output Enable (active LOW tri state). When HIGH, DO outputs are high impedance.',
       'INT':  'Interrupt. Pulses HIGH after STB to notify CPU of new data.',
       'DO7':  'Latched output bit 7.',
       'DO6':  'Latched output bit 6.',
@@ -422,7 +422,7 @@ export const CHIPS_BLOCK_25 = {
       {
         title: '74x412 vs 74x432',
         paragraphs: [
-          'Both chips implement the Intel 8212 function. The 74x432 uses tri-state (totem-pole) outputs instead of open-collector, making it faster and not requiring external pull up resistors.',
+          'Both chips implement the Intel 8212 function. The 74x432 uses tri state (totem pole) outputs instead of open collector, making it faster and not requiring external pull up resistors.',
         ],
       },
     ],
@@ -459,18 +459,18 @@ export const CHIPS_BLOCK_25 = {
     ],
   },
 
-  // ── 74433: 256 bit FIFO (64×4), tri-state ───────────────────────────────
+  // ── 74433: 256 bit FIFO (64×4), tri state ───────────────────────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic
      Wikipedia: https://en.wikipedia.org/wiki/Random-access_memory */
-  '74433': {
+  '74x433': {
     name: '74x433',
     simpleName: '64×4 FIFO (3-state)',
-    description: '256 bit FIFO memory (64×4) with tri-state outputs (24-pin)',
+    description: '256 bit FIFO memory (64×4) with tri state outputs (24-pin)',
     pins: 24, vcc: 24, gnd: 12,
     sequential: true,
-    tags: ['fifo', '64x4', 'memory', 'tri-state'],
-    guideOverview: 'The 74x433 is the tri-state output version of the 74x413 (64-word × 4 bit FIFO). It adds an output enable pin (OEn) that tri-states the data outputs, allowing multiple FIFOs to share a common output bus. Otherwise operation is identical: independent read and write clocks, EF and FF status flags.',
+    tags: ['fifo', '64x4', 'memory', 'tri state'],
+    guideOverview: 'The 74x433 is the tri state output version of the 74x413 (64 word × 4 bit FIFO). It adds an output enable pin (OEn) that tri states the data outputs, allowing multiple FIFOs to share a common output bus. Otherwise operation is identical: independent read and write clocks, EF and FF status flags.',
     guidePinDescriptions: {
       'DIN0':   'Data input bit 0.',
       'DIN1':   'Data input bit 1.',
@@ -479,7 +479,7 @@ export const CHIPS_BLOCK_25 = {
       'WR_CLK': 'Write clock. Rising edge enqueues DIN when WR_EN is HIGH.',
       'WR_EN':  'Write Enable (active HIGH).',
       'RD_EN':  'Read Enable (active HIGH). Advances read pointer on RD_CLK.',
-      'OEn':    'Output Enable (active LOW). When HIGH, DOUT outputs are tri-stated.',
+      'OEn':    'Output Enable (active LOW). When HIGH, DOUT outputs are tri stated.',
       'NC1':    'No connect.',
       'NC2':    'No connect.',
       'EF':     'Empty Flag. HIGH when FIFO is empty.',
@@ -499,7 +499,7 @@ export const CHIPS_BLOCK_25 = {
     },
     guideSections: [
       {
-        title: 'Tri-State vs Always-Active FIFO',
+        title: 'Tri State vs Always Active FIFO',
         paragraphs: [
           'Use the 74x433 when multiple FIFOs share a common read bus. Only one device asserts OEn LOW at a time. The 74x413 (no OEn) is simpler when the FIFO is the only driver on the output lines.',
         ],
@@ -540,13 +540,13 @@ export const CHIPS_BLOCK_25 = {
 
   // ── 74436: Line driver / MOS memory interface (with damping) ────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits */
-  '74436': {
+  '74x436': {
     name: '74x436',
     simpleName: 'Line Driver (damped)',
     description: 'Line driver / MOS memory interface with damping output resistors (16-pin)',
     pins: 16, vcc: 16, gnd: 8,
     tags: ['driver', 'buffer', 'memory-interface', 'mos'],
-    guideOverview: 'The 74x436 is a hex non-inverting line driver designed to interface TTL logic with MOS memory buses. It features internal damping resistors on the outputs to suppress transmission-line reflections on long PCB traces, reducing ringing that could cause false triggering of MOS inputs.',
+    guideOverview: 'The 74x436 is a hex non inverting line driver designed to interface TTL logic with MOS memory buses. It features internal damping resistors on the outputs to suppress transmission line reflections on long PCB traces, reducing ringing that could cause false triggering of MOS inputs.',
     guidePinDescriptions: {
       'A1':  'Input 1.',
       'Y1':  'Buffered output 1 (damped).',
@@ -561,7 +561,7 @@ export const CHIPS_BLOCK_25 = {
       'Y5':  'Buffered output 5 (damped).',
       'A6':  'Input 6.',
       'Y6':  'Buffered output 6 (damped).',
-      'OEn': 'Output Enable (active LOW). When HIGH, all outputs are tri-stated.',
+      'OEn': 'Output Enable (active LOW). When HIGH, all outputs are tri stated.',
       'EN':  'Additional enable input.',
       'VCC': 'Positive supply (+5 V, pin 16).',
     },
@@ -569,7 +569,7 @@ export const CHIPS_BLOCK_25 = {
       {
         title: 'Damped Line Driver',
         paragraphs: [
-          'The on-chip damping resistors series-terminate the output, absorbing signal reflections from capacitive or mismatched loads. This was important when driving long traces to DRAM chips in late-1970s minicomputer memory boards.',
+          'The on chip damping resistors series terminate the output, absorbing signal reflections from capacitive or mismatched loads. This was important when driving long traces to DRAM chips in late-1970s minicomputer memory boards.',
         ],
       },
     ],
@@ -600,13 +600,13 @@ export const CHIPS_BLOCK_25 = {
 
   // ── 74437: Line driver / MOS memory interface ────────────────────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits */
-  '74437': {
+  '74x437': {
     name: '74x437',
     simpleName: 'Line Driver',
     description: 'Line driver / MOS memory interface (16-pin)',
     pins: 16, vcc: 16, gnd: 8,
     tags: ['driver', 'buffer', 'memory-interface', 'mos'],
-    guideOverview: 'The 74x437 is a hex non-inverting line driver for MOS memory interfaces, identical to the 74x436 but without the internal damping resistors. Use when external series resistors are preferred, or when the output load is close enough that reflection damping is not required.',
+    guideOverview: 'The 74x437 is a hex non inverting line driver for MOS memory interfaces, identical to the 74x436 but without the internal damping resistors. Use when external series resistors are preferred, or when the output load is close enough that reflection damping is not required.',
     guidePinDescriptions: {
       'A1':  'Input 1.',
       'Y1':  'Buffered output 1.',
@@ -629,7 +629,7 @@ export const CHIPS_BLOCK_25 = {
       {
         title: '74x436 vs 74x437',
         paragraphs: [
-          'The 74x437 is pin-compatible with 74x436. Choose 74x436 when on-chip damping is required for long-line signals; use 74x437 when adding your own series resistors or when the trace length is short.',
+          'The 74x437 is pin compatible with 74x436. Choose 74x436 when on chip damping is required for long line signals; use 74x437 when adding your own series resistors or when the trace length is short.',
         ],
       },
     ],
@@ -658,30 +658,31 @@ export const CHIPS_BLOCK_25 = {
     ],
   },
 
-  // ── 74440: Quad tridirectional transceiver, non-inverting, OC ───────────
+  // ── 74440: Quad tridirectional transceiver, non inverting, OC ───────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Open_collector
      Wikipedia: https://en.wikipedia.org/wiki/Bus_transceiver */
-  '74440': {
+  '74x440': {
     name: '74x440',
     simpleName: 'Quad Tridirnl Xcvr (OC)',
-    description: 'Quad tridirectional bus transceiver, non-inverting, open-collector (20-pin)',
+    description: 'Quad tridirectional bus transceiver, non inverting, open collector (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
-    tags: ['transceiver', 'quad', 'bidirectional', 'open-collector'],
-    guideOverview: 'The 74x440 is a quad non-inverting tridirectional bus transceiver with open-collector outputs. Two enable inputs (OE1n, OE2n) and a direction control (DIR) allow four A/B channels to pass data in either direction. Open-collector outputs support wired OR bus configurations.',
+    openCollector: true,
+    tags: ['transceiver', 'quad', 'bidirectional', 'open collector'],
+    guideOverview: 'The 74x440 is a quad non inverting tridirectional bus transceiver with open collector outputs. Two enable inputs (OE1n, OE2n) and a direction control (DIR) allow four A/B channels to pass data in either direction. Open collector outputs support wired OR bus configurations.',
     guidePinDescriptions: {
       'OE1n': 'Output Enable 1 (active LOW). Both OE1n and OE2n must be LOW to enable.',
       'OE2n': 'Output Enable 2 (active LOW).',
       'DIR':  'Direction. HIGH = A to B; LOW = B to A.',
-      'A1':   'Side-A pin 1.',
-      'B1':   'Side-B pin 1 (OC output when DIR=HIGH).',
-      'A2':   'Side-A pin 2.',
-      'B2':   'Side-B pin 2.',
-      'A3':   'Side-A pin 3.',
-      'B3':   'Side-B pin 3.',
+      'A1':   'Side A pin 1.',
+      'B1':   'Side B pin 1 (OC output when DIR=HIGH).',
+      'A2':   'Side A pin 2.',
+      'B2':   'Side B pin 2.',
+      'A3':   'Side A pin 3.',
+      'B3':   'Side B pin 3.',
       'GND':  'Ground reference (pin 10).',
-      'B4':   'Side-B pin 4.',
-      'A4':   'Side-A pin 4.',
+      'B4':   'Side B pin 4.',
+      'A4':   'Side A pin 4.',
       'NC1':  'No connect.',
       'NC2':  'No connect.',
       'NC3':  'No connect.',
@@ -695,7 +696,7 @@ export const CHIPS_BLOCK_25 = {
       {
         title: 'Tridirectional Transceiver',
         paragraphs: [
-          'Tridirectional means the device supports not just two directions but also a high-impedance (off) state, making three possible modes. With two OEn pins both must be LOW to enable data flow; either HIGH disables all outputs.',
+          'Tridirectional means the device supports not just two directions but also a high impedance (off) state, making three possible modes. With two OEn pins both must be LOW to enable data flow; either HIGH disables all outputs.',
         ],
       },
     ],
@@ -732,26 +733,27 @@ export const CHIPS_BLOCK_25 = {
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Open_collector
      Wikipedia: https://en.wikipedia.org/wiki/Bus_transceiver */
-  '74441': {
+  '74x441': {
     name: '74x441',
     simpleName: 'Quad Tridirnl Xcvr (Inv, OC)',
-    description: 'Quad tridirectional bus transceiver, inverting, open-collector (20-pin)',
+    description: 'Quad tridirectional bus transceiver, inverting, open collector (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
-    tags: ['transceiver', 'quad', 'bidirectional', 'inverting', 'open-collector'],
-    guideOverview: 'The 74x441 is an inverting quad tridirectional bus transceiver with open-collector outputs. It is identical in control to the 74x440 but inverts the data on the output side. Useful when bus polarity needs to be reversed between two circuit domains.',
+    openCollector: true,
+    tags: ['transceiver', 'quad', 'bidirectional', 'inverting', 'open collector'],
+    guideOverview: 'The 74x441 is an inverting quad tridirectional bus transceiver with open collector outputs. It is identical in control to the 74x440 but inverts the data on the output side. Useful when bus polarity needs to be reversed between two circuit domains.',
     guidePinDescriptions: {
       'OE1n': 'Output Enable 1 (active LOW).',
       'OE2n': 'Output Enable 2 (active LOW).',
       'DIR':  'Direction. HIGH = A to B (inverted); LOW = B to A (inverted).',
-      'A1':   'Side-A pin 1.',
-      'B1':   'Side-B pin 1 (OC, inverted from A1).',
-      'A2':   'Side-A pin 2.',
-      'B2':   'Side-B pin 2.',
-      'A3':   'Side-A pin 3.',
-      'B3':   'Side-B pin 3.',
+      'A1':   'Side A pin 1.',
+      'B1':   'Side B pin 1 (OC, inverted from A1).',
+      'A2':   'Side A pin 2.',
+      'B2':   'Side B pin 2.',
+      'A3':   'Side A pin 3.',
+      'B3':   'Side B pin 3.',
       'GND':  'Ground reference (pin 10).',
-      'B4':   'Side-B pin 4.',
-      'A4':   'Side-A pin 4.',
+      'B4':   'Side B pin 4.',
+      'A4':   'Side A pin 4.',
       'NC1':  'No connect.',
       'NC2':  'No connect.',
       'NC3':  'No connect.',
@@ -765,7 +767,7 @@ export const CHIPS_BLOCK_25 = {
       {
         title: 'Inverting Transceiver',
         paragraphs: [
-          'By inverting the data in transit, the 74x441 allows a system that uses positive-logic on one bus and negative-logic on another to communicate without external inverters.',
+          'By inverting the data in transit, the 74x441 allows a system that uses positive logic on one bus and negative logic on another to communicate without external inverters.',
         ],
       },
     ],
@@ -798,31 +800,31 @@ export const CHIPS_BLOCK_25 = {
     ],
   },
 
-  // ── 74442: Quad tridirectional transceiver, non-inverting, tri-state ─────
+  // ── 74442: Quad tridirectional transceiver, non inverting, tri state ─────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic
      Wikipedia: https://en.wikipedia.org/wiki/Open_collector
      Wikipedia: https://en.wikipedia.org/wiki/Bus_transceiver */
-  '74442': {
+  '74x442': {
     name: '74x442',
     simpleName: 'Quad Tridirnl Xcvr (3-state)',
-    description: 'Quad tridirectional bus transceiver, non-inverting, tri-state (20-pin)',
+    description: 'Quad tridirectional bus transceiver, non inverting, tri state (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
-    tags: ['transceiver', 'quad', 'bidirectional', 'tri-state'],
-    guideOverview: 'The 74x442 is a quad non-inverting tridirectional bus transceiver with tri-state outputs. It is the tri-state counterpart of the 74x440 (which is open-collector). DIR controls data direction; OE1n and OE2n (both active LOW) must both be asserted to enable data flow.',
+    tags: ['transceiver', 'quad', 'bidirectional', 'tri state'],
+    guideOverview: 'The 74x442 is a quad non inverting tridirectional bus transceiver with tri state outputs. It is the tri state counterpart of the 74x440 (which is open collector). DIR controls data direction; OE1n and OE2n (both active LOW) must both be asserted to enable data flow.',
     guidePinDescriptions: {
       'OE1n': 'Output Enable 1 (active LOW).',
       'OE2n': 'Output Enable 2 (active LOW).',
       'DIR':  'Direction. HIGH = A to B; LOW = B to A.',
-      'A1':   'Side-A pin 1.',
-      'B1':   'Side-B pin 1.',
-      'A2':   'Side-A pin 2.',
-      'B2':   'Side-B pin 2.',
-      'A3':   'Side-A pin 3.',
-      'B3':   'Side-B pin 3.',
+      'A1':   'Side A pin 1.',
+      'B1':   'Side B pin 1.',
+      'A2':   'Side A pin 2.',
+      'B2':   'Side B pin 2.',
+      'A3':   'Side A pin 3.',
+      'B3':   'Side B pin 3.',
       'GND':  'Ground reference (pin 10).',
-      'B4':   'Side-B pin 4.',
-      'A4':   'Side-A pin 4.',
+      'B4':   'Side B pin 4.',
+      'A4':   'Side A pin 4.',
       'NC1':  'No connect.',
       'NC2':  'No connect.',
       'NC3':  'No connect.',
@@ -836,7 +838,7 @@ export const CHIPS_BLOCK_25 = {
       {
         title: '74x440/441/442/443/444 Family',
         paragraphs: [
-          'These five chips form a matrix of inverting/non-inverting and OC/tri-state options. The 74x442 is the non-inverting, tri-state version. Choose based on whether your bus uses wired OR (OC) or totem-pole (tri-state) signaling, and whether data polarity needs inversion.',
+          'These five chips form a matrix of inverting/non inverting and OC/tri state options. The 74x442 is the non inverting, tri state version. Choose based on whether your bus uses wired OR (OC) or totem pole (tri state) signaling, and whether data polarity needs inversion.',
         ],
       },
     ],
@@ -869,30 +871,30 @@ export const CHIPS_BLOCK_25 = {
     ],
   },
 
-  // ── 74443: Quad tridirectional transceiver, inverting, tri-state ─────────
+  // ── 74443: Quad tridirectional transceiver, inverting, tri state ─────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic
      Wikipedia: https://en.wikipedia.org/wiki/Bus_transceiver */
-  '74443': {
+  '74x443': {
     name: '74x443',
     simpleName: 'Quad Tridirnl Xcvr (Inv, 3-state)',
-    description: 'Quad tridirectional bus transceiver, inverting, tri-state (20-pin)',
+    description: 'Quad tridirectional bus transceiver, inverting, tri state (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
-    tags: ['transceiver', 'quad', 'bidirectional', 'inverting', 'tri-state'],
-    guideOverview: 'The 74x443 is an inverting quad tridirectional bus transceiver with tri-state outputs. It is identical to 74x442 except data is inverted in transit. Useful for interfacing two buses where one uses inverted polarity (e.g., active HIGH to active LOW bus conversion).',
+    tags: ['transceiver', 'quad', 'bidirectional', 'inverting', 'tri state'],
+    guideOverview: 'The 74x443 is an inverting quad tridirectional bus transceiver with tri state outputs. It is identical to 74x442 except data is inverted in transit. Useful for interfacing two buses where one uses inverted polarity (e.g., active HIGH to active LOW bus conversion).',
     guidePinDescriptions: {
       'OE1n': 'Output Enable 1 (active LOW).',
       'OE2n': 'Output Enable 2 (active LOW).',
       'DIR':  'Direction. HIGH = A to B (inverted); LOW = B to A (inverted).',
-      'A1':   'Side-A pin 1.',
-      'B1':   'Side-B pin 1 (inverted from A1).',
-      'A2':   'Side-A pin 2.',
-      'B2':   'Side-B pin 2.',
-      'A3':   'Side-A pin 3.',
-      'B3':   'Side-B pin 3.',
+      'A1':   'Side A pin 1.',
+      'B1':   'Side B pin 1 (inverted from A1).',
+      'A2':   'Side A pin 2.',
+      'B2':   'Side B pin 2.',
+      'A3':   'Side A pin 3.',
+      'B3':   'Side B pin 3.',
       'GND':  'Ground reference (pin 10).',
-      'B4':   'Side-B pin 4.',
-      'A4':   'Side-A pin 4.',
+      'B4':   'Side B pin 4.',
+      'A4':   'Side A pin 4.',
       'NC1':  'No connect.',
       'NC2':  'No connect.',
       'NC3':  'No connect.',
@@ -904,9 +906,9 @@ export const CHIPS_BLOCK_25 = {
     },
     guideSections: [
       {
-        title: 'Inverting Tri-State Transceiver',
+        title: 'Inverting Tri State Transceiver',
         paragraphs: [
-          'The combination of inversion and tri-state outputs makes the 74x443 useful for bus isolation with polarity translation. Unlike OC versions, no pull up resistors are needed, giving faster edges on long lines.',
+          'The combination of inversion and tri state outputs makes the 74x443 useful for bus isolation with polarity translation. Unlike OC versions, no pull up resistors are needed, giving faster edges on long lines.',
         ],
       },
     ],
@@ -939,30 +941,30 @@ export const CHIPS_BLOCK_25 = {
     ],
   },
 
-  // ── 74444: Quad tridirectional transceiver, inv & non-inv, tri-state ─────
+  // ── 74444: Quad tridirectional transceiver, inv & non inv, tri state ─────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic
      Wikipedia: https://en.wikipedia.org/wiki/Bus_transceiver */
-  '74444': {
+  '74x444': {
     name: '74x444',
     simpleName: 'Quad Tridirnl Xcvr (Mix, 3-state)',
-    description: 'Quad tridirectional bus transceiver, inverting and non-inverting, tri-state (20-pin)',
+    description: 'Quad tridirectional bus transceiver, inv and non-inv, 3-state (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
-    tags: ['transceiver', 'quad', 'bidirectional', 'tri-state'],
-    guideOverview: 'The 74x444 is a mixed polarity quad tridirectional bus transceiver with tri-state outputs. Two channels are non-inverting and two are inverting, allowing address/data bus translations where only some lines need polarity inversion. DIR and OE1n/OE2n work the same as the rest of the 744xx transceiver family.',
+    tags: ['transceiver', 'quad', 'bidirectional', 'tri state'],
+    guideOverview: 'The 74x444 is a mixed polarity quad tridirectional bus transceiver with tri state outputs. Two channels are non inverting and two are inverting, allowing address/data bus translations where only some lines need polarity inversion. DIR and OE1n/OE2n work the same as the rest of the 744xx transceiver family.',
     guidePinDescriptions: {
       'OE1n': 'Output Enable 1 (active LOW).',
       'OE2n': 'Output Enable 2 (active LOW).',
       'DIR':  'Direction. HIGH = A to B; LOW = B to A.',
-      'A1':   'Side-A pin 1.',
-      'B1':   'Side-B pin 1.',
-      'A2':   'Side-A pin 2.',
-      'B2':   'Side-B pin 2.',
-      'A3':   'Side-A pin 3.',
-      'B3':   'Side-B pin 3.',
+      'A1':   'Side A pin 1.',
+      'B1':   'Side B pin 1.',
+      'A2':   'Side A pin 2.',
+      'B2':   'Side B pin 2.',
+      'A3':   'Side A pin 3.',
+      'B3':   'Side B pin 3.',
       'GND':  'Ground reference (pin 10).',
-      'B4':   'Side-B pin 4.',
-      'A4':   'Side-A pin 4.',
+      'B4':   'Side B pin 4.',
+      'A4':   'Side A pin 4.',
       'NC1':  'No connect.',
       'NC2':  'No connect.',
       'NC3':  'No connect.',
@@ -976,7 +978,7 @@ export const CHIPS_BLOCK_25 = {
       {
         title: 'Mixed Polarity Transceiver',
         paragraphs: [
-          'The mixed polarity configuration is useful when a bus has both inverted and non-inverted lines. For example, some early CPU address buses used active LOW lower bits and active HIGH upper bits. The 74x444 handles the mix in one package.',
+          'The mixed polarity configuration is useful when a bus has both inverted and non inverted lines. For example, some early CPU address buses used active LOW lower bits and active HIGH upper bits. The 74x444 handles the mix in one package.',
         ],
       },
     ],
@@ -1012,7 +1014,7 @@ export const CHIPS_BLOCK_25 = {
   // ── 74445: BCD to decimal decoder/driver ─────────────────────────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Multiplexer */
-  '74445': {
+  '74x445': {
     name: '74x445',
     simpleName: 'BCD→Decimal Decoder',
     description: 'BCD to decimal decoders/drivers (80 mA outputs) (16-pin)',
@@ -1039,9 +1041,9 @@ export const CHIPS_BLOCK_25 = {
     },
     guideSections: [
       {
-        title: 'BCD to Decimal Decoding',
+        title: 'BCD to Decimal-Decoding',
         paragraphs: [
-          'BCD (Binary-Coded Decimal) represents digits 0-9 as 4 bit binary patterns. The 74x445 converts each BCD code to a single asserted output only one of the ten outputs is LOW at a time.',
+          'BCD (Binary Coded Decimal) represents digits 0-9 as 4 bit binary patterns. The 74x445 converts each BCD code to a single asserted output only one of the ten outputs is LOW at a time.',
           'The high sink current (80 mA) means you can connect indicator lamps or relays directly to the outputs with appropriate current limiting.',
         ],
       },

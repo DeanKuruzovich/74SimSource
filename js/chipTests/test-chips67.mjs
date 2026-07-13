@@ -1,6 +1,6 @@
 // test-chips67.mjs - Tests for the NE555 Timer IC (chips67.js)
 // Validates the analog comparator model: THRESH vs 2/3 VCC, TRIG vs 1/3 VCC,
-// internal SR flip-flop, DISCH open-collector, RESETn, and CTRL override.
+// internal SR flip flop, DISCH open collector, RESETn, and CTRL override.
 
 import { CHIPS_BLOCK_67 } from '../chips/chips67.js';
 import { BreadboardWorld, holeId } from '../breadboard.js';
@@ -94,7 +94,7 @@ console.log('\n── Chip definition ──');
 {
   const def = CHIPS_BLOCK_67['555'];
   assert(def !== undefined, '555 chip definition exists');
-  assert(def.pins === 8, '555 is 8-pin DIP');
+  assert(def.pins === 8, '555 is 8 pin DIP');
   assert(def.vcc === 8, 'VCC is pin 8');
   assert(def.gnd === 1, 'GND is pin 1');
   assert(def.gates.length === 1, 'One gate entry (TIMER_555)');
@@ -404,7 +404,7 @@ console.log('\n── 556 chip definition ──');
 {
   const def = CHIPS_BLOCK_67['556'];
   assert(def !== undefined, '556 chip definition exists');
-  assert(def.pins === 14, '556 is 14-pin DIP');
+  assert(def.pins === 14, '556 is 14 pin DIP');
   assert(def.vcc === 14, '556 VCC is pin 14');
   assert(def.gnd === 7, '556 GND is pin 7');
   assert(def.gates.length === 2, '556 has two gate entries');
@@ -546,7 +546,7 @@ console.log('\n── 558 chip definition ──');
 {
   const def = CHIPS_BLOCK_67['558'];
   assert(def !== undefined, '558 chip definition exists');
-  assert(def.pins === 16, '558 is 16-pin DIP');
+  assert(def.pins === 16, '558 is 16 pin DIP');
   assert(def.vcc === 15, '558 VCC is pin 15');
   assert(def.gnd === 8,  '558 GND is pin 8');
   assert(def.gates.length === 4, '558 has four gate entries');

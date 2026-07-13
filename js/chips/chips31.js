@@ -3,21 +3,21 @@
 
 export const CHIPS_BLOCK_31 = {
 
-  // ── 74564: Octal D-type edge-triggered flip-flop, inverting outputs ──────
+  // ── 74564: Octal D type edge triggered flip flop, inverting outputs ──────
   /* Primary source: Texas Instruments, 74564 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74als564b.pdf
      https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
-  '74564': {
+  '74x564': {
     name: '74x564',
     simpleName: 'Octal FF Inv (TRI)',
-    description: 'Octal D-type edge-triggered flip-flop with inverting outputs and tri-state (20-pin)',
+    description: 'Octal D-type edge-triggered flip-flop, inverting, 3-state (20-pin)',
     pins: 20,
     vcc: 20,
     gnd: 10,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74als564b.pdf',
-    tags: ['flip-flop', 'octal', 'register', 'inverting', 'tri-state'],
-    guideOverview: 'The 74x564 is an octal D-type edge-triggered flip-flop with inverting outputs and tri-state output control. On each rising edge of CLK, each output Qn is set to the complement of the corresponding D input. OE (active LOW) enables all outputs; negating it (HIGH) tri-states them. It is the inverting complement of the 74x574.',
+    tags: ['flip flop', 'octal', 'register', 'inverting', 'tri state'],
+    guideOverview: 'The 74x564 is an octal D type edge triggered flip flop with inverting outputs and tri state output control. On each rising edge of CLK, each output Qn is set to the complement of the corresponding D input. OE (active LOW) enables all outputs; negating it (HIGH) tri states them. It is the inverting complement of the 74x574.',
     guidePinDescriptions: {
-      'OEn': 'Output Enable (active LOW). Tri-states all Qn outputs when negated (HIGH).',
+      'OEn': 'Output Enable (active LOW). Tri states all Qn outputs when negated (HIGH).',
       'D0':  'Data input 0.',
       'D1':  'Data input 1.',
       'D2':  'Data input 2.',
@@ -42,7 +42,7 @@ export const CHIPS_BLOCK_31 = {
       {
         title: 'Inverting Octal Register',
         paragraphs: [
-          'The inverting output makes the 74x564 useful when the downstream logic requires active LOW signals, saving an inverter stage on the bus. It is otherwise pin-compatible with the 74x574.',
+          'The inverting output makes the 74x564 useful when the downstream logic requires active LOW signals, saving an inverter stage on the bus. It is otherwise pin compatible with the 74x574.',
         ],
       },
     ],
@@ -78,21 +78,21 @@ export const CHIPS_BLOCK_31 = {
   // ── 74566: 8 bit bidirectional registered transceiver, inverting ─────────
   /* Primary source: Texas Instruments, 74566 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls566.pdf
      https://en.wikipedia.org/wiki/Bus_transceiver */
-  '74566': {
+  '74x566': {
     name: '74x566',
     simpleName: 'Octal Reg Xcvr Inv (TRI)',
-    description: '8 bit bidirectional registered transceiver with inverting outputs and tri-state (24-pin)',
+    description: '8-bit bidirectional registered transceiver, inverting 3-state (24-pin)',
     pins: 24,
     vcc: 24,
     gnd: 12,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls566.pdf',
-    tags: ['transceiver', 'registered', 'bidirectional', 'inverting', 'octal', 'tri-state'],
-    guideOverview: 'The 74x566 is an 8 bit bidirectional registered transceiver with inverting outputs. It is the inverting-output version of the 74x546. LEAB and LEBA are latch enables for the two directions; CLK registers the latch output; DIR and OEABn/OEBAn control direction and bus drives. Data is inverted through the register path.',
+    tags: ['transceiver', 'registered', 'bidirectional', 'inverting', 'octal', 'tri state'],
+    guideOverview: 'The 74x566 is an 8 bit bidirectional registered transceiver with inverting outputs. It is the inverting output version of the 74x546. LEAB and LEBA are latch enables for the two directions; CLK registers the latch output; DIR and OEABn/OEBAn control direction and bus drives. Data is inverted through the register path.',
     guidePinDescriptions: {
-      'OEABn': 'A-to-B Output Enable (active LOW).',
-      'OEBAn': 'B-to-A Output Enable (active LOW).',
-      'LEAB':  'Latch Enable A-to-B.',
-      'LEBA':  'Latch Enable B-to-A.',
+      'OEABn': 'A-to B Output Enable (active LOW).',
+      'OEBAn': 'B-to A Output Enable (active LOW).',
+      'LEAB':  'Latch Enable A-to B.',
+      'LEBA':  'Latch Enable B-to A.',
       'CLK':   'Clock for register capture.',
       'DIR':   'Direction select.',
       'A0':    'Port A bit 0.',
@@ -116,7 +116,7 @@ export const CHIPS_BLOCK_31 = {
     },
     guideSections: [
       {
-        title: 'Inverting vs Non-Inverting Registered Transceiver',
+        title: 'Inverting vs Non Inverting Registered Transceiver',
         paragraphs: [
           '74x546 passes data unchanged; 74x566 inverts it. Use 74x566 when the receiving bus uses complemented logic or to avoid external inverter stages.',
         ],
@@ -161,21 +161,21 @@ export const CHIPS_BLOCK_31 = {
   // ── 74567: 8 bit bidirectional latched transceiver, inverting ───────────
   /* Primary source: Texas Instruments, 74567 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls567.pdf
      https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
-  '74567': {
+  '74x567': {
     name: '74x567',
     simpleName: 'Octal Latch Xcvr Inv (TRI)',
-    description: '8 bit bidirectional latched transceiver with inverting outputs and tri-state (24-pin)',
+    description: '8-bit bidirectional latched transceiver, inverting 3-state (24-pin)',
     pins: 24,
     vcc: 24,
     gnd: 12,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls567.pdf',
-    tags: ['transceiver', 'latch', 'bidirectional', 'inverting', 'octal', 'tri-state'],
-    guideOverview: 'The 74x567 is an 8 bit bidirectional latched transceiver with inverting outputs. It is the inverting version of the 74x547. LEAB/LEBA are level-triggered (transparent when HIGH); there is no separate CLK. All data paths invert through the latch.',
+    tags: ['transceiver', 'latch', 'bidirectional', 'inverting', 'octal', 'tri state'],
+    guideOverview: 'The 74x567 is an 8 bit bidirectional latched transceiver with inverting outputs. It is the inverting version of the 74x547. LEAB/LEBA are level triggered (transparent when HIGH); there is no separate CLK. All data paths invert through the latch.',
     guidePinDescriptions: {
-      'OEABn': 'A-to-B Output Enable (active LOW).',
-      'OEBAn': 'B-to-A Output Enable (active LOW).',
-      'LEAB':  'Latch Enable A-to-B. HIGH = transparent.',
-      'LEBA':  'Latch Enable B-to-A.',
+      'OEABn': 'A-to B Output Enable (active LOW).',
+      'OEBAn': 'B-to A Output Enable (active LOW).',
+      'LEAB':  'Latch Enable A-to B. HIGH = transparent.',
+      'LEBA':  'Latch Enable B-to A.',
       'DIR':   'Direction select.',
       'A0':    'Port A bit 0.',
       'A1':    'Port A bit 1.',
@@ -241,19 +241,19 @@ export const CHIPS_BLOCK_31 = {
     ],
   },
 
-  // ── 74568: Decade up/down counter, tri-state ────────────────────────────
+  // ── 74568: Decade up/down counter, tri state ────────────────────────────
   /* Primary source: Texas Instruments, 74568 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74als568a.pdf
      https://en.wikipedia.org/wiki/Counter_(digital) */
-  '74568': {
+  '74x568': {
     name: '74x568',
     simpleName: 'Decade Up/Down Ctr (TRI)',
-    description: 'Synchronous 4 bit decade up/down counter with tri-state outputs (20-pin)',
+    description: 'Synchronous 4 bit decade up/down counter with tri state outputs (20-pin)',
     pins: 20,
     vcc: 20,
     gnd: 10,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74als568a.pdf',
-    tags: ['counter', 'decade', 'up-down', 'synchronous', 'tri-state'],
-    guideOverview: 'The 74x568 is a synchronous 4 bit BCD (decade) up/down counter with tri-state outputs. U_Dn HIGH = count up, LOW = count down. ENP and ENT both HIGH enable counting; LOAD loads the parallel A-D inputs; CLRn (active LOW) synchronously clears on the next CLK edge. RCO carries for multi-digit cascading.',
+    tags: ['counter', 'decade', 'up-down', 'synchronous', 'tri state'],
+    guideOverview: 'The 74x568 is a synchronous 4 bit BCD (decade) up/down counter with tri state outputs. U_Dn HIGH = count up, LOW = count down. ENP and ENT both HIGH enable counting; LOAD loads the parallel A-D inputs; CLRn (active LOW) synchronously clears on the next CLK edge. RCO carries for multi digit cascading.',
     guidePinDescriptions: {
       'CLRn':  'Synchronous Clear (active LOW). Clears counter on next CLK edge.',
       'CLK':   'Clock (rising edge).',
@@ -280,7 +280,7 @@ export const CHIPS_BLOCK_31 = {
       {
         title: 'Up/Down BCD Counter',
         paragraphs: [
-          'The up/down capability enables presettable timer and event-counting circuits. For a down counter, preload the starting value via LOAD; the counter decrements to 0 and then rolls over to 9.',
+          'The up/down capability enables presettable timer and event counting circuits. For a down counter, preload the starting value via LOAD; the counter decrements to 0 and then rolls over to 9.',
         ],
       },
     ],
@@ -313,19 +313,19 @@ export const CHIPS_BLOCK_31 = {
     ],
   },
 
-  // ── 74569: Binary up/down counter, tri-state ────────────────────────────
+  // ── 74569: Binary up/down counter, tri state ────────────────────────────
   /* Primary source: Texas Instruments, 74569 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74als569a.pdf
      https://en.wikipedia.org/wiki/Counter_(digital) */
-  '74569': {
+  '74x569': {
     name: '74x569',
     simpleName: 'Binary Up/Down Ctr (TRI)',
-    description: 'Synchronous 4 bit binary up/down counter with tri-state outputs (20-pin)',
+    description: 'Synchronous 4 bit binary up/down counter with tri state outputs (20-pin)',
     pins: 20,
     vcc: 20,
     gnd: 10,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74als569a.pdf',
-    tags: ['counter', 'binary', 'up-down', 'synchronous', 'tri-state'],
-    guideOverview: 'The 74x569 is the binary version of the 74x568, counting 0-15 (modulo-16) rather than 0-9. Same synchronous up/down control, ENP/ENT enables, parallel load, synchronous clear (CLRn active LOW), and tri-state outputs. RCO cascades for wider counters.',
+    tags: ['counter', 'binary', 'up-down', 'synchronous', 'tri state'],
+    guideOverview: 'The 74x569 is the binary version of the 74x568, counting 0-15 (modulo-16) rather than 0-9. Same synchronous up/down control, ENP/ENT enables, parallel load, synchronous clear (CLRn active LOW), and tri state outputs. RCO cascades for wider counters.',
     guidePinDescriptions: {
       'CLRn':  'Synchronous Clear (active LOW).',
       'CLK':   'Clock (rising edge).',
@@ -352,7 +352,7 @@ export const CHIPS_BLOCK_31 = {
       {
         title: '74x568 vs 74x569',
         paragraphs: [
-          '74x568 is decade (BCD, 0-9); 74x569 is binary (0-15). Choose 74x568 for decimal display applications; 74x569 for general-purpose power-of-2 counting.',
+          '74x568 is decade (BCD, 0-9); 74x569 is binary (0-15). Choose 74x568 for decimal display applications; 74x569 for general purpose power of-2 counting.',
         ],
       },
     ],
@@ -385,19 +385,19 @@ export const CHIPS_BLOCK_31 = {
     ],
   },
 
-  // ── 74575: Octal D-type FF, synchronous clear, tri-state ────────────────
+  // ── 74575: Octal D type FF, synchronous clear, tri state ────────────────
   /* Primary source: Texas Instruments, 74575 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74als575a.pdf
      https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
-  '74575': {
+  '74x575': {
     name: '74x575',
     simpleName: 'Octal FF Sync CLR (TRI)',
-    description: 'Octal D-type edge-triggered flip-flop with synchronous clear and tri-state (24-pin)',
+    description: 'Octal D-type edge-triggered flip-flop, sync clear, 3-state (24-pin)',
     pins: 24,
     vcc: 24,
     gnd: 12,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74als575a.pdf',
-    tags: ['flip-flop', 'octal', 'register', 'synchronous-clear', 'tri-state'],
-    guideOverview: 'The 74x575 is an octal D-type edge-triggered flip-flop with synchronous clear and tri-state outputs. CLRn (active LOW) on the rising CLK edge resets all outputs to 0. OE (active LOW) enables the Q outputs. The 24-pin package provides 3 NC pins for mechanical compatibility.',
+    tags: ['flip flop', 'octal', 'register', 'synchronous-clear', 'tri state'],
+    guideOverview: 'The 74x575 is an octal D type edge triggered flip flop with synchronous clear and tri state outputs. CLRn (active LOW) on the rising CLK edge resets all outputs to 0. OE (active LOW) enables the Q outputs. The 24-pin package provides 3 NC pins for mechanical compatibility.',
     guidePinDescriptions: {
       'OEn':  'Output Enable (active LOW).',
       'CLRn': 'Synchronous Clear (active LOW). Clears to 0 on rising CLK edge.',
@@ -465,19 +465,19 @@ export const CHIPS_BLOCK_31 = {
     ],
   },
 
-  // ── 74576: Octal D-type edge-triggered FF, inverting, tri-state ──────────
+  // ── 74576: Octal D type edge triggered FF, inverting, tri state ──────────
   /* Primary source: Texas Instruments, 74576 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74als576b.pdf
      https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
-  '74576': {
+  '74x576': {
     name: '74x576',
     simpleName: 'Octal FF Inv (TRI)',
-    description: 'Octal D-type edge-triggered flip-flop with inverting outputs and tri-state (20-pin)',
+    description: 'Octal D-type edge-triggered flip-flop, inverting, 3-state (20-pin)',
     pins: 20,
     vcc: 20,
     gnd: 10,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74als576b.pdf',
-    tags: ['flip-flop', 'octal', 'register', 'inverting', 'tri-state'],
-    guideOverview: 'The 74x576 is an octal D-type edge-triggered flip-flop with inverting outputs and tri-state, identical in function to the 74x564. Both capture the complement of D inputs on the rising CLK edge. The part number difference reflects a process or package revision within the ALS/FAST family.',
+    tags: ['flip flop', 'octal', 'register', 'inverting', 'tri state'],
+    guideOverview: 'The 74x576 is an octal D type edge triggered flip flop with inverting outputs and tri state, identical in function to the 74x564. Both capture the complement of D inputs on the rising CLK edge. The part number difference reflects a process or package revision within the ALS/FAST family.',
     guidePinDescriptions: {
       'OEn': 'Output Enable (active LOW).',
       'D0':  'Data input 0.',
@@ -504,7 +504,7 @@ export const CHIPS_BLOCK_31 = {
       {
         title: '74x564 vs 74x576',
         paragraphs: [
-          'Both chips are octal inverting registers. The 74x576 is the ALS-family update of the 74x564. They are functionally interchangeable in most designs.',
+          'Both chips are octal inverting registers. The 74x576 is the ALS family update of the 74x564. They are functionally interchangeable in most designs.',
         ],
       },
     ],
@@ -537,19 +537,19 @@ export const CHIPS_BLOCK_31 = {
     ],
   },
 
-  // ── 74577: Octal D-type FF, synchronous clear, inverting, tri-state ──────
+  // ── 74577: Octal D type FF, synchronous clear, inverting, tri state ──────
   /* Primary source: Texas Instruments, 74577 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74als577a.pdf
      https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
-  '74577': {
+  '74x577': {
     name: '74x577',
     simpleName: 'Octal FF SynCLR Inv (TRI)',
-    description: 'Octal D-type flip-flop with synchronous clear, inverting outputs and tri-state (24-pin)',
+    description: 'Octal D-type flip-flop, sync clear, inverting, 3-state (24-pin)',
     pins: 24,
     vcc: 24,
     gnd: 12,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74als577a.pdf',
-    tags: ['flip-flop', 'octal', 'register', 'synchronous-clear', 'inverting', 'tri-state'],
-    guideOverview: 'The 74x577 adds synchronous clear to the inverting-output octal D-FF. CLRn LOW on a rising CLK edge forces all Qn HIGH (since outputs are inverted). OEn tri-states all outputs. The 24-pin package is pin-compatible with 74x575 but with inverted outputs.',
+    tags: ['flip flop', 'octal', 'register', 'synchronous-clear', 'inverting', 'tri state'],
+    guideOverview: 'The 74x577 adds synchronous clear to the inverting output octal D-FF. CLRn LOW on a rising CLK edge forces all Qn HIGH (since outputs are inverted). OEn tri states all outputs. The 24-pin package is pin compatible with 74x575 but with inverted outputs.',
     guidePinDescriptions: {
       'OEn':  'Output Enable (active LOW).',
       'CLRn': 'Synchronous Clear (active LOW). Forces Qn HIGH on rising CLK.',
@@ -580,7 +580,7 @@ export const CHIPS_BLOCK_31 = {
       {
         title: 'Synchronous Clear with Inverted Outputs',
         paragraphs: [
-          'Because outputs are inverted, CLRn LOW clears D=0 into the flip-flop, which appears as Qn=HIGH after the CLK edge. For active LOW downstream logic, this acts as a forced-HIGH reset.',
+          'Because outputs are inverted, CLRn LOW clears D=0 into the flip flop, which appears as Qn=HIGH after the CLK edge. For active LOW downstream logic, this acts as a forced HIGH reset.',
         ],
       },
     ],
@@ -617,19 +617,19 @@ export const CHIPS_BLOCK_31 = {
     ],
   },
 
-  // ── 74579: 8 bit bidirectional binary counter, tri-state ─────────────────
+  // ── 74579: 8 bit bidirectional binary counter, tri state ─────────────────
   /* Primary source: Texas Instruments, 74579 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/mc74f579.pdf
      https://en.wikipedia.org/wiki/Counter_(digital) */
-  '74579': {
+  '74x579': {
     name: '74x579',
     simpleName: '8 bit Bidir Ctr (TRI)',
-    description: '8 bit bidirectional synchronous binary counter with tri-state outputs (20-pin)',
+    description: '8-bit bidirectional sync binary counter, 3-state (20-pin)',
     pins: 20,
     vcc: 20,
     gnd: 10,
     datasheet: 'https://www.ti.com/lit/ds/symlink/mc74f579.pdf',
-    tags: ['counter', 'binary', 'up-down', '8 bit', 'synchronous', 'tri-state'],
-    guideOverview: 'The 74x579 is an 8 bit synchronous binary up/down counter with a bidirectional tri-state bus (A0-A7 are shared data/output pins). ENP, ENT, U_Dn, LOAD, and OEn provide full count control. TC (terminal count) goes HIGH at the maximum (count up) or minimum (count down) to cascade multiple chips.',
+    tags: ['counter', 'binary', 'up-down', '8 bit', 'synchronous', 'tri state'],
+    guideOverview: 'The 74x579 is an 8 bit synchronous binary up/down counter with a bidirectional tri state bus (A0-A7 are shared data/output pins). ENP, ENT, U_Dn, LOAD, and OEn provide full count control. TC (terminal count) goes HIGH at the maximum (count up) or minimum (count down) to cascade multiple chips.',
     guidePinDescriptions: {
       'CLK':  'Clock (rising edge).',
       'ENT':  'Count Enable Trickle (also gates TC).',
@@ -689,19 +689,19 @@ export const CHIPS_BLOCK_31 = {
     ],
   },
 
-  // ── 74580: Octal D-type transparent latch, inverting, tri-state ──────────
+  // ── 74580: Octal D type transparent latch, inverting, tri state ──────────
   /* Primary source: Texas Instruments, 74580 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74als580b.pdf
      https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
-  '74580': {
+  '74x580': {
     name: '74x580',
     simpleName: 'Octal Latch Inv (TRI)',
-    description: 'Octal D-type transparent latch with inverting outputs and tri-state (20-pin)',
+    description: 'Octal D-type transparent latch, inverting, 3-state (20-pin)',
     pins: 20,
     vcc: 20,
     gnd: 10,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74als580b.pdf',
-    tags: ['latch', 'octal', 'inverting', 'tri-state'],
-    guideOverview: 'The 74x580 is an octal D-type transparent latch with inverting outputs and tri-state. LE HIGH makes outputs follow the inverted D inputs; LE LOW holds the latched value. OEn enables outputs. Functionally equivalent to the 74x533/74x563 family.',
+    tags: ['latch', 'octal', 'inverting', 'tri state'],
+    guideOverview: 'The 74x580 is an octal D type transparent latch with inverting outputs and tri state. LE HIGH makes outputs follow the inverted D inputs; LE LOW holds the latched value. OEn enables outputs. Functionally equivalent to the 74x533/74x563 family.',
     guidePinDescriptions: {
       'OEn': 'Output Enable (active LOW).',
       'D0':  'Data input 0.',
@@ -764,16 +764,16 @@ export const CHIPS_BLOCK_31 = {
   // ── 74582: 4 bit BCD arithmetic logic unit ───────────────────────────────
   /* Primary source: Texas Instruments, 74582 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/74f582.pdf
      https://en.wikipedia.org/wiki/Arithmetic_logic_unit */
-  '74582': {
+  '74x582': {
     name: '74x582',
     simpleName: '4 bit BCD ALU',
-    description: '4 bit binary-coded decimal arithmetic logic unit (24-pin)',
+    description: '4 bit binary coded decimal arithmetic logic unit (24-pin)',
     pins: 24,
     vcc: 24,
     gnd: 12,
     datasheet: 'https://www.ti.com/lit/ds/symlink/74f582.pdf',
     tags: ['alu', 'bcd', 'arithmetic'],
-    guideOverview: 'The 74x582 is a 4 bit BCD (binary-coded decimal) arithmetic logic unit. It performs 16 operations on BCD operands selected by S3-S0, with mode M (arithmetic vs logic). Cn is carry-in; F0-F3 are the result; Cn4 is carry-out; OVR indicates decimal overflow; P and G are carry propagate and generate outputs for fast lookahead chaining.',
+    guideOverview: 'The 74x582 is a 4 bit BCD (binary coded decimal) arithmetic logic unit. It performs 16 operations on BCD operands selected by S3-S0, with mode M (arithmetic vs logic). Cn is carry in; F0-F3 are the result; Cn4 is carry out; OVR indicates decimal overflow; P and G are carry propagate and generate outputs for fast lookahead chaining.',
     guidePinDescriptions: {
       'B0':  'BCD operand B bit 0.',
       'A0':  'BCD operand A bit 0.',
@@ -806,6 +806,7 @@ export const CHIPS_BLOCK_31 = {
         paragraphs: [
           'The 74x582 performs the same 16 operations as the 74x181 but corrects the BCD carry internally. This avoids the BCD correction step required when doing decimal arithmetic with binary ALUs.',
         ],
+        note: 'Simplification: only the BCD-add operation is modelled in 74Sim (mode M=LOW with S3..S0 = 1001), which produces F = A + B + Cn with decimal carry on Cn4. Every other select/mode combination simply passes A through to F, and the OVR, P and G outputs are always held LOW. Treat this part as a decimal adder in-sim, not a full 16-function ALU.',
       },
     ],
     pinout: [
@@ -844,16 +845,16 @@ export const CHIPS_BLOCK_31 = {
   // ── 74583: 4 bit BCD adder ───────────────────────────────────────────────
   /* Primary source: Texas Instruments, 74583 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/74f583.pdf
      https://en.wikipedia.org/wiki/Adder_(electronics) */
-  '74583': {
+  '74x583': {
     name: '74x583',
     simpleName: '4 bit BCD Adder',
-    description: '4 bit binary-coded decimal adder (16-pin)',
+    description: '4 bit binary coded decimal adder (16-pin)',
     pins: 16,
     vcc: 16,
     gnd: 8,
     datasheet: 'https://www.ti.com/lit/ds/symlink/74f583.pdf',
     tags: ['adder', 'bcd', 'arithmetic'],
-    guideOverview: 'The 74x583 is a 4 bit BCD adder that sums two BCD digits and a carry-in to produce a 4 bit BCD sum and a carry-out. It is simpler than the 74x582 (addition only, no function select). Cascade by connecting Cout to Cin of the next chip for multi-digit decimal addition.',
+    guideOverview: 'The 74x583 is a 4 bit BCD adder that sums two BCD digits and a carry in to produce a 4 bit BCD sum and a carry out. It is simpler than the 74x582 (addition only, no function select). Cascade by connecting Cout to Cin of the next chip for multi digit decimal addition.',
     guidePinDescriptions: {
       'B0':  'BCD addend B bit 0.',
       'A0':  'BCD addend A bit 0.',
@@ -908,16 +909,16 @@ export const CHIPS_BLOCK_31 = {
   // ── 74588: Octal bidirectional transceiver, IEEE-488 termination ─────────
   /* Primary source: Texas Instruments, 74588 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/74f588.pdf
      https://en.wikipedia.org/wiki/Bus_transceiver */
-  '74588': {
+  '74x588': {
     name: '74x588',
     simpleName: 'Octal Xcvr IEEE-488',
-    description: 'Octal bidirectional transceiver with IEEE-488 bus termination resistors (20-pin)',
+    description: 'Octal bidirectional transceiver, IEEE-488 termination (20-pin)',
     pins: 20,
     vcc: 20,
     gnd: 10,
     datasheet: 'https://www.ti.com/lit/ds/symlink/74f588.pdf',
     tags: ['transceiver', 'bidirectional', 'octal', 'ieee-488', 'gpib'],
-    guideOverview: 'The 74x588 is an 8 bit bidirectional bus transceiver designed for IEEE-488 (GPIB) bus interfaces. It integrates bus-termination resistors matched to GPIB cable impedance requirements. DIR and OEn control direction and output enable, identical to a 74x245, but internal termination simplifies GPIB board design.',
+    guideOverview: 'The 74x588 is an 8 bit bidirectional bus transceiver designed for IEEE-488 (GPIB) bus interfaces. It integrates bus termination resistors matched to GPIB cable impedance requirements. DIR and OEn control direction and output enable, identical to a 74x245, but internal termination simplifies GPIB board design.',
     guidePinDescriptions: {
       'OEn': 'Output Enable (active LOW).',
       'DIR': 'Direction. HIGH = A drives B; LOW = B drives A.',
@@ -944,7 +945,7 @@ export const CHIPS_BLOCK_31 = {
       {
         title: 'IEEE-488 / GPIB Bus',
         paragraphs: [
-          'IEEE-488 (also called GPIB or HP-IB) is an 8 bit parallel instrumentation bus. The bus uses passive termination resistors to defined impedance. The 74x588 combines the driver/receiver function of a 74x245 with the required termination, reducing external component count.',
+          'IEEE-488 (also called GPIB or HP IB) is an 8 bit parallel instrumentation bus. The bus uses passive termination resistors to defined impedance. The 74x588 combines the driver/receiver function of a 74x245 with the required termination, reducing external component count.',
         ],
       },
     ],

@@ -3,36 +3,36 @@
 //
 // Review notes for this block:
 // - This block is mostly medium-complexity AO/AOI combinational TTL, plus two
-//   divider parts and one AND-gated J-K storage device.
+//   divider parts and one AND gated JK storage device.
 // - Parts with exposed expansion pins or expander outputs are modeled for their
-//   base Boolean function, but multi-package expansion chaining is not solved.
+//   base Boolean function, but multi package expansion chaining is not solved.
 // - 7449 blanking behavior is represented through BI, while invalid BCD codes
 //   follow the generic decoder table instead of device-specific lamp nuances.
 // - 7456 and 7457 are treated as functional edge-count dividers; exact output
-//   phase, duty-cycle shape, and startup waveform details are simplified.
-// - Open-collector and current-sensing electrical characteristics are only
+//   phase, duty cycle shape, and startup waveform details are simplified.
+// - Open collector and current sensing electrical characteristics are only
 //   modeled at logic level, not as analog current or voltage behavior.
 
 export const CHIPS_BLOCK_8 = {
-  // ── 74x49: BCD to 7-segment decoder/driver (open-collector) ──────────────
+  // ── 74x49: BCD to 7 segment decoder/driver (open collector) ──────────────
   /* Primary source: Texas Instruments, SN74LS49 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls49.pdf
-     Open-collector output technology: https://en.wikipedia.org/wiki/Open_collector
+     Open collector output technology: https://en.wikipedia.org/wiki/Open_collector
      Decoder/demultiplexer concept: https://en.wikipedia.org/wiki/Multiplexer */
   // BCD inputs A-D are decoded into seven active LOW segment outputs intended
-  // for a common-anode display. Because the outputs are open-collector, a HIGH
+  // for a common anode display. Because the outputs are open collector, a HIGH
   // in the simulation means the segment line is released rather than driven up.
   // BI is honored as a whole-digit active LOW blanking request.
-  '7449': {
+  '74x49': {
     name: '74x49',
     simpleName: 'BCD to 7-Seg (OC)',
-    description: 'BCD to 7-segment decoder/driver (open-collector) (14-pin)',
+    description: 'BCD to 7 segment decoder/driver (open collector) (14-pin)',
     pins: 14,
     vcc: 14,
     gnd: 7,
     openCollector: true,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls49.pdf',
-    tags: ['7-segment', '7 seg', 'decoder', 'driver', 'bcd', 'display', 'open collector'],
-    guideOverview: 'The 7449 converts a 4 bit BCD input into seven active LOW segment outputs for a common anode display. Its outputs are open collector, so active segments pull low while inactive segments simply release the line, and BI can blank the whole digit at once.',
+    tags: ['7 segment', '7 seg', 'decoder', 'driver', 'bcd', 'display', 'open collector'],
+    guideOverview: 'The 74x49 converts a 4 bit BCD input into seven active LOW segment outputs for a common anode display. Its outputs are open collector, so active segments pull low while inactive segments simply release the line, and BI can blank the whole digit at once.',
     guidePinDescriptions: {
       BI: 'Active LOW blanking input. Pull it LOW to blank the display regardless of the BCD code.',
       A: 'Least significant BCD input bit (weight 1).',
@@ -40,19 +40,21 @@ export const CHIPS_BLOCK_8 = {
       C: 'Third BCD input bit (weight 4).',
       D: 'Most significant BCD input bit (weight 8).',
       a: 'Segment a output (top horizontal bar), open collector, active LOW.',
-      b: 'Segment b output (upper-right vertical bar), active LOW.',
-      c: 'Segment c output (lower-right vertical bar), active LOW.',
+      b: 'Segment b output (upper right vertical bar), active LOW.',
+      c: 'Segment c output (lower right vertical bar), active LOW.',
       d: 'Segment d output (bottom horizontal bar), active LOW.',
-      e: 'Segment e output (lower-left vertical bar), active LOW.',
-      f: 'Segment f output (upper-left vertical bar), active LOW.',
+      e: 'Segment e output (lower left vertical bar), active LOW.',
+      f: 'Segment f output (upper left vertical bar), active LOW.',
       g: 'Segment g output (middle horizontal bar), active LOW.',
       GND: 'Ground reference (pin 7).',
       VCC: 'Positive supply (+5 V) at pin 14.',
     },
     guideSections: [
       {
-        title: 'BCD to 7-Segment (Common Anode)',
-        paragraphs: ['The 7449 drives a common anode 7-segment LED display. Active LOW open collector outputs sink current through each segment to ground. Drive BI# LOW to blank the display, HIGH for normal BCD decoding. For common cathode displays, use the 7448 instead, which provides active HIGH push-pull outputs.'],
+        title: 'BCD to 7 Segment (Common Anode)',
+        paragraphs: [
+          'The 74x49 drives a common anode 7 segment LED display. Active LOW open collector outputs sink current through each segment to ground. Drive BI# LOW to blank the display, HIGH for normal BCD decoding. For common cathode displays, use the 74x48 instead, which provides active HIGH push pull outputs.',
+        ],
       },
     ],
     pinout: [
@@ -76,21 +78,21 @@ export const CHIPS_BLOCK_8 = {
     ],
   },
 
-  // ── 74x50: Dual 2-wide 2 input AND-OR-Invert (one gate expandable) ───────
+  // ── 74x50: Dual 2-wide 2 input AND OR Invert (one gate expandable) ───────
   /* Primary source: Texas Instruments, SN7450 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn7450.pdf */
   // Each section implements the base AOI function NOT((A&B)|(C&D)). The X pins
-  // on the package exist for real-world expansion schemes; 74Sim keeps the
-  // standalone truth table but does not simulate multi-package X-pin chaining.
-  '7450': {
+  // on the package exist for real world expansion schemes; 74Sim keeps the
+  // standalone truth table but does not simulate multi package X-pin chaining.
+  '74x50': {
     name: '74x50',
     simpleName: 'Dual AOI 2-wide',
-    description: 'Dual 2-wide 2 input AND-OR-INVERT gate (one gate expandable) (14-pin)',
+    description: 'Dual 2-wide 2 input AND OR INVERT gate (one gate expandable) (14-pin)',
     pins: 14,
     vcc: 14,
     gnd: 7,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn7450.pdf',
-    tags: ['aoi', 'and-or-invert', 'gate', 'logic', 'dual'],
-    guideOverview: 'The 7450 contains two 2-wide AOI gates, each performing NOT((A&B)|(C&D)). Real parts expose X expansion pins so you can widen one section with external expander parts, but 74Sim models the ordinary 4 input AOI behavior only.',
+    tags: ['aoi', 'and or invert', 'gate', 'logic', 'dual'],
+    guideOverview: 'The 74x50 contains two 2-wide AOI gates, each performing NOT((A&B)|(C&D)). Real parts expose X expansion pins so you can widen one section with external expander parts, but 74Sim models the ordinary 4 input AOI behavior only.',
     guidePinDescriptions: {
       '1X': 'Expansion connection for gate 1 in hardware. It is present in the package but not separately modeled for chained expansion in 74Sim.',
       '2X': 'Expansion connection for gate 2 in hardware. 74Sim keeps the base AOI truth table and does not solve external X-pin expansion.',
@@ -109,7 +111,7 @@ export const CHIPS_BLOCK_8 = {
     },
     guideSections: [
       {
-        title: 'AND-OR-INVERT (2-wide 2 input)',
+        title: 'AND OR INVERT (2-wide 2 input)',
         paragraphs: ['Each gate output is LOW when any one 2 input AND group is fully asserted. Y = NOT((A&B)|(C&D)).'],
         formulas: ['Y = NOT((1A·1B)|(1C·1D))'],
       },
@@ -136,21 +138,21 @@ export const CHIPS_BLOCK_8 = {
     ],
   },
 
-  // ── 74x52: 3-2-2-2 input AND-OR gate (expandable with 74x61) ─────────────
+  // ── 74x52: 3-2-2-2 input AND OR gate (expandable with 74x61) ─────────────
   /* Primary source: Texas Instruments, SN74H52 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74h52.pdf */
   // This gate outputs the OR of one 3 input product term and three 2 input
   // product terms. The package also exposes X for expansion in hardware, but
   // the simulator models the direct standalone AO truth table only.
-  '7452': {
+  '74x52': {
     name: '74x52',
-    simpleName: '3-2-2-2 AND-OR',
-    description: '3-2-2-2 input AND-OR gate, expandable with 74x61 (14-pin)',
+    simpleName: '3-2-2-2 AND OR',
+    description: '3-2-2-2 input AND OR gate, expandable with 74x61 (14-pin)',
     pins: 14,
     vcc: 14,
     gnd: 7,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74h52.pdf',
-    tags: ['ao', 'and-or', 'gate', 'logic', 'expandable'],
-    guideOverview: 'The 7452 forms Y = (A1&A2&A3) OR (B1&B2) OR (C1&C2) OR (D1&D2). In hardware it can be widened with a 7461-style expander through the X connection; 74Sim models the direct 3-2-2-2 AND-OR behavior and documents the expansion feature as a caveat.',
+    tags: ['ao', 'and or', 'gate', 'logic', 'expandable'],
+    guideOverview: 'The 74x52 forms Y = (A1&A2&A3) OR (B1&B2) OR (C1&C2) OR (D1&D2). In hardware it can be widened with a 74x61-style expander through the X connection; 74Sim models the direct 3-2-2-2 AND OR behavior and documents the expansion feature as a caveat.',
     guidePinDescriptions: {
       X: 'Expansion connection used when widening the part with external expander hardware. It is not separately simulated here.',
       A1: 'Input A1 of the 3 input AND group.',
@@ -162,14 +164,14 @@ export const CHIPS_BLOCK_8 = {
       C2: 'Input C2 of the second 2 input AND group.',
       D1: 'Input D1 of the third 2 input AND group.',
       D2: 'Input D2 of the third 2 input AND group.',
-      Y: 'AND-OR output: HIGH when any AND group is fully asserted.',
+      Y: 'AND OR output: HIGH when any AND group is fully asserted.',
       'NC1': 'No connection.',
       GND: 'Ground reference (pin 7).',
       VCC: 'Positive supply (+5 V) at pin 14.',
     },
     guideSections: [
       {
-        title: '3-2-2-2 AND-OR Logic',
+        title: '3-2-2-2 AND OR Logic',
         paragraphs: ['Y is HIGH when the 3 input term or any 2 input term is satisfied: Y = (A1·A2·A3)+(B1·B2)+(C1·C2)+(D1·D2).'],
         formulas: ['Y = (A1·A2·A3)|(B1·B2)|(C1·C2)|(D1·D2)'],
       },
@@ -196,20 +198,20 @@ export const CHIPS_BLOCK_8 = {
     ],
   },
 
-  // ── 74H53: 3-2-2-2 input AND-OR-Invert gate (expandable) ─────────────────
+  // ── 74H53: 3-2-2-2 input AND OR Invert gate (expandable) ─────────────────
   /* Primary source: Texas Instruments, SN74H53 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74h53.pdf */
   // Functionally this is the inverted companion to the 7452. Its expansion pin
-  // is documented but not solved as a multi-package network in the simulator.
-  '7453': {
+  // is documented but not solved as a multi package network in the simulator.
+  '74x53': {
     name: '74x53',
     simpleName: '3-2-2-2 AOI',
-    description: '3-2-2-2 input AND-OR-INVERT gate, expandable (14-pin)',
+    description: '3-2-2-2 input AND OR INVERT gate, expandable (14-pin)',
     pins: 14,
     vcc: 14,
     gnd: 7,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74h53.pdf',
-    tags: ['aoi', 'and-or-invert', 'gate', 'logic', 'expandable'],
-    guideOverview: 'The 7453 produces the inverted form of the 7452 logic: NOT((A1&A2&A3) OR (B1&B2) OR (C1&C2) OR (D1&D2)). The real package supports expansion through X, but 74Sim keeps the direct AOI behavior and notes external expansion as unsupported.',
+    tags: ['aoi', 'and or invert', 'gate', 'logic', 'expandable'],
+    guideOverview: 'The 74x53 produces the inverted form of the 74x52 logic: NOT((A1&A2&A3) OR (B1&B2) OR (C1&C2) OR (D1&D2)). The real package supports expansion through X, but 74Sim keeps the direct AOI behavior and notes external expansion as unsupported.',
     guidePinDescriptions: {
       X: 'Expansion connection for widening the logic function with another package in hardware. 74Sim does not propagate logic through that expansion path.',
       A1: 'Input A1 of the 3 input AND group.',
@@ -228,7 +230,7 @@ export const CHIPS_BLOCK_8 = {
     },
     guideSections: [
       {
-        title: '3-2-2-2 AND-OR-INVERT Logic',
+        title: '3-2-2-2 AND OR INVERT Logic',
         paragraphs: ['Y is LOW when the 3 input term or any 2 input term is satisfied. Y = NOT((A1·A2·A3)+(B1·B2)+(C1·C2)+(D1·D2)).'],
         formulas: ['Y = NOT((A1·A2·A3)|(B1·B2)|(C1·C2)|(D1·D2))'],
       },
@@ -255,20 +257,20 @@ export const CHIPS_BLOCK_8 = {
     ],
   },
 
-  // ── 74x55: 2-wide 4 input AND-OR-INVERT gate ─────────────────────────────
+  // ── 74x55: 2-wide 4 input AND OR INVERT gate ─────────────────────────────
   /* Primary source: Texas Instruments, SN74LS55 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls55.pdf */
   // Two 4 input AND sections feed a NOR to produce a single inverted output.
   // Pins 5, 6, and 9 are not connected (NC).
-  '7455': {
+  '74x55': {
     name: '74x55',
-    simpleName: '2-Wide 4 Input AND-OR-INVERT',
-    description: '2-wide 4 input AND-OR-INVERT gate. (14-pin)',
+    simpleName: '2-Wide 4 Input AND OR INVERT',
+    description: '2-wide 4 input AND OR INVERT gate. (14-pin)',
     pins: 14,
     vcc: 14,
     gnd: 7,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls55.pdf',
-    tags: ['aoi', 'and-or-invert', 'gate', 'logic'],
-    guideOverview: 'The 7455 is a single 2-wide 4 input AND-OR-INVERT gate. Two 4 input AND sections (inputs on pins 1-4 and 10-13) feed a NOR to produce output Y at pin 8. Y goes LOW when all four inputs of either AND section are HIGH. Three pins (5, 6, 9) are not connected.',
+    tags: ['aoi', 'and or invert', 'gate', 'logic'],
+    guideOverview: 'The 74x55 is a single 2-wide 4 input AND OR INVERT gate. Two 4 input AND sections (inputs on pins 1-4 and 10-13) feed a NOR to produce output Y at pin 8. Y goes LOW when all four inputs of either AND section are HIGH. Three pins (5, 6, 9) are not connected.',
     guidePinDescriptions: {
       '1A':  'Input A of the first 4 input AND section.',
       '1B':  'Input B of the first 4 input AND section.',
@@ -307,15 +309,15 @@ export const CHIPS_BLOCK_8 = {
     ],
     guideSections: [
       {
-        title: 'AND-OR-INVERT Logic (4-4)',
+        title: 'AND OR INVERT Logic (4-4)',
         paragraphs: [
-          'The 7455 computes Y = NOT((1A·1B·1C·1D) OR (2A·2B·2C·2D)). Y goes LOW when every input in either 4 input AND section is simultaneously HIGH.',
-          'Inputs for the first AND section are on pins 1 4, and inputs for the second AND section are on pins 10 13. Three pins (5, 6, 9) are not connected.',
+          'The 74x55 computes Y = NOT((1A·1B·1C·1D) OR (2A·2B·2C·2D)). Y goes LOW when every input in either 4 input AND section is simultaneously HIGH.',
+          'Inputs for the first AND section are on pins 1-4, and inputs for the second AND section are on pins 10-13. Three pins (5, 6, 9) are not connected.',
         ],
         formulas: [
           'Y = NOT((1A·1B·1C·1D) OR (2A·2B·2C·2D))',
         ],
-        note: 'Do not confuse with the 7454, which uses a 2-3-3-2 configuration. The 7455 has only two AND sections, each with four inputs.',
+        note: 'Do not confuse with the 74x54, which uses a 2-3-3-2 configuration. The 74x55 has only two AND sections, each with four inputs.',
       },
     ],
   },
@@ -323,10 +325,10 @@ export const CHIPS_BLOCK_8 = {
   // ── 74x56: 50:1 Frequency Divider ─────────────────────────────────────────
   /* Primary source: Texas Instruments, SN74LS56 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls56.pdf
      Counter (digital) concept: https://en.wikipedia.org/wiki/Counter_(digital) */
-  // The simulator treats this as a functional divide-by-50 stage driven from a
+  // The simulator treats this as a functional divide by-50 stage driven from a
   // single clock input. Exact startup phase and waveform shape are simplified,
   // because the part's primary distinction in hardware is timing behavior.
-  '7456': {
+  '74x56': {
     name: '74x56',
     simpleName: '÷50 Divider',
     description: '50:1 frequency divider (8-pin)',
@@ -335,7 +337,7 @@ export const CHIPS_BLOCK_8 = {
     gnd: 4,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls56.pdf',
     tags: ['frequency divider', 'divider', 'counter', 'sequential', 'divide by 50'],
-    guideOverview: 'The 7456 is a fixed divide-by-50 timing element. In 74Sim it behaves like a functional counter-driven divider on CLK, while exact output phase and duty-cycle details are simplified rather than modeled as a timing-accurate waveform source.',
+    guideOverview: 'The 74x56 is a fixed divide by-50 timing element. In 74Sim it behaves like a functional counter-driven divider on CLK, while exact output phase and duty cycle details are simplified rather than modeled as a timing-accurate waveform source.',
     guidePinDescriptions: {
       CLK:  'Clock input. The internal counter advances on each rising edge.',
       Q:    'Divided output. Goes HIGH once per 50 input clocks.',
@@ -373,9 +375,9 @@ export const CHIPS_BLOCK_8 = {
   // ── 74x57: 60:1 Frequency Divider ─────────────────────────────────────────
   /* Primary source: Texas Instruments, SN74LS57 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls57.pdf
      Counter (digital) concept: https://en.wikipedia.org/wiki/Counter_(digital) */
-  // This is the divide-by-60 companion to the 7456. As with 7456, the model is
+  // This is the divide by-60 companion to the 7456. As with 7456, the model is
   // intended for functional logic sequencing, not precise phase or pulse shape.
-  '7457': {
+  '74x57': {
     name: '74x57',
     simpleName: '÷60 Divider',
     description: '60:1 frequency divider (8-pin)',
@@ -384,7 +386,7 @@ export const CHIPS_BLOCK_8 = {
     gnd: 4,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls57.pdf',
     tags: ['frequency divider', 'divider', 'counter', 'sequential', 'divide by 60'],
-    guideOverview: 'The 7457 is a fixed divide-by-60 timing element. 74Sim counts clock edges to reproduce the overall divide function, but it does not promise exact real-device startup phase or duty-cycle timing.',
+    guideOverview: 'The 74x57 is a fixed divide by-60 timing element. 74Sim counts clock edges to reproduce the overall divide function, but it does not promise exact real-device startup phase or duty cycle timing.',
     guidePinDescriptions: {
       CLK:  'Clock input. The internal counter advances on each rising edge.',
       Q:    'Divided output. Goes HIGH once per 60 input clocks.',
@@ -419,29 +421,29 @@ export const CHIPS_BLOCK_8 = {
     sequential: true,
   },
 
-  // ── 74x58: Dual AND-OR gate ───────────────────────────────────────────────
+  // ── 74x58: Dual AND OR gate ───────────────────────────────────────────────
   /* Primary source: Texas Instruments, SN74HC58 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74hc58.pdf */
-  // Gate 1 is a 2-wide 2 input AND-OR: Y1 = (1A&1B)|(1C&1D)
-  // Gate 2 is a 2-wide 3 input AND-OR: Y2 = (2A&2B&2C)|(2D&2E&2F)
-  '7458': {
+  // Gate 1 is a 2-wide 2 input AND OR: Y1 = (1A&1B)|(1C&1D)
+  // Gate 2 is a 2-wide 3 input AND OR: Y2 = (2A&2B&2C)|(2D&2E&2F)
+  '74x58': {
     name: '74x58',
-    simpleName: 'Dual AND-OR',
-    description: 'Two non-inverting AND-OR gates. (14-pin)',
+    simpleName: 'Dual AND OR',
+    description: 'Two non inverting AND OR gates. (14-pin)',
     pins: 14,
     vcc: 14,
     gnd: 7,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74hc58.pdf',
-    tags: ['ao', 'and-or', 'gate', 'logic', 'dual', 'sum-of-products'],
-    guideOverview: 'The 74x58 combines two different AND-OR sections in one package. Gate 1 has two 2 input AND terms; Gate 2 has two 3 input AND terms. Each output goes HIGH when any one of its AND-groups is fully satisfied, making the chip handy for multi-condition detection without extra inverters.',
+    tags: ['ao', 'and or', 'gate', 'logic', 'dual', 'sum-of-products'],
+    guideOverview: 'The 74x58 combines two different AND OR sections in one package. Gate 1 has two 2 input AND terms; Gate 2 has two 3 input AND terms. Each output goes HIGH when any one of its AND-groups is fully satisfied, making the chip handy for multi-condition detection without extra inverters.',
     guidePinDescriptions: {
       '2A':  'Input A for the first AND group of gate 2.',
       '1A':  'Input A for the first AND group of gate 1.',
       '1B':  'Input B for the first AND group of gate 1.',
       '1C':  'Input A for the second AND group of gate 1.',
       '1D':  'Input B for the second AND group of gate 1.',
-      '1Y':  'Gate 1 AND-OR output. HIGH when (1A·1B) or (1C·1D).',
+      '1Y':  'Gate 1 AND OR output. HIGH when (1A·1B) or (1C·1D).',
       GND:   'Ground reference (pin 7).',
-      '2Y':  'Gate 2 AND-OR output. HIGH when (2A·2B·2C) or (2D·2E·2F).',
+      '2Y':  'Gate 2 AND OR output. HIGH when (2A·2B·2C) or (2D·2E·2F).',
       '2D':  'Input A for the second AND group of gate 2.',
       '2E':  'Input B for the second AND group of gate 2.',
       '2F':  'Input C for the second AND group of gate 2.',
@@ -451,7 +453,7 @@ export const CHIPS_BLOCK_8 = {
     },
     guideSections: [
       {
-        title: 'Dual AND-OR',
+        title: 'Dual AND OR',
         paragraphs: ['Gate 1: Y1=(1A·1B)|(1C·1D). Gate 2: Y2=(2A·2B·2C)|(2D·2E·2F). No inversion outputs go HIGH when any AND term is satisfied.'],
       },
     ],
@@ -472,27 +474,27 @@ export const CHIPS_BLOCK_8 = {
       { pin: 14, name: 'VCC', type: 'power',  description: 'Positive supply (+5 V)' },
     ],
     gates: [
-      // Gate 1: 2-wide 2 input AND-OR Y = (1A&1B)|(1C&1D)
+      // Gate 1: 2-wide 2 input AND OR Y = (1A&1B)|(1C&1D)
       { type: 'AO_22', inputs: ['1A', '1B', '1C', '1D'], output: '1Y' },
-      // Gate 2: 2-wide 3 input AND-OR Y = (2A&2B&2C)|(2D&2E&2F)
+      // Gate 2: 2-wide 3 input AND OR Y = (2A&2B&2C)|(2D&2E&2F)
       { type: 'AO_33', inputs: ['2A', '2B', '2C', '2D', '2E', '2F'], output: '2Y' },
     ],
   },
 
-  // ── 74x59: Dual 3-2 input AND-OR-Invert gate ─────────────────────────────
+  // ── 74x59: Dual 3-2 input AND OR Invert gate ─────────────────────────────
   /* Primary source: Texas Instruments, US7459A datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/us7459a.pdf */
   // Each section computes NOT((A&B&C)|(D&E)), so the part is convenient for
   // small decode and inhibit terms where one product term is wider than the other.
-  '7459': {
+  '74x59': {
     name: '74x59',
     simpleName: 'Dual 3-2 AOI',
-    description: 'Dual 3-2 input AND-OR-INVERT gate (14-pin)',
+    description: 'Dual 3-2 input AND OR INVERT gate (14-pin)',
     pins: 14,
     vcc: 14,
     gnd: 7,
     datasheet: 'https://www.ti.com/lit/ds/symlink/us7459a.pdf',
-    tags: ['aoi', 'and-or-invert', 'gate', 'logic', 'dual'],
-    guideOverview: 'The 7459 contains two AOI sections, each performing NOT((A&B&C) OR (D&E)). That asymmetry makes it handy for compact sum-of-products logic with one 3 input term and one 2 input term.',
+    tags: ['aoi', 'and or invert', 'gate', 'logic', 'dual'],
+    guideOverview: 'The 74x59 contains two AOI sections, each performing NOT((A&B&C) OR (D&E)). That asymmetry makes it handy for compact sum of products logic with one 3 input term and one 2 input term.',
     guidePinDescriptions: {
       '1A':  'Input A for the 3 input AND group of gate 1.',
       '1B':  'Input B for the 3 input AND group of gate 1.',
@@ -544,7 +546,7 @@ export const CHIPS_BLOCK_8 = {
   // Standalone, each section behaves like a 4 input AND whose output is meant
   // to feed another chip's expansion node. 74Sim preserves the AND result but
   // does not simulate the special internal analog behavior of expander chains.
-  '7460': {
+  '74x60': {
     name: '74x60',
     simpleName: 'Dual 4-in AND Expander',
     description: 'Dual 4 input expander for 74x23, 74x50, 74x53, 74x55 (14-pin)',
@@ -553,7 +555,7 @@ export const CHIPS_BLOCK_8 = {
     gnd: 7,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn7460.pdf',
     tags: ['expander', 'and', 'gate', 'logic', 'dual', '4 input'],
-    guideOverview: 'The 7460 is a dual 4 input AND expander. In standalone simulator use, 1X and 2X behave like ordinary AND outputs that can feed surrounding logic, while the original multi-package expansion use is documented but not specially solved.',
+    guideOverview: 'The 74x60 is a dual 4 input AND expander. In standalone simulator use, 1X and 2X behave like ordinary AND outputs that can feed surrounding logic, while the original multi package expansion use is documented but not specially solved.',
     guidePinDescriptions: {
       '1X': 'Gate 1 AND result, typically used as an expansion output in hardware.',
       '2X': 'Gate 2 AND result, typically used as an expansion output in hardware.',
@@ -603,7 +605,7 @@ export const CHIPS_BLOCK_8 = {
   /* Primary source: Texas Instruments, SN74H61 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74h61.pdf */
   // This part supplies three 3 input AND terms intended to widen an external
   // logic package. The simulator treats those X pins as ordinary AND outputs.
-  '7461': {
+  '74x61': {
     name: '74x61',
     simpleName: 'Triple 3-in AND Expander',
     description: 'Triple 3 input expander for 74x52 (14-pin)',
@@ -612,7 +614,7 @@ export const CHIPS_BLOCK_8 = {
     gnd: 7,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74h61.pdf',
     tags: ['expander', 'and', 'gate', 'logic', 'triple', '3 input'],
-    guideOverview: 'The 7461 provides three 3 input AND terms for use as expansion signals. In 74Sim those X pins are available as direct logic outputs, while dedicated expansion-network behavior is intentionally simplified away.',
+    guideOverview: 'The 74x61 provides three 3 input AND terms for use as expansion signals. In 74Sim those X pins are available as direct logic outputs, while dedicated expansion network behavior is intentionally simplified away.',
     guidePinDescriptions: {
       '1A':  'Input A for AND expander 1.',
       '1B':  'Input B for AND expander 1.',
@@ -658,20 +660,20 @@ export const CHIPS_BLOCK_8 = {
     ],
   },
 
-  // ── 74x62: 3-3-2-2 input AND-OR expander ──────────────────────────────────
+  // ── 74x62: 3-3-2-2 input AND OR expander ──────────────────────────────────
   /* Primary source: Texas Instruments, SN74H62 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74h62.pdf */
-  // Functionally this part produces one combined AND-OR result and is typically
+  // Functionally this part produces one combined AND OR result and is typically
   // used to widen another AO/AOI package. 74Sim models the direct AO behavior.
-  '7462': {
+  '74x62': {
     name: '74x62',
     simpleName: '3-3-2-2 AO Expander',
-    description: '3-3-2-2 input AND-OR expander for 74x50, 74x53, 74x55 (14-pin)',
+    description: '3-3-2-2 input AND OR expander for 74x50, 74x53, 74x55 (14-pin)',
     pins: 14,
     vcc: 14,
     gnd: 7,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74h62.pdf',
-    tags: ['expander', 'ao', 'and-or', 'gate', 'logic'],
-    guideOverview: 'The 7462 computes X = (A1&A2&A3) OR (B1&B2&B3) OR (C1&C2) OR (D1&D2). It is historically an expander-oriented part, but in the simulator it is most useful as a direct 3-3-2-2 AND-OR logic element.',
+    tags: ['expander', 'ao', 'and or', 'gate', 'logic'],
+    guideOverview: 'The 74x62 computes X = (A1&A2&A3) OR (B1&B2&B3) OR (C1&C2) OR (D1&D2). It is historically an expander oriented part, but in the simulator it is most useful as a direct 3-3-2-2 AND OR logic element.',
     guidePinDescriptions: {
       A1: 'Input A1 of the first 3 input AND group.',
       A2: 'Input A2 of the first 3 input AND group.',
@@ -683,14 +685,14 @@ export const CHIPS_BLOCK_8 = {
       C2: 'Input C2 of the first 2 input AND group.',
       D1: 'Input D1 of the second 2 input AND group.',
       D2: 'Input D2 of the second 2 input AND group.',
-      X:  'AND-OR output: HIGH when any AND group is fully asserted.',
+      X:  'AND OR output: HIGH when any AND group is fully asserted.',
       'NC1': 'No connection.',
       GND: 'Ground reference (pin 7).',
       VCC: 'Positive supply (+5 V) at pin 14.',
     },
     guideSections: [
       {
-        title: '3-3-2-2 AND-OR Expander',
+        title: '3-3-2-2 AND OR Expander',
         paragraphs: ['X = (A1·A2·A3)|(B1·B2·B3)|(C1·C2)|(D1·D2). No inversion. Use X directly in logic or feed it to an AOI expander input.'],
       },
     ],
@@ -718,40 +720,40 @@ export const CHIPS_BLOCK_8 = {
 
   // ── 74x63: Hex Current Sensing Interface Gates ────────────────────────────
   /* Primary source: Texas Instruments, SN74LS63 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls63.pdf */
-  // Digital behavior is six open-collector inverters. The real part's special
-  // value is its interface/current-sensing capability, which 74Sim documents
+  // Digital behavior is six open collector inverters. The real part's special
+  // value is its interface/current sensing capability, which 74Sim documents
   // as an electrical caveat rather than modeling as analog threshold behavior.
-  '7463': {
+  '74x63': {
     name: '74x63',
     simpleName: 'Hex Interface',
-    description: 'Hex current sensing interface gates (inverting, open-collector) (14-pin)',
+    description: 'Hex current sensing interface gates (inverting, open collector) (14-pin)',
     pins: 14,
     vcc: 14,
     gnd: 7,
     openCollector: true,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls63.pdf',
     tags: ['not', 'inverter', 'buffer', 'interface', 'current', 'open collector', 'hex'],
-    guideOverview: 'The 7463 behaves as six open-collector inverters at the logic level. Its real-world current-sensing and interface-drive characteristics are not separately modeled, so use it in 74Sim when you need the inversion and open-collector behavior.',
+    guideOverview: 'The 74x63 behaves as six open collector inverters at the logic level. Its real world current sensing and interface-drive characteristics are not separately modeled, so use it in 74Sim when you need the inversion and open collector behavior.',
     guidePinDescriptions: {
       '1A':  'Input for inverter 1.',
-      '1Y':  'Open-collector inverter output 1. Pulls LOW when 1A=HIGH.',
+      '1Y':  'Open collector inverter output 1. Pulls LOW when 1A=HIGH.',
       '2A':  'Input for inverter 2.',
-      '2Y':  'Open-collector inverter output 2.',
+      '2Y':  'Open collector inverter output 2.',
       '3A':  'Input for inverter 3.',
-      '3Y':  'Open-collector inverter output 3.',
+      '3Y':  'Open collector inverter output 3.',
       GND:   'Ground reference (pin 7).',
-      '4Y':  'Open-collector inverter output 4.',
+      '4Y':  'Open collector inverter output 4.',
       '4A':  'Input for inverter 4.',
-      '5Y':  'Open-collector inverter output 5.',
+      '5Y':  'Open collector inverter output 5.',
       '5A':  'Input for inverter 5.',
-      '6Y':  'Open-collector inverter output 6.',
+      '6Y':  'Open collector inverter output 6.',
       '6A':  'Input for inverter 6.',
       VCC:   'Positive supply (+5 V) at pin 14.',
     },
     guideSections: [
       {
         title: 'Hex Inverting Interface Gates',
-        paragraphs: ['Each section inverts and provides a sink-only (open-collector) output for interfacing between logic families or driving inductive loads with external pull ups.'],
+        paragraphs: ['Each section inverts and provides a sink only (open collector) output for interfacing between logic families or driving inductive loads with external pull ups.'],
       },
     ],
     pinout: [
@@ -780,20 +782,20 @@ export const CHIPS_BLOCK_8 = {
     ],
   },
 
-  // ── 74x64: 4-3-2-2 input AND-OR-Invert gate ──────────────────────────────
+  // ── 74x64: 4-3-2-2 input AND OR Invert gate ──────────────────────────────
   /* Primary source: Texas Instruments, SN74S64 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74s64.pdf */
   // This combines one 4 input term, one 3 input term, and two 2 input terms,
   // then inverts the OR result, giving a compact wide AOI decode structure.
-  '7464': {
+  '74x64': {
     name: '74x64',
     simpleName: '4-3-2-2 AOI',
-    description: '4-3-2-2 input AND-OR-INVERT gate (14-pin)',
+    description: '4-3-2-2 input AND OR INVERT gate (14-pin)',
     pins: 14,
     vcc: 14,
     gnd: 7,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74s64.pdf',
-    tags: ['aoi', 'and-or-invert', 'gate', 'logic'],
-    guideOverview: 'The 7464 computes NOT((A1&A2&A3&A4) OR (B1&B2&B3) OR (C1&C2) OR (D1&D2)). It is useful when you need several product-term widths merged into one inverted output.',
+    tags: ['aoi', 'and or invert', 'gate', 'logic'],
+    guideOverview: 'The 74x64 computes NOT((A1&A2&A3&A4) OR (B1&B2&B3) OR (C1&C2) OR (D1&D2)). It is useful when you need several product-term widths merged into one inverted output.',
     guidePinDescriptions: {
       A1: 'Input A1 of the 4 input AND group.',
       A2: 'Input A2.',
@@ -812,7 +814,7 @@ export const CHIPS_BLOCK_8 = {
     },
     guideSections: [
       {
-        title: '4-3-2-2 AND-OR-INVERT',
+        title: '4-3-2-2 AND OR INVERT',
         paragraphs: ['Y = NOT((A1·A2·A3·A4)|(B1·B2·B3)|(C1·C2)|(D1·D2)). Y is LOW when the 4 input, 3 input, or either 2 input AND group is all-HIGH.'],
       },
     ],
@@ -838,22 +840,22 @@ export const CHIPS_BLOCK_8 = {
     ],
   },
 
-  // ── 74x65: 4-3-2-2 input AND-OR-Invert gate (open-collector) ─────────────
+  // ── 74x65: 4-3-2-2 input AND OR Invert gate (open collector) ─────────────
   /* Primary source: Texas Instruments, SN74S65 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74s65.pdf
-     Open-collector output technology: https://en.wikipedia.org/wiki/Open_collector */
-  // Logic-wise this matches the 7464, but the output is open-collector so the
+     Open collector output technology: https://en.wikipedia.org/wiki/Open_collector */
+  // Logic wise this matches the 7464, but the output is open collector so the
   // HIGH state is a released line rather than an actively driven high level.
-  '7465': {
+  '74x65': {
     name: '74x65',
     simpleName: '4-3-2-2 AOI (OC)',
-    description: '4-3-2-2 input AND-OR-INVERT gate (open-collector) (14-pin)',
+    description: '4-3-2-2 input AND OR INVERT gate (open collector) (14-pin)',
     pins: 14,
     vcc: 14,
     gnd: 7,
     openCollector: true,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74s65.pdf',
-    tags: ['aoi', 'and-or-invert', 'gate', 'logic', 'open collector'],
-    guideOverview: 'The 7465 has the same 4-3-2-2 AOI logic as the 7464, but with an open-collector output. That makes it suitable for wired-logic style use in hardware, while 74Sim represents the output as LOW or released.',
+    tags: ['aoi', 'and or invert', 'gate', 'logic', 'open collector'],
+    guideOverview: 'The 74x65 has the same 4-3-2-2 AOI logic as the 74x64, but with an open collector output. That makes it suitable for wired logic style use in hardware, while 74Sim represents the output as LOW or released.',
     guidePinDescriptions: {
       A1: 'Input A1 of the 4 input AND group.',
       A2: 'Input A2.',
@@ -866,14 +868,16 @@ export const CHIPS_BLOCK_8 = {
       C2: 'Input C2.',
       D1: 'Input D1 of the second 2 input AND group.',
       D2: 'Input D2.',
-      Y:  'Open-collector AOI output. Pulls LOW when any AND group is fully asserted; high-Z otherwise.',
+      Y:  'Open collector AOI output. Pulls LOW when any AND group is fully asserted; high Z otherwise.',
       GND: 'Ground reference (pin 7).',
       VCC: 'Positive supply (+5 V) at pin 14.',
     },
     guideSections: [
       {
         title: '4-3-2-2 AOI (Open Collector)',
-        paragraphs: ['Same logic as 7464 but with an open-collector output. Requires external pull up. Can be wired ANDed with other open-collector outputs.'],
+        paragraphs: [
+          'Same logic as 74x64 but with an open collector output. Requires external pull up. Can be wired ANDed with other open collector outputs.',
+        ],
       },
     ],
     pinout: [
@@ -897,26 +901,26 @@ export const CHIPS_BLOCK_8 = {
     ],
   },
 
-  // ── 74x67: AND-gated J-K controller-device flip-flop (preset & clear) ──────────
+  // ── 74x67: AND gated JK controller device flip flop (preset & clear) ──────────
   /* Primary source: Texas Instruments, BL54L67Y datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/bl54l67y.pdf
-     Flip-flop concept: https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
+     Flip flop concept: https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
   // J is the AND of J1-J3 and K is the AND of K1-K3, with asynchronous active-
   // LOW preset and clear. The simulator preserves the functional storage logic
-  // and control-pin priority without trying to model race-around or analog timing.
-  '7467': {
+  // and control pin priority without trying to model race around or analog timing.
+  '74x67': {
     name: '74x67',
-    simpleName: 'JK FF (AND-gated)',
-    description: 'AND-gated J-K controller-device flip-flop with async preset and clear (16-pin)',
+    simpleName: 'JK FF (AND gated)',
+    description: 'AND-gated JK flip-flop, async preset and clear (16-pin)',
     pins: 16,
     vcc: 16,
     gnd: 8,
     datasheet: 'https://www.ti.com/lit/ds/symlink/bl54l67y.pdf',
-    tags: ['flip-flop', 'flip flop', 'jk', 'controller-device', 'sequential', 'preset', 'clear'],
-    guideOverview: 'The 7467 is an AND-gated J-K controller-device flip-flop. All three J inputs must be HIGH to request set, all three K inputs must be HIGH to request reset/toggle behavior, and the asynchronous PRE and CLR inputs override the clocked action immediately.',
+    tags: ['flip flop', 'flip flop', 'jk', 'controller device', 'sequential', 'preset', 'clear'],
+    guideOverview: 'The 74x67 is an AND gated JK controller device flip flop. All three J inputs must be HIGH to request set, all three K inputs must be HIGH to request reset/toggle behavior, and the asynchronous PRE and CLR inputs override the clocked action immediately.',
     guidePinDescriptions: {
       PRE: 'Active LOW asynchronous preset. Pull it LOW to force Q HIGH immediately.',
       CLR: 'Active LOW asynchronous clear. Pull it LOW to force Q LOW immediately.',
-      CLK: 'Clock input for the gated J-K action when PRE and CLR are inactive.',
+      CLK: 'Clock input for the gated JK action when PRE and CLR are inactive.',
       J1:  'J input bit 1 (all three J inputs must be HIGH to set).',
       J2:  'J input bit 2.',
       J3:  'J input bit 3.',
@@ -933,7 +937,7 @@ export const CHIPS_BLOCK_8 = {
     },
     guideSections: [
       {
-        title: 'AND-Gated JK Flip-Flop',
+        title: 'AND Gated JK Flip Flop',
         paragraphs: ['J = J1·J2·J3 and K = K1·K2·K3. All three J or K inputs must be HIGH for the respective J or K action to take effect on the clock edge. PRE# and CLR# override clock operation.'],
       },
     ],

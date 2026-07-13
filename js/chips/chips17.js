@@ -7,16 +7,16 @@ export const CHIPS_BLOCK_17 = {
   /* Primary source: Texas Instruments, SN74LS242 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls242.pdf
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic
      Wikipedia: https://en.wikipedia.org/wiki/Bus_transceiver */
-  '74242': {
+  '74x242': {
     name: '74x242',
     simpleName: '4 bit Inv Transceiver',
-    description: 'Quad inverting tri-state bus transceiver (14-pin)',
+    description: 'Quad inverting tri state bus transceiver (14-pin)',
     pins: 14,
     vcc: 14,
     gnd: 7,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls242.pdf',
-    tags: ['transceiver', 'bus', 'inverting', '4 bit', 'tri-state'],
-    guideOverview: 'The 74x242 is a quad (4-channel) inverting bus transceiver. Each channel passes data in one of two directions while inverting the logic level. GABn (active LOW) enables the A-to-B direction; GBAn (active LOW) enables the B-to-A direction. Enabling both simultaneously causes bus contention and should be avoided. Inverting transceivers are useful when interfacing signals of opposite polarity or when the downstream bus requires active LOW signals.',
+    tags: ['transceiver', 'bus', 'inverting', '4 bit', 'tri state'],
+    guideOverview: 'The 74x242 is a quad (4-channel) inverting bus transceiver. Each channel passes data in one of two directions while inverting the logic level. GABn (active LOW) enables the A-to B direction; GBAn (active LOW) enables the B-to A direction. Enabling both simultaneously causes bus contention and should be avoided. Inverting transceivers are useful when interfacing signals of opposite polarity or when the downstream bus requires active LOW signals.',
     guidePinDescriptions: {
       'A1':   'Bus A channel 1. Output when GBAn active; input when GABn active.',
       'B1':   'Bus B channel 1. Output when GABn active; input when GBAn active.',
@@ -68,24 +68,24 @@ export const CHIPS_BLOCK_17 = {
     ],
   },
 
-  // ── 74243: Quad Bus Transceiver, Non-Inverting ──────────────────────────
+  // ── 74243: Quad Bus Transceiver, Non Inverting ──────────────────────────
   /* Primary source: Texas Instruments, SN74LS243 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls243.pdf
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic
      Wikipedia: https://en.wikipedia.org/wiki/Bus_transceiver */
-  '74243': {
+  '74x243': {
     name: '74x243',
     simpleName: '4 bit Transceiver',
-    description: 'Quad non-inverting tri-state bus transceiver (14-pin)',
+    description: 'Quad non inverting tri state bus transceiver (14-pin)',
     pins: 14,
     vcc: 14,
     gnd: 7,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls243.pdf',
-    tags: ['transceiver', 'bus', 'non-inverting', '4 bit', 'tri-state'],
-    guideOverview: 'The 74x243 is a quad (4-channel) non-inverting bus transceiver the non-inverting complement to the 74x242. GABn (active LOW) enables A-to-B data flow; GBAn (active LOW) enables B-to-A. Signals pass through without polarity change. Bus transceivers provide isolation between two bus sections, allowing one side to be driven while the other remains high-impedance.',
+    tags: ['transceiver', 'bus', 'non inverting', '4 bit', 'tri state'],
+    guideOverview: 'The 74x243 is a quad (4-channel) non inverting bus transceiver the non inverting complement to the 74x242. GABn (active LOW) enables A-to B data flow; GBAn (active LOW) enables B-to A. Signals pass through without polarity change. Bus transceivers provide isolation between two bus sections, allowing one side to be driven while the other remains high impedance.',
     guidePinDescriptions: {
       'A1':   'Bus A channel 1.',
       'B1':   'Bus B channel 1.',
-      'GABn': 'Enable A→B direction (active LOW). When LOW, A inputs are driven non-inverted onto B.',
+      'GABn': 'Enable A→B direction (active LOW). When LOW, A inputs are driven non inverted onto B.',
       'A2':   'Bus A channel 2.',
       'B2':   'Bus B channel 2.',
       'A3':   'Bus A channel 3.',
@@ -93,7 +93,7 @@ export const CHIPS_BLOCK_17 = {
       'B3':   'Bus B channel 3.',
       'A4':   'Bus A channel 4.',
       'B4':   'Bus B channel 4.',
-      'GBAn': 'Enable B→A direction (active LOW). When LOW, B inputs are driven non-inverted onto A.',
+      'GBAn': 'Enable B→A direction (active LOW). When LOW, B inputs are driven non inverted onto A.',
       'NC1':  'Not connected.',
       'NC2':  'Not connected.',
       'VCC':  'Positive supply (+5 V, pin 14).',
@@ -126,28 +126,28 @@ export const CHIPS_BLOCK_17 = {
       {
         title: 'Bidirectional Bus Isolation',
         paragraphs: [
-          'Bus transceivers like the 74x243 isolate two bus segments so that capacitive loading from one side does not affect the other. They also allow a slow-driving device on one side to be isolated while a fast device takes over the bus.',
+          'Bus transceivers like the 74x243 isolate two bus segments so that capacitive loading from one side does not affect the other. They also allow a slow driving device on one side to be isolated while a fast device takes over the bus.',
           'Control logic should ensure only one direction is enabled at a time. A common approach uses a single direction signal: DIR=HIGH enables A→B (GABn=LOW, GBAn=HIGH); DIR=LOW enables B→A.',
         ],
       },
     ],
   },
 
-  // ── 74246: BCD to 7-Segment Decoder/Driver (OC 30V) ────────────────────
+  // ── 74246: BCD to 7 Segment Decoder/Driver (OC 30V) ────────────────────
   /* Primary source: Texas Instruments, SN74246 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74246.pdf
      Wikipedia: https://en.wikipedia.org/wiki/Multiplexer
      Wikipedia: https://en.wikipedia.org/wiki/Open_collector */
-  '74246': {
+  '74x246': {
     name: '74x246',
     simpleName: 'BCD to 7-Seg (OC)',
-    description: 'BCD to 7-segment decoder/driver with open-collector outputs (30V) (16-pin)',
+    description: 'BCD to 7 segment decoder/driver with open collector outputs (30V) (16-pin)',
     pins: 16,
     vcc: 16,
     gnd: 8,
     openCollector: true,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74246.pdf',
-    tags: ['7-segment', '7 seg', 'decoder', 'bcd', 'display', 'open-collector'],
-    guideOverview: 'The 74x246 is a BCD-to-7-segment decoder/driver with open-collector outputs rated for up to 30 V. It accepts a 4 bit BCD input (A D) and drives seven output lines (a g) LOW for the segments that should illuminate on a common-anode display. Open-collector outputs allow direct interface with LED arrays or vacuum fluorescent displays running at elevated supply voltages. LT (Lamp Test) forces all segments ON; RBI (Ripple Blanking Input) suppresses leading/trailing zeros; BI/RBO is the blanking input/output.',
+    tags: ['7 segment', '7 seg', 'decoder', 'bcd', 'display', 'open collector'],
+    guideOverview: 'The 74x246 is a BCD to-7 segment decoder/driver with open collector outputs rated for up to 30 V. It accepts a 4 bit BCD input (A D) and drives seven output lines (a g) LOW for the segments that should illuminate on a common anode display. Open collector outputs allow direct interface with LED arrays or vacuum fluorescent displays running at elevated supply voltages. LT (Lamp Test) forces all segments ON; RBI (Ripple Blanking Input) suppresses leading/trailing zeros; BI/RBO is the blanking input/output.',
     guidePinDescriptions: {
       'B':      'BCD input bit B (weight 2).',
       'C':      'BCD input bit C (weight 4).',
@@ -157,7 +157,7 @@ export const CHIPS_BLOCK_17 = {
       'D':      'BCD input bit D (weight 8, MSB).',
       'A':      'BCD input bit A (weight 1, LSB).',
       'GND':    'Ground reference (pin 8).',
-      'e':      'Segment e output (open-collector, active LOW).',
+      'e':      'Segment e output (open collector, active LOW).',
       'd':      'Segment d output.',
       'c':      'Segment c output.',
       'b':      'Segment b output.',
@@ -189,10 +189,10 @@ export const CHIPS_BLOCK_17 = {
     ],
     guideSections: [
       {
-        title: '7-Segment Display Encoding',
+        title: '7 Segment Display Encoding',
         paragraphs: [
-          'A 7-segment display uses seven LED segments (a g) arranged to show digits 0 9. The decoder maps each 4 bit BCD code to the correct combination of active LOW segment drivers. For example, digit ‘0’ illuminates segments a,b,c,d,e,f (g is off).',
-          'The 74x246 drives common-anode displays where each segment anode is connected to VCC and the cathode is driven LOW by the decoder. The 30 V open-collector rating allows higher-voltage display drivers.',
+          'A 7 segment display uses seven LED segments (a g) arranged to show digits-0-9. The decoder maps each 4 bit BCD code to the correct combination of active LOW segment drivers. For example, digit ‘0’ illuminates segments a,b,c,d,e,f (g is off).',
+          'The 74x246 drives common anode displays where each segment anode is connected to VCC and the cathode is driven LOW by the decoder. The 30 V open collector rating allows higher voltage display drivers.',
         ],
         formulas: [
           'BCD 0000 → segments a,b,c,d,e,f ON (g off)',
@@ -203,21 +203,21 @@ export const CHIPS_BLOCK_17 = {
     ],
   },
 
-  // ── 74247: BCD to 7-Segment Decoder/Driver (OC 15V) ────────────────────
+  // ── 74247: BCD to 7 Segment Decoder/Driver (OC 15V) ────────────────────
   /* Primary source: Texas Instruments, SN74LS247 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls247.pdf
      Wikipedia: https://en.wikipedia.org/wiki/Multiplexer
      Wikipedia: https://en.wikipedia.org/wiki/Open_collector */
-  '74247': {
+  '74x247': {
     name: '74x247',
     simpleName: 'BCD to 7-Seg (OC)',
-    description: 'BCD to 7-segment decoder/driver with open-collector outputs (15V) (16-pin)',
+    description: 'BCD to 7 segment decoder/driver with open collector outputs (15V) (16-pin)',
     pins: 16,
     vcc: 16,
     gnd: 8,
     openCollector: true,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls247.pdf',
-    tags: ['7-segment', '7 seg', 'decoder', 'bcd', 'display', 'open-collector'],
-    guideOverview: 'The 74x247 is a BCD-to-7-segment decoder/driver identical to the 74x246 except the open-collector outputs are rated for 15 V (vs 30 V). It drives common-anode 7-segment displays with active LOW segment outputs. LT, BI/RBO, and RBI control lamp test and zero blanking.',
+    tags: ['7 segment', '7 seg', 'decoder', 'bcd', 'display', 'open collector'],
+    guideOverview: 'The 74x247 is a BCD to-7 segment decoder/driver identical to the 74x246 except the open collector outputs are rated for 15 V (vs 30 V). It drives common anode 7 segment displays with active LOW segment outputs. LT, BI/RBO, and RBI control lamp test and zero blanking.',
     guidePinDescriptions: {
       'B':      'BCD input bit B (weight 2).',
       'C':      'BCD input bit C (weight 4).',
@@ -227,7 +227,7 @@ export const CHIPS_BLOCK_17 = {
       'D':      'BCD input bit D (weight 8, MSB).',
       'A':      'BCD input bit A (weight 1, LSB).',
       'GND':    'Ground reference (pin 8).',
-      'e':      'Segment e output (open-collector, active LOW, 15 V max).',
+      'e':      'Segment e output (open collector, active LOW, 15 V max).',
       'd':      'Segment d output.',
       'c':      'Segment c output.',
       'b':      'Segment b output.',
@@ -259,27 +259,27 @@ export const CHIPS_BLOCK_17 = {
     ],
     guideSections: [
       {
-        title: 'Equivalent to 74246 at 15 V',
+        title: 'Equivalent to 74x246 at 15 V',
         paragraphs: [
-          'The 74x247 is functionally identical to the 74x246. The only difference is the maximum open-collector output voltage: 15 V for the 74x247 vs 30 V for the 74x246. Use the 74x247 for standard 5 V or 12 V LED displays and the 74x246 for higher-voltage vacuum fluorescent or gas discharge displays.',
+          'The 74x247 is functionally identical to the 74x246. The only difference is the maximum open collector output voltage: 15 V for the 74x247 vs 30 V for the 74x246. Use the 74x247 for standard 5 V or 12 V LED displays and the 74x246 for higher voltage vacuum fluorescent or gas discharge displays.',
         ],
       },
     ],
   },
 
-  // ── 74248: BCD to 7-Segment Decoder/Driver (OC with internal pull up) ──
+  // ── 74248: BCD to 7 Segment Decoder/Driver (OC with internal pull up) ──
   /* Primary source: Texas Instruments, SN74LS248 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls248.pdf
      Wikipedia: https://en.wikipedia.org/wiki/Multiplexer */
-  '74248': {
+  '74x248': {
     name: '74x248',
     simpleName: 'BCD to 7-Seg (CC)',
-    description: 'BCD to 7-segment decoder/driver with 2k internal pull up resistors (common cathode) (16-pin)',
+    description: 'BCD to 7-seg decoder/driver, internal pull-ups, common cathode (16-pin)',
     pins: 16,
     vcc: 16,
     gnd: 8,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls248.pdf',
-    tags: ['7-segment', '7 seg', 'decoder', 'bcd', 'display', 'common-cathode'],
-    guideOverview: 'The 74x248 is a BCD-to-7-segment decoder/driver for common-cathode displays. It includes internal 2 kΩ pull up resistors, making its active HIGH outputs capable of driving common-cathode LED segments directly without additional components. LAMP_TEST (equivalent to LT on 74x246/247) forces all segments ON; BI/RBO controls blanking.',
+    tags: ['7 segment', '7 seg', 'decoder', 'bcd', 'display', 'common-cathode'],
+    guideOverview: 'The 74x248 is a BCD to-7 segment decoder/driver for common cathode displays. It includes internal 2 kΩ pull up resistors, making its active HIGH outputs capable of driving common cathode LED segments directly without additional components. LAMP_TEST (equivalent to LT on 74x246/247) forces all segments ON; BI/RBO controls blanking.',
     guidePinDescriptions: {
       'B':         'BCD input bit B (weight 2).',
       'C':         'BCD input bit C (weight 4).',
@@ -321,30 +321,30 @@ export const CHIPS_BLOCK_17 = {
     ],
     guideSections: [
       {
-        title: 'Common-Cathode vs Common-Anode',
+        title: 'Common Cathode vs Common Anode',
         paragraphs: [
-          'The 74x248 produces active HIGH outputs: a segment lights when the output is HIGH. Connect each output directly to the anode of the corresponding segment; the cathodes of all segments share a common ground (common-cathode configuration).',
+          'The 74x248 produces active HIGH outputs: a segment lights when the output is HIGH. Connect each output directly to the anode of the corresponding segment; the cathodes of all segments share a common ground (common cathode configuration).',
           'The internal 2 kΩ pull ups limit segment current. For brighter displays, use external series resistors in place of relying on the internal pull ups, or choose a driver IC with lower output resistance.',
         ],
       },
     ],
   },
 
-  // ── 74249: BCD to 7-Segment Decoder/Driver (OC, active HIGH) ───────────
+  // ── 74249: BCD to 7 Segment Decoder/Driver (OC, active HIGH) ───────────
   /* Primary source: Texas Instruments, SN74249 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74249.pdf
      Wikipedia: https://en.wikipedia.org/wiki/Multiplexer
      Wikipedia: https://en.wikipedia.org/wiki/Open_collector */
-  '74249': {
+  '74x249': {
     name: '74x249',
     simpleName: 'BCD to 7-Seg (OC CC)',
-    description: 'BCD to 7-segment decoder/driver with open-collector active HIGH outputs (16-pin)',
+    description: 'BCD to 7-seg decoder/driver, open-collector active HIGH outputs (16-pin)',
     pins: 16,
     vcc: 16,
     gnd: 8,
     openCollector: true,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74249.pdf',
-    tags: ['7-segment', '7 seg', 'decoder', 'bcd', 'display', 'open-collector', 'common-cathode'],
-    guideOverview: 'The 74x249 is a BCD-to-7-segment decoder/driver with open-collector, active HIGH outputs for common-cathode displays. Unlike the 74x246/247 (which drive common-anode with active LOW outputs), the 74x249 outputs go HIGH to turn segments ON. External pull up resistors to VCC (or a higher display supply) are needed since the outputs are open-collector.',
+    tags: ['7 segment', '7 seg', 'decoder', 'bcd', 'display', 'open collector', 'common-cathode'],
+    guideOverview: 'The 74x249 is a BCD to-7 segment decoder/driver with open collector, active HIGH outputs for common cathode displays. Unlike the 74x246/247 (which drive common anode with active LOW outputs), the 74x249 outputs go HIGH to turn segments ON. External pull up resistors to VCC (or a higher display supply) are needed since the outputs are open collector.',
     guidePinDescriptions: {
       'B':      'BCD input bit B (weight 2).',
       'C':      'BCD input bit C (weight 4).',
@@ -354,7 +354,7 @@ export const CHIPS_BLOCK_17 = {
       'D':      'BCD input bit D (weight 8, MSB).',
       'A':      'BCD input bit A (weight 1, LSB).',
       'GND':    'Ground reference (pin 8).',
-      'e':      'Segment e (open-collector, active HIGH). Pulls HIGH via external pull up when segment is ON.',
+      'e':      'Segment e (open collector, active HIGH). Pulls HIGH via external pull up when segment is ON.',
       'd':      'Segment d output.',
       'c':      'Segment c output.',
       'b':      'Segment b output.',
@@ -386,19 +386,19 @@ export const CHIPS_BLOCK_17 = {
     ],
     guideSections: [
       {
-        title: 'Open Collector for Common-Cathode',
+        title: 'Open Collector for Common Cathode',
         paragraphs: [
-          'The 74x249 combines the open-collector output style with active HIGH polarity. Connect each output through a pull up resistor to the display’s supply voltage; the display’s cathodes share a common ground. This arrangement is useful when the display supply differs from the logic supply.',
+          'The 74x249 combines the open collector output style with active HIGH polarity. Connect each output through a pull up resistor to the display’s supply voltage; the display’s cathodes share a common ground. This arrangement is useful when the display supply differs from the logic supply.',
         ],
       },
     ],
   },
 
-  // ── 74250: 1-of-16 Data Selector/Multiplexer (Tri-state) ───────────────
+  // ── 74250: 1-of-16 Data Selector/Multiplexer (Tri state) ───────────────
   /* Primary source: Texas Instruments, SN74AS250 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74as250.pdf
      Wikipedia: https://en.wikipedia.org/wiki/Multiplexer
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic */
-  '74250': {
+  '74x250': {
     name: '74x250',
     simpleName: '16-to-1 MUX (3-state)',
     description: '1-of-16 data selector/multiplexer with 3-state output (24-pin)',
@@ -406,8 +406,8 @@ export const CHIPS_BLOCK_17 = {
     vcc: 24,
     gnd: 12,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74as250.pdf',
-    tags: ['multiplexer', 'mux', '16-to-1', 'tri-state', 'selector'],
-    guideOverview: 'The 74x250 is a 16-to-1 data selector (multiplexer) with a 3-state output. A 4 bit select address (A, B, C, D) picks one of 16 data inputs (E1 E16) and routes it to the single output W. OE (active LOW) enables the output; when OE is HIGH, W is tri-stated. The 24-pin DIP accommodates all 16 data inputs while leaving room for the address, enable, and power pins.',
+    tags: ['multiplexer', 'mux', '16-to-1', 'tri state', 'selector'],
+    guideOverview: 'The 74x250 is a 16-to-1 data selector (multiplexer) with a 3-state output. A 4 bit select address (A, B, C, D) picks one of 16 data inputs (E1 E16) and routes it to the single output W. OE (active LOW) enables the output; when OE is HIGH, W is tri stated. The 24-pin DIP accommodates all 16 data inputs while leaving room for the address, enable, and power pins.',
     guidePinDescriptions: {
       'E8':  'Data input 8.',
       'E7':  'Data input 7.',
@@ -419,7 +419,7 @@ export const CHIPS_BLOCK_17 = {
       'E1':  'Data input 1.',
       'A':   'Select bit A (LSB of 4 bit address).',
       'B':   'Select bit B.',
-      'OE':  'Output Enable (active LOW). When asserted (LOW), drives W output; when HIGH, tri-states it.',
+      'OE':  'Output Enable (active LOW). When asserted (LOW), drives W output; when HIGH, tri states it.',
       'GND': 'Ground reference (pin 12).',
       'W':   'Selected data output (3-state). Reflects the E input addressed by A D when OE=LOW.',
       'C':   'Select bit C.',
@@ -478,28 +478,28 @@ export const CHIPS_BLOCK_17 = {
     ],
   },
 
-  // ── 74251: 8-Line to 1-Line Data Selector/Multiplexer (Complementary 3-state) ──
+  // ── 74251: 8 Line to 1 Line Data Selector/Multiplexer (Complementary 3-state) ──
   /* Primary source: Texas Instruments, SN74LS251 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls251.pdf
      Wikipedia: https://en.wikipedia.org/wiki/Multiplexer
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic */
-  '74251': {
+  '74x251': {
     name: '74x251',
     simpleName: '8-to-1 MUX (3-state, comp)',
-    description: '8-line to 1-line data selector/multiplexer with complementary 3-state outputs (16-pin)',
+    description: '8-to-1 data selector/mux, complementary 3-state outputs (16-pin)',
     pins: 16,
     vcc: 16,
     gnd: 8,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls251.pdf',
-    tags: ['multiplexer', 'mux', '8-to-1', 'tri-state', 'complementary'],
-    guideOverview: 'The 74x251 is an 8-to-1 data selector (MUX) with complementary 3-state outputs. Three select lines (A, B, C) address one of eight data inputs (D0 D7). Unlike the 74x151 which has a single output, the 74x251 provides both Y (true, non-inverted) and W (complement, inverted) outputs simultaneously, both tri-stated. Gn (active LOW) enables both outputs; when Gn is HIGH, both Y and W are tri-stated.',
+    tags: ['multiplexer', 'mux', '8-to-1', 'tri state', 'complementary'],
+    guideOverview: 'The 74x251 is an 8-to-1 data selector (MUX) with complementary 3-state outputs. Three select lines (A, B, C) address one of eight data inputs (D0-D7). Unlike the 74x151 which has a single output, the 74x251 provides both Y (true, non inverted) and W (complement, inverted) outputs simultaneously, both tri stated. Gn (active LOW) enables both outputs; when Gn is HIGH, both Y and W are tri stated.',
     guidePinDescriptions: {
       'D3':  'Data input 3.',
       'D2':  'Data input 2.',
       'D1':  'Data input 1.',
       'D0':  'Data input 0.',
-      'Y':   'True (non-inverted) output (3-state). Reflects the selected data input when Gn=LOW.',
+      'Y':   'True (non inverted) output (3-state). Reflects the selected data input when Gn=LOW.',
       'W':   'Complement (inverted) output (3-state). Reflects the inverse of the selected data input when Gn=LOW.',
-      'Gn':  'Enable (active LOW). When asserted (LOW), drives Y and W outputs; when HIGH, tri-states them.',
+      'Gn':  'Enable (active LOW). When asserted (LOW), drives Y and W outputs; when HIGH, tri states them.',
       'GND': 'Ground reference (pin 8).',
       'C':   'Select bit C (MSB).',
       'B':   'Select bit B.',
@@ -539,34 +539,34 @@ export const CHIPS_BLOCK_17 = {
       {
         title: 'Complementary Outputs',
         paragraphs: [
-          'The dual outputs Y and W allow the MUX to feed both a positive-logic and negative-logic input simultaneously without an external inverter. This is useful in comparators, priority encoders, and any circuit that benefits from having both the selected value and its complement available.',
+          'The dual outputs Y and W allow the MUX to feed both a positive logic and negative logic input simultaneously without an external inverter. This is useful in comparators, priority encoders, and any circuit that benefits from having both the selected value and its complement available.',
         ],
       },
     ],
   },
 
-  // ── 74253: Dual 4-Line to 1-Line Data Selector/Multiplexer (Tri-state) ─
+  // ── 74253: Dual 4 Line to 1 Line Data Selector/Multiplexer (Tri state) ─
   /* Primary source: Texas Instruments, SN74LS253 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls253.pdf
      Wikipedia: https://en.wikipedia.org/wiki/Multiplexer
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic */
-  '74253': {
+  '74x253': {
     name: '74x253',
     simpleName: 'Dual 4-to-1 MUX (3-state)',
-    description: 'Dual 4-line to 1-line data selector/multiplexer with 3-state outputs (16-pin)',
+    description: 'Dual 4-to-1 data selector/mux, 3-state outputs (16-pin)',
     pins: 16,
     vcc: 16,
     gnd: 8,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls253.pdf',
-    tags: ['multiplexer', 'mux', '4-to-1', 'dual', 'tri-state'],
-    guideOverview: 'The 74x253 is the 3-state output version of the 74x153 dual 4-to-1 multiplexer. It contains two independent 4 input MUX sections sharing select lines S0 and S1. Each section has an independent active LOW enable (1Gn, 2Gn): when asserted LOW, the selected input is routed to the output; when HIGH, the output is tri-stated. The 3-state outputs allow multiple 74x253s to share a common data bus.',
+    tags: ['multiplexer', 'mux', '4-to-1', 'dual', 'tri state'],
+    guideOverview: 'The 74x253 is the 3-state output version of the 74x153 dual 4-to-1 multiplexer. It contains two independent 4 input MUX sections sharing select lines S0 and S1. Each section has an independent active LOW enable (1Gn, 2Gn): when asserted LOW, the selected input is routed to the output; when HIGH, the output is tri stated. The 3-state outputs allow multiple 74x253s to share a common data bus.',
     guidePinDescriptions: {
       'S0':  'Select bit 0 (LSB), shared by both sections. S1S0=00 selects C0; =11 selects C3.',
-      '1Gn': 'Enable for section 1 (active LOW). LOW = output 1Y reflects selected input; HIGH = 1Y tri-stated.',
+      '1Gn': 'Enable for section 1 (active LOW). LOW = output 1Y reflects selected input; HIGH = 1Y tri stated.',
       '1C3': 'Section 1 data input 3 (selected when S1=1, S0=1).',
       '1C2': 'Section 1 data input 2 (selected when S1=1, S0=0).',
       '1C1': 'Section 1 data input 1 (selected when S1=0, S0=1).',
       '1C0': 'Section 1 data input 0 (selected when S1=0, S0=0).',
-      '1Y':  'Section 1 output (3-state). Tri-stated when 1Gn=HIGH.',
+      '1Y':  'Section 1 output (3-state). Tri stated when 1Gn=HIGH.',
       'GND': 'Ground reference (pin 8).',
       '2Y':  'Section 2 output (3-state).',
       '2C0': 'Section 2 data input 0.',
@@ -603,29 +603,29 @@ export const CHIPS_BLOCK_17 = {
       {
         title: '3-State Dual MUX',
         paragraphs: [
-          'The 3-state outputs make the 74x253 ideal for bus-structured designs. Multiple 74x253 chips can be connected with their outputs tied together; only the enabled chip drives the bus. Use Gn as the chip-select: assert one chip’s Gn LOW while keeping all others HIGH.',
+          'The 3-state outputs make the 74x253 ideal for bus structured designs. Multiple 74x253 chips can be connected with their outputs tied together; only the enabled chip drives the bus. Use Gn as the chip-select: assert one chip’s Gn LOW while keeping all others HIGH.',
         ],
       },
     ],
   },
 
-  // ── 74255: Dual 2-to-4 Line Decoder/Demultiplexer (Inverting, Tri-state) ─
+  // ── 74255: Dual 2-to-4 Line Decoder/Demultiplexer (Inverting, Tri state) ─
   /* Primary source: Texas Instruments, 74LS255 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/74ls255.pdf
      Wikipedia: https://en.wikipedia.org/wiki/Multiplexer
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic */
-  '74255': {
+  '74x255': {
     name: '74x255',
     simpleName: 'Dual 2-to-4 Decoder (inv, 3-state)',
-    description: 'Dual 2-to-4 line decoder/demultiplexer with inverting outputs and 3-state enable (16-pin)',
+    description: 'Dual 2-to-4 decoder/demux, inverting outputs, 3-state enable (16-pin)',
     pins: 16,
     vcc: 16,
     gnd: 8,
     datasheet: 'https://www.ti.com/lit/ds/symlink/74ls255.pdf',
-    tags: ['decoder', 'demultiplexer', '2-to-4', 'dual', 'tri-state', 'inverting'],
-    guideOverview: 'The 74x255 is a dual 2-to-4 line decoder/demultiplexer with inverting, 3-state outputs. Two shared select lines (S0, S1) address one of four output lines per section. In demultiplex mode, a data input (1C or 2C) is routed to the selected output; the other three outputs remain HIGH (inactive-inverted). When the enable pin Gn is HIGH, all outputs are tri-stated, enabling bus sharing.',
+    tags: ['decoder', 'demultiplexer', '2-to-4', 'dual', 'tri state', 'inverting'],
+    guideOverview: 'The 74x255 is a dual 2-to-4 line decoder/demultiplexer with inverting, 3-state outputs. Two shared select lines (S0, S1) address one of four output lines per section. In demultiplex mode, a data input (1C or 2C) is routed to the selected output; the other three outputs remain HIGH (inactive inverted). When the enable pin Gn is HIGH, all outputs are tri stated, enabling bus sharing.',
     guidePinDescriptions: {
       'S0':   'Select bit 0 (LSB), shared. S1S0=00 routes to Y0; =11 routes to Y3.',
-      '1Gn':  'Enable for section 1 (active LOW). HIGH = section 1 outputs tri-stated.',
+      '1Gn':  'Enable for section 1 (active LOW). HIGH = section 1 outputs tri stated.',
       '1Y3n': 'Section 1 output 3 (inverting, 3-state). LOW when selected with data=HIGH.',
       '1Y2n': 'Section 1 output 2.',
       '1Y1n': 'Section 1 output 1.',
@@ -677,7 +677,7 @@ export const CHIPS_BLOCK_17 = {
   // ── 74256: Dual 4 bit Addressable Latch ─────────────────────────────────
   /* Primary source: Texas Instruments, MC74F256 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/mc74f256.pdf
      Wikipedia: https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
-  '74256': {
+  '74x256': {
     name: '74x256',
     simpleName: 'Dual 4 bit Addr Latch',
     description: 'Dual 4 bit addressable latch (16-pin)',
@@ -688,7 +688,7 @@ export const CHIPS_BLOCK_17 = {
     tags: ['latch', 'addressable', 'dual', '4 bit', 'register'],
     guideOverview: 'The 74x256 is a dual 4 bit addressable latch, similar to two 74x259 sections in one package. Two address bits (A0, A1) select which of four latch bits receives input D during a GS (Gate Strobe) pulse. Each 4 bit section has its own active LOW CLR pin. A0/A1/D/GS are shared between both sections; CLR1 clears section 1 and CLR2 clears section 2.',
     guidePinDescriptions: {
-      'A0':   'Address bit 0 (LSB). Together with A1, selects which bit (Q0 Q3) receives D.',
+      'A0':   'Address bit 0 (LSB). Together with A1, selects which bit (Q0-Q3) receives D.',
       'A1':   'Address bit 1 (MSB). A1A0=00 addresses Q0; =11 addresses Q3.',
       'D':    'Data input. Written to the addressed bit when GS is asserted.',
       'GS':   'Gate Strobe. When HIGH (active HIGH), the addressed bit is written with D.',
@@ -742,20 +742,20 @@ export const CHIPS_BLOCK_17 = {
     ],
   },
 
-  // ── 74258: Quad 2-to-1 MUX, Inverting, Tri-state ────────────────────────
+  // ── 74258: Quad 2-to-1 MUX, Inverting, Tri state ────────────────────────
   /* Primary source: Texas Instruments, SN74LS258B datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls258b.pdf
      Wikipedia: https://en.wikipedia.org/wiki/Multiplexer
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic */
-  '74258': {
+  '74x258': {
     name: '74x258',
     simpleName: 'Quad 2-to-1 MUX (inv, 3-state)',
-    description: 'Quad 2-line to 1-line data selector/multiplexer with inverting 3-state outputs (16-pin)',
+    description: 'Quad 2-to-1 data selector/mux, inverting 3-state outputs (16-pin)',
     pins: 16,
     vcc: 16,
     gnd: 8,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls258b.pdf',
-    tags: ['multiplexer', 'mux', '2-to-1', 'quad', 'tri-state', 'inverting'],
-    guideOverview: 'The 74x258 is a quad 2-to-1 inverting multiplexer with 3-state outputs the inverting, 3-state complement to the 74x157. A single select pin S chooses between the A or B input of all four sections simultaneously; when S=LOW, A is selected; when S=HIGH, B is selected. Output Enable (active LOW): when asserted (LOW), drives outputs; when HIGH, tri-states them.',
+    tags: ['multiplexer', 'mux', '2-to-1', 'quad', 'tri state', 'inverting'],
+    guideOverview: 'The 74x258 is a quad 2-to-1 inverting multiplexer with 3-state outputs the inverting, 3-state complement to the 74x157. A single select pin S chooses between the A or B input of all four sections simultaneously; when S=LOW, A is selected; when S=HIGH, B is selected. Output Enable (active LOW): when asserted (LOW), drives outputs; when HIGH, tri states them.',
     guidePinDescriptions: {
       'S':   'Select input. LOW = route A inputs; HIGH = route B inputs (applies to all four sections).',
       '1A':  'Section 1 input A.',
@@ -765,7 +765,7 @@ export const CHIPS_BLOCK_17 = {
       '2B':  'Section 2 input B.',
       '2Y':  'Section 2 output.',
       'GND': 'Ground reference (pin 8).',
-      'OEn': 'Output Enable (active LOW). When asserted (LOW), drives Y outputs; when HIGH, tri-states them.',
+      'OEn': 'Output Enable (active LOW). When asserted (LOW), drives Y outputs; when HIGH, tri states them.',
       '3Y':  'Section 3 output.',
       '3A':  'Section 3 input A.',
       '3B':  'Section 3 input B.',
@@ -811,7 +811,7 @@ export const CHIPS_BLOCK_17 = {
 
   // ── 74260: Dual 5 Input NOR Gate ─────────────────────────────────────────
   /* Primary source: Texas Instruments, SN74LS260 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls260.pdf */
-  '74260': {
+  '74x260': {
     name: '74x260',
     simpleName: 'Dual 5 Input NOR',
     description: 'Dual 5 input NOR gate (14-pin)',
@@ -820,7 +820,7 @@ export const CHIPS_BLOCK_17 = {
     gnd: 7,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls260.pdf',
     tags: ['nor', 'gate', 'dual', '5 input', 'logic'],
-    guideOverview: 'The 74x260 contains two independent 5 input NOR gates. A NOR gate output is HIGH only when ALL inputs are LOW; if any input is HIGH, the output is LOW. With five inputs per gate, the 74x260 can replace combinations of 2- and 3 input NOR gates when a single-chip solution for a 5 input NOR function is desired.',
+    guideOverview: 'The 74x260 contains two independent 5 input NOR gates. A NOR gate output is HIGH only when ALL inputs are LOW; if any input is HIGH, the output is LOW. With five inputs per gate, the 74x260 can replace combinations of 2- and 3 input NOR gates when a single chip solution for a 5 input NOR function is desired.',
     guidePinDescriptions: {
       '1Y':  'Gate 1 output. HIGH only when 1A, 1B, 1C, 1D, and 1E are all LOW.',
       '1A':  'Gate 1 input A.',
@@ -873,7 +873,7 @@ export const CHIPS_BLOCK_17 = {
 
   // ── 74261: 2 bit by 4 bit Parallel Binary Multiplier ─────────────────────
   /* Primary source: Texas Instruments, SN74LS261 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls261.pdf */
-  '74261': {
+  '74x261': {
     name: '74x261',
     simpleName: '2x4 bit Multiplier',
     description: '2 bit by 4 bit parallel binary multiplier (16-pin)',
@@ -882,14 +882,14 @@ export const CHIPS_BLOCK_17 = {
     gnd: 8,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls261.pdf',
     tags: ['multiplier', 'binary', '2 bit', '4 bit', 'arithmetic'],
-    guideOverview: 'The 74x261 is a 2×4 bit parallel binary multiplier. It multiplies a 2 bit multiplicand (B1 B2) by a 4 bit multiplier (A1 A2 plus partial products Y1 Y4 for cascading) to produce a 6 bit product (P1 P6). Unlike serial multiply-accumulate approaches, the entire product appears combinationally within one propagation delay. Useful for small DSP building blocks and hardware scaling operations.',
+    guideOverview: 'The 74x261 is a 2×4 bit parallel binary multiplier. It multiplies a 2 bit multiplicand (B1 B2) by a 4 bit multiplier (A1 A2 plus partial products Y1 Y4 for cascading) to produce a 6 bit product (P1 P6). Unlike serial multiply accumulate approaches, the entire product appears combinationally within one propagation delay. Useful for small DSP building blocks and hardware scaling operations.',
     guidePinDescriptions: {
       'B1':  'Multiplicand bit 1 (LSB of the 2 bit value).',
       'B2':  'Multiplicand bit 2 (MSB of the 2 bit value).',
-      'Y1':  'Partial product / carry-in bit 1 (used when cascading multiple 74x261s).',
-      'Y2':  'Partial product / carry-in bit 2.',
-      'Y3':  'Partial product / carry-in bit 3.',
-      'Y4':  'Partial product / carry-in bit 4.',
+      'Y1':  'Partial product / carry in bit 1 (used when cascading multiple 74x261s).',
+      'Y2':  'Partial product / carry in bit 2.',
+      'Y3':  'Partial product / carry in bit 3.',
+      'Y4':  'Partial product / carry in bit 4.',
       'A1':  'Multiplier bit 1 (LSB of the 4 bit value).',
       'GND': 'Ground reference (pin 8).',
       'A2':  'Multiplier bit 2.',
@@ -930,7 +930,7 @@ export const CHIPS_BLOCK_17 = {
       {
         title: 'Parallel Binary Multiplication',
         paragraphs: [
-          'Multiplying an N-bit number by an M-bit number produces an (N+M)-bit result. A 2×4 multiplier produces a 6 bit result. The 74x261 computes all partial products simultaneously using AND gates and carry-save adder trees, yielding the full product combinationally.',
+          'Multiplying an N-bit number by an M-bit number produces an (N+M)-bit result. A 2×4 multiplier produces a 6 bit result. The 74x261 computes all partial products simultaneously using AND gates and carry save adder trees, yielding the full product combinationally.',
           'For a 4×4 unsigned multiply (16 bit result), cascade two 74x261s: feed the upper 2 bits of the 4 bit number to the B inputs of one chip and the lower 2 bits to the other, then sum the partial products.',
         ],
         formulas: [
@@ -941,23 +941,23 @@ export const CHIPS_BLOCK_17 = {
     ],
   },
 
-  // ── 74264: Look-Ahead Carry Generator ────────────────────────────────────
+  // ── 74264: Look Ahead Carry Generator ────────────────────────────────────
   /* Primary source: Texas Instruments, SN74AS264 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74as264.pdf
      Wikipedia: https://en.wikipedia.org/wiki/Adder_(electronics)
      Wikipedia: https://en.wikipedia.org/wiki/Arithmetic_logic_unit */
-  '74264': {
+  '74x264': {
     name: '74x264',
-    simpleName: 'Look-Ahead Carry Gen',
-    description: 'High-speed carry look-ahead generator (same function as 74182) (16-pin)',
+    simpleName: 'Look Ahead Carry Gen',
+    description: 'High speed carry look ahead generator (same function as 74182) (16-pin)',
     pins: 16,
     vcc: 16,
     gnd: 8,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74as264.pdf',
-    tags: ['carry', 'look-ahead', 'alu', 'arithmetic', 'carry generator'],
-    guideOverview: 'The 74x264 is a high-speed carry look-ahead generator equivalent in function to the 74x182. It accepts group Propagate (P0 P3) and Generate (G0 G3) signals from four 4 bit ALU slices (e.g., 74x181), plus a carry-in Cn, and produces intermediate carry outputs (Cn_x, Cn_y, Cn_z) for bits 4, 8, and 12, along with a group Generate (G) and group Propagate (P) for chaining another level of look-ahead. This eliminates carry ripple delay in 16 bit and wider adders.',
+    tags: ['carry', 'look ahead', 'alu', 'arithmetic', 'carry generator'],
+    guideOverview: 'The 74x264 is a high speed carry look ahead generator equivalent in function to the 74x182. It accepts group Propagate (P0 P3) and Generate (G0 G3) signals from four 4 bit ALU slices (e.g., 74x181), plus a carry in Cn, and produces intermediate carry outputs (Cn_x, Cn_y, Cn_z) for bits 4, 8, and 12, along with a group Generate (G) and group Propagate (P) for chaining another level of look ahead. This eliminates carry ripple delay in 16 bit and wider adders.',
     guidePinDescriptions: {
       'P0':   'Propagate input from ALU slice 0 (bits 0 3). HIGH when a carry will propagate through this slice.',
-      'G0':   'Generate input from ALU slice 0. HIGH when this slice generates a carry regardless of carry-in.',
+      'G0':   'Generate input from ALU slice 0. HIGH when this slice generates a carry regardless of carry in.',
       'P1':   'Propagate input from ALU slice 1 (bits 4 7).',
       'G1':   'Generate input from ALU slice 1.',
       'Cn_y': 'Carry output into bit 8 (between slice 1 and slice 2).',
@@ -965,9 +965,9 @@ export const CHIPS_BLOCK_17 = {
       'G2':   'Generate input from ALU slice 2.',
       'GND':  'Ground reference (pin 8).',
       'Cn_x': 'Carry output into bit 4 (between slice 0 and slice 1).',
-      'Cn':   'Carry input from the previous 74x264 (or tied LOW for the least-significant group).',
+      'Cn':   'Carry input from the previous 74x264 (or tied LOW for the least significant group).',
       'G':    'Group Generate output. HIGH if this group of four slices generates a carry out of bit 15.',
-      'P':    'Group Propagate output. HIGH if a carry-in to bit 0 would propagate through all 16 bits.',
+      'P':    'Group Propagate output. HIGH if a carry in to bit 0 would propagate through all 16 bits.',
       'Cn_z': 'Carry output into bit 12 (between slice 2 and slice 3).',
       'P3':   'Propagate input from ALU slice 3 (bits 12 15).',
       'G3':   'Generate input from ALU slice 3.',
@@ -1000,10 +1000,10 @@ export const CHIPS_BLOCK_17 = {
     ],
     guideSections: [
       {
-        title: 'Carry Look-Ahead Concept',
+        title: 'Carry Look Ahead Concept',
         paragraphs: [
-          'A ripple-carry adder computes each bit’s carry sequentially, causing delay proportional to word width. Look-ahead carry solves this by pre-computing all carries in parallel using Generate (G) and Propagate (P) signals from each slice.',
-          'G=1 means the slice generates a carry regardless of carry-in. P=1 means the slice passes any carry-in to its carry-out. The 74x264 combines four slices’ P and G signals to produce carry outputs Cn_x, Cn_y, Cn_z simultaneously reducing a 16 bit carry chain to a single gate level delay.',
+          'A ripple carry adder computes each bit’s carry sequentially, causing delay proportional to word width. Look ahead carry solves this by pre-computing all carries in parallel using Generate (G) and Propagate (P) signals from each slice.',
+          'G=1 means the slice generates a carry regardless of carry in. P=1 means the slice passes any carry in to its carry out. The 74x264 combines four slices’ P and G signals to produce carry outputs Cn_x, Cn_y, Cn_z simultaneously reducing a 16 bit carry chain to a single gate level delay.',
         ],
         formulas: [
           'Cn_x = G0 + P0·Cn',

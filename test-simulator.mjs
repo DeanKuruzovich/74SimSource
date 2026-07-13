@@ -692,7 +692,7 @@ console.log('\nTest 18: 7420 4 input NAND - truth table');
 // ─────────────────────────────────────────────────────────────────────────────
 // Test 19: 7448 - BCD to 7-seg decoder drives common-cathode display
 // ─────────────────────────────────────────────────────────────────────────────
-console.log('\nTest 19: 7448 drives common-cathode 7-segment display');
+console.log('\nTest 19: 7448 drives common-cathode 7 segment display');
 {
   const digitCases = [
     { value: 2, on: ['a', 'b', 'd', 'e', 'g'], off: ['c', 'f'] },
@@ -733,7 +733,7 @@ console.log('\nTest 19: 7448 drives common-cathode 7-segment display');
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Test 20: 74138 - Active low 3-to-8 decoder
+// Test 20: 74138 - Active low 3 to 8 decoder
 // ─────────────────────────────────────────────────────────────────────────────
 console.log('\nTest 20: 74138 active low decoder outputs');
 {

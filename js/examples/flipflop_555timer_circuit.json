@@ -1,0 +1,194 @@
+{
+  "components": [
+    {
+      "id": 1,
+      "type": "chip",
+      "tileX": 0,
+      "tileY": 0,
+      "col": 20,
+      "row": 4,
+      "chipId": "CD4013",
+      "ffState": {
+        "Q1": {
+          "q": 1,
+          "prevClk": 0
+        },
+        "Q2": {
+          "q": 0,
+          "prevClk": 0
+        }
+      }
+    },
+    {
+      "id": 3,
+      "type": "push_button",
+      "startHoleId": "0:0:main:16:7",
+      "endHoleId": "0:0:main:22:6"
+    },
+    {
+      "id": 4,
+      "type": "resistor",
+      "resistance": 10000,
+      "startHoleId": "0:0:main:22:7",
+      "endHoleId": "0:0:power:22:2"
+    },
+    {
+      "id": 5,
+      "type": "resistor",
+      "resistance": 470,
+      "startHoleId": "0:0:main:20:6",
+      "endHoleId": "0:0:main:30:6"
+    },
+    {
+      "id": 6,
+      "type": "led",
+      "color": "green",
+      "startHoleId": "0:0:main:30:7",
+      "endHoleId": "0:0:power:30:2"
+    },
+    {
+      "id": 7,
+      "type": "resistor",
+      "resistance": 470,
+      "startHoleId": "0:0:main:21:7",
+      "endHoleId": "0:0:main:34:6"
+    },
+    {
+      "id": 8,
+      "type": "led",
+      "color": "red",
+      "startHoleId": "0:0:main:34:7",
+      "endHoleId": "0:0:power:34:2"
+    },
+    {
+      "id": 9,
+      "type": "chip",
+      "tileX": 0,
+      "tileY": 0,
+      "col": 11,
+      "row": 4,
+      "chipId": "555",
+      "ffState": {
+        "OUT": {
+          "q": 1
+        }
+      }
+    },
+    {
+      "id": 13,
+      "type": "capacitor",
+      "capacitance": 1.0000000000000001e-7,
+      "startHoleId": "0:0:main:12:9",
+      "endHoleId": "0:0:power:12:2"
+    },
+    {
+      "id": 15,
+      "type": "resistor",
+      "resistance": 10000,
+      "startHoleId": "0:0:main:12:2",
+      "endHoleId": "0:0:power:12:1"
+    },
+    {
+      "id": 16,
+      "type": "resistor",
+      "resistance": 10000,
+      "startHoleId": "0:0:main:12:3",
+      "endHoleId": "0:0:main:12:7"
+    }
+  ],
+  "wires": [
+    {
+      "id": 1,
+      "startHoleId": "0:0:main:20:3",
+      "endHoleId": "0:0:power:20:1",
+      "color": "#ff6b6b"
+    },
+    {
+      "id": 2,
+      "startHoleId": "0:0:main:26:6",
+      "endHoleId": "0:0:power:26:2",
+      "color": "#2244bb"
+    },
+    {
+      "id": 3,
+      "startHoleId": "0:0:main:24:6",
+      "endHoleId": "0:0:main:21:6",
+      "color": "#fdcb6e"
+    },
+    {
+      "id": 4,
+      "startHoleId": "0:0:main:25:6",
+      "endHoleId": "0:0:main:26:7",
+      "color": "#2244bb"
+    },
+    {
+      "id": 5,
+      "startHoleId": "0:0:main:23:6",
+      "endHoleId": "0:0:main:26:8",
+      "color": "#2244bb"
+    },
+    {
+      "id": 6,
+      "startHoleId": "0:0:main:13:6",
+      "endHoleId": "0:0:main:16:6",
+      "color": "#9b59b6"
+    },
+    {
+      "id": 7,
+      "startHoleId": "0:0:main:11:3",
+      "endHoleId": "0:0:power:11:1",
+      "color": "#6c5ce7"
+    },
+    {
+      "id": 8,
+      "startHoleId": "0:0:main:11:6",
+      "endHoleId": "0:0:power:11:2",
+      "color": "#ff7675"
+    },
+    {
+      "id": 9,
+      "startHoleId": "0:0:main:12:6",
+      "endHoleId": "0:0:main:13:3",
+      "color": "#3498db"
+    },
+    {
+      "id": 10,
+      "startHoleId": "0:0:main:14:6",
+      "endHoleId": "0:0:power:14:3",
+      "color": "#55efc4"
+    }
+  ],
+  "extraTiles": [],
+  "textBoxes": [
+    {
+      "id": 1,
+      "x": 180,
+      "y": -150,
+      "w": 520,
+      "h": 44,
+      "text": "Title: CD4013 Electronic Coin Toss",
+      "v": 2
+    },
+    {
+      "id": 2,
+      "x": 180,
+      "y": -100,
+      "w": 680,
+      "h": 60,
+      "text": "Description: One half of a CD4013 flip-flop wired to toggle. Hold the TOSS button to spin it fast (both LEDs blur), release to land on HEADS (green) or TAILS (red) at random.",
+      "v": 2
+    }
+  ],
+  "chipFamily": "LS",
+  "showNetPower": false,
+  "showSimpleChipNames": false,
+  "showRealisticBoard": false,
+  "showLogicView": false,
+  "showCircuitInfo": false,
+  "showValues": false,
+  "lastUsedChips": [
+    "555",
+    "CD4013"
+  ],
+  "logicFormat": "programming"
+}

@@ -4,38 +4,100 @@
 
 export const CHIPS_BLOCK_52 = {
 
-  // 74x2299: 8 bit universal shift register, TRI+25Ω (20-pin)
+  // 74x2299: 8 bit universal shift/storage register, 3-state + 25Ω (20-pin).
+  // The '2299 is the Advanced-Schottky variant of the '299, identical in logic
+  // and pinout but with 25 Ohm series resistors built into each output to damp
+  // ringing on bus lines. Those resistors don't change the digital behavior, so
+  // it shares the SHIFT_REG_8BIT_UNIV_CLR_TRI primitive with the '299.
+  //
+  // Source: Texas Instruments, "SN54ALS299, SN74ALS299 8-Bit Universal
+  //   Shift/Storage Registers With 3-State Outputs", SDAS220B (Dec 1982, rev.
+  //   Dec 1994). [Online]. Available:
+  //   https://www.ti.com/lit/ds/symlink/sn74als299.pdf. Verified: terminal
+  //   assignment (DW/N package top view), function table, and positive-logic
+  //   logic diagram, pages 1-3, read as 1.2 MB PDF page images. The pre-existing
+  //   stub pinout (separate A-H inputs, no CLR, no QA'/QH') was hand-entered and
+  //   wrong; corrected here to the datasheet's multiplexed-I/O 20-pin map.
   '74x2299': {
     name: '74x2299',
     simpleName: '8 bit Universal Shift Register (25Ω)',
-    description: '8 bit universal shift register, TRI-STATE with 25 Ω series resistor (20-pin)',
+    description: '8 bit universal shift/storage register, 3-state I/O, 25 Ω R (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
-    datasheet: '',
-    tags: ['shift register', '8 bit', 'universal', 'tri-state', 'stub'],
+    sequential: true,
+    datasheet: 'https://www.ti.com/lit/ds/symlink/sn74als299.pdf',
+    tags: ['shift register', '8 bit', 'universal', 'storage', 'tri state'],
+    guideOverview: 'The 74x2299 is an 8 bit universal shift/storage register with 3-state outputs. Mode pins S1:S0 pick one of four actions on each clock edge: 00 hold, 01 shift right, 10 shift left, 11 parallel load. To save pins it multiplexes its eight data pins: each A/QA through H/QH pin is an output when the register is driving the bus and an input when you load data into it. It is the same part as the 74x299, with 25 Ω resistors built into each output to damp ringing when driving long bus lines.',
+    guidePinDescriptions: {
+      'S0':   'Mode select bit 0. With S1, picks hold (00), shift right (01), shift left (10), or parallel load (11).',
+      'S1':   'Mode select bit 1.',
+      'OE1n': 'Output Enable 1 (active LOW). Both OE1n and OE2n must be LOW for the A/QA-H/QH pins to drive the bus; either one HIGH releases them to high impedance.',
+      'OE2n': 'Output Enable 2 (active LOW). Works together with OE1n.',
+      'SR':   'Serial input for shift right. Its value enters the QA stage on a shift-right clock edge.',
+      'SL':   'Serial input for shift left. Its value enters the QH stage on a shift-left clock edge.',
+      'CLK':  'Clock. Hold, shift, and load all happen on the rising edge.',
+      'CLRn': 'Clear (active LOW). Forces all eight bits to 0 immediately, ignoring the clock and the mode pins.',
+      "QA'":  'Dedicated output of the first stage (QA). Always driven, even when the A/QA-H/QH pins are in high impedance, so registers can be chained.',
+      "QH'":  'Dedicated output of the last stage (QH). Always driven, used as the serial output when chaining.',
+      'A/QA': 'Bit A I/O. Drives the stored QA bit when outputs are enabled; reads in as load data when the mode is parallel load.',
+      'B/QB': 'Bit B I/O.',
+      'C/QC': 'Bit C I/O.',
+      'D/QD': 'Bit D I/O.',
+      'E/QE': 'Bit E I/O.',
+      'F/QF': 'Bit F I/O.',
+      'G/QG': 'Bit G I/O.',
+      'H/QH': 'Bit H I/O.',
+      'GND':  'Ground (pin 10).',
+      'VCC':  'Positive supply, +5 V (pin 20).',
+    },
     pinout: [
       { pin:  1, name: 'S0',   type: 'input'  },
-      { pin:  2, name: 'S1',   type: 'input'  },
-      { pin:  3, name: 'SRSIn',type: 'input'  },
-      { pin:  4, name: 'A',    type: 'input'  },
-      { pin:  5, name: 'B',    type: 'input'  },
-      { pin:  6, name: 'C',    type: 'input'  },
-      { pin:  7, name: 'D',    type: 'input'  },
-      { pin:  8, name: 'E',    type: 'input'  },
-      { pin:  9, name: 'F',    type: 'input'  },
+      { pin:  2, name: 'OE1n', type: 'input'  },
+      { pin:  3, name: 'OE2n', type: 'input'  },
+      { pin:  4, name: 'G/QG', type: 'bidir'  },
+      { pin:  5, name: 'E/QE', type: 'bidir'  },
+      { pin:  6, name: 'C/QC', type: 'bidir'  },
+      { pin:  7, name: 'A/QA', type: 'bidir'  },
+      { pin:  8, name: "QA'",  type: 'output' },
+      { pin:  9, name: 'CLRn', type: 'input'  },
       { pin: 10, name: 'GND',  type: 'power'  },
-      { pin: 11, name: 'G',    type: 'input'  },
-      { pin: 12, name: 'H',    type: 'input'  },
-      { pin: 13, name: 'CLK',  type: 'input'  },
-      { pin: 14, name: 'OEn',  type: 'input'  },
-      { pin: 15, name: 'QH',   type: 'output' },
-      { pin: 16, name: 'QG',   type: 'output' },
-      { pin: 17, name: 'QF',   type: 'output' },
-      { pin: 18, name: 'QE',   type: 'output' },
-      { pin: 19, name: 'SLSIn',type: 'input'  },
+      { pin: 11, name: 'SR',   type: 'input'  },
+      { pin: 12, name: 'CLK',  type: 'input'  },
+      { pin: 13, name: 'B/QB', type: 'bidir'  },
+      { pin: 14, name: 'D/QD', type: 'bidir'  },
+      { pin: 15, name: 'F/QF', type: 'bidir'  },
+      { pin: 16, name: 'H/QH', type: 'bidir'  },
+      { pin: 17, name: "QH'",  type: 'output' },
+      { pin: 18, name: 'SL',   type: 'input'  },
+      { pin: 19, name: 'S1',   type: 'input'  },
       { pin: 20, name: 'VCC',  type: 'power'  },
     ],
     gates: [
-      { type: 'GENERIC_STUB', inputs: ['S0','S1','SRSIn','A','B','C','D','E','F','G','H','CLK','OEn','SLSIn'], outputs: [] },
+      { type: 'SHIFT_REG_8BIT_UNIV_CLR_TRI',
+        inputs:  ['S0','S1','SR','SL','OE1n','OE2n','CLRn','CLK',
+                  'A/QA','B/QB','C/QC','D/QD','E/QE','F/QF','G/QG','H/QH'],
+        outputs: ['A/QA','B/QB','C/QC','D/QD','E/QE','F/QF','G/QG','H/QH',"QA'","QH'"] },
+    ],
+    guideSections: [
+      {
+        title: 'The four modes',
+        paragraphs: [
+          'S1:S0 choose what happens on the next rising clock edge. 00 holds the current value. 01 shifts right: the SR input enters the QA stage and every bit moves one place toward QH. 10 shifts left: SL enters the QH stage and bits move toward QA. 11 loads all eight bits at once from the A/QA-H/QH pins.',
+          'Parallel load is synchronous, so the data on the pins is captured on the clock edge, not the moment you set it. While the register is in load mode its outputs go to high impedance on their own so the external source can drive the pins.',
+        ],
+      },
+      {
+        title: 'Multiplexed I/O and the QA′/QH′ outputs',
+        paragraphs: [
+          'Eight pins carry both the stored data out and the load data in, which is how a full 8 bit register fits in a 20 pin package. When OE1n and OE2n are both LOW and the register is not loading, those pins drive the stored bits onto the bus. Either enable HIGH releases them.',
+          'QA′ and QH′ are separate outputs wired straight to the first and last stages. They stay driven no matter what the enables do, so you can chain several 2299s end to end: QH′ of one feeds the SR input of the next.',
+        ],
+      },
+      {
+        title: 'Clear',
+        paragraphs: [
+          'CLRn is a direct clear. Pulling it LOW forces all eight bits to 0 right away, without waiting for a clock edge and regardless of the mode pins. The 74x323 is the same register but with a synchronous clear that only acts on the clock edge.',
+        ],
+      },
     ],
   },
 
@@ -47,7 +109,7 @@ export const CHIPS_BLOCK_52 = {
     pins: 8, vcc: 8, gnd: 4,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls2323.pdf',
     tags: ['receiver', 'line', 'differential', 'analog', 'stub'],
-    guideOverview: 'The 74x2323 is a dual line receiver intended for differential or analog-style line signaling. Each receiver compares two input nodes and produces a digital output, which helps reject noise that appears equally on both wires of a pair. Parts like this are used when a signal must travel farther or through a noisier environment than a simple single-ended TTL input would comfortably tolerate.',
+    guideOverview: 'The 74x2323 is a dual line receiver intended for differential or analog style line signaling. Each receiver compares two input nodes and produces a digital output, which helps reject noise that appears equally on both wires of a pair. Parts like this are used when a signal must travel farther or through a noisier environment than a simple single ended TTL input would comfortably tolerate.',
     guidePinDescriptions: {
       '1A': 'Input A of receiver 1. This is one side of the first compared signal pair.',
       '1B': 'Input B of receiver 1. The first receiver compares this pin against 1A.',
@@ -71,7 +133,7 @@ export const CHIPS_BLOCK_52 = {
         paragraphs: [
           'A line receiver is the input-side partner of a line driver. It converts the incoming signal into a clean local logic level that the rest of the digital system can use.',
         ],
-        note: 'This simulator entry is documented as a stub. The guide explains the differential-receiver concept, but analog threshold and common-mode behavior are not fully modeled here.',
+        note: 'This simulator entry is documented as a stub. The guide explains the differential receiver concept, but analog threshold and common mode behavior are not fully modeled here.',
       },
     ],
     pinout: [
@@ -93,10 +155,10 @@ export const CHIPS_BLOCK_52 = {
   '74x2373': {
     name: '74x2373',
     simpleName: '8 bit Transparent Latch (25Ω)',
-    description: '8 bit transparent latch, TRI-STATE with 25 Ω series resistor (20-pin)',
+    description: '8 bit transparent latch, TRI STATE with 25 Ω series resistor (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
     datasheet: '',
-    tags: ['latch', '8 bit', 'transparent', 'tri-state', 'stub'],
+    tags: ['latch', '8 bit', 'transparent', 'tri state', 'stub'],
     pinout: [
       { pin:  1, name: 'OEn',  type: 'input'  },
       { pin:  2, name: 'D1',   type: 'input'  },
@@ -124,14 +186,14 @@ export const CHIPS_BLOCK_52 = {
     ],
   },
 
-  // 74x2374: Octal D-type flip-flop, shared clock, TRI+25Ω (20-pin)
+  // 74x2374: Octal D type flip flop, shared clock, TRI+25Ω (20-pin)
   '74x2374': {
     name: '74x2374',
-    simpleName: 'Octal D-Type Flip-Flop Shared CLK (25Ω)',
-    description: 'Octal D-type flip-flop with shared clock, TRI-STATE with 25 Ω series resistor (20-pin)',
+    simpleName: 'Octal D Type Flip Flop Shared CLK (25Ω)',
+    description: 'Octal D flip-flop, shared clock, 3-state, 25 Ω series R (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
     datasheet: '',
-    tags: ['flip-flop', 'octal', 'D-type', 'tri-state', 'stub'],
+    tags: ['flip flop', 'octal', 'D type', 'tri state', 'stub'],
     pinout: [
       { pin:  1, name: 'OEn',  type: 'input'  },
       { pin:  2, name: 'D1',   type: 'input'  },
@@ -198,10 +260,10 @@ export const CHIPS_BLOCK_52 = {
   '74x2400': {
     name: '74x2400',
     simpleName: 'Dual 4 bit Buffer Inverting Schmitt TRI',
-    description: 'Dual 4 bit buffer / line driver, inverting, Schmitt trigger input, TRI-STATE (20-pin)',
+    description: 'Dual 4 bit inverting buffer/line driver, Schmitt input, 3-state (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
     datasheet: '',
-    tags: ['buffer', 'inverting', 'Schmitt', 'tri-state', 'stub'],
+    tags: ['buffer', 'inverting', 'Schmitt', 'tri state', 'stub'],
     pinout: [
       { pin:  1, name: '1OEn', type: 'input'  },
       { pin:  2, name: '2OEn', type: 'input'  },
@@ -237,7 +299,7 @@ export const CHIPS_BLOCK_52 = {
     pins: 20, vcc: 20, gnd: 10,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74bct2414.pdf',
     tags: ['decoder', '2-to-4', 'dual', 'monitor', 'stub'],
-    guideOverview: 'The 74x2414 combines two 2-to-4 decoders with a supply-voltage monitoring function. A decoder takes a binary address and activates one of several outputs, which is useful for chip select, state selection, or control routing. Adding a supply monitor lets the device also report when the observed voltage rail is outside the expected window, which can help protect a system from bad power conditions.',
+    guideOverview: 'The 74x2414 combines two 2-to-4 decoders with a supply voltage monitoring function. A decoder takes a binary address and activates one of several outputs, which is useful for chip select, state selection, or control routing. Adding a supply monitor lets the device also report when the observed voltage rail is outside the expected window, which can help protect a system from bad power conditions.',
     guidePinDescriptions: {
       'G1n': 'Enable input (active LOW) for decoder section 1. Pull LOW to allow the first decoder to respond to its address inputs.',
       'A1A': 'Address input A for decoder section 1. Together with A1B it selects one of the four 1Y outputs.',
@@ -246,10 +308,10 @@ export const CHIPS_BLOCK_52 = {
       '1Y1': 'Decoded output 1 of section 1.',
       '1Y2': 'Decoded output 2 of section 1.',
       '1Y3': 'Decoded output 3 of section 1.',
-      'FAIL': 'Supply-monitor status output. It indicates that the monitored voltage condition has moved outside the allowed range defined by VIN and VREF.',
-      'VREF': 'Reference-voltage input for the supply monitor. It establishes the comparison threshold.',
+      'FAIL': 'Supply monitor status output. It indicates that the monitored voltage condition has moved outside the allowed range defined by VIN and VREF.',
+      'VREF': 'Reference voltage input for the supply monitor. It establishes the comparison threshold.',
       'GND': 'Ground reference for the device.',
-      'VIN': 'Voltage-monitor input. This is the rail or node being checked by the supply-monitor circuit.',
+      'VIN': 'Voltage monitor input. This is the rail or node being checked by the supply monitor circuit.',
       'NC': 'No internal connection. Leave this pin unconnected.',
       '2Y3': 'Decoded output 3 of section 2.',
       '2Y2': 'Decoded output 2 of section 2.',
@@ -264,7 +326,7 @@ export const CHIPS_BLOCK_52 = {
       {
         title: 'Decoder Concept',
         paragraphs: [
-          'A 2-to-4 decoder turns a 2 bit binary address into one-of-four active outputs. That is a compact way to choose one destination or generate chip-select lines from a small control field.',
+          'A 2-to-4 decoder turns a 2 bit binary address into one of four active outputs. That is a compact way to choose one destination or generate chip-select lines from a small control field.',
           'With two decoder sections in one package, the device can handle two independent address-selection jobs at once.',
         ],
       },
@@ -273,7 +335,7 @@ export const CHIPS_BLOCK_52 = {
         paragraphs: [
           'The extra monitoring pins let the part compare a voltage rail against a reference. If the observed rail drifts outside the intended operating region, the FAIL output can warn the rest of the system or force a safer startup/shutdown behavior.',
         ],
-        note: 'This entry remains a documented stub in the simulator, so the guide focuses on the intended hardware role rather than a full decoder-plus-monitor behavior model.',
+        note: 'This entry remains a documented stub in the simulator, so the guide focuses on the intended hardware role rather than a full decoder plus monitor behavior model.',
       },
     ],
     pinout: [
@@ -307,10 +369,10 @@ export const CHIPS_BLOCK_52 = {
   '74x2442': {
     name: '74x2442',
     simpleName: 'NuBus Block Device Address Generator',
-    description: 'NuBus block device address generator, TRI-STATE (20-pin)',
+    description: 'NuBus block device address generator, TRI STATE (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
     datasheet: '',
-    tags: ['address', 'NuBus', 'generator', 'tri-state', 'stub'],
+    tags: ['address', 'NuBus', 'generator', 'tri state', 'stub'],
     pinout: [
       { pin:  1, name: 'OEn',  type: 'input'  },
       { pin:  2, name: 'A0',   type: 'input'  },
@@ -342,7 +404,7 @@ export const CHIPS_BLOCK_52 = {
   '74x2509': {
     name: '74x2509',
     simpleName: '9-Output Clock Driver with PLL',
-    description: '9-output clock driver with phase-locked loop, TRI-STATE (24-pin)',
+    description: '9-output clock driver with phase locked loop, TRI STATE (24-pin)',
     pins: 24, vcc: 24, gnd: 12,
     datasheet: '',
     tags: ['clock', 'driver', 'PLL', '9-output', 'stub'],
@@ -381,7 +443,7 @@ export const CHIPS_BLOCK_52 = {
   '74x2510': {
     name: '74x2510',
     simpleName: '10-Output Clock Driver with PLL',
-    description: '10-output clock driver with phase-locked loop, TRI-STATE (24-pin)',
+    description: '10-output clock driver with phase locked loop, TRI STATE (24-pin)',
     pins: 24, vcc: 24, gnd: 12,
     datasheet: '',
     tags: ['clock', 'driver', 'PLL', '10-output', 'stub'],
@@ -480,10 +542,10 @@ export const CHIPS_BLOCK_52 = {
   '74x2533': {
     name: '74x2533',
     simpleName: '8 bit Bus Interface Latch Inverting (25Ω)',
-    description: '8 bit bus interface latch, inverting, TRI-STATE with 25 Ω series resistor (20-pin)',
+    description: '8 bit bus interface latch, inverting, 3-state, 25 Ω series R (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
     datasheet: '',
-    tags: ['latch', '8 bit', 'inverting', 'tri-state', 'stub'],
+    tags: ['latch', '8 bit', 'inverting', 'tri state', 'stub'],
     pinout: [
       { pin:  1, name: 'OEn',  type: 'input'  },
       { pin:  2, name: 'D1',   type: 'input'  },
@@ -515,10 +577,10 @@ export const CHIPS_BLOCK_52 = {
   '74x2534': {
     name: '74x2534',
     simpleName: '8 bit Bus Interface Register Inverting (25Ω)',
-    description: '8 bit bus interface register, inverting, TRI-STATE with 25 Ω series resistor (20-pin)',
+    description: '8 bit bus interface register, inverting, 3-state, 25 Ω series R (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
     datasheet: '',
-    tags: ['register', '8 bit', 'inverting', 'tri-state', 'stub'],
+    tags: ['register', '8 bit', 'inverting', 'tri state', 'stub'],
     pinout: [
       { pin:  1, name: 'OEn',  type: 'input'  },
       { pin:  2, name: 'D1',   type: 'input'  },
@@ -550,10 +612,10 @@ export const CHIPS_BLOCK_52 = {
   '74x2540': {
     name: '74x2540',
     simpleName: '8 bit Buffer Inverting (25Ω)',
-    description: '8 bit buffer / line driver, inverting, TRI-STATE with 25 Ω series resistor (20-pin)',
+    description: '8 bit buffer/line driver, inverting, 3-state, 25 Ω series R (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
     datasheet: '',
-    tags: ['buffer', '8 bit', 'inverting', 'tri-state', 'stub'],
+    tags: ['buffer', '8 bit', 'inverting', 'tri state', 'stub'],
     pinout: [
       { pin:  1, name: '1OEn', type: 'input'  },
       { pin:  2, name: 'A1',   type: 'input'  },
@@ -581,14 +643,14 @@ export const CHIPS_BLOCK_52 = {
     ],
   },
 
-  // 74x2541: 8 bit buffer/line driver, non-inverting, TRI+25Ω (20-pin)
+  // 74x2541: 8 bit buffer/line driver, non inverting, TRI+25Ω (20-pin)
   '74x2541': {
     name: '74x2541',
-    simpleName: '8 bit Buffer Non-Inverting (25Ω)',
-    description: '8 bit buffer / line driver, non-inverting, TRI-STATE with 25 Ω series resistor (20-pin)',
+    simpleName: '8 bit Buffer Non Inverting (25Ω)',
+    description: '8 bit buffer/line driver, non inverting, 3-state, 25 Ω series R (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
     datasheet: '',
-    tags: ['buffer', '8 bit', 'non-inverting', 'tri-state', 'stub'],
+    tags: ['buffer', '8 bit', 'non inverting', 'tri state', 'stub'],
     pinout: [
       { pin:  1, name: '1OEn', type: 'input'  },
       { pin:  2, name: 'A1',   type: 'input'  },

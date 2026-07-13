@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>74Sim Report a Bug</title>
+  <link rel="icon" type="image/png" href="assets/Logo74Sim.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/tokens.css">
+  <link rel="stylesheet" href="/css/report-form.css">
+</head>
+<body>
+
+  <div class="content">
+    <div class="page-heading">Report a Bug</div>
+    
+    <form id="bug-report-form">
+      <div class="form-group">
+        <textarea id="bug-description" rows="6" placeholder="Describe the bug what happened, what you expected, and how to reproduce it." required></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Screenshots</label>
+        <input id="bug-images" type="file" accept="image/*" multiple>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Project File</label>
+        <div class="project-row">
+          <span class="project-label" id="project-label">No file selected</span>
+          <label class="project-replace">Attach <input id="bug-project-file" type="file" accept=".json,.74sim,.zip" style="display:none;"></label>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-submit" id="submit-btn">Submit Bug Report</button>
+      <div class="status-msg" id="status-msg"></div>
+    </form>
+  </div>
+
+  <script src="/js/bug-report.js" defer></script>
+<!-- 100% privacy-first analytics -->
+<script async src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
+</body>
+</html>

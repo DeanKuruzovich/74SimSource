@@ -90,15 +90,15 @@ function connectPinLow(wm, chip, name) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const EXPECTED_IDS = [
-  '74694','74695','74696','74697','74698','74699',
-  '74700','74701','74702',
-  '74707','74710',
-  '74711','74712','74716','74718',
+  '74x694','74x695','74x696','74x697','74x698','74x699',
+  '74x700','74x701','74x702',
+  '74x707','74x710',
+  '74x711','74x712','74x716','74x718',
 ];
 
 const SEQUENTIAL_IDS = [
-  '74694','74695','74696','74697','74698','74699',
-  '74701','74702','74707','74710','74716','74718',
+  '74x694','74x695','74x696','74x697','74x698','74x699',
+  '74x701','74x702','74x707','74x710','74x716','74x718',
 ];
 
 console.log('\n=== SECTION S: Structure ===');
@@ -138,20 +138,24 @@ for (const id of EXPECTED_IDS) {
 console.log('\n=== SECTION A: Stub chips (HiZ outputs) ===');
 
 const STUB_CONFIGS = [
-  { id: '74694', outputs: ['Q0','Q1','Q2','Q3','RCO'] },
-  { id: '74695', outputs: ['Q0','Q1','Q2','Q3','RCO'] },
-  { id: '74696', outputs: ['Q0','Q1','Q2','Q3','RCO'] },
-  { id: '74697', outputs: ['Q0','Q1','Q2','Q3','RCO'] },
-  { id: '74698', outputs: ['Q0','Q1','Q2','Q3','RCO'] },
-  { id: '74699', outputs: ['Q0','Q1','Q2','Q3','RCO'] },
-  { id: '74700', outputs: ['Y0','Y1','Y2','Y3','Y4','Y5','Y6','Y7'] },
-  { id: '74701', outputs: ['Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7','EQout'] },
-  { id: '74702', outputs: ['B0','B1','B2','B3','B4','B5','B6','B7'] },
-  { id: '74707', outputs: ['Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7'] },
-  { id: '74710', outputs: ['Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7'] },
-  { id: '74712', outputs: ['Y0','Y1','Y2','Y3','Y4'] },
-  { id: '74716', outputs: ['QA','QB','QC','QD','RCO'] },
-  { id: '74718', outputs: ['QA','QB','QC','QD','RCO'] },
+  { id: '74x694', outputs: ['Q0','Q1','Q2','Q3','RCO'] },
+  { id: '74x695', outputs: ['Q0','Q1','Q2','Q3','RCO'] },
+  { id: '74x696', outputs: ['Q0','Q1','Q2','Q3','RCO'] },
+  { id: '74x697', outputs: ['Q0','Q1','Q2','Q3','RCO'] },
+  // 74x698 de-stubbed: real BCD up/down counter/register/mux (COUNTER_UPDOWN_REG_MUX_TRI).
+  //   See js/debug/scenarios/74x698-bcd-counter-reg-mux.mjs for its behavioral test.
+  { id: '74x699', outputs: ['Q0','Q1','Q2','Q3','RCO'] },
+  { id: '74x700', outputs: ['Y0','Y1','Y2','Y3','Y4','Y5','Y6','Y7'] },
+  // 74x701 pinout corrected to the real National 54F/74F701 (shared bidirectional
+  //   bus, outputs Oa=b + TC); kept a stub — no operation truth table survives. See
+  //   issues.md C56 and js/debug/scenarios/74x701-reg-counter-compare-stub.mjs.
+  { id: '74x701', outputs: ['Oa=b','TC'] },
+  { id: '74x702', outputs: ['B0','B1','B2','B3','B4','B5','B6','B7'] },
+  { id: '74x707', outputs: ['Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7'] },
+  { id: '74x710', outputs: ['Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7'] },
+  { id: '74x712', outputs: ['Y0','Y1','Y2','Y3','Y4'] },
+  { id: '74x716', outputs: ['QA','QB','QC','QD','RCO'] },
+  { id: '74x718', outputs: ['QA','QB','QC','QD','RCO'] },
 ];
 
 for (const { id, outputs } of STUB_CONFIGS) {
@@ -171,7 +175,7 @@ console.log('\n=== SECTION B: 74711 - Quint 2-to-1 MUX ===');
 
 // B1: OEn=HIGH → all Y HiZ
 {
-  const { world, chip, wm } = setupChipWithPower('74711');
+  const { world, chip, wm } = setupChipWithPower('74x711');
   connectPinHigh(wm, chip, 'OEn');
   connectPinLow(wm, chip, 'SEL');
   for (let i = 0; i < 5; i++) {
@@ -189,7 +193,7 @@ console.log('\n=== SECTION B: 74711 - Quint 2-to-1 MUX ===');
 {
   const aVals = [1, 0, 1, 0, 1];
   const bVals = [0, 1, 0, 1, 0];
-  const { world, chip, wm } = setupChipWithPower('74711');
+  const { world, chip, wm } = setupChipWithPower('74x711');
   connectPinLow(wm, chip, 'OEn');
   connectPinLow(wm, chip, 'SEL');
   for (let i = 0; i < 5; i++) {
@@ -207,7 +211,7 @@ console.log('\n=== SECTION B: 74711 - Quint 2-to-1 MUX ===');
 {
   const aVals = [0, 1, 0, 1, 0];
   const bVals = [1, 0, 1, 0, 1];
-  const { world, chip, wm } = setupChipWithPower('74711');
+  const { world, chip, wm } = setupChipWithPower('74x711');
   connectPinLow(wm, chip, 'OEn');
   connectPinHigh(wm, chip, 'SEL');
   for (let i = 0; i < 5; i++) {
@@ -223,7 +227,7 @@ console.log('\n=== SECTION B: 74711 - Quint 2-to-1 MUX ===');
 
 // B4: SEL=LOW, all A=0 → all Y=0
 {
-  const { world, chip, wm } = setupChipWithPower('74711');
+  const { world, chip, wm } = setupChipWithPower('74x711');
   connectPinLow(wm, chip, 'OEn');
   connectPinLow(wm, chip, 'SEL');
   for (let i = 0; i < 5; i++) {
@@ -239,7 +243,7 @@ console.log('\n=== SECTION B: 74711 - Quint 2-to-1 MUX ===');
 
 // B5: SEL=HIGH, all B=1 → all Y=1
 {
-  const { world, chip, wm } = setupChipWithPower('74711');
+  const { world, chip, wm } = setupChipWithPower('74x711');
   connectPinLow(wm, chip, 'OEn');
   connectPinHigh(wm, chip, 'SEL');
   for (let i = 0; i < 5; i++) {
@@ -257,7 +261,7 @@ console.log('\n=== SECTION B: 74711 - Quint 2-to-1 MUX ===');
 {
   const aVals = [0, 1, 1, 0, 0];
   const bVals = [1, 0, 0, 1, 1];
-  const { world, chip, wm } = setupChipWithPower('74711');
+  const { world, chip, wm } = setupChipWithPower('74x711');
   connectPinLow(wm, chip, 'OEn');
   connectPinLow(wm, chip, 'SEL');
   for (let i = 0; i < 5; i++) {
@@ -275,7 +279,7 @@ console.log('\n=== SECTION B: 74711 - Quint 2-to-1 MUX ===');
 {
   const aVals = [1, 0, 1, 0, 1];
   const bVals = [0, 1, 0, 1, 0];
-  const { world, chip, wm } = setupChipWithPower('74711');
+  const { world, chip, wm } = setupChipWithPower('74x711');
   connectPinLow(wm, chip, 'OEn');
   connectPinHigh(wm, chip, 'SEL');
   for (let i = 0; i < 5; i++) {

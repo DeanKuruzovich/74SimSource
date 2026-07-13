@@ -8,44 +8,44 @@
 //   parts whose public pin behavior matters more than their internal transistor
 //   topology for breadboard use.
 // - Family-specific L/H/LS electrical differences are not modeled; only the
-//   logic-level behavior and active-level conventions are represented.
-// - 74x78 is handled as a falling-edge device, while the H/L78 variants remain
+//   logic level behavior and active-level conventions are represented.
+// - 74x78 is handled as a falling edge device, while the H/L78 variants remain
 //   on the positive edge as described by their definitions.
 // - 7480, 7481, and 7484 use functional models that preserve normal logic use,
 //   but omit some complementary-input and bus-drive details of the originals.
-// - Controller-device internals, race-around limits, and other analog timing nuances
+// - Controller device internals, race around limits, and other analog timing nuances
 //   are intentionally simplified to ideal digital storage behavior.
 
 export const CHIPS_BLOCK_9 = {
 
   // ── 74L68: dual JK FF, async clear (improved 74L73), 18-pin ───────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
-     Flip-flop concept: https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
-  // Each section is a J-K storage element with its own clock and active LOW
+     Flip flop concept: https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
+  // Each section is a JK storage element with its own clock and active LOW
   // asynchronous clear. The simulator models the logical J/K state changes and
-  // clear priority, while omitting internal controller-device analog timing details.
+  // clear priority, while omitting internal controller device analog timing details.
   '74L68': {
     name: '74x68',
     simpleName: 'Dual JK FF (CLR)',
-    description: 'Dual J-K controller-device flip-flop with asynchronous clear (no preset) (18-pin)',
+    description: 'Dual JK flip-flop, async clear (no preset) (18-pin)',
     pins: 18,
     vcc: 18,
     gnd: 9,
     datasheet: 'https://en.wikipedia.org/wiki/7400-series_integrated_circuits',
-    tags: ['flip-flop', 'jk', 'sequential', 'dual', 'clear'],
-    guideOverview: 'The 74L68 contains two independent J-K flip-flops with asynchronous clear. Each section responds to its own clock input, stores one bit of state, and exposes both Q and Qn so you can use either polarity directly.',
+    tags: ['flip flop', 'jk', 'sequential', 'dual', 'clear'],
+    guideOverview: 'The 74L68 contains two independent JK flip flops with asynchronous clear. Each section responds to its own clock input, stores one bit of state, and exposes both Q and Qn so you can use either polarity directly.',
     guidePinDescriptions: {
       '1CLR': 'Active LOW asynchronous clear for FF1. Forces 1Q LOW immediately.',
       '1CLK': 'Clock input for FF1.',
       '1J':   'J input for FF1.',
       '1K':   'K input for FF1.',
-      '1Q':   'Non-inverting output of FF1.',
+      '1Q':   'Non inverting output of FF1.',
       '1Qn':  'Complementary output of FF1.',
       '2CLR': 'Active LOW asynchronous clear for FF2. Forces 2Q LOW immediately.',
       '2CLK': 'Clock input for FF2.',
       '2J':   'J input for FF2.',
       '2K':   'K input for FF2.',
-      '2Q':   'Non-inverting output of FF2.',
+      '2Q':   'Non inverting output of FF2.',
       '2Qn':  'Complementary output of FF2.',
       GND:    'Ground reference (pin 9).',
       VCC:    'Positive supply (+5 V) at pin 18.',
@@ -53,7 +53,7 @@ export const CHIPS_BLOCK_9 = {
     },
     guideSections: [
       {
-        title: 'JK Flip-Flop Operation',
+        title: 'JK Flip Flop Operation',
         paragraphs: ['J=0,K=0: hold; J=1,K=0: set; J=0,K=1: reset; J=1,K=1: toggle. CLR (active LOW) clears asynchronously.'],
       },
     ],
@@ -149,31 +149,31 @@ export const CHIPS_BLOCK_9 = {
 
   // ── 74L69: dual JK FF, preset, shared clock and clear, 18-pin ─────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
-     Flip-flop concept: https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
+     Flip flop concept: https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
   // Both sections share the same clock and clear but have separate preset and
   // J/K data pins. The simulator keeps that shared-control behavior intact.
   '74L69': {
     name: '74x69',
     simpleName: 'Dual JK FF (shared CLK/CLR)',
-    description: 'Dual J-K controller-device flip-flop with asynchronous preset, shared clock and clear (18-pin)',
+    description: 'Dual JK flip-flop, async preset, shared clock and clear (18-pin)',
     pins: 18,
     vcc: 18,
     gnd: 9,
     datasheet: 'https://en.wikipedia.org/wiki/7400-series_integrated_circuits',
-    tags: ['flip-flop', 'jk', 'sequential', 'dual', 'preset', 'clear'],
-    guideOverview: 'The 74L69 is a dual J-K flip-flop where both sections share CLK and CLR, but each section has its own preset and J/K inputs. That makes it useful when two bits must be clocked together but initialized independently.',
+    tags: ['flip flop', 'jk', 'sequential', 'dual', 'preset', 'clear'],
+    guideOverview: 'The 74L69 is a dual JK flip flop where both sections share CLK and CLR, but each section has its own preset and J/K inputs. That makes it useful when two bits must be clocked together but initialized independently.',
     guidePinDescriptions: {
       '1PRE': 'Active LOW asynchronous preset for FF1. Forces 1Q HIGH immediately.',
       '1J':   'J input for FF1.',
       '1K':   'K input for FF1.',
-      '1Q':   'Non-inverting output of FF1.',
+      '1Q':   'Non inverting output of FF1.',
       '1Qn':  'Complementary output of FF1.',
-      CLK:    'Shared clock for both flip-flops.',
+      CLK:    'Shared clock for both flip flops.',
       CLR:    'Shared active LOW clear. Forces both Q outputs LOW asynchronously.',
       '2PRE': 'Active LOW asynchronous preset for FF2.',
       '2J':   'J input for FF2.',
       '2K':   'K input for FF2.',
-      '2Q':   'Non-inverting output of FF2.',
+      '2Q':   'Non inverting output of FF2.',
       '2Qn':  'Complementary output of FF2.',
       GND:    'Ground reference (pin 9).',
       VCC:    'Positive supply (+5 V) at pin 18.',
@@ -181,8 +181,8 @@ export const CHIPS_BLOCK_9 = {
     },
     guideSections: [
       {
-        title: 'Shared-Clock JK Pair',
-        paragraphs: ['Both flip-flops respond to the same clock edge. Use individual PRE (active LOW) inputs to initialize each bit independently at power-on or between clocked events.'],
+        title: 'Shared Clock JK Pair',
+        paragraphs: ['Both flip flops respond to the same clock edge. Use individual PRE (active LOW) inputs to initialize each bit independently at power on or between clocked events.'],
       },
     ],
     pinout: [
@@ -275,21 +275,21 @@ export const CHIPS_BLOCK_9 = {
     sequential: true,
   },
 
-  // ── 74H71: AND-OR-gated JK MS FF, preset, 14-pin ──────────────────────────
+  // ── 74H71: AND OR gated JK MS FF, preset, 14-pin ──────────────────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
-     Flip-flop concept: https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
+     Flip flop concept: https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
   // J is formed by ANDing J1-J3, K is formed by ANDing K1-K3, and PRE forces a
   // set asynchronously. The simulator focuses on that logical behavior only.
   '74H71': {
     name: '74x71',
-    simpleName: 'JK FF (AND-OR, PRE)',
-    description: 'AND-OR-gated J-K controller-device flip-flop with preset only (no clear) (14-pin)',
+    simpleName: 'JK FF (AND OR, PRE)',
+    description: 'AND-OR-gated JK flip-flop, preset only (no clear) (14-pin)',
     pins: 14,
     vcc: 14,
     gnd: 7,
     datasheet: 'https://en.wikipedia.org/wiki/7400-series_integrated_circuits',
-    tags: ['flip-flop', 'jk', 'sequential', 'preset', 'controller-device'],
-    guideOverview: 'The 74H71 is a single J-K flip-flop with three J inputs, three K inputs, and an asynchronous preset. All J inputs must be HIGH together to request set behavior, all K inputs must be HIGH together to request reset/toggle behavior, and PRE overrides the clocked action.',
+    tags: ['flip flop', 'jk', 'sequential', 'preset', 'controller device'],
+    guideOverview: 'The 74H71 is a single JK flip flop with three J inputs, three K inputs, and an asynchronous preset. All J inputs must be HIGH together to request set behavior, all K inputs must be HIGH together to request reset/toggle behavior, and PRE overrides the clocked action.',
     guidePinDescriptions: {
       PRE:  'Active LOW asynchronous preset. Forces Q HIGH immediately when LOW.',
       J1:   'J input bit 1. All three must be HIGH for J to be asserted.',
@@ -299,7 +299,7 @@ export const CHIPS_BLOCK_9 = {
       K2:   'K input bit 2.',
       K3:   'K input bit 3.',
       CLK:  'Clock input.',
-      Q:    'Non-inverting output.',
+      Q:    'Non inverting output.',
       Qn:   'Complementary output.',
       GND:  'Ground reference (pin 7).',
       VCC:  'Positive supply (+5 V) at pin 14.',
@@ -307,7 +307,7 @@ export const CHIPS_BLOCK_9 = {
     },
     guideSections: [
       {
-        title: 'AND-gated JK (no clear)',
+        title: 'AND gated JK (no clear)',
         paragraphs: ['J=J1·J2·J3, K=K1·K2·K3. Use this part when you want gating on J and K inputs without an asynchronous clear. Tie unused J/K inputs HIGH to maintain normal JK operation.'],
       },
     ],
@@ -333,22 +333,22 @@ export const CHIPS_BLOCK_9 = {
     sequential: true,
   },
 
-  // ── 74L71: AND-gated RS MS FF, preset and clear, 14-pin ───────────────────
+  // ── 74L71: AND gated RS MS FF, preset and clear, 14-pin ───────────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
-     Flip-flop concept: https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
+     Flip flop concept: https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
   // This is an R-S style storage part, but 74Sim maps its set and reset groups
-  // through the shared J-K evaluator because the breadboard-visible behavior is
+  // through the shared JK evaluator because the breadboard-visible behavior is
   // equivalent for ordinary valid inputs. Invalid simultaneous assertions are a caveat.
   '74L71': {
     name: '74x71',
-    simpleName: 'RS FF (AND-gated)',
-    description: 'AND-gated R-S controller-device flip-flop with preset and clear (14-pin)',
+    simpleName: 'RS FF (AND gated)',
+    description: 'AND gated R-S controller device flip flop with preset and clear (14-pin)',
     pins: 14,
     vcc: 14,
     gnd: 7,
     datasheet: 'https://en.wikipedia.org/wiki/7400-series_integrated_circuits',
-    tags: ['flip-flop', 'rs', 'sr', 'sequential', 'preset', 'clear', 'controller-device'],
-    guideOverview: 'The 74L71 is an AND-gated R-S controller-device flip-flop with asynchronous preset and clear. In 74Sim it behaves like the expected set/reset storage element for valid inputs, while simultaneous contradictory control assertions are treated as a documented realism limit.',
+    tags: ['flip flop', 'rs', 'sr', 'sequential', 'preset', 'clear', 'controller device'],
+    guideOverview: 'The 74L71 is an AND gated R-S controller device flip flop with asynchronous preset and clear. In 74Sim it behaves like the expected set/reset storage element for valid inputs, while simultaneous contradictory control assertions are treated as a documented realism limit.',
     guidePinDescriptions: {
       CLR:  'Active LOW asynchronous clear. Forces Q LOW immediately.',
       S1:   'Set input bit 1. All three S inputs must be HIGH to set Q.',
@@ -359,7 +359,7 @@ export const CHIPS_BLOCK_9 = {
       R1:   'Reset input bit 1. All three R inputs must be HIGH to reset Q.',
       R2:   'Reset input bit 2.',
       CLK:  'Clock input.',
-      Q:    'Non-inverting output.',
+      Q:    'Non inverting output.',
       Qn:   'Complementary output.',
       GND:  'Ground reference (pin 7).',
       VCC:  'Positive supply (+5 V) at pin 14.',
@@ -367,7 +367,7 @@ export const CHIPS_BLOCK_9 = {
     },
     guideSections: [
       {
-        title: 'AND-gated RS Flip-Flop',
+        title: 'AND gated RS Flip Flop',
         paragraphs: ['Maps S inputs to J and R inputs to K. S=S1·S2·S3, R=R1·R2·R3. Do not assert S and R simultaneously.'],
       },
     ],
@@ -396,10 +396,10 @@ export const CHIPS_BLOCK_9 = {
 
   // ── 74x77: 4 bit bistable latch, 14-pin ────────────────────────────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
-     Latch/flip-flop concept: https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
+     Latch/flip flop concept: https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
   // Four D latches share one active HIGH enable. When E is HIGH the outputs are
   // transparent to the D inputs; when E is LOW they hold their last stored value.
-  '7477': {
+  '74x77': {
     name: '74x77',
     simpleName: '4 bit Latch',
     description: '4 bit bistable latch with shared enable (no Qn outputs) (14-pin)',
@@ -408,7 +408,7 @@ export const CHIPS_BLOCK_9 = {
     gnd: 7,
     datasheet: 'https://en.wikipedia.org/wiki/7400-series_integrated_circuits',
     tags: ['latch', 'bistable', '4 bit', 'sequential', 'register'],
-    guideOverview: 'The 7477 is a 4 bit transparent latch with one shared enable input. Pull E HIGH to let each Q follow its D input, then return E LOW to freeze the current 4 bit state.',
+    guideOverview: 'The 74x77 is a 4 bit transparent latch with one shared enable input. Pull E HIGH to let each Q follow its D input, then return E LOW to freeze the current 4 bit state.',
     guidePinDescriptions: {
       E:    'Shared latch enable (active HIGH transparent). HIGH = transparent; LOW = latched.',
       '1D': 'Data input for bit 1.',
@@ -456,19 +456,19 @@ export const CHIPS_BLOCK_9 = {
 
   // ── 74H78: dual JK FF, preset, shared clock and clear, 14-pin ─────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
-     Flip-flop concept: https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
+     Flip flop concept: https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
   // Both sections share CLK and CLR and respond on the positive clock edge in
   // this model, matching the device description used by the block definition.
   '74H78': {
     name: '74x78',
     simpleName: 'Dual JK FF (shared CLK/CLR)',
-    description: 'Dual positive pulse triggered J-K flip-flop with preset, shared clock and clear (14-pin)',
+    description: 'Dual pos-pulse JK flip-flop, preset, shared clock and clear (14-pin)',
     pins: 14,
     vcc: 14,
     gnd: 7,
     datasheet: 'https://en.wikipedia.org/wiki/7400-series_integrated_circuits',
-    tags: ['flip-flop', 'jk', 'sequential', 'dual', 'preset', 'clear'],
-    guideOverview: 'The 74H78 contains two J-K flip-flops with a shared clock and shared clear, plus individual preset inputs. In this block it is modeled as a positive-edge-triggered family member.',
+    tags: ['flip flop', 'jk', 'sequential', 'dual', 'preset', 'clear'],
+    guideOverview: 'The 74H78 contains two JK flip flops with a shared clock and shared clear, plus individual preset inputs. In this block it is modeled as a positive edge triggered family member.',
     guidePinDescriptions: {
       CLK:    'Shared clock. Both FFs update on the rising edge.',
       CLR:    'Shared active LOW clear. Forces both Q outputs LOW asynchronously.',
@@ -487,8 +487,8 @@ export const CHIPS_BLOCK_9 = {
     },
     guideSections: [
       {
-        title: 'Shared-Clock JK Pair (Positive Edge)',
-        paragraphs: ['Both flip-flops share one clock and one CLR. Individual PRE# lets you set each bit independently without clocking.'],
+        title: 'Shared Clock JK Pair (Positive Edge)',
+        paragraphs: ['Both flip flops share one clock and one CLR. Individual PRE# lets you set each bit independently without clocking.'],
       },
     ],
     pinout: [
@@ -516,19 +516,19 @@ export const CHIPS_BLOCK_9 = {
 
   // ── 74L78: dual JK FF, preset, shared clock and clear, 14-pin ─────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
-     Flip-flop concept: https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
+     Flip flop concept: https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
   // This L-family variant uses the same functional model as the H-family part:
-  // shared clock and clear, independent preset pins, and positive-edge capture.
+  // shared clock and clear, independent preset pins, and positive edge capture.
   '74L78': {
     name: '74x78',
     simpleName: 'Dual JK FF (shared CLK/CLR)',
-    description: 'Dual positive pulse triggered J-K flip-flop with preset, shared clock and clear (14-pin)',
+    description: 'Dual pos-pulse JK flip-flop, preset, shared clock and clear (14-pin)',
     pins: 14,
     vcc: 14,
     gnd: 7,
     datasheet: 'https://en.wikipedia.org/wiki/7400-series_integrated_circuits',
-    tags: ['flip-flop', 'jk', 'sequential', 'dual', 'preset', 'clear'],
-    guideOverview: 'The 74L78 is the L-family dual J-K flip-flop with shared CLK and CLR. Each section has its own preset, and the modeled clocked action occurs on the positive clock edge.',
+    tags: ['flip flop', 'jk', 'sequential', 'dual', 'preset', 'clear'],
+    guideOverview: 'The 74L78 is the L-family dual JK flip flop with shared CLK and CLR. Each section has its own preset, and the modeled clocked action occurs on the positive clock edge.',
     guidePinDescriptions: {
       CLK:    'Shared clock. Both FFs update on the rising edge.',
       CLR:    'Shared active LOW clear.',
@@ -547,8 +547,8 @@ export const CHIPS_BLOCK_9 = {
     },
     guideSections: [
       {
-        title: 'Shared-Clock JK Pair (L-family)',
-        paragraphs: ['L-family low power variant of the 78-style JK flip-flop. Function is identical to 74H78 but with lower power dissipation and slower speed.'],
+        title: 'Shared Clock JK Pair (L-family)',
+        paragraphs: ['L-family low power variant of the 78-style JK flip flop. Function is identical to 74H78 but with lower power dissipation and slower speed.'],
       },
     ],
     pinout: [
@@ -574,35 +574,35 @@ export const CHIPS_BLOCK_9 = {
     sequential: true,
   },
 
-  // ── 74x78: dual neg-edge triggered JK FF, preset, shared clock+clear, 14-pin
+  // ── 74x78: dual neg edge triggered JK FF, preset, shared clock+clear, 14-pin
   /* Primary source: Texas Instruments, SN74LS78A datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls78a.pdf
-     Flip-flop concept: https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
-  // This LS-family member is the negative-edge version of the 78-style device.
-  // It now uses a falling-edge JK primitive so the modeled clocking matches the
-  // published part description instead of the positive-edge H/L variants.
+     Flip flop concept: https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
+  // This LS family member is the negative edge version of the 78-style device.
+  // It now uses a falling edge JK primitive so the modeled clocking matches the
+  // published part description instead of the positive edge H/L variants.
   '74x78': {
     name: '74x78',
-    simpleName: 'Dual JK FF (Neg-Edge, Shared CLK/CLR)',
-    description: 'Dual negative-edge-triggered JK flip-flop with shared clock, shared active LOW clear, and individual active LOW preset inputs (14-pin)',
+    simpleName: 'Dual JK FF (Neg Edge, Shared CLK/CLR)',
+    description: 'Dual neg-edge JK flip-flop, shared clk, active-LOW preset/clear (14-pin)',
     pins: 14,
     vcc: 14,
     gnd: 7,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls78a.pdf',
-    tags: ['flip-flop', 'jk', 'sequential', 'dual', 'preset', 'clear', 'negative-edge'],
-    guideOverview: 'The 74x78 gives you two negative-edge-triggered JK flip-flops that share a common clock and a common active LOW clear. Each flip-flop has its own active LOW preset input. The JK inputs let you set, reset, or toggle the output on each falling clock edge.',
+    tags: ['flip flop', 'jk', 'sequential', 'dual', 'preset', 'clear', 'negative edge'],
+    guideOverview: 'The 74x78 gives you two negative edge triggered JK flip flops that share a common clock and a common active LOW clear. Each flip flop has its own active LOW preset input. The JK inputs let you set, reset, or toggle the output on each falling clock edge.',
     guidePinDescriptions: {
-      '1J':   'J input for flip-flop 1. Controls set/toggle behavior on falling clock edge.',
+      '1J':   'J input for flip flop 1. Controls set/toggle behavior on falling clock edge.',
       '1PRE': 'Active LOW asynchronous preset for FF1. When LOW, forces 1Q HIGH immediately.',
-      '1K':   'K input for flip-flop 1. Controls reset/toggle behavior on falling clock edge.',
-      '1Q':   'Non-inverting output of flip-flop 1.',
-      '1Qn':  'Inverting (complement) output of flip-flop 1.',
-      CLK:    'Common clock for both flip-flops. State updates on the falling (negative) edge.',
+      '1K':   'K input for flip flop 1. Controls reset/toggle behavior on falling clock edge.',
+      '1Q':   'Non inverting output of flip flop 1.',
+      '1Qn':  'Inverting (complement) output of flip flop 1.',
+      CLK:    'Common clock for both flip flops. State updates on the falling (negative) edge.',
       GND:    'Ground reference (pin 7).',
-      '2Qn':  'Inverting (complement) output of flip-flop 2.',
-      '2Q':   'Non-inverting output of flip-flop 2.',
-      '2K':   'K input for flip-flop 2.',
+      '2Qn':  'Inverting (complement) output of flip flop 2.',
+      '2Q':   'Non inverting output of flip flop 2.',
+      '2K':   'K input for flip flop 2.',
       '2PRE': 'Active LOW asynchronous preset for FF2. When LOW, forces 2Q HIGH immediately.',
-      '2J':   'J input for flip-flop 2.',
+      '2J':   'J input for flip flop 2.',
       CLR:    'Common active LOW asynchronous clear. When LOW, forces both Q outputs LOW.',
       VCC:    'Positive supply (5V). Standard position at pin 14.',
     },
@@ -629,10 +629,10 @@ export const CHIPS_BLOCK_9 = {
     sequential: true,
     guideSections: [
       {
-        title: 'JK Flip-Flop Operation',
+        title: 'JK Flip Flop Operation',
         paragraphs: [
           'On the falling edge of CLK: J=0,K=0 → hold; J=1,K=0 → set Q=1; J=0,K=1 → reset Q=0; J=1,K=1 → toggle Q.',
-          'The shared CLR is active LOW: pulling it LOW clears both flip-flops asynchronously regardless of CLK. Individual PRE inputs are also active LOW and take priority over CLR when both are asserted set Q HIGH regardless of clock.',
+          'The shared CLR is active LOW: pulling it LOW clears both flip flops asynchronously regardless of CLK. Individual PRE inputs are also active LOW and take priority over CLR when both are asserted set Q HIGH regardless of clock.',
         ],
         note: 'Connect CLR HIGH and both PRE inputs HIGH during normal clocked operation so the async overrides are inactive.',
       },
@@ -641,19 +641,19 @@ export const CHIPS_BLOCK_9 = {
 
   // ── 74x79: dual D positive edge triggered FF, async PRE and CLR, 14-pin ──
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
-     Flip-flop concept: https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
-  // Each section is a straightforward D flip-flop with active LOW asynchronous
+     Flip flop concept: https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
+  // Each section is a straightforward D flip flop with active LOW asynchronous
   // preset and clear. That makes it one of the more literal models in the block.
-  '7479': {
+  '74x79': {
     name: '74x79',
     simpleName: 'Dual D FF',
-    description: 'Dual D positive edge triggered flip-flop with asynchronous preset and clear (14-pin)',
+    description: 'Dual D pos-edge flip-flop, async preset and clear (14-pin)',
     pins: 14,
     vcc: 14,
     gnd: 7,
     datasheet: 'https://en.wikipedia.org/wiki/7400-series_integrated_circuits',
-    tags: ['flip-flop', 'd-type', 'sequential', 'dual', 'preset', 'clear'],
-    guideOverview: 'The 7479 provides two positive-edge-triggered D flip-flops with asynchronous preset and clear. Each section captures D on its clock edge and also supplies the complementary output Qn.',
+    tags: ['flip flop', 'd type', 'sequential', 'dual', 'preset', 'clear'],
+    guideOverview: 'The 74x79 provides two positive edge triggered D flip flops with asynchronous preset and clear. Each section captures D on its clock edge and also supplies the complementary output Qn.',
     guidePinDescriptions: {
       '1CLR': 'Active LOW asynchronous clear for FF1. Forces 1Q LOW immediately.',
       '1D':   'Data input for FF1.',
@@ -672,7 +672,7 @@ export const CHIPS_BLOCK_9 = {
     },
     guideSections: [
       {
-        title: 'Dual D Flip-Flop',
+        title: 'Dual D Flip Flop',
         paragraphs: ['Each section captures D on the rising clock edge. PRE# and CLR# override the clock asynchronously. Tie unused PRE# and CLR# to VCC for normal clocked operation.'],
       },
     ],
@@ -705,7 +705,7 @@ export const CHIPS_BLOCK_9 = {
   // The real package includes complementary A/B inputs, carry gating pins, and
   // both true and complemented carry outputs. 74Sim preserves ordinary 1 bit
   // addition through A, B, and CIN, and documents the extra package signals as a caveat.
-  '7480': {
+  '74x80': {
     name: '74x80',
     simpleName: 'Gated Full Adder',
     description: 'Gated full adder (complementary inputs, carry gating) (14-pin)',
@@ -714,18 +714,18 @@ export const CHIPS_BLOCK_9 = {
     gnd: 7,
     datasheet: 'https://en.wikipedia.org/wiki/7400-series_integrated_circuits',
     tags: ['adder', 'arithmetic', 'combinational'],
-    guideOverview: 'The 7480 is modeled as a 1 bit full adder using A, B, and CIN, producing SUM and COUT. The package also contains complementary and gating pins in real hardware, but 74Sim keeps the common logic-design use case rather than emulating every internal gating path.',
+    guideOverview: 'The 74x80 is modeled as a 1 bit full adder using A, B, and CIN, producing SUM and COUT. The package also contains complementary and gating pins in real hardware, but 74Sim keeps the common logic design use case rather than emulating every internal gating path.',
     guidePinDescriptions: {
       A:     'First operand bit.',
       An:    'Complement of A (ignored in simulation).',
       B:     'Second operand bit.',
       Bn:    'Complement of B (ignored in simulation).',
-      CIN:   'Carry-in from a previous stage.',
+      CIN:   'Carry in from a previous stage.',
       SUM:   'Sum output: A XOR B XOR CIN.',
-      COUT:  'Carry-out: HIGH when two or more inputs are HIGH.',
-      COUTn: 'Complement carry-out (present on package, not used by simulator).',
-      G1:    'Gate-select input 1 (package gating, not used in simulator).',
-      G2:    'Gate-select input 2.',
+      COUT:  'Carry out: HIGH when two or more inputs are HIGH.',
+      COUTn: 'Complement carry out (present on package, not used by simulator).',
+      G1:    'Gate select input 1 (package gating, not used in simulator).',
+      G2:    'Gate select input 2.',
       GND:   'Ground reference (pin 7).',
       VCC:   'Positive supply (+5 V) at pin 14.',
       NC1: 'No connection.', NC2: 'No connection.',
@@ -762,19 +762,19 @@ export const CHIPS_BLOCK_9 = {
 
   // ── 74x81: 16 bit RAM (16×1), 14-pin ───────────────────────────────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits */
-  // Functionally this is a 16-word by 1 bit RAM with CE and WE controls plus Q
+  // Functionally this is a 16 word by 1 bit RAM with CE and WE controls plus Q
   // and Qn outputs. The simulator keeps the storage behavior but does not make
   // separate use of DINn or model real disabled-output bus nuances.
-  '7481': {
+  '74x81': {
     name: '74x81',
     simpleName: '16 bit RAM (16×1)',
-    description: '16 bit random-access memory organized as 16 words × 1 bit (14-pin)',
+    description: '16 bit random access memory organized as 16 words × 1 bit (14-pin)',
     pins: 14,
     vcc: 14,
     gnd: 7,
     datasheet: 'https://en.wikipedia.org/wiki/7400-series_integrated_circuits',
     tags: ['ram', 'memory', 'sequential', '16 bit'],
-    guideOverview: 'The 7481 stores 16 single-bit words selected by A0-A3. With CE active and WE asserted, the addressed bit is written from DIN; with CE active and WE inactive, the addressed bit appears on Q and Qn.',
+    guideOverview: 'The 74x81 stores 16 single bit words selected by A0-A3. With CE active and WE asserted, the addressed bit is written from DIN; with CE active and WE inactive, the addressed bit appears on Q and Qn.',
     guidePinDescriptions: {
       A0:   'Address bit 0 (LSB).',
       A1:   'Address bit 1.',
@@ -794,7 +794,7 @@ export const CHIPS_BLOCK_9 = {
       {
         title: 'Modeling Caveat',
         paragraphs: [
-          'The package includes DINn and historical bus-interface details. 74Sim uses DIN as the stored value source and models disabled behavior in a simplified digital way rather than reproducing all real output-drive states.',
+          'The package includes DINn and historical bus interface details. 74Sim uses DIN as the stored value source and models disabled behavior in a simplified digital way rather than reproducing all real output-drive states.',
         ],
       },
     ],
@@ -823,9 +823,9 @@ export const CHIPS_BLOCK_9 = {
   // ── 74x82: 2 bit binary full adder, 14-pin ─────────────────────────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Binary adder concept: https://en.wikipedia.org/wiki/Adder_(electronics) */
-  // This is a direct arithmetic element: two 2 bit words plus carry-in produce
-  // two sum bits and a carry-out with no notable control-pin caveats.
-  '7482': {
+  // This is a direct arithmetic element: two 2 bit words plus carry in produce
+  // two sum bits and a carry out with no notable control pin caveats.
+  '74x82': {
     name: '74x82',
     simpleName: '2 bit Full Adder',
     description: '2 bit binary full adder (14-pin)',
@@ -834,16 +834,16 @@ export const CHIPS_BLOCK_9 = {
     gnd: 7,
     datasheet: 'https://en.wikipedia.org/wiki/7400-series_integrated_circuits',
     tags: ['adder', 'arithmetic', 'combinational', '2 bit'],
-    guideOverview: 'The 7482 adds two 2 bit binary values plus CIN and produces SUM1, SUM2, and COUT. It is useful as a compact arithmetic block when you need only the low two bits of addition.',
+    guideOverview: 'The 74x82 adds two 2 bit binary values plus CIN and produces SUM1, SUM2, and COUT. It is useful as a compact arithmetic block when you need only the low two bits of addition.',
     guidePinDescriptions: {
       A1:   'Bit 0 of operand A.',
       A2:   'Bit 1 of operand A.',
       B1:   'Bit 0 of operand B.',
       B2:   'Bit 1 of operand B.',
-      CIN:  'Carry-in from a lower-order stage.',
+      CIN:  'Carry in from a lower order stage.',
       SUM1: 'Sum bit 0.',
       SUM2: 'Sum bit 1.',
-      COUT: 'Carry-out to a higher-order stage.',
+      COUT: 'Carry out to a higher order stage.',
       GND:  'Ground reference (pin 7).',
       VCC:  'Positive supply (+5 V) at pin 14.',
       NC1: 'No connection.', NC2: 'No connection.', NC3: 'No connection.', NC4: 'No connection.',
@@ -851,7 +851,9 @@ export const CHIPS_BLOCK_9 = {
     guideSections: [
       {
         title: '2 bit Full Adder',
-        paragraphs: ['Cascade two 7482s to form a 4 bit adder: connect COUT of the lower chip to CIN of the upper chip. Pair four chips with the 74283 for a carry-lookahead 4 bit adder.'],
+        paragraphs: [
+          'Cascade two 7482s to form a 4 bit adder: connect COUT of the lower chip to CIN of the upper chip. Pair four chips with the 74x283 for a carry lookahead 4 bit adder.',
+        ],
       },
     ],
     pinout: [
@@ -879,16 +881,16 @@ export const CHIPS_BLOCK_9 = {
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits */
   // This is the 16-pin package variant of the same 16x1 RAM concept used by the
   // 7481, so the same functional storage model and caveats apply here.
-  '7484': {
+  '74x84': {
     name: '74x84',
     simpleName: '16 bit RAM (16×1)',
-    description: '16 bit random-access memory organized as 16 words × 1 bit (16-pin package) (16-pin)',
+    description: '16-bit RAM organized as 16 words × 1 bit (16-pin)',
     pins: 16,
     vcc: 16,
     gnd: 8,
     datasheet: 'https://en.wikipedia.org/wiki/7400-series_integrated_circuits',
     tags: ['ram', 'memory', 'sequential', '16 bit'],
-    guideOverview: 'The 7484 is another 16-word by 1 bit RAM, packaged with a few extra pins but used the same way logically: address the cell with A0-A3, write through DIN under CE/WE control, and read the stored bit on Q/Qn.',
+    guideOverview: 'The 74x84 is another 16 word by 1 bit RAM, packaged with a few extra pins but used the same way logically: address the cell with A0-A3, write through DIN under CE/WE control, and read the stored bit on Q/Qn.',
     guidePinDescriptions: {
       A0:   'Address bit 0 (LSB).',
       A1:   'Address bit 1.',
@@ -908,7 +910,7 @@ export const CHIPS_BLOCK_9 = {
       {
         title: 'Modeling Caveat',
         paragraphs: [
-          'As with the 7481, DINn and real disabled-output electrical behavior are simplified. The simulator focuses on readable and writable 16x1 storage rather than bus-electrical fidelity.',
+          'As with the 74x81, DINn and real disabled-output electrical behavior are simplified. The simulator focuses on readable and writable 16x1 storage rather than bus electrical fidelity.',
         ],
       },
     ],
@@ -941,19 +943,19 @@ export const CHIPS_BLOCK_9 = {
   // The select inputs choose whether each data bit passes through unchanged,
   // inverted, forced to 0, or forced to 1. That makes the part useful around
   // arithmetic units where you need controlled inversion or constants.
-  '7487': {
+  '74x87': {
     name: '74x87',
     simpleName: '4 bit TRUE/COMP/Z/ONE',
-    description: '4 bit true/complement/zero/one element (bit-by-bit programmable inverter) (14-pin)',
+    description: '4-bit true/complement/zero/one element (programmable inverter) (14-pin)',
     pins: 14,
     vcc: 14,
     gnd: 7,
     datasheet: 'https://en.wikipedia.org/wiki/7400-series_integrated_circuits',
     tags: ['programmable', 'combinational', 'complement', 'arithmetic'],
-    guideOverview: 'The 7487 applies one of four modes bit-by-bit to inputs A through D: force 0, pass true, pass complement, or force 1. In arithmetic designs that makes it useful for controlled inversion, constant generation, and operand conditioning.',
+    guideOverview: 'The 74x87 applies one of four modes bit by bit to inputs A through D: force 0, pass true, pass complement, or force 1. In arithmetic designs that makes it useful for controlled inversion, constant generation, and operand conditioning.',
     guidePinDescriptions: {
-      S0:  'Mode-select bit 0. See truth table.',
-      S1:  'Mode-select bit 1. Together with S0 selects mode: 00=zero, 01=true, 10=complement, 11=one.',
+      S0:  'Mode select bit 0. See truth table.',
+      S1:  'Mode select bit 1. Together with S0 selects mode: 00=zero, 01=true, 10=complement, 11=one.',
       A:   'Data input A.',
       B:   'Data input B.',
       C:   'Data input C.',

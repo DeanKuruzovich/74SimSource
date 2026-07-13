@@ -4,20 +4,15 @@
 
 import { GRID, COLORS, REALISTIC_COLORS, COMP, SNAP_RADIUS, getFamilySpec } from './constants.js';
 
-// Vertical fine-tune for wire-terminal label text. canvas textBaseline='middle'
-// is close but not pixel-perfect for these bold monospace glyphs at small sizes
-// tune these to nudge the text up/down inside its circle. Positive = down.
-const WIRE_LABEL_NUM_Y_OFFSET = 0;   // numbered net labels (8px) tune if "12" sits high
-const WIRE_LABEL_TEXT_Y_OFFSET = 0;  // VCC / GND / CLK (6px)   tune if these sit low
-
 // Replaces the `74x` placeholder in chip names with the selected family letters
 // so the DIP package renders as `74LS00`, `74HC00`, or `74HCT00`.
+// Per-chip override (comp.chipFamily) wins over the project default (state.chipFamily).
 function chipDisplayName(comp, state) {
   if (state && state.showSimpleChipNames && comp.chipId) {
     return comp.chipDef?.simpleName || comp.chipId;
   }
   const raw = comp.name || '';
-  const label = getFamilySpec(state?.chipFamily).label; // '74LS' | '74HC' | '74HCT'
+  const label = getFamilySpec(comp?.chipFamily ?? state?.chipFamily).label;
   return raw.replace(/^74x/, label);
 }
 
@@ -40,20 +35,56 @@ export class Renderer {
     this._simPowerCache = null;
     this._simPowerCacheVersion = -1;
 
+    // Optional callback (set by the app) invoked after every resize so the
+    // owner can mark its frame dirty and repaint immediately — otherwise a
+    // resized canvas stays cleared until the next redraw, flashing the dark
+    // page background through.
+    this.onResize = null;
+
     this._resize();
-    window.addEventListener('resize', () => this._resize());
+
+    // Track container size with a ResizeObserver rather than only the window
+    // 'resize' event. The window event fires *before* the flex layout settles
+    // when Chrome DevTools docks/undocks/closes, so getBoundingClientRect()
+    // returns a stale (smaller) width and the canvas gets locked too narrow —
+    // leaving a "black bar" strip on the right where the page background shows
+    // through. ResizeObserver fires after layout with the true content-box size
+    // and catches every size change, so it fixes that case. We keep a window
+    // 'resize' listener as well, only to catch devicePixelRatio changes (moving
+    // the window between monitors / browser zoom), which don't change the CSS
+    // box and so wouldn't trip the observer.
+    if (typeof ResizeObserver !== 'undefined') {
+      this._resizeObserver = new ResizeObserver(() => this._resize());
+      this._resizeObserver.observe(this.canvas.parentElement);
+    } else {
+      window.addEventListener('resize', () => this._resize());
+    }
+    this._lastDpr = window.devicePixelRatio || 1;
+    window.addEventListener('resize', () => {
+      const dpr = window.devicePixelRatio || 1;
+      if (dpr !== this._lastDpr) { this._lastDpr = dpr; this._resize(); }
+    });
   }
 
   _resize() {
     const dpr = window.devicePixelRatio || 1;
     const rect = this.canvas.parentElement.getBoundingClientRect();
-    this.canvas.width = rect.width * dpr;
-    this.canvas.height = rect.height * dpr;
+    // Round to whole device pixels so a fractional dpr can't leave a sub-pixel
+    // gap between the canvas and the container edge.
+    const w = Math.round(rect.width * dpr);
+    const h = Math.round(rect.height * dpr);
+    // Skip no-op resizes: reassigning canvas.width/height clears the canvas
+    // even when the value is unchanged, which would flash on every observer tick.
+    if (this.canvas.width !== w || this.canvas.height !== h) {
+      this.canvas.width = w;
+      this.canvas.height = h;
+    }
     this.canvas.style.width = rect.width + 'px';
     this.canvas.style.height = rect.height + 'px';
     this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     this.screenW = rect.width;
     this.screenH = rect.height;
+    if (this.onResize) this.onResize();
   }
 
   // ── Coordinate transforms ────────────────────────────────────────────────
@@ -77,7 +108,18 @@ export class Renderer {
     ctx.save();
 
     // Clear
-    ctx.fillStyle = state.showRealisticBoard ? REALISTIC_COLORS.BG : COLORS.BG;
+    if (state.showRealisticBoard) {
+      // Soft workbench vignette — center slightly lifted, edges fall off dark
+      const vg = ctx.createRadialGradient(
+        this.screenW / 2, this.screenH * 0.42, 0,
+        this.screenW / 2, this.screenH * 0.50, Math.max(this.screenW, this.screenH) * 0.72
+      );
+      vg.addColorStop(0, '#3c3c30');
+      vg.addColorStop(1, '#22221a');
+      ctx.fillStyle = vg;
+    } else {
+      ctx.fillStyle = COLORS.BG;
+    }
     ctx.fillRect(0, 0, this.screenW, this.screenH);
 
     // Apply camera transform
@@ -145,7 +187,7 @@ export class Renderer {
     }
 
     // Bottom layer: chips, 7-seg, slide switches drawn first (behind wires/terminals)
-    const BOTTOM_TYPES = new Set([COMP.CHIP, COMP.SEVEN_SEG, COMP.SLIDE_SWITCH]);
+    const BOTTOM_TYPES = new Set([COMP.CHIP, COMP.SEVEN_SEG, COMP.SLIDE_SWITCH, COMP.DIP_SWITCH]);
     for (const comp of state.components) {
       if (!comp.placed) continue;
       if (!BOTTOM_TYPES.has(comp.type)) continue;
@@ -202,6 +244,17 @@ export class Renderer {
         this._drawWireEndpoint(ctx, mw.wire.startHoleId, mw.wire.startNet, mw.wire.color, state.simulator);
         this._drawWireEndpoint(ctx, mw.wire.endHoleId,   mw.wire.endNet,   mw.wire.color, state.simulator);
       }
+    }
+    // Draw paste-preview ghost wires as faded endpoint discs at the snapped
+    // positions, matching the chip ghost's translucent style.
+    if (state.ghostWires && state.ghostWires.length > 0) {
+      ctx.save();
+      ctx.globalAlpha = 0.5;
+      for (const gw of state.ghostWires) {
+        this._drawGhostWireEndpoint(ctx, gw.startHoleId, gw.color);
+        this._drawGhostWireEndpoint(ctx, gw.endHoleId,   gw.color);
+      }
+      ctx.restore();
     }
 
     if (dragOffset) { ctx.restore(); }
@@ -514,33 +567,46 @@ export class Renderer {
     const w = GRID.TILE_WIDTH;
     const h = GRID.TILE_HEIGHT;
 
-    // Drop shadow
+    // Drop shadow — soft and mostly downward, like a board resting on a bench
     ctx.save();
-    ctx.shadowColor = 'rgba(0,0,0,0.55)';
-    ctx.shadowBlur = 12;
-    ctx.shadowOffsetX = 4;
-    ctx.shadowOffsetY = 4;
+    ctx.shadowColor = 'rgba(10, 8, 2, 0.45)';
+    ctx.shadowBlur = 18;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 6;
     ctx.fillStyle = RC.BOARD_BG;
     ctx.beginPath();
-    ctx.roundRect(origin.x + 4, origin.y + 4, w - 8, h - 8, 6);
+    ctx.roundRect(origin.x + 4, origin.y + 4, w - 8, h - 8, 7);
     ctx.fill();
     ctx.restore();
 
     // Board body with subtle gradient (top highlight → slightly darker bottom)
     const bodyGrad = ctx.createLinearGradient(origin.x, origin.y, origin.x, origin.y + h);
-    bodyGrad.addColorStop(0,   '#faf6ef');
+    bodyGrad.addColorStop(0,   '#fbf7f0');
     bodyGrad.addColorStop(0.5, '#f5f0e8');
-    bodyGrad.addColorStop(1,   '#ece6d8');
+    bodyGrad.addColorStop(1,   '#eae3d4');
     ctx.fillStyle = bodyGrad;
     ctx.beginPath();
-    ctx.roundRect(origin.x + 4, origin.y + 4, w - 8, h - 8, 6);
+    ctx.roundRect(origin.x + 4, origin.y + 4, w - 8, h - 8, 7);
     ctx.fill();
 
-    // Board border
+    // Edge bevel: light catch along the top edge, shaded lower edge — makes
+    // the plastic slab read as having thickness instead of a flat sticker.
+    const bevelGrad = ctx.createLinearGradient(origin.x, origin.y, origin.x, origin.y + h);
+    bevelGrad.addColorStop(0,    'rgba(255,255,255,0.85)');
+    bevelGrad.addColorStop(0.12, 'rgba(255,255,255,0.25)');
+    bevelGrad.addColorStop(0.85, 'rgba(140,125,100,0.18)');
+    bevelGrad.addColorStop(1,    'rgba(120,105,80,0.55)');
+    ctx.strokeStyle = bevelGrad;
+    ctx.lineWidth = 1.6;
+    ctx.beginPath();
+    ctx.roundRect(origin.x + 5, origin.y + 5, w - 10, h - 10, 6);
+    ctx.stroke();
+
+    // Board outline
     ctx.strokeStyle = RC.BOARD_BORDER;
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.roundRect(origin.x + 4, origin.y + 4, w - 8, h - 8, 6);
+    ctx.roundRect(origin.x + 4, origin.y + 4, w - 8, h - 8, 7);
     ctx.stroke();
 
     // ── Power rail lines ─────────────────────────────────────────────────────
@@ -557,7 +623,9 @@ export class Renderer {
     // Draw rail stripes as 10 segments matching hole groups (cols 2-6, 8-12, ..., 56-60)
     const drawRealisticSegLines = (y, color) => {
       ctx.strokeStyle = color;
-      ctx.lineWidth = 2;
+      ctx.globalAlpha = 0.82;   // printed-ink look rather than solid plastic
+      ctx.lineWidth = 1.8;
+      ctx.lineCap = 'round';
       ctx.setLineDash([]);
       for (let k = 0; k < 10; k++) {
         const sx = origin.x + GRID.TILE_PADDING + (2 + k * 6) * GRID.HOLE_SPACING - 6;
@@ -572,6 +640,7 @@ export class Renderer {
     drawRealisticSegLines(botPlusY  + railOff, RC.POWER_PLUS_MARK);
     drawRealisticSegLines(topMinusY + railOff, RC.POWER_MINUS_MARK);
     drawRealisticSegLines(botMinusY - railOff, RC.POWER_MINUS_MARK);
+    ctx.globalAlpha = 1;
 
     // Rail +/- labels
     ctx.font = 'bold 11px sans-serif';
@@ -584,17 +653,39 @@ export class Renderer {
     ctx.fillText('−', startX - 12, topMinusY);
     ctx.fillText('−', startX - 12, botMinusY);
 
-    // ── Center channel (divider strip) ────────────────────────────────────
+    // ── Center channel (recessed groove between the two halves) ───────────
     const channelY = origin.y + GRID.TILE_PADDING + GRID.POWER_RAIL_HEIGHT + GRID.POWER_RAIL_GAP + GRID.HALF_HEIGHT;
     const channelBarH = Math.round((GRID.CHANNEL_GAP - 4) * 0.7);
-    ctx.fillStyle = '#d8d0be';
-    ctx.fillRect(origin.x + GRID.TILE_PADDING - 4, channelY + (GRID.CHANNEL_GAP - channelBarH) / 2, railW + 8, channelBarH);
-    // Subtle engraved line in channel center
-    ctx.strokeStyle = '#c4baa8';
+    const chX = origin.x + GRID.TILE_PADDING - 4;
+    const chY = channelY + (GRID.CHANNEL_GAP - channelBarH) / 2;
+    const chW = railW + 8;
+    // Groove floor: darker than the board face, with the top wall in shadow
+    // and the bottom lip catching light — reads as an actual recess.
+    const chGrad = ctx.createLinearGradient(0, chY, 0, chY + channelBarH);
+    chGrad.addColorStop(0,    '#b7ac97');
+    chGrad.addColorStop(0.18, '#cfc5b0');
+    chGrad.addColorStop(0.8,  '#dbd2bf');
+    chGrad.addColorStop(1,    '#c9bfa9');
+    ctx.fillStyle = chGrad;
+    ctx.fillRect(chX, chY, chW, channelBarH);
+    // Crisp shadow line under the top lip
+    ctx.strokeStyle = 'rgba(90, 78, 58, 0.45)';
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.moveTo(origin.x + GRID.TILE_PADDING - 4, channelY + GRID.CHANNEL_GAP / 2);
-    ctx.lineTo(origin.x + GRID.TILE_PADDING + railW + 4, channelY + GRID.CHANNEL_GAP / 2);
+    ctx.moveTo(chX, chY + 0.5);
+    ctx.lineTo(chX + chW, chY + 0.5);
+    ctx.stroke();
+    // Bright catch on the bottom lip (just below the groove)
+    ctx.strokeStyle = 'rgba(255,255,255,0.7)';
+    ctx.beginPath();
+    ctx.moveTo(chX, chY + channelBarH + 0.5);
+    ctx.lineTo(chX + chW, chY + channelBarH + 0.5);
+    ctx.stroke();
+    // Faint engraved line along the groove center
+    ctx.strokeStyle = 'rgba(150, 138, 112, 0.5)';
+    ctx.beginPath();
+    ctx.moveTo(chX, channelY + GRID.CHANNEL_GAP / 2);
+    ctx.lineTo(chX + chW, channelY + GRID.CHANNEL_GAP / 2);
     ctx.stroke();
 
     // ── Occupied holes set ─────────────────────────────────────────────────
@@ -662,42 +753,42 @@ export class Renderer {
     ctx.restore();
   }
 
-  /** Draw a single realistic main-grid hole at (x,y). */
+  /** Draw a single realistic main-grid hole at (x,y).
+   *  A recessed square aperture in cream plastic: shaded chamfer above,
+   *  light catch below, dark warm interior. Flat fills only — this runs for
+   *  every hole on every tile, so no gradient allocation here. */
   _drawRealisticHole(ctx, x, y, occupied) {
     const r = GRID.HOLE_RADIUS;
-    // Metallic square rim
-    const rimGrad = ctx.createRadialGradient(x - 0.5, y - 0.5, r * 0.5, x, y, r + 2);
-    rimGrad.addColorStop(0, '#c8bca8');
-    rimGrad.addColorStop(1, '#8a7a68');
+    // Light catch on the bottom lip (light comes from the top of the screen)
     ctx.beginPath();
-    ctx.roundRect(x - r - 1.5, y - r - 1.5, (r + 1.5) * 2, (r + 1.5) * 2, 1.5);
-    ctx.fillStyle = rimGrad;
+    ctx.roundRect(x - r - 0.5, y - r + 0.9, (r + 0.5) * 2, r * 2, 2);
+    ctx.fillStyle = 'rgba(255,255,255,0.75)';
     ctx.fill();
-    // Dark square hole center
+    // Shaded chamfer ring, biased upward
     ctx.beginPath();
-    ctx.roundRect(x - r, y - r, r * 2, r * 2, 1.5);
-    ctx.fillStyle = occupied ? '#2c1e10' : '#1a1408';
+    ctx.roundRect(x - r - 0.5, y - r - 0.9, (r + 0.5) * 2, r * 2, 2);
+    ctx.fillStyle = 'rgba(126, 110, 86, 0.5)';
     ctx.fill();
+    // Dark warm interior
+    ctx.beginPath();
+    ctx.roundRect(x - r + 0.2, y - r + 0.2, r * 2 - 0.4, r * 2 - 0.4, 1.6);
+    ctx.fillStyle = occupied ? '#3a2a18' : '#221a10';
+    ctx.fill();
+    // Hint of the metal contact leaf inside the aperture
+    ctx.fillStyle = occupied ? 'rgba(200,170,120,0.28)' : 'rgba(190,175,150,0.20)';
+    ctx.fillRect(x - r + 1, y + r - 2.1, r * 2 - 2, 1.1);
   }
 
-  /** Draw a power-rail hole neutral square, no color tint. */
+  /** Draw a power-rail hole — same recessed aperture as the main grid. */
   _drawRealisticPowerHole(ctx, x, y, isPlus) {
-    const r = GRID.HOLE_RADIUS;
-    // Neutral square rim
-    ctx.beginPath();
-    ctx.roundRect(x - r - 1.5, y - r - 1.5, (r + 1.5) * 2, (r + 1.5) * 2, 1.5);
-    ctx.fillStyle = '#8a7a68';
-    ctx.fill();
-    // Dark square hole center
-    ctx.beginPath();
-    ctx.roundRect(x - r, y - r, r * 2, r * 2, 1.5);
-    ctx.fillStyle = isPlus ? '#2a1008' : '#0a0a18';
-    ctx.fill();
+    this._drawRealisticHole(ctx, x, y, false);
   }
 
   // ── Realistic Component Renderers ─────────────────────────────────────────
 
-  /** Realistic 5mm through-hole LED: dome, leads, body stands perpendicular to wire line. */
+  /** Realistic 5mm through-hole LED, seen from above: round lens between the
+   *  two pin holes, flange with a flat spot on the cathode side, reflector
+   *  cup and die visible through the translucent plastic. */
   _drawLEDRealistic(ctx, comp) {
     if (comp.pins.length < 2) return;
     const aPos = this.world.getHolePosById(comp.pins[0].holeId);
@@ -705,168 +796,137 @@ export class Renderer {
     if (!aPos || !cPos) return;
 
     const cs = this._ledColorScheme(comp.color || 'red');
+    // Brightness 0..1; gradient stops lerp from dark → lit by this value.
+    const b = (typeof comp.brightness === 'number') ? comp.brightness : (comp.lit ? 1 : 0);
+    const lit = b > 0.05;
 
     const angle = Math.atan2(cPos.y - aPos.y, cPos.x - aPos.x);
     const dist = Math.hypot(cPos.x - aPos.x, cPos.y - aPos.y);
     const cx = (aPos.x + cPos.x) / 2;
     const cy = (aPos.y + cPos.y) / 2;
 
-    // Determine which direction LED body points (perpendicular to wire line)
-    const upSign = Math.cos(angle) >= 0 ? -1 : 1;
+    const flangeR = 9;    // flange (widest ring at the base of a 5mm LED)
+    const lensR   = 7.2;  // lens body
 
-    // LED body dimensions
-    const domeR = 7;                      // dome radius (5mm LED)
-    const bodyW = domeR * 2;              // body width matches dome diameter
-    const bodyH = 6;                      // rectangular body height
-    const rimH = 2;                       // flange/rim at base
-    const leadLen = Math.min(10, dist * 0.2);  // lead length from holes to body
-
-    // Position of the body base (where leads connect)
-    const bodyBase = upSign * leadLen;
-    // Position of top of dome
-    const domeTop = bodyBase + upSign * (rimH + bodyH + domeR);
-
-    ctx.save();
-    ctx.translate(cx, cy);
-    ctx.rotate(angle);
-
-    // Glow halo when lit (in rotated space)
-    if (comp.lit) {
-      const glowCx = 0;
-      const glowCy = bodyBase + upSign * (rimH + bodyH + domeR * 0.5);
-      const halo = ctx.createRadialGradient(glowCx, glowCy, domeR * 0.3, glowCx, glowCy, domeR * 4);
-      halo.addColorStop(0, `rgba(${cs.halo}, 0.7)`);
-      halo.addColorStop(1, `rgba(${cs.halo}, 0)`);
+    // Glow halo under everything; alpha scales with brightness.
+    if (lit) {
+      const halo = ctx.createRadialGradient(cx, cy, lensR * 0.3, cx, cy, flangeR * 4);
+      halo.addColorStop(0,    `rgba(${cs.halo}, ${(0.75 * b).toFixed(3)})`);
+      halo.addColorStop(0.35, `rgba(${cs.halo}, ${(0.28 * b).toFixed(3)})`);
+      halo.addColorStop(1,    `rgba(${cs.halo}, 0)`);
       ctx.beginPath();
-      ctx.arc(glowCx, glowCy, domeR * 4, 0, Math.PI * 2);
+      ctx.arc(cx, cy, flangeR * 4, 0, Math.PI * 2);
       ctx.fillStyle = halo;
       ctx.fill();
     }
 
-    // Lead wires (silver/metallic)
-    ctx.strokeStyle = '#9a9a9a';
-    ctx.lineWidth = 1.8;
+    // Leads from the holes in under the flange
+    ctx.strokeStyle = '#a9acaf';
+    ctx.lineWidth = 2;
     ctx.lineCap = 'round';
-    // Anode lead (longer, from pin A)
     ctx.beginPath();
-    ctx.moveTo(-dist / 2, 0);
-    ctx.lineTo(-bodyW * 0.22, bodyBase);
+    ctx.moveTo(aPos.x, aPos.y);
+    ctx.lineTo(cx - Math.cos(angle) * lensR * 0.5, cy - Math.sin(angle) * lensR * 0.5);
     ctx.stroke();
-    // Cathode lead (shorter, from pin C)
     ctx.beginPath();
-    ctx.moveTo(dist / 2, 0);
-    ctx.lineTo(bodyW * 0.22, bodyBase);
+    ctx.moveTo(cPos.x, cPos.y);
+    ctx.lineTo(cx + Math.cos(angle) * lensR * 0.5, cy + Math.sin(angle) * lensR * 0.5);
     ctx.stroke();
 
-    // Rim/flange at base (slightly wider than body)
-    const rimTop = bodyBase + upSign * rimH;
-    const rimBot = bodyBase;
-    ctx.fillStyle = comp.lit ? cs.litBody : cs.darkBody;
-    ctx.beginPath();
-    ctx.rect(-bodyW / 2 - 1, Math.min(rimTop, rimBot), bodyW + 2, Math.abs(rimH));
-    ctx.fill();
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(angle);   // local +x points toward the cathode pin
 
-    // Main rectangular body
-    const rectTop = rimTop;
-    const rectBot = rimTop + upSign * bodyH;
-    const bodyGrad = ctx.createLinearGradient(-bodyW / 2, 0, bodyW / 2, 0);
-    if (comp.lit) {
-      bodyGrad.addColorStop(0, cs.litBody);
-      bodyGrad.addColorStop(0.5, cs.litStroke);
-      bodyGrad.addColorStop(1, cs.litBody);
-    } else {
-      bodyGrad.addColorStop(0, cs.darkBody);
-      bodyGrad.addColorStop(0.5, this._lightenColor(cs.darkBody, 30));
-      bodyGrad.addColorStop(1, cs.darkBody);
+    // Contact shadow under the package so it sits on the board
+    if (!lit) {
+      ctx.fillStyle = 'rgba(40,30,12,0.22)';
+      ctx.beginPath();
+      ctx.ellipse(0.6, 1.4, flangeR, flangeR * 0.92, 0, 0, Math.PI * 2);
+      ctx.fill();
     }
-    ctx.fillStyle = bodyGrad;
+
+    // Flange: full disc except a flat chord on the cathode (+x) side
+    const flangeColor = this._lerpHex(this._lightenColor(cs.darkBody, -25), cs.litBody, b * 0.8);
+    const flat = Math.acos(0.72); // chord at x = 0.72·flangeR
     ctx.beginPath();
-    ctx.rect(-bodyW / 2, Math.min(rectTop, rectBot), bodyW, Math.abs(bodyH));
+    ctx.arc(0, 0, flangeR, flat, Math.PI * 2 - flat);
+    ctx.closePath();
+    ctx.fillStyle = flangeColor;
     ctx.fill();
+    ctx.strokeStyle = this._lerpHex(cs.darkStroke, cs.litStroke, b);
+    ctx.lineWidth = 0.8;
+    ctx.stroke();
 
-    // Inner element visible through translucent body (the die/chip inside)
-    const innerY = rectTop + upSign * bodyH * 0.5;
-    ctx.fillStyle = comp.lit ? 'rgba(255,255,255,0.6)' : 'rgba(80,80,80,0.4)';
-    ctx.beginPath();
-    ctx.rect(-bodyW * 0.25, innerY - 2, bodyW * 0.5, 4);
-    ctx.fill();
-
-    // Dome (lens) tall rounded dome shape (like a bullet/capsule top)
-    const domeBaseY = rectBot;  // dome starts at top of body
-    const domeHeight = domeR * 1.4;  // dome is taller than it is wide
-    const domeTipY = domeBaseY + upSign * domeHeight;
-
-    if (comp.lit) {
-      ctx.shadowBlur = 20;
+    // Lens body: radial gradient, light biased to the upper-left
+    const lens = ctx.createRadialGradient(-lensR * 0.35, -lensR * 0.35, lensR * 0.12, 0, 0, lensR);
+    const midDark = this._lightenColor(cs.darkBody, 28);
+    lens.addColorStop(0,   this._lerpHex(this._lightenColor(cs.darkBody, 55), '#ffffff', b));
+    lens.addColorStop(0.45, this._lerpHex(midDark, cs.litStroke, b));
+    lens.addColorStop(0.85, this._lerpHex(cs.darkBody, cs.litBody, b));
+    lens.addColorStop(1,   this._lerpHex(this._lightenColor(cs.darkBody, -20), cs.litBody, b));
+    if (lit) {
+      ctx.shadowBlur = 16 * b;
       ctx.shadowColor = cs.shadow;
     }
-
-    // Draw dome as a rounded capsule shape using bezier curves
-    const domeGrad = ctx.createLinearGradient(-bodyW / 2, domeBaseY, bodyW / 2, domeBaseY);
-    if (comp.lit) {
-      domeGrad.addColorStop(0, cs.litBody);
-      domeGrad.addColorStop(0.3, cs.litStroke);
-      domeGrad.addColorStop(0.5, '#fff');
-      domeGrad.addColorStop(0.7, cs.litStroke);
-      domeGrad.addColorStop(1, cs.litBody);
-    } else {
-      domeGrad.addColorStop(0, cs.darkBody);
-      domeGrad.addColorStop(0.35, this._lightenColor(cs.darkBody, 25));
-      domeGrad.addColorStop(0.5, this._lightenColor(cs.darkBody, 40));
-      domeGrad.addColorStop(0.65, this._lightenColor(cs.darkBody, 25));
-      domeGrad.addColorStop(1, cs.darkBody);
-    }
-    ctx.fillStyle = domeGrad;
     ctx.beginPath();
-    if (upSign < 0) {
-      // Dome points upward (negative Y)
-      ctx.moveTo(-bodyW / 2, domeBaseY);
-      ctx.bezierCurveTo(-bodyW / 2, domeBaseY - domeHeight * 0.5, -bodyW / 4, domeTipY, 0, domeTipY);
-      ctx.bezierCurveTo(bodyW / 4, domeTipY, bodyW / 2, domeBaseY - domeHeight * 0.5, bodyW / 2, domeBaseY);
-    } else {
-      // Dome points downward (positive Y)
-      ctx.moveTo(-bodyW / 2, domeBaseY);
-      ctx.bezierCurveTo(-bodyW / 2, domeBaseY + domeHeight * 0.5, -bodyW / 4, domeTipY, 0, domeTipY);
-      ctx.bezierCurveTo(bodyW / 4, domeTipY, bodyW / 2, domeBaseY + domeHeight * 0.5, bodyW / 2, domeBaseY);
-    }
-    ctx.closePath();
+    ctx.arc(0, 0, lensR, 0, Math.PI * 2);
+    ctx.fillStyle = lens;
     ctx.fill();
     ctx.shadowBlur = 0;
 
-    // Dome outline
-    ctx.strokeStyle = comp.lit ? cs.litStroke : cs.darkStroke;
-    ctx.lineWidth = 0.8;
-    ctx.beginPath();
-    if (upSign < 0) {
-      ctx.moveTo(-bodyW / 2, domeBaseY);
-      ctx.bezierCurveTo(-bodyW / 2, domeBaseY - domeHeight * 0.5, -bodyW / 4, domeTipY, 0, domeTipY);
-      ctx.bezierCurveTo(bodyW / 4, domeTipY, bodyW / 2, domeBaseY - domeHeight * 0.5, bodyW / 2, domeBaseY);
-    } else {
-      ctx.moveTo(-bodyW / 2, domeBaseY);
-      ctx.bezierCurveTo(-bodyW / 2, domeBaseY + domeHeight * 0.5, -bodyW / 4, domeTipY, 0, domeTipY);
-      ctx.bezierCurveTo(bodyW / 4, domeTipY, bodyW / 2, domeBaseY + domeHeight * 0.5, bodyW / 2, domeBaseY);
+    // Reflector cup + die, visible through the plastic when unlit;
+    // washed out by the emission when lit.
+    if (b < 0.85) {
+      ctx.globalAlpha = 1 - b;
+      ctx.beginPath();
+      ctx.arc(0.5, 0.5, 3.4, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(0,0,0,0.28)';
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(0.5, 0.5, 2.4, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(235,235,225,0.55)';
+      ctx.fill();
+      // Bond-wire hint
+      ctx.strokeStyle = 'rgba(60,60,60,0.5)';
+      ctx.lineWidth = 0.7;
+      ctx.beginPath();
+      ctx.moveTo(0.5, 0.5);
+      ctx.lineTo(-2.6, -1.6);
+      ctx.stroke();
+      ctx.globalAlpha = 1;
     }
-    ctx.stroke();
 
-    // Highlight on dome (specular reflection)
-    ctx.fillStyle = 'rgba(255,255,255,0.4)';
+    // Hot core when lit
+    if (lit) {
+      const core = ctx.createRadialGradient(0, 0, 0, 0, 0, lensR * 0.75);
+      core.addColorStop(0, `rgba(255,255,255,${(0.95 * b).toFixed(3)})`);
+      core.addColorStop(0.55, `rgba(${cs.halo}, ${(0.45 * b).toFixed(3)})`);
+      core.addColorStop(1, `rgba(${cs.halo}, 0)`);
+      ctx.beginPath();
+      ctx.arc(0, 0, lensR * 0.75, 0, Math.PI * 2);
+      ctx.fillStyle = core;
+      ctx.fill();
+    }
+
+    // Lens rim + specular highlight
+    ctx.strokeStyle = this._lerpHex(cs.darkStroke, cs.litStroke, b);
+    ctx.lineWidth = 0.9;
     ctx.beginPath();
-    ctx.ellipse(-domeR * 0.25, domeBaseY + upSign * domeHeight * 0.4, domeR * 0.22, domeR * 0.35, 0, 0, Math.PI * 2);
+    ctx.arc(0, 0, lensR, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.fillStyle = `rgba(255,255,255,${lit ? 0.75 : 0.5})`;
+    ctx.beginPath();
+    ctx.ellipse(-lensR * 0.42, -lensR * 0.45, lensR * 0.3, lensR * 0.17, -Math.PI / 5, 0, Math.PI * 2);
     ctx.fill();
 
-    // Body side outlines
-    ctx.strokeStyle = comp.lit ? cs.litStroke : cs.darkStroke;
-    ctx.lineWidth = 0.7;
-    ctx.beginPath();
-    ctx.moveTo(-bodyW / 2 - 1, rimBot);
-    ctx.lineTo(-bodyW / 2 - 1, rimTop);
-    ctx.lineTo(-bodyW / 2, rectTop);
-    ctx.lineTo(-bodyW / 2, rectBot);
-    ctx.moveTo(bodyW / 2 + 1, rimBot);
-    ctx.lineTo(bodyW / 2 + 1, rimTop);
-    ctx.lineTo(bodyW / 2, rectTop);
-    ctx.lineTo(bodyW / 2, rectBot);
-    ctx.stroke();
+    // Overdrive warning: red ring around the flange
+    if (comp.overdrive) {
+      ctx.strokeStyle = '#ff2020';
+      ctx.lineWidth = 1.4;
+      ctx.beginPath();
+      ctx.arc(0, 0, flangeR + 1.2, 0, Math.PI * 2);
+      ctx.stroke();
+    }
 
     ctx.restore();
 
@@ -879,13 +939,26 @@ export class Renderer {
     ctx.fillText('−', cPos.x, cPos.y + 1);
   }
 
-  /** Lighten a hex color by a given amount (0-255). */
+  /** Lighten (positive amount) or darken (negative amount) a hex color. */
   _lightenColor(hex, amount) {
     const num = parseInt(hex.replace('#', ''), 16);
-    const r = Math.min(255, ((num >> 16) & 0xff) + amount);
-    const g = Math.min(255, ((num >> 8) & 0xff) + amount);
-    const b = Math.min(255, (num & 0xff) + amount);
+    const r = Math.max(0, Math.min(255, ((num >> 16) & 0xff) + amount));
+    const g = Math.max(0, Math.min(255, ((num >> 8) & 0xff) + amount));
+    const b = Math.max(0, Math.min(255, (num & 0xff) + amount));
     return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, '0')}`;
+  }
+
+  /** Linear interpolation between two #rrggbb hex colors. t clamped to 0..1. */
+  _lerpHex(a, b, t) {
+    const tt = Math.min(1, Math.max(0, t));
+    const na = parseInt(a.replace('#', ''), 16);
+    const nb = parseInt(b.replace('#', ''), 16);
+    const ar = (na >> 16) & 0xff, ag = (na >> 8) & 0xff, ab = na & 0xff;
+    const br = (nb >> 16) & 0xff, bg = (nb >> 8) & 0xff, bb = nb & 0xff;
+    const r = Math.round(ar + (br - ar) * tt);
+    const g = Math.round(ag + (bg - ag) * tt);
+    const bC = Math.round(ab + (bb - ab) * tt);
+    return `#${((r << 16) | (g << 8) | bC).toString(16).padStart(6, '0')}`;
   }
 
   /** Realistic axial resistor: beige cylinder with color bands, kinked leads. */
@@ -904,48 +977,73 @@ export class Renderer {
     ctx.translate(cx, cy);
     ctx.rotate(angle);
 
-    const bodyW = Math.min(dist * 0.55, 22);
-    const bodyH = 7;
+    const bodyW = Math.min(dist * 0.6, 26);
+    const bodyH = 8;
 
-    // Lead wires (copper-colored)
-    ctx.strokeStyle = '#b8906a';
-    ctx.lineWidth = 1.5;
+    // Tinned leads
+    ctx.strokeStyle = '#b0b3b6';
+    ctx.lineWidth = 1.6;
     ctx.lineCap  = 'round';
     ctx.beginPath();
     ctx.moveTo(-dist / 2, 0);
-    ctx.lineTo(-bodyW / 2, 0);
+    ctx.lineTo(-bodyW / 2 + 2, 0);
     ctx.stroke();
     ctx.beginPath();
     ctx.moveTo(dist / 2, 0);
-    ctx.lineTo(bodyW / 2, 0);
+    ctx.lineTo(bodyW / 2 - 2, 0);
     ctx.stroke();
 
-    // Body beige/tan gradient cylinder
-    const bodyGrad = ctx.createLinearGradient(0, -bodyH / 2, 0, bodyH / 2);
-    bodyGrad.addColorStop(0,   '#e8d8b0');
-    bodyGrad.addColorStop(0.3, '#f0e4c0');
-    bodyGrad.addColorStop(0.7, '#d8c898');
-    bodyGrad.addColorStop(1,   '#b8a878');
+    // Contact shadow so the body sits above the board
+    ctx.fillStyle = 'rgba(40,30,12,0.20)';
     ctx.beginPath();
-    ctx.rect(-bodyW / 2, -bodyH / 2, bodyW, bodyH);
+    ctx.roundRect(-bodyW / 2 + 0.5, -bodyH / 2 + 1.6, bodyW, bodyH, bodyH / 2);
+    ctx.fill();
+
+    // Body: beige capsule with cylindrical shading (light from above)
+    const bodyGrad = ctx.createLinearGradient(0, -bodyH / 2, 0, bodyH / 2);
+    bodyGrad.addColorStop(0,    '#cbb98e');
+    bodyGrad.addColorStop(0.22, '#f2e6c4');
+    bodyGrad.addColorStop(0.45, '#f8eed2');
+    bodyGrad.addColorStop(0.75, '#d9c69a');
+    bodyGrad.addColorStop(1,    '#a8946a');
+    ctx.beginPath();
+    ctx.roundRect(-bodyW / 2, -bodyH / 2, bodyW, bodyH, bodyH / 2);
     ctx.fillStyle = bodyGrad;
     ctx.fill();
 
-    // Color bands derive from resistance value
+    // Color bands derive from resistance value; clip to the capsule so the
+    // band ends follow the body's rounded profile.
+    ctx.save();
+    ctx.beginPath();
+    ctx.roundRect(-bodyW / 2, -bodyH / 2, bodyW, bodyH, bodyH / 2);
+    ctx.clip();
     const bands = this._resistorColorBands(comp.resistance || 1000);
-    const bandW = 2.5;
-    const bandSpacing = bodyW / (bands.length + 1);
+    const bandW = 2.6;
+    const bandSpacing = (bodyW - 6) / (bands.length + 1);
     for (let i = 0; i < bands.length; i++) {
-      const bx = -bodyW / 2 + bandSpacing * (i + 1) - bandW / 2;
+      // Tolerance band sits apart, near the far end
+      const bx = (i === bands.length - 1)
+        ? bodyW / 2 - 4.6
+        : -bodyW / 2 + 3 + bandSpacing * (i + 1) - bandW / 2;
       ctx.fillStyle = bands[i];
-      ctx.fillRect(bx, -bodyH / 2 + 0.5, bandW, bodyH - 1);
+      ctx.fillRect(bx, -bodyH / 2, bandW, bodyH);
+      // Cylindrical shading over the band (dark at both rims)
+      ctx.fillStyle = 'rgba(0,0,0,0.22)';
+      ctx.fillRect(bx, -bodyH / 2, bandW, 1.4);
+      ctx.fillRect(bx, bodyH / 2 - 1.8, bandW, 1.8);
     }
+    // Glossy lacquer stripe along the top of the whole body
+    ctx.fillStyle = 'rgba(255,255,255,0.38)';
+    ctx.beginPath();
+    ctx.roundRect(-bodyW / 2 + 2.5, -bodyH / 2 + 1.1, bodyW - 5, 1.4, 0.7);
+    ctx.fill();
+    ctx.restore();
 
     // Body outline
-    ctx.strokeStyle = '#a08858';
+    ctx.strokeStyle = 'rgba(130, 106, 62, 0.75)';
     ctx.lineWidth = 0.8;
     ctx.beginPath();
-    ctx.rect(-bodyW / 2, -bodyH / 2, bodyW, bodyH);
+    ctx.roundRect(-bodyW / 2, -bodyH / 2, bodyW, bodyH, bodyH / 2);
     ctx.stroke();
 
     ctx.restore();
@@ -1019,100 +1117,129 @@ export class Renderer {
     const w = lastTopPin.x - firstPin.x + padX * 2;
     const h = firstBotPin.y - firstPin.y - 2 * legLen;         // body bottom is legLen above bottom row
 
-    // ── Metallic DIP legs drawn BEFORE body so body edge is clean ──────
-    const legW = 8.5;   // pin width in px (~50% thicker than original 5.5)
+    // ── Tinned DIP legs drawn BEFORE body so body edge is clean ────────
+    // Each leg is a tapered trapezoid: wide shoulder at the body narrowing
+    // toward the hole, like a real stamped DIP lead.
+    const shoulderW = 7.5;  // width where the leg leaves the body
+    const tipW      = 4.5;  // width where it enters the breadboard hole
     for (const p of comp.pins) {
       const pos = this.world.getHolePosById(p.holeId);
       if (!pos) continue;
 
       const isTop = pos.y < (firstPin.y + firstBotPin.y) / 2;
+      const bodyEdgeY = isTop ? pos.y + legLen : pos.y - legLen;
+      const tipY      = isTop ? pos.y - 1      : pos.y + 1;
 
-      // Leg spans through the hole center to exactly the body edge
-      const legTop = isTop ? pos.y - (GRID.HOLE_RADIUS + 1) : pos.y - legLen;
-      const legBot = isTop ? pos.y + legLen                  : pos.y + (GRID.HOLE_RADIUS + 1);
-
-      // Darker metallic gradient across the width
-      const lg = ctx.createLinearGradient(pos.x - legW, 0, pos.x + legW, 0);
-      lg.addColorStop(0,    '#303030');
-      lg.addColorStop(0.18, '#707070');
-      lg.addColorStop(0.45, '#a8a8a8');
-      lg.addColorStop(0.55, '#bababa');
-      lg.addColorStop(0.82, '#787878');
-      lg.addColorStop(1,    '#303030');
+      const lg = ctx.createLinearGradient(pos.x - shoulderW / 2, 0, pos.x + shoulderW / 2, 0);
+      lg.addColorStop(0,    '#5a5a5a');
+      lg.addColorStop(0.3,  '#c2c2c2');
+      lg.addColorStop(0.5,  '#e8e8e8');
+      lg.addColorStop(0.7,  '#b0b0b0');
+      lg.addColorStop(1,    '#4e4e4e');
       ctx.fillStyle = lg;
-      ctx.fillRect(pos.x - legW / 2, legTop, legW, legBot - legTop);
-
-      // Subtle top/bottom edge highlight on the leg tip
-      ctx.fillStyle = 'rgba(255,255,255,0.25)';
-      if (isTop) {
-        ctx.fillRect(pos.x - legW / 2 + 0.5, legTop, legW - 1, 1.5);
-      } else {
-        ctx.fillRect(pos.x - legW / 2 + 0.5, legBot - 1.5, legW - 1, 1.5);
-      }
-
-      // Metallic ring where pin enters the breadboard hole
       ctx.beginPath();
-      ctx.arc(pos.x, pos.y, GRID.HOLE_RADIUS + 1.5, 0, Math.PI * 2);
-      ctx.strokeStyle = '#888888';
-      ctx.lineWidth   = 1.5;
-      ctx.stroke();
+      ctx.moveTo(pos.x - shoulderW / 2, bodyEdgeY);
+      ctx.lineTo(pos.x + shoulderW / 2, bodyEdgeY);
+      ctx.lineTo(pos.x + tipW / 2, tipY);
+      ctx.lineTo(pos.x - tipW / 2, tipY);
+      ctx.closePath();
+      ctx.fill();
+      // Shoulder shadow where the leg exits the epoxy body
+      ctx.fillStyle = 'rgba(0,0,0,0.35)';
+      ctx.fillRect(pos.x - shoulderW / 2, isTop ? bodyEdgeY - 1.2 : bodyEdgeY, shoulderW, 1.2);
     }
+
+    // ── Soft contact shadow under the package (cheap, no shadowBlur) ────
+    ctx.fillStyle = 'rgba(40, 30, 12, 0.30)';
+    ctx.beginPath();
+    ctx.roundRect(x - 1.5, y + 2, w + 3, h + 1, 3);
+    ctx.fill();
 
     // ── Chip body gradient near-black epoxy mold compound ─────────────
     const bodyGrad = ctx.createLinearGradient(x, y, x, y + h);
-    bodyGrad.addColorStop(0,    '#222222');
-    bodyGrad.addColorStop(0.12, '#2e2e2e');
-    bodyGrad.addColorStop(0.5,  '#1a1a1a');
-    bodyGrad.addColorStop(0.88, '#111111');
-    bodyGrad.addColorStop(1,    '#0a0a0a');
+    bodyGrad.addColorStop(0,    '#3a3a3a');
+    bodyGrad.addColorStop(0.06, '#2c2c2c');
+    bodyGrad.addColorStop(0.5,  '#1c1c1c');
+    bodyGrad.addColorStop(0.94, '#121212');
+    bodyGrad.addColorStop(1,    '#060606');
     ctx.fillStyle = bodyGrad;
     ctx.beginPath();
-    ctx.roundRect(x, y, w, h, 2);
+    ctx.roundRect(x, y, w, h, 2.5);
     ctx.fill();
 
-    // Subtle top-edge sheen line (specular reflection off molded edge)
+    // Side bevels: the molded package's chamfered long edges
+    ctx.fillStyle = 'rgba(255,255,255,0.05)';
+    ctx.fillRect(x + 1, y + 2, 1.2, h - 4);
+    ctx.fillStyle = 'rgba(0,0,0,0.5)';
+    ctx.fillRect(x + w - 2.2, y + 2, 1.2, h - 4);
+
+    // Top-edge sheen line (specular reflection off the molded edge)
     const sheenGrad = ctx.createLinearGradient(x, y, x + w, y);
-    sheenGrad.addColorStop(0,   'rgba(255,255,255,0)');
-    sheenGrad.addColorStop(0.3, 'rgba(255,255,255,0.06)');
-    sheenGrad.addColorStop(0.7, 'rgba(255,255,255,0.06)');
-    sheenGrad.addColorStop(1,   'rgba(255,255,255,0)');
+    sheenGrad.addColorStop(0,   'rgba(255,255,255,0.02)');
+    sheenGrad.addColorStop(0.3, 'rgba(255,255,255,0.14)');
+    sheenGrad.addColorStop(0.7, 'rgba(255,255,255,0.14)');
+    sheenGrad.addColorStop(1,   'rgba(255,255,255,0.02)');
     ctx.fillStyle = sheenGrad;
-    ctx.fillRect(x + 2, y, w - 4, 2);
+    ctx.fillRect(x + 2, y + 0.6, w - 4, 1.6);
+
+    // Faint mold ejector marks — two shallow circles on the package face
+    if (w > 70) {
+      ctx.strokeStyle = 'rgba(255,255,255,0.045)';
+      ctx.lineWidth = 1;
+      for (const mx of [x + w * 0.22, x + w * 0.78]) {
+        ctx.beginPath();
+        ctx.arc(mx, y + h / 2, Math.min(6, h * 0.16), 0, Math.PI * 2);
+        ctx.stroke();
+      }
+    }
 
     // Body border
-    ctx.strokeStyle = '#404040';
+    ctx.strokeStyle = '#3c3c3c';
     ctx.lineWidth = 0.8;
     ctx.beginPath();
-    ctx.roundRect(x, y, w, h, 2);
+    ctx.roundRect(x, y, w, h, 2.5);
     ctx.stroke();
 
-    // ── DIP notch semicircle on left edge, centred vertically ─────────
+    // ── DIP notch semicircle on left edge, shaded as a recess ──────────
     ctx.beginPath();
     ctx.arc(x, y + h / 2, 5, -Math.PI / 2, Math.PI / 2);
-    ctx.fillStyle = '#0c0c0c';
+    ctx.fillStyle = '#050505';
     ctx.fill();
-    ctx.strokeStyle = '#505050';
-    ctx.lineWidth = 0.8;
+    // Light catch on the lower inside wall of the notch
+    ctx.strokeStyle = 'rgba(255,255,255,0.22)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(x, y + h / 2, 4.2, Math.PI * 0.12, Math.PI * 0.5);
+    ctx.stroke();
+    // Shadow on the upper inside wall
+    ctx.strokeStyle = 'rgba(0,0,0,0.8)';
+    ctx.beginPath();
+    ctx.arc(x, y + h / 2, 4.4, -Math.PI * 0.5, -Math.PI * 0.1);
     ctx.stroke();
 
-    // Small circular depression next to notch (additional DIP detail)
+    // Pin-1 dimple: shallow molded depression with a light catch below
     ctx.beginPath();
-    ctx.arc(x + 9, y + h / 2, 2.5, 0, Math.PI * 2);
-    ctx.fillStyle = '#0d0d0d';
+    ctx.arc(x + 9, y + h - 7, 2.4, 0, Math.PI * 2);
+    ctx.fillStyle = '#0a0a0a';
     ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.18)';
+    ctx.lineWidth = 0.9;
+    ctx.beginPath();
+    ctx.arc(x + 9, y + h - 7, 2.1, Math.PI * 0.15, Math.PI * 0.85);
+    ctx.stroke();
 
     // ── Chip name label laser-etched look (emboss + main) ─────────────
     ctx.font = 'bold 10px monospace';
     ctx.textAlign    = 'center';
     ctx.textBaseline = 'middle';
     // Subtle dark shadow for emboss depth
-    ctx.fillStyle = '#080808';
+    ctx.fillStyle = '#000';
     ctx.fillText(
       chipDisplayName(comp, state),
       x + w / 2 + 0.7, y + h / 2 + 0.7
     );
     // Main label slightly warm white, like laser etching
-    ctx.fillStyle = '#d8d4cc';
+    ctx.fillStyle = '#e2ded4';
     ctx.fillText(
       chipDisplayName(comp, state),
       x + w / 2, y + h / 2
@@ -1161,46 +1288,97 @@ export class Renderer {
       }
     }
 
+    this._drawTactHousing(ctx, cx, cy, hw, 14, comp.pressed);
+  }
+
+  /** Shared realistic tact-switch housing: brushed metal plate, corner
+   *  rivets, black base, round plunger. `half` is the housing half-size,
+   *  `capR` the plunger radius. */
+  _drawTactHousing(ctx, cx, cy, half, capR, pressed) {
     const r = 3;
-    // Outer metal housing (square)
-    const housingGrad = ctx.createLinearGradient(cx - hw, cy - hh, cx + hw, cy + hh);
-    housingGrad.addColorStop(0,   '#c8c0b0');
-    housingGrad.addColorStop(0.4, '#a8a098');
-    housingGrad.addColorStop(1,   '#888078');
+    // Contact shadow
+    ctx.fillStyle = 'rgba(40,30,12,0.30)';
     ctx.beginPath();
-    ctx.roundRect(cx - hw, cy - hh, hw * 2, hh * 2, r);
+    ctx.roundRect(cx - half - 0.5, cy - half + 1.5, half * 2 + 1, half * 2 + 1, r);
+    ctx.fill();
+
+    // Brushed metal top plate
+    const housingGrad = ctx.createLinearGradient(cx - half, cy - half, cx + half, cy + half);
+    housingGrad.addColorStop(0,    '#e2e0da');
+    housingGrad.addColorStop(0.35, '#c2beb4');
+    housingGrad.addColorStop(0.65, '#a9a59a');
+    housingGrad.addColorStop(1,    '#8b877c');
+    ctx.beginPath();
+    ctx.roundRect(cx - half, cy - half, half * 2, half * 2, r);
     ctx.fillStyle = housingGrad;
     ctx.fill();
-    ctx.strokeStyle = '#707060';
+    ctx.strokeStyle = '#6e6a60';
     ctx.lineWidth = 1;
     ctx.stroke();
-
-    // Inner plastic base
+    // Light catch along the top edge of the plate
+    ctx.strokeStyle = 'rgba(255,255,255,0.65)';
+    ctx.lineWidth = 0.9;
     ctx.beginPath();
-    ctx.roundRect(cx - hw + 2, cy - hh + 2, hw * 2 - 4, hh * 2 - 4, r - 1);
-    ctx.fillStyle = comp.pressed ? '#444' : '#222';
+    ctx.moveTo(cx - half + r, cy - half + 0.8);
+    ctx.lineTo(cx + half - r, cy - half + 0.8);
+    ctx.stroke();
+
+    // Corner rivets (stamped dimples)
+    const rd = Math.max(1.6, half * 0.11);
+    const ro = half - rd - 1.5;
+    for (const [sx, sy] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) {
+      ctx.beginPath();
+      ctx.arc(cx + sx * ro, cy + sy * ro, rd, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(60,55,45,0.55)';
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(cx + sx * ro - 0.4, cy + sy * ro - 0.4, rd * 0.55, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(255,255,255,0.5)';
+      ctx.fill();
+    }
+
+    // Round opening in the plate (dark base visible)
+    ctx.beginPath();
+    ctx.arc(cx, cy, capR + 2.5, 0, Math.PI * 2);
+    ctx.fillStyle = '#15130f';
     ctx.fill();
 
-    // Cap
-    const capR = 14;
-    const capGrad = ctx.createLinearGradient(cx, cy - capR, cx, cy + capR);
-    if (comp.pressed) {
-      capGrad.addColorStop(0, '#5a4030');
-      capGrad.addColorStop(1, '#3a2818');
+    // Plunger: radial-shaded cap; pressed = darker, highlight collapses
+    const capGrad = ctx.createRadialGradient(
+      cx - capR * 0.35, cy - capR * 0.35, capR * 0.15, cx, cy, capR
+    );
+    if (pressed) {
+      capGrad.addColorStop(0, '#6b4a33');
+      capGrad.addColorStop(0.7, '#48301e');
+      capGrad.addColorStop(1, '#301d10');
     } else {
-      capGrad.addColorStop(0, '#8a6644');
-      capGrad.addColorStop(1, '#5c3f28');
+      capGrad.addColorStop(0, '#a57b52');
+      capGrad.addColorStop(0.6, '#7d5936');
+      capGrad.addColorStop(1, '#52371e');
     }
     ctx.beginPath();
     ctx.arc(cx, cy, capR, 0, Math.PI * 2);
     ctx.fillStyle = capGrad;
     ctx.fill();
-    ctx.strokeStyle = '#3d2200';
-    ctx.lineWidth = 0.8;
+    ctx.strokeStyle = '#2c1a08';
+    ctx.lineWidth = 0.9;
     ctx.stroke();
+
+    // Rim ring on the plunger + specular dot
+    ctx.strokeStyle = pressed ? 'rgba(0,0,0,0.4)' : 'rgba(255,235,210,0.30)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(cx, cy, capR * 0.72, 0, Math.PI * 2);
+    ctx.stroke();
+    if (!pressed) {
+      ctx.fillStyle = 'rgba(255,255,255,0.45)';
+      ctx.beginPath();
+      ctx.ellipse(cx - capR * 0.4, cy - capR * 0.45, capR * 0.24, capR * 0.14, -Math.PI / 5, 0, Math.PI * 2);
+      ctx.fill();
+    }
   }
 
-  /** Realistic 2-pin push button (small inline tact switch). */
+  /** Realistic 2 pin push button (small inline tact switch). */
   _drawPushButtonRealistic(ctx, comp) {
     if (comp.pins.length < 2) return;
     const aPos = this.world.getHolePosById(comp.pins[0].holeId);
@@ -1221,43 +1399,7 @@ export class Renderer {
     ctx.beginPath(); ctx.moveTo(edgeA.x, edgeA.y); ctx.lineTo(aPos.x, aPos.y); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(edgeB.x, edgeB.y); ctx.lineTo(bPos.x, bPos.y); ctx.stroke();
 
-    const r = 3;
-    // Outer metal housing
-    const housingGrad = ctx.createLinearGradient(cx - s, cy - s, cx + s, cy + s);
-    housingGrad.addColorStop(0,   '#c8c0b0');
-    housingGrad.addColorStop(0.4, '#a8a098');
-    housingGrad.addColorStop(1,   '#888078');
-    ctx.beginPath();
-    ctx.roundRect(cx - s, cy - s, s * 2, s * 2, r);
-    ctx.fillStyle = housingGrad;
-    ctx.fill();
-    ctx.strokeStyle = '#707060';
-    ctx.lineWidth = 1;
-    ctx.stroke();
-
-    // Inner plastic base
-    ctx.beginPath();
-    ctx.roundRect(cx - s + 1.5, cy - s + 1.5, s * 2 - 3, s * 2 - 3, r - 1);
-    ctx.fillStyle = comp.pressed ? '#444' : '#222';
-    ctx.fill();
-
-    // Cap
-    const capR = 7.5;
-    const capGrad = ctx.createLinearGradient(cx, cy - capR, cx, cy + capR);
-    if (comp.pressed) {
-      capGrad.addColorStop(0, '#5a4030');
-      capGrad.addColorStop(1, '#3a2818');
-    } else {
-      capGrad.addColorStop(0, '#8a6644');
-      capGrad.addColorStop(1, '#5c3f28');
-    }
-    ctx.beginPath();
-    ctx.arc(cx, cy, capR, 0, Math.PI * 2);
-    ctx.fillStyle = capGrad;
-    ctx.fill();
-    ctx.strokeStyle = '#3d2200';
-    ctx.lineWidth = 0.8;
-    ctx.stroke();
+    this._drawTactHousing(ctx, cx, cy, s, 7, comp.pressed);
 
     // Pin endpoint dots
     for (const pos of [aPos, bPos]) {
@@ -1415,12 +1557,12 @@ export class Renderer {
 
   /** Realistic SPST panel Slide switch body. */
   _drawSwitchRealistic(ctx, comp) {
-    this._drawSwitch(ctx, comp);
+    this._drawSwitch(ctx, comp, true);
   }
 
-  /** Realistic 3-pin SPDT slide switch. */
+  /** Realistic 3 pin SPDT slide switch. */
   _drawSlideSwitchRealistic(ctx, comp) {
-    this._drawSlideSwitch(ctx, comp);
+    this._drawSlideSwitch(ctx, comp, true);
   }
 
   // ── Components ────────────────────────────────────────────────────────────
@@ -1428,8 +1570,13 @@ export class Renderer {
     const realistic = state && state.showRealisticBoard;
     switch (comp.type) {
       case COMP.CHIP:
-        if (realistic) this._drawChipRealistic(ctx, comp, state);
-        else this._drawChip(ctx, comp, state);
+        if (comp.chipDef && comp.chipDef.name === 'XO') {
+          this._drawCrystalOscCan(ctx, comp);
+        } else if (realistic) {
+          this._drawChipRealistic(ctx, comp, state);
+        } else {
+          this._drawChip(ctx, comp, state);
+        }
         break;
       case COMP.LED:
         if (realistic) this._drawLEDRealistic(ctx, comp);
@@ -1457,17 +1604,31 @@ export class Renderer {
         else this._drawResistor(ctx, comp);
         break;
       case COMP.CAPACITOR:
-        this._drawCapacitor(ctx, comp);
+        if (realistic) this._drawCapacitorRealistic(ctx, comp);
+        else this._drawCapacitor(ctx, comp);
         break;
       case COMP.POLARIZED_CAPACITOR:
-        this._drawPolarizedCapacitor(ctx, comp);
+        if (realistic) this._drawPolarizedCapacitorRealistic(ctx, comp);
+        else this._drawPolarizedCapacitor(ctx, comp);
+        break;
+      case COMP.INDUCTOR:
+        this._drawInductor(ctx, comp);
         break;
       case COMP.DIODE:
         if (realistic) this._drawDiodeRealistic(ctx, comp);
         else this._drawDiode(ctx, comp);
         break;
+      case COMP.CRYSTAL:
+        this._drawCrystal(ctx, comp);
+        break;
       case COMP.CLOCK:
         this._drawClock(ctx, comp);
+        break;
+      case COMP.TESTPOINT:
+        this._drawTestPoint(ctx, comp, state);
+        break;
+      case COMP.DIP_SWITCH:
+        this._drawDipSwitch(ctx, comp, state);
         break;
     }
 
@@ -1586,6 +1747,63 @@ export class Renderer {
       chipDisplayName(comp, state),
       x + w / 2, y + h / 2
     );
+  }
+
+  // ── XO crystal oscillator can ─────────────────────────────────────────────
+  // A single rounded-rectangle metal can no legs, no visible board hookup.
+  // The body extends a little past both pin rows so the holes are covered and
+  // it reads as a solid can sitting on the board.
+  // Top-down look: warm nickel lid inside a crimped rim (the visible border),
+  // nearly flat shading, and the pin-1 index dot in the corner nearest pin 1.
+  _drawCrystalOscCan(ctx, comp) {
+    if (!comp.pins.length) return;
+    const half = comp.chipDef.pins / 2;
+    const firstPin    = this.world.getHolePosById(comp.pins[0].holeId);
+    const lastTopPin  = this.world.getHolePosById(comp.pins[half - 1].holeId);
+    const firstBotPin = this.world.getHolePosById(comp.pins[half].holeId);
+    if (!firstPin || !lastTopPin || !firstBotPin) return;
+
+    const padX = 6;
+    const over = GRID.HOLE_RADIUS + 3;  // extend past each pin row → covers holes
+    const x = firstPin.x - padX;
+    const y = firstPin.y - over;
+    const w = lastTopPin.x - firstPin.x + padX * 2;
+    const h = (firstBotPin.y - firstPin.y) + over * 2;
+
+    // Outer flange the crimped edge where the lid is folded over the base
+    ctx.beginPath();
+    ctx.roundRect(x, y, w, h, 8);
+    ctx.fillStyle = '#b4b0a8';
+    ctx.fill();
+    ctx.strokeStyle = '#67635c';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // Lid face, inset inside the rim near-flat warm nickel, faint sheen only
+    const rim = 3;
+    const grad = ctx.createLinearGradient(0, y + rim, 0, y + h - rim);
+    grad.addColorStop(0, '#dbd8d1');
+    grad.addColorStop(1, '#c9c5bd');
+    ctx.beginPath();
+    ctx.roundRect(x + rim, y + rim, w - rim * 2, h - rim * 2, 5.5);
+    ctx.fillStyle = grad;
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(60,56,50,0.28)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Pin-1 index dot in whichever corner of the lid is nearest pin 1
+    const pin1 = comp.getPinByNumber(1);
+    const p1 = pin1 ? this.world.getHolePosById(pin1.holeId) : null;
+    if (p1) {
+      const inset = rim + 5;
+      const dotX = p1.x < x + w / 2 ? x + inset : x + w - inset;
+      const dotY = p1.y < y + h / 2 ? y + inset : y + h - inset;
+      ctx.beginPath();
+      ctx.arc(dotX, dotY, 2.2, 0, Math.PI * 2);
+      ctx.fillStyle = '#45413b';
+      ctx.fill();
+    }
   }
 
   // ── Chip Logic Diagram View ───────────────────────────────────────────────
@@ -1834,11 +2052,14 @@ export class Renderer {
 
     const r = 10;
     const cs = this._ledColorScheme(comp.color || 'red');
+    // Brightness 0..1 from sim; fall back to legacy boolean for any sim mode that hasn't been updated.
+    const b = (typeof comp.brightness === 'number') ? comp.brightness : (comp.lit ? 1 : 0);
+    const lit = b > 0.05;
 
-    // Radial glow halo when lit (drawn first, behind body)
-    if (comp.lit) {
+    // Radial glow halo when lit (drawn first, behind body); alpha scales with brightness.
+    if (lit) {
       const halo = ctx.createRadialGradient(cx, cy, r * 0.5, cx, cy, r * 3.5);
-      halo.addColorStop(0, `rgba(${cs.halo}, 0.55)`);
+      halo.addColorStop(0, `rgba(${cs.halo}, ${(0.55 * b).toFixed(3)})`);
       halo.addColorStop(1, `rgba(${cs.halo}, 0)`);
       ctx.beginPath();
       ctx.arc(cx, cy, r * 3.5, 0, Math.PI * 2);
@@ -1846,19 +2067,28 @@ export class Renderer {
       ctx.fill();
     }
 
-    // LED body colored circle
-    if (comp.lit) {
-      ctx.shadowBlur = 18;
+    // LED body colored circle; body color lerps dark → lit by brightness.
+    if (lit) {
+      ctx.shadowBlur = 18 * b;
       ctx.shadowColor = cs.shadow;
     }
     ctx.beginPath();
     ctx.arc(cx, cy, r, 0, Math.PI * 2);
-    ctx.fillStyle = comp.lit ? cs.litBody : cs.darkBody;
+    ctx.fillStyle = this._lerpHex(cs.darkBody, cs.litBody, b);
     ctx.fill();
     ctx.shadowBlur = 0;
-    ctx.strokeStyle = comp.lit ? cs.litStroke : cs.darkStroke;
+    ctx.strokeStyle = lit ? cs.litStroke : cs.darkStroke;
     ctx.lineWidth = 1.5;
     ctx.stroke();
+
+    // Overdrive warning: red ring around the dome when current exceeds rated max.
+    if (comp.overdrive) {
+      ctx.beginPath();
+      ctx.arc(cx, cy, r + 2, 0, Math.PI * 2);
+      ctx.strokeStyle = '#ff2020';
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+    }
 
     // Diode triangle + line to indicate direction (anode→cathode)
     const angle = Math.atan2(cPos.y - aPos.y, cPos.x - aPos.x);
@@ -1871,13 +2101,13 @@ export class Renderer {
     ctx.lineTo(4, 0);
     ctx.lineTo(-4, 4);
     ctx.closePath();
-    ctx.fillStyle = comp.lit ? '#fff' : cs.darkSymbol;
+    ctx.fillStyle = lit ? '#fff' : cs.darkSymbol;
     ctx.fill();
     // Cathode bar
     ctx.beginPath();
     ctx.moveTo(4, -4);
     ctx.lineTo(4, 4);
-    ctx.strokeStyle = comp.lit ? '#fff' : cs.darkSymbol;
+    ctx.strokeStyle = lit ? '#fff' : cs.darkSymbol;
     ctx.lineWidth = 1.5;
     ctx.stroke();
     ctx.restore();
@@ -1908,11 +2138,39 @@ export class Renderer {
     const h = firstBotPin.y - firstPin.y + pad * 2;
 
     // Body
-    ctx.fillStyle = '#111111';
-    ctx.fillRect(x, y, w, h);
-    ctx.strokeStyle = '#444';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(x, y, w, h);
+    const realisticSS = state && state.showRealisticBoard;
+    if (realisticSS) {
+      // Contact shadow + molded charcoal package with a soft face sheen
+      ctx.fillStyle = 'rgba(40,30,12,0.35)';
+      ctx.beginPath();
+      ctx.roundRect(x - 1.5, y + 2.5, w + 3, h + 1, 4);
+      ctx.fill();
+      const ssg = ctx.createLinearGradient(x, y, x, y + h);
+      ssg.addColorStop(0,    '#2e2e30');
+      ssg.addColorStop(0.08, '#232325');
+      ssg.addColorStop(0.85, '#141416');
+      ssg.addColorStop(1,    '#0a0a0c');
+      ctx.fillStyle = ssg;
+      ctx.beginPath();
+      ctx.roundRect(x, y, w, h, 3);
+      ctx.fill();
+      // Inset bezel line around the display window
+      ctx.strokeStyle = 'rgba(255,255,255,0.07)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.roundRect(x + 3, y + 3, w - 6, h - 6, 2);
+      ctx.stroke();
+      ctx.strokeStyle = '#000';
+      ctx.beginPath();
+      ctx.roundRect(x, y, w, h, 3);
+      ctx.stroke();
+    } else {
+      ctx.fillStyle = '#111111';
+      ctx.fillRect(x, y, w, h);
+      ctx.strokeStyle = '#444';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(x, y, w, h);
+    }
 
     // Digit area centered in body, well proportioned
     const dw = w * 0.52;
@@ -1924,10 +2182,25 @@ export class Renderer {
     const gap = t * 0.28;   // gap between adjacent segments
 
     const segs = comp.segments || {};
-    const realistic = state && state.showRealisticBoard;
-    const segColor = (name) => segs[name]
-      ? (realistic ? '#ff3300' : '#ff5500')
-      : (realistic ? '#7a1800' : '#3d0a00');
+    const segBr = comp.segmentBrightness || {};
+    const segOd = comp.segmentOverdrive || {};
+    const realistic = realisticSS;
+    const offColor = realistic ? '#57150a' : '#3d0a00';
+    const onColor  = realistic ? '#ff3300' : '#ff5500';
+    // Lerp off→on by per-segment brightness; fall back to legacy boolean.
+    const segBright = (name) =>
+      (typeof segBr[name] === 'number') ? segBr[name] : (segs[name] ? 1 : 0);
+    const segColor = (name) => this._lerpHex(offColor, onColor, segBright(name));
+    // In realistic mode a lit segment blooms slightly, like a real LED bar
+    // behind a tinted window. shadowBlur only fires on lit segments.
+    const segGlow = (name) => {
+      if (!realistic) return;
+      const br = segBright(name);
+      if (br > 0.15) {
+        ctx.shadowColor = 'rgba(255, 60, 10, 0.9)';
+        ctx.shadowBlur = 7 * br;
+      }
+    };
 
     // Horizontal segment (flat hexagon)
     const drawH = (sx, sy, name) => {
@@ -1940,8 +2213,15 @@ export class Renderer {
       ctx.lineTo(sx + b,      sy + t);
       ctx.lineTo(sx,          sy + t / 2);
       ctx.closePath();
+      segGlow(name);
       ctx.fillStyle = segColor(name);
       ctx.fill();
+      ctx.shadowBlur = 0;
+      if (segOd[name]) {
+        ctx.strokeStyle = '#ff2020';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
     };
 
     // Vertical segment (tall hexagon), sh = explicit height
@@ -1954,8 +2234,15 @@ export class Renderer {
       ctx.lineTo(sx,         sy + sh - b);
       ctx.lineTo(sx,         sy + b);
       ctx.closePath();
+      segGlow(name);
       ctx.fillStyle = segColor(name);
       ctx.fill();
+      ctx.shadowBlur = 0;
+      if (segOd[name]) {
+        ctx.strokeStyle = '#ff2020';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
     };
 
     const vH = dh / 2 - 1.5 * t - 2 * gap; // height of each vertical half-segment
@@ -1981,8 +2268,15 @@ export class Renderer {
     const dpY = dy + dh - dpR;
     ctx.beginPath();
     ctx.arc(dpX, dpY, dpR, 0, Math.PI * 2);
-    ctx.fillStyle = segs['dp'] ? (realistic ? '#ff3300' : '#ff5500') : (realistic ? '#7a1800' : '#3d0a00');
+    segGlow('dp');
+    ctx.fillStyle = segColor('dp');
     ctx.fill();
+    ctx.shadowBlur = 0;
+    if (segOd['dp']) {
+      ctx.strokeStyle = '#ff2020';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
 
     // Label intentionally omitted
   }
@@ -2099,7 +2393,7 @@ export class Renderer {
     ctx.restore();
   }
 
-  _drawSwitch(ctx, comp) {
+  _drawSwitch(ctx, comp, realistic = false) {
     if (comp.pins.length < 2) return;
     const aPos = this.world.getHolePosById(comp.pins[0].holeId);
     const bPos = this.world.getHolePosById(comp.pins[1].holeId);
@@ -2123,7 +2417,7 @@ export class Renderer {
     ctx.rotate(angle);
 
     // Wires from pins to body edges (like resistor style)
-    ctx.strokeStyle = '#888';
+    ctx.strokeStyle = realistic ? '#b0b3b6' : '#888';
     ctx.lineWidth = 1.5;
     ctx.lineCap = 'round';
     ctx.beginPath();
@@ -2144,33 +2438,236 @@ export class Renderer {
     ctx.arc(dist / 2, 0, 2.5, 0, Math.PI * 2);
     ctx.fill();
 
-    // Body
-    ctx.fillStyle = '#666';
-    ctx.fillRect(-bodyW / 2, -bodyH / 2, bodyW, bodyH);
+    if (realistic) {
+      // Contact shadow
+      ctx.fillStyle = 'rgba(40,30,12,0.28)';
+      ctx.beginPath();
+      ctx.roundRect(-bodyW / 2 - 0.5, -bodyH / 2 + 1.5, bodyW + 1, bodyH + 0.5, 2.5);
+      ctx.fill();
+      // Stamped metal frame
+      const fg = ctx.createLinearGradient(0, -bodyH / 2, 0, bodyH / 2);
+      fg.addColorStop(0,    '#dcdad2');
+      fg.addColorStop(0.25, '#c0bcb2');
+      fg.addColorStop(0.8,  '#9d998e');
+      fg.addColorStop(1,    '#807c72');
+      ctx.fillStyle = fg;
+      ctx.beginPath();
+      ctx.roundRect(-bodyW / 2, -bodyH / 2, bodyW, bodyH, 2.5);
+      ctx.fill();
+      ctx.strokeStyle = '#6b675d';
+      ctx.lineWidth = 0.9;
+      ctx.beginPath();
+      ctx.roundRect(-bodyW / 2, -bodyH / 2, bodyW, bodyH, 2.5);
+      ctx.stroke();
 
-    // White outline around whole body when closed (on=true)
-    if (comp.on) {
-      ctx.strokeStyle = 'rgba(255,255,255,0.85)';
-      ctx.lineWidth = 1.5;
+      // Recessed track with an upper inner shadow
+      ctx.fillStyle = '#1b1913';
+      ctx.beginPath();
+      ctx.roundRect(-bodyW / 2 + 2.5, -trackH / 2 - 2, bodyW - 5, trackH + 4, 2);
+      ctx.fill();
+      ctx.fillStyle = 'rgba(0,0,0,0.55)';
+      ctx.fillRect(-bodyW / 2 + 3, -trackH / 2 - 1.6, bodyW - 6, 1.4);
+
+      // Red plastic slider knob: left=off, right=on
+      const knobX = comp.on ? knobOffset : -knobOffset;
+      const kg = ctx.createLinearGradient(0, -knobH / 2, 0, knobH / 2);
+      kg.addColorStop(0,   '#e8695c');
+      kg.addColorStop(0.4, '#c93a2c');
+      kg.addColorStop(1,   '#8e2015');
+      ctx.fillStyle = kg;
+      ctx.beginPath();
+      ctx.roundRect(knobX - knobW / 2, -knobH / 2 + 1, knobW, knobH - 2, 2);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(60,10,4,0.8)';
+      ctx.lineWidth = 0.8;
+      ctx.beginPath();
+      ctx.roundRect(knobX - knobW / 2, -knobH / 2 + 1, knobW, knobH - 2, 2);
+      ctx.stroke();
+      // Grip ridges on the knob
+      ctx.strokeStyle = 'rgba(255,180,170,0.5)';
+      ctx.lineWidth = 0.8;
+      ctx.beginPath();
+      for (const gx of [-3, 0, 3]) {
+        ctx.moveTo(knobX + gx, -knobH / 2 + 4);
+        ctx.lineTo(knobX + gx, knobH / 2 - 4);
+      }
+      ctx.stroke();
+
+      // Closed-state cue: same white outline as the schematic look, kept for
+      // at-a-glance readability on the cream board.
+      if (comp.on) {
+        ctx.strokeStyle = 'rgba(255,255,255,0.9)';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.roundRect(-bodyW / 2, -bodyH / 2, bodyW, bodyH, 2.5);
+        ctx.stroke();
+      }
     } else {
-      ctx.strokeStyle = '#000';
-      ctx.lineWidth = 0.5;
+      // Body
+      ctx.fillStyle = '#666';
+      ctx.fillRect(-bodyW / 2, -bodyH / 2, bodyW, bodyH);
+
+      // White outline around whole body when closed (on=true)
+      if (comp.on) {
+        ctx.strokeStyle = 'rgba(255,255,255,0.85)';
+        ctx.lineWidth = 1.5;
+      } else {
+        ctx.strokeStyle = '#000';
+        ctx.lineWidth = 0.5;
+      }
+      ctx.strokeRect(-bodyW / 2, -bodyH / 2, bodyW, bodyH);
+
+      // Track
+      ctx.fillStyle = '#333';
+      ctx.fillRect(-bodyW / 2 + 2, -trackH / 2, bodyW - 4, trackH);
+
+      // Knob: left=off, right=on
+      const knobX = comp.on ? knobOffset : -knobOffset;
+      ctx.fillStyle = '#000';
+      ctx.fillRect(knobX - knobW / 2, -knobH / 2, knobW, knobH);
     }
-    ctx.strokeRect(-bodyW / 2, -bodyH / 2, bodyW, bodyH);
-
-    // Track
-    ctx.fillStyle = '#333';
-    ctx.fillRect(-bodyW / 2 + 2, -trackH / 2, bodyW - 4, trackH);
-
-    // Knob: left=off, right=on
-    const knobX = comp.on ? knobOffset : -knobOffset;
-    ctx.fillStyle = '#000';
-    ctx.fillRect(knobX - knobW / 2, -knobH / 2, knobW, knobH);
 
     ctx.restore();
   }
 
-  _drawSlideSwitch(ctx, comp) {
+  _drawDipSwitch(ctx, comp, state) {
+    const count = comp.count;
+    if (comp.pins.length < 2 * count) return;
+
+    const topPos = [];
+    const botPos = [];
+    for (let i = 0; i < count; i++) {
+      topPos.push(this.world.getHolePosById(comp.pins[i].holeId));
+      botPos.push(this.world.getHolePosById(comp.pins[count + i].holeId));
+    }
+    if (!topPos[0] || !botPos[0]) return;
+
+    const padX  = 6;
+    const legLen = 9;
+    const legW  = 6;
+
+    const lastTop = topPos[count - 1];
+    const bodyX = topPos[0].x - padX;
+    const bodyW = (count > 1 ? lastTop.x - topPos[0].x : 0) + padX * 2;
+    const bodyTop = topPos[0].y + legLen;
+    const bodyBot = botPos[0].y - legLen;
+    const bodyH = bodyBot - bodyTop;
+
+    const realistic = state && state.showRealisticBoard;
+    const legColor = realistic ? '#b9bcbf' : COLORS.CHIP_PIN;
+    const bodyColor = realistic ? '#1c3f8f' : COLORS.CHIP_BODY;
+
+    // Legs
+    ctx.fillStyle = legColor;
+    for (let i = 0; i < count; i++) {
+      const tp = topPos[i];
+      const bp = botPos[i];
+      if (!tp || !bp) continue;
+      ctx.fillRect(tp.x - legW / 2, tp.y - 2, legW, legLen + 2);
+      ctx.fillRect(bp.x - legW / 2, bp.y - legLen - 2, legW, legLen + 2);
+    }
+
+    // Body
+    if (realistic) {
+      // Contact shadow + molded blue body with a top light catch
+      ctx.fillStyle = 'rgba(40,30,12,0.30)';
+      ctx.beginPath();
+      ctx.roundRect(bodyX - 1, bodyTop + 2, bodyW + 2, bodyH, 2);
+      ctx.fill();
+      const bg = ctx.createLinearGradient(0, bodyTop, 0, bodyTop + bodyH);
+      bg.addColorStop(0,    '#3a63c0');
+      bg.addColorStop(0.08, '#2a4da6');
+      bg.addColorStop(0.6,  '#1c3f8f');
+      bg.addColorStop(1,    '#132b66');
+      ctx.fillStyle = bg;
+      ctx.beginPath();
+      ctx.roundRect(bodyX, bodyTop, bodyW, bodyH, 2);
+      ctx.fill();
+      ctx.strokeStyle = '#0e2150';
+      ctx.lineWidth = 0.8;
+      ctx.beginPath();
+      ctx.roundRect(bodyX, bodyTop, bodyW, bodyH, 2);
+      ctx.stroke();
+    } else {
+      ctx.fillStyle = bodyColor;
+      ctx.fillRect(bodyX, bodyTop, bodyW, bodyH);
+      ctx.strokeStyle = legColor;
+      ctx.lineWidth = 0.5;
+      ctx.strokeRect(bodyX, bodyTop, bodyW, bodyH);
+    }
+
+    // Individual switch slots and knobs — fixed size matching original body height,
+    // centered vertically in the taller body.
+    const slotW        = Math.min(10, GRID.HOLE_SPACING - 4);
+    const margin       = 6;
+    const origBodyH    = GRID.CHANNEL_GAP - 2 * legLen;  // height when pins were at rows 4/5
+    const slotH        = origBodyH - margin * 2;
+    const slotTop      = bodyTop + (bodyH - slotH) / 2;
+
+    // "ON" marking + position numbers, printed on the molded body
+    if (bodyW > 30) {
+      ctx.fillStyle = 'rgba(240,244,255,0.85)';
+      ctx.font = 'bold 6px sans-serif';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('ON', bodyX + 3, slotTop + 3);
+    }
+
+    for (let i = 0; i < count; i++) {
+      const tp = topPos[i];
+      if (!tp) continue;
+      const cx = tp.x;
+      const isOn = comp.states[i];
+
+      if (realistic) {
+        // Slot recess with an inner top shadow
+        ctx.fillStyle = '#0c1530';
+        ctx.beginPath();
+        ctx.roundRect(cx - slotW / 2, slotTop, slotW, slotH, 1);
+        ctx.fill();
+        ctx.fillStyle = 'rgba(0,0,0,0.6)';
+        ctx.fillRect(cx - slotW / 2 + 0.5, slotTop + 0.5, slotW - 1, 1.4);
+
+        // Ivory slider with a subtle 3D face
+        const knobH = Math.floor(slotH / 2) - 1;
+        const knobY = isOn ? slotTop + 1 : slotTop + slotH - knobH - 1;
+        const kg = ctx.createLinearGradient(0, knobY, 0, knobY + knobH);
+        kg.addColorStop(0, '#ffffff');
+        kg.addColorStop(0.5, '#eceada');
+        kg.addColorStop(1, '#c9c5b2');
+        ctx.fillStyle = kg;
+        ctx.beginPath();
+        ctx.roundRect(cx - slotW / 2 + 1, knobY, slotW - 2, knobH, 1);
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(20,30,60,0.5)';
+        ctx.lineWidth = 0.6;
+        ctx.beginPath();
+        ctx.roundRect(cx - slotW / 2 + 1, knobY, slotW - 2, knobH, 1);
+        ctx.stroke();
+        // Grip line across the slider face
+        ctx.strokeStyle = 'rgba(120,115,95,0.65)';
+        ctx.beginPath();
+        ctx.moveTo(cx - slotW / 2 + 2.5, knobY + knobH / 2);
+        ctx.lineTo(cx + slotW / 2 - 2.5, knobY + knobH / 2);
+        ctx.stroke();
+      } else {
+        // Slot recess
+        ctx.fillStyle = '#0a0a0a';
+        ctx.fillRect(cx - slotW / 2, slotTop, slotW, slotH);
+        ctx.strokeStyle = '#444';
+        ctx.lineWidth = 0.5;
+        ctx.strokeRect(cx - slotW / 2, slotTop, slotW, slotH);
+
+        // Knob: top half when ON, bottom half when OFF
+        const knobH = Math.floor(slotH / 2) - 1;
+        const knobY = isOn ? slotTop + 1 : slotTop + slotH - knobH - 1;
+        ctx.fillStyle = isOn ? '#c0c0c0' : '#555555';
+        ctx.fillRect(cx - slotW / 2 + 1, knobY, slotW - 2, knobH);
+      }
+    }
+  }
+
+  _drawSlideSwitch(ctx, comp, realistic = false) {
     if (comp.pins.length < 3) return;
     const p1 = this.world.getHolePosById(comp.pins[0].holeId);
     const p2 = this.world.getHolePosById(comp.pins[1].holeId);
@@ -2182,19 +2679,7 @@ export class Renderer {
     const bodyW = (p3.x - p1.x) + 14;
     const bodyH = 20;
 
-    // Body darker gray rectangle, thin black outline
-    ctx.fillStyle = '#666';
-    ctx.fillRect(cx - bodyW / 2, cy - bodyH / 2, bodyW, bodyH);
-    ctx.strokeStyle = '#000';
-    ctx.lineWidth = 0.5;
-    ctx.strokeRect(cx - bodyW / 2, cy - bodyH / 2, bodyW, bodyH);
-
-    // Track dark channel through the center
-    const trackH = 6;
-    ctx.fillStyle = '#333';
-    ctx.fillRect(cx - bodyW / 2 + 2, cy - trackH / 2, bodyW - 4, trackH);
-
-    // Slider knob black rectangle, position based on state
+    // Slider knob geometry, position based on state
     const knobW = 20;
     const knobH = 18;
     let knobX;
@@ -2205,8 +2690,77 @@ export class Renderer {
     } else {
       knobX = (p2.x + p3.x) / 2; // between pin 2 and pin 3
     }
-    ctx.fillStyle = '#000';
-    ctx.fillRect(knobX - knobW / 2, cy - knobH / 2, knobW, knobH);
+
+    if (realistic) {
+      // Contact shadow
+      ctx.fillStyle = 'rgba(40,30,12,0.28)';
+      ctx.beginPath();
+      ctx.roundRect(cx - bodyW / 2 - 0.5, cy - bodyH / 2 + 1.5, bodyW + 1, bodyH + 0.5, 2.5);
+      ctx.fill();
+      // Stamped metal frame
+      const fg = ctx.createLinearGradient(0, cy - bodyH / 2, 0, cy + bodyH / 2);
+      fg.addColorStop(0,    '#dcdad2');
+      fg.addColorStop(0.25, '#c0bcb2');
+      fg.addColorStop(0.8,  '#9d998e');
+      fg.addColorStop(1,    '#807c72');
+      ctx.fillStyle = fg;
+      ctx.beginPath();
+      ctx.roundRect(cx - bodyW / 2, cy - bodyH / 2, bodyW, bodyH, 2.5);
+      ctx.fill();
+      ctx.strokeStyle = '#6b675d';
+      ctx.lineWidth = 0.9;
+      ctx.beginPath();
+      ctx.roundRect(cx - bodyW / 2, cy - bodyH / 2, bodyW, bodyH, 2.5);
+      ctx.stroke();
+
+      // Recessed track with an upper inner shadow
+      const trackH = 6;
+      ctx.fillStyle = '#1b1913';
+      ctx.beginPath();
+      ctx.roundRect(cx - bodyW / 2 + 2.5, cy - trackH / 2 - 2, bodyW - 5, trackH + 4, 2);
+      ctx.fill();
+      ctx.fillStyle = 'rgba(0,0,0,0.55)';
+      ctx.fillRect(cx - bodyW / 2 + 3, cy - trackH / 2 - 1.6, bodyW - 6, 1.4);
+
+      // Red plastic slider knob
+      const kg = ctx.createLinearGradient(0, cy - knobH / 2, 0, cy + knobH / 2);
+      kg.addColorStop(0,   '#e8695c');
+      kg.addColorStop(0.4, '#c93a2c');
+      kg.addColorStop(1,   '#8e2015');
+      ctx.fillStyle = kg;
+      ctx.beginPath();
+      ctx.roundRect(knobX - knobW / 2, cy - knobH / 2 + 1, knobW, knobH - 2, 2);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(60,10,4,0.8)';
+      ctx.lineWidth = 0.8;
+      ctx.beginPath();
+      ctx.roundRect(knobX - knobW / 2, cy - knobH / 2 + 1, knobW, knobH - 2, 2);
+      ctx.stroke();
+      // Grip ridges
+      ctx.strokeStyle = 'rgba(255,180,170,0.5)';
+      ctx.lineWidth = 0.8;
+      ctx.beginPath();
+      for (const gx of [-4, 0, 4]) {
+        ctx.moveTo(knobX + gx, cy - knobH / 2 + 4);
+        ctx.lineTo(knobX + gx, cy + knobH / 2 - 4);
+      }
+      ctx.stroke();
+    } else {
+      // Body darker gray rectangle, thin black outline
+      ctx.fillStyle = '#666';
+      ctx.fillRect(cx - bodyW / 2, cy - bodyH / 2, bodyW, bodyH);
+      ctx.strokeStyle = '#000';
+      ctx.lineWidth = 0.5;
+      ctx.strokeRect(cx - bodyW / 2, cy - bodyH / 2, bodyW, bodyH);
+
+      // Track dark channel through the center
+      const trackH = 6;
+      ctx.fillStyle = '#333';
+      ctx.fillRect(cx - bodyW / 2 + 2, cy - trackH / 2, bodyW - 4, trackH);
+
+      ctx.fillStyle = '#000';
+      ctx.fillRect(knobX - knobW / 2, cy - knobH / 2, knobW, knobH);
+    }
   }
 
   _drawResistor(ctx, comp) {
@@ -2353,6 +2907,84 @@ export class Renderer {
     ctx.fill();
   }
 
+  // ── Inductor (top view: dark core rod with copper winding) ──────────────
+  // Black core rectangle on the lead axis with its ends exposed, wrapped by
+  // stacked, slightly bowed copper rings so the wire reads as coiled around it.
+
+  _drawInductor(ctx, comp) {
+    if (comp.pins.length < 2) return;
+    const aPos = this.world.getHolePosById(comp.pins[0].holeId);
+    const bPos = this.world.getHolePosById(comp.pins[1].holeId);
+    if (!aPos || !bPos) return;
+
+    const cx = (aPos.x + bPos.x) / 2;
+    const cy = (aPos.y + bPos.y) / 2;
+    const angle = Math.atan2(bPos.y - aPos.y, bPos.x - aPos.x);
+    const dist = Math.hypot(bPos.x - aPos.x, bPos.y - aPos.y);
+
+    const bodyHalf = Math.min(dist * 0.38, 20);   // core half-length
+    const coreHalfH = Math.min(6, bodyHalf * 0.45); // core half-height
+    const windHalf = bodyHalf * 0.72;             // winding half-length (core ends stay bare)
+    const ringHalfH = coreHalfH + 1.2;            // rings wrap just past the core edges
+
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(angle);
+
+    // Copper leads from the pins to the ends of the winding
+    ctx.strokeStyle = '#b87333';
+    ctx.lineWidth = 1.8;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(-dist / 2, 0);
+    ctx.lineTo(-windHalf, 0);
+    ctx.moveTo(windHalf, 0);
+    ctx.lineTo(dist / 2, 0);
+    ctx.stroke();
+
+    // Core: dark cylinder rod, ends protruding beyond the winding
+    const coreGrad = ctx.createLinearGradient(0, -coreHalfH, 0, coreHalfH);
+    coreGrad.addColorStop(0,    '#1c1c1e');
+    coreGrad.addColorStop(0.45, '#3d3d40');
+    coreGrad.addColorStop(1,    '#111113');
+    ctx.beginPath();
+    ctx.roundRect(-bodyHalf, -coreHalfH, bodyHalf * 2, coreHalfH * 2, coreHalfH * 0.6);
+    ctx.fillStyle = coreGrad;
+    ctx.fill();
+
+    // Winding: stacked copper rings, each bowed to one side so the wire
+    // appears to wrap around the core like a beehive of turns
+    const spacing = 3.3;
+    const turns = Math.max(5, Math.floor((windHalf * 2) / spacing));
+    const step = (windHalf * 2) / turns;
+    const bow = 1.8;    // sideways bulge of each ring
+    const lean = 0.7;   // helix slant: top of each ring trails the bottom
+    const ringGrad = ctx.createLinearGradient(0, -ringHalfH, 0, ringHalfH);
+    ringGrad.addColorStop(0,   '#8a4d16');
+    ringGrad.addColorStop(0.5, '#f2a35c');
+    ringGrad.addColorStop(1,   '#8a4d16');
+    ctx.strokeStyle = ringGrad;
+    ctx.lineWidth = Math.min(2.4, step * 0.72);
+    ctx.beginPath();
+    for (let i = 0; i < turns; i++) {
+      const tx = -windHalf + step * (i + 0.5);
+      ctx.moveTo(tx - lean, -ringHalfH);
+      ctx.quadraticCurveTo(tx + bow, 0, tx - lean, ringHalfH);
+    }
+    ctx.stroke();
+
+    ctx.restore();
+
+    // Pin endpoint dots
+    ctx.beginPath();
+    ctx.arc(aPos.x, aPos.y, 3, 0, Math.PI * 2);
+    ctx.fillStyle = '#888';
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(bPos.x, bPos.y, 3, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
   // ── Capacitor (realistic ceramic disc) ─────────────────────────────────
 
   _drawCapacitorRealistic(ctx, comp) {
@@ -2374,8 +3006,8 @@ export class Renderer {
     // Front-facing disc view: full circular face offset perpendicular (screen-up)
     // from the lead axis, with both leads emerging from the underside and angling
     // outward to reach the pins matches the classic ceramic-disc look.
-    const r = Math.min(dist * 0.4, 13);
-    const discCy = upSign * r * 1.05;
+    const r = Math.min(dist * 0.38, 10.5);
+    const discCy = upSign * r * 1.0;
     const leadSpread = r * 0.42;
     const attachY = discCy - upSign * Math.sqrt(Math.max(0, r * r - leadSpread * leadSpread));
 
@@ -2392,40 +3024,62 @@ export class Renderer {
     ctx.lineTo(leadSpread, attachY);
     ctx.stroke();
 
-    // Disc body saturated orange ceramic with a gentle top-light gradient
-    const topY = discCy + upSign * r;
-    const botY = discCy - upSign * r;
-    const bodyGrad = ctx.createLinearGradient(0, topY, 0, botY);
-    bodyGrad.addColorStop(0, '#ff8e38');
-    bodyGrad.addColorStop(0.55, '#ee6c1e');
-    bodyGrad.addColorStop(1, '#c65214');
+    // Contact shadow under the disc
+    ctx.fillStyle = 'rgba(40,30,12,0.20)';
+    ctx.beginPath();
+    ctx.ellipse(0.5, discCy + 1.4, r, r * 0.95, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Disc body: dipped-ceramic orange with the light biased top-left.
+    // A slightly wavy rim (dip-coating bulge) reads more like the real part
+    // than a perfect circle.
+    const bodyGrad = ctx.createRadialGradient(
+      -r * 0.35, discCy - r * 0.4, r * 0.15, 0, discCy, r * 1.05
+    );
+    bodyGrad.addColorStop(0,    '#ffab5e');
+    bodyGrad.addColorStop(0.45, '#f27a28');
+    bodyGrad.addColorStop(0.85, '#d55c16');
+    bodyGrad.addColorStop(1,    '#b34a10');
     ctx.beginPath();
     ctx.arc(0, discCy, r, 0, Math.PI * 2);
     ctx.fillStyle = bodyGrad;
     ctx.fill();
 
-    // Crisp dark outline
-    ctx.lineWidth = 1.1;
-    ctx.strokeStyle = '#3e1805';
+    // Soft dark outline
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = 'rgba(80, 32, 6, 0.75)';
     ctx.stroke();
 
-    // Soft highlight on the upper portion of the face
-    ctx.save();
+    // Specular highlight
+    ctx.fillStyle = 'rgba(255, 235, 205, 0.5)';
     ctx.beginPath();
-    ctx.arc(0, discCy, r - 0.6, 0, Math.PI * 2);
-    ctx.clip();
-    ctx.beginPath();
-    ctx.ellipse(
-      upSign * r * 0.28,
-      discCy + upSign * r * 0.42,
-      r * 0.48, r * 0.2,
-      0, 0, Math.PI * 2
-    );
-    ctx.fillStyle = 'rgba(255, 228, 190, 0.3)';
+    ctx.ellipse(-r * 0.35, discCy - r * 0.42, r * 0.34, r * 0.18, -Math.PI / 6, 0, Math.PI * 2);
     ctx.fill();
-    ctx.restore();
+
+    // Capacitance marking on the face when there's room (e.g. "104")
+    if (r >= 8 && comp.capacitance) {
+      const code = this._capCodeMarking(comp.capacitance);
+      if (code) {
+        ctx.font = 'bold 5.5px monospace';
+        ctx.fillStyle = 'rgba(60, 24, 4, 0.85)';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(code, 0, discCy + r * 0.18);
+      }
+    }
 
     ctx.restore();
+  }
+
+  /** Three-digit EIA marking for a capacitance in farads (e.g. 1e-7 → "104"). */
+  _capCodeMarking(farads) {
+    if (!farads || farads <= 0) return null;
+    const pF = farads * 1e12;
+    if (pF < 10 || pF >= 1e6) return null;
+    const exp = Math.floor(Math.log10(pF)) - 1;
+    const sig = Math.round(pF / Math.pow(10, exp));
+    if (sig < 10 || sig > 99) return null;
+    return `${sig}${exp}`;
   }
 
   // ── Polarized Capacitor (schematic style) ────────────────────────────────
@@ -2566,8 +3220,8 @@ export class Renderer {
     const halfW = bodyW / 2;
     const halfH = bodyH / 2;
 
-    // Lead wires
-    ctx.strokeStyle = '#b8906a';
+    // Tinned lead wires
+    ctx.strokeStyle = '#b0b3b6';
     ctx.lineWidth = 1.5;
     ctx.lineCap = 'round';
     ctx.beginPath();
@@ -2579,16 +3233,33 @@ export class Renderer {
     ctx.lineTo(halfW, 0);
     ctx.stroke();
 
-    // Main cylindrical body dark navy
+    // Contact shadow
+    ctx.fillStyle = 'rgba(40,30,12,0.22)';
+    ctx.beginPath();
+    ctx.roundRect(-halfW + 0.5, -halfH + 1.5, bodyW, bodyH, 2);
+    ctx.fill();
+
+    // Main cylindrical body: navy vinyl sleeve with a glossy top band
     const bodyGrad = ctx.createLinearGradient(0, -halfH, 0, halfH);
-    bodyGrad.addColorStop(0, '#3a3a4a');
-    bodyGrad.addColorStop(0.25, '#4a4a5c');
-    bodyGrad.addColorStop(0.75, '#2a2a38');
-    bodyGrad.addColorStop(1, '#1a1a28');
+    bodyGrad.addColorStop(0,    '#2e2e40');
+    bodyGrad.addColorStop(0.18, '#5a5a72');
+    bodyGrad.addColorStop(0.35, '#43435a');
+    bodyGrad.addColorStop(0.75, '#26263a');
+    bodyGrad.addColorStop(1,    '#141422');
     ctx.beginPath();
     ctx.roundRect(-halfW, -halfH, bodyW, bodyH, 2);
     ctx.fillStyle = bodyGrad;
     ctx.fill();
+
+    // Crimp grooves near the positive end (sleeve pinched into the can)
+    ctx.strokeStyle = 'rgba(0,0,0,0.45)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(-halfW + 3.5, -halfH + 0.8);
+    ctx.lineTo(-halfW + 3.5, halfH - 0.8);
+    ctx.moveTo(-halfW + 5.5, -halfH + 0.8);
+    ctx.lineTo(-halfW + 5.5, halfH - 0.8);
+    ctx.stroke();
 
     // Silver stripe on negative (B) side rightmost ~28% of body
     const stripeX = halfW * 0.44;
@@ -2708,6 +3379,70 @@ export class Renderer {
     ctx.restore();
   }
 
+  // 2-pin quartz crystal: two nested pill (stadium) shapes a dark outer pill
+  // for the can edge and a lighter inner pill for the raised dome/bump. Tinned
+  // leads run out to the two holes. The inner pill lights up when OUT is HIGH.
+  _drawCrystal(ctx, comp) {
+    if (comp.pins.length < 2) return;
+    const aPos = this.world.getHolePosById(comp.pins[0].holeId); // OUT
+    const bPos = this.world.getHolePosById(comp.pins[1].holeId); // GND
+    if (!aPos || !bPos) return;
+
+    const cx = (aPos.x + bPos.x) / 2;
+    const cy = (aPos.y + bPos.y) / 2;
+    const angle = Math.atan2(bPos.y - aPos.y, bPos.x - aPos.x);
+    const dist = Math.hypot(bPos.x - aPos.x, bPos.y - aPos.y);
+
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(angle);
+
+    const bodyW = 26;
+    const bodyH = 13;
+    const halfW = bodyW / 2;
+
+    // Pill / stadium centred on the origin (fully rounded ends)
+    const pill = (w, h) => {
+      const hw = w / 2, hh = h / 2, rad = hh;
+      ctx.beginPath();
+      ctx.moveTo(-hw + rad, -hh);
+      ctx.arcTo( hw, -hh,  hw,  hh, rad);
+      ctx.arcTo( hw,  hh, -hw,  hh, rad);
+      ctx.arcTo(-hw,  hh, -hw, -hh, rad);
+      ctx.arcTo(-hw, -hh,  hw, -hh, rad);
+      ctx.closePath();
+    };
+
+    // Tinned leads from each hole to the can body
+    ctx.strokeStyle = '#b0b0b0';
+    ctx.lineWidth = 1.2;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(-dist / 2, 0);
+    ctx.lineTo(-halfW + 1, 0);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(dist / 2, 0);
+    ctx.lineTo(halfW - 1, 0);
+    ctx.stroke();
+
+    // Outer pill the can edge (darker)
+    pill(bodyW, bodyH);
+    ctx.fillStyle = '#33373b';
+    ctx.fill();
+    ctx.strokeStyle = '#1c1e20';
+    ctx.lineWidth = 0.8;
+    ctx.stroke();
+
+    // Inner pill the raised dome/bump. Fixed white — the crystal is idealized as
+    // a self-running clock, so its body doesn't visually change with the tick.
+    pill(bodyW - 6, bodyH - 5);
+    ctx.fillStyle = '#ffffff';
+    ctx.fill();
+
+    ctx.restore();
+  }
+
   _drawDiodeRealistic(ctx, comp) {
     if (comp.pins.length < 2) return;
     const aPos = this.world.getHolePosById(comp.pins[0].holeId);
@@ -2783,7 +3518,7 @@ export class Renderer {
     if (!state.showValues && !state.showRealisticBoard) return;
     const realistic = state.showRealisticBoard;
     for (const comp of state.components) {
-      if (!comp.placed || (comp.type !== COMP.RESISTOR && comp.type !== COMP.CAPACITOR && comp.type !== COMP.POLARIZED_CAPACITOR)) continue;
+      if (!comp.placed || (comp.type !== COMP.RESISTOR && comp.type !== COMP.CAPACITOR && comp.type !== COMP.POLARIZED_CAPACITOR && comp.type !== COMP.INDUCTOR)) continue;
       // Skip the comp whose endpoint is being dragged its body is hidden
       // and the live preview handles its visualization (without label).
       if (state.draggingCompEp && state.draggingCompEp.comp.id === comp.id) continue;
@@ -2838,7 +3573,7 @@ export class Renderer {
     // Current labels (cyan) at resistor/LED/capacitor/diode body midpoints
     for (const comp of state.components) {
       if (!comp.placed) continue;
-      if (comp.type !== COMP.RESISTOR && comp.type !== COMP.LED && comp.type !== COMP.CAPACITOR && comp.type !== COMP.POLARIZED_CAPACITOR && comp.type !== COMP.DIODE) continue;
+      if (comp.type !== COMP.RESISTOR && comp.type !== COMP.LED && comp.type !== COMP.CAPACITOR && comp.type !== COMP.POLARIZED_CAPACITOR && comp.type !== COMP.INDUCTOR && comp.type !== COMP.DIODE) continue;
       if (!comp.pins || comp.pins.length < 2) continue;
       const p0 = this.world.getHolePosById(comp.pins[0].holeId);
       const p1 = this.world.getHolePosById(comp.pins[1].holeId);
@@ -2981,10 +3716,6 @@ export class Renderer {
       const maxV = Math.max(vStart !== undefined ? vStart : 0, vEnd !== undefined ? vEnd : 0);
       const maxI = Math.max(iStart, iEnd);
 
-      // Skip the glow when no measurable current flows on the net — keeps dangling
-      // wires on a hot rail (and quiet digital nets) from looking energized.
-      if (maxI < 1e-5) continue;
-
       // Determine direction: current flows from high voltage to low voltage
       const vS = vStart !== undefined ? vStart : 0;
       const vE = vEnd   !== undefined ? vEnd   : 0;
@@ -3065,7 +3796,72 @@ export class Renderer {
     ctx.fillStyle = '#fff';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText('CLK', pos.x, pos.y + WIRE_LABEL_TEXT_Y_OFFSET);
+    ctx.fillText('CLK', pos.x, pos.y + 1);
+  }
+
+  // ── Test point ─────────────────────────────────────────────────────────────
+  // A labelled probe flag on a single hole. The terminal dot uses the test
+  // point's lane color (matching its timing-diagram trace); the red "powered"
+  // ring follows the same convention as wire endpoints — net voltage above
+  // the family VIH (see _drawWireEndpoint).
+  _drawTestPoint(ctx, comp, state) {
+    if (!comp.placed || comp.pins.length === 0) return;
+    const pos = this.world.getHolePosById(comp.pins[0].holeId);
+    if (!pos) return;
+
+    const simulator = state && state.simulator;
+    const radius = 6;
+
+    // Terminal dot in the lane color
+    ctx.beginPath();
+    ctx.arc(pos.x, pos.y, radius, 0, Math.PI * 2);
+    ctx.fillStyle = comp.color || '#f39c12';
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(pos.x, pos.y, radius, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(0,0,0,0.55)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Powered ring: net above the family VIH — identical rule to wire terminals
+    if (simulator) {
+      const v = simulator.getVoltageAtHole(comp.pins[0].holeId);
+      const vih = simulator._spec ? simulator._spec.VIH : 2.0;
+      if (v !== undefined && v > vih) {
+        ctx.beginPath();
+        ctx.arc(pos.x, pos.y, radius + 2, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(220, 50, 50, 0.9)';
+        ctx.lineWidth = 2.5;
+        ctx.stroke();
+      }
+    }
+
+    // Label flag above the dot (below when on the top row so it stays on-board)
+    const label = comp.label || 'TP';
+    const below = comp.row <= 0;
+    const flagY = below ? pos.y + radius + 11 : pos.y - radius - 11;
+    ctx.font = 'bold 9px monospace';
+    const w = ctx.measureText(label).width + 8;
+    ctx.fillStyle = 'rgba(20, 20, 20, 0.85)';
+    ctx.strokeStyle = comp.color || '#f39c12';
+    ctx.lineWidth = 1.5;
+    const rx = pos.x - w / 2, ry = flagY - 8, rw = w, rh = 15;
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(rx, ry, rw, rh, 3);
+    else ctx.rect(rx, ry, rw, rh);
+    ctx.fill();
+    ctx.stroke();
+    // Stem from flag to dot
+    ctx.beginPath();
+    ctx.moveTo(pos.x, below ? ry : ry + rh);
+    ctx.lineTo(pos.x, below ? pos.y + radius : pos.y - radius);
+    ctx.strokeStyle = comp.color || '#f39c12';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.fillStyle = '#fff';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(label, pos.x, flagY - 0.5);
   }
 
   _drawWireEndpoints(ctx, state, _powerNodes, simulator, skipWireIds) {
@@ -3114,14 +3910,14 @@ export class Renderer {
     ctx.fillStyle = circleColor;
     ctx.fill();
 
-    // Red outline on numbered (non-VCC/GND) terminals when the net is powered
-    // AND actually conducting current. Gating on current keeps wires on a
-    // dead-end branch of a hot net from looking like they carry it.
-    // Drawn at the same radius so it overlays the circle edge without growing it
+    // Red outline on numbered (non-VCC/GND) terminals when the net's voltage
+    // would register as a logic HIGH input for the active 74-series family
+    // (i.e. above VIH). Below VIH a real chip can't be guaranteed to read it
+    // as a 1, so the terminal isn't drawn as "powered".
     if (!isLabel && simulator) {
       const v = simulator.getVoltageAtHole(holeId);
-      const i = simulator.getCurrentAtHole(holeId);
-      if (v !== undefined && v > 0.1 && i > 1e-5) {
+      const vih = simulator._spec ? simulator._spec.VIH : 2.0;
+      if (v !== undefined && v > vih) {
         ctx.beginPath();
         ctx.arc(pos.x, pos.y, radius, 0, Math.PI * 2);
         ctx.strokeStyle = 'rgba(220, 50, 50, 0.9)';
@@ -3135,7 +3931,7 @@ export class Renderer {
     ctx.fillStyle = '#fff';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(label, pos.x, pos.y + (isLabel ? WIRE_LABEL_TEXT_Y_OFFSET : WIRE_LABEL_NUM_Y_OFFSET));
+    ctx.fillText(label, pos.x, pos.y + (isLabel ? 1 : 0));
   }
 
   // ── Short-Circuit Highlight ───────────────────────────────────────────────
@@ -3278,6 +4074,18 @@ export class Renderer {
     ctx.globalAlpha = 0.5;
     this._drawComponent(ctx, ghost, state);
     ctx.globalAlpha = 1.0;
+  }
+
+  // Ghost wire endpoint: same disc as a real wire, drawn at the snapped hole
+  // but skipping the powered/net glow (preview has no net yet). Caller handles
+  // globalAlpha for the translucent ghost look.
+  _drawGhostWireEndpoint(ctx, holeId, color) {
+    const pos = this.world.getHolePosById(holeId);
+    if (!pos) return;
+    ctx.beginPath();
+    ctx.arc(pos.x, pos.y, 8, 0, Math.PI * 2);
+    ctx.fillStyle = color || '#888';
+    ctx.fill();
   }
 
   // ── Selection highlight ───────────────────────────────────────────────────
@@ -3428,15 +4236,25 @@ export class Renderer {
     }
     ctx.setLineDash([]);
 
-    // For 7-seg: draw white dots on all pin-connection holes
-    if (comp.type === COMP.SEVEN_SEG) {
+    // 7-seg and XO can: their solid bodies hide the holes, so on selection
+    // draw dots where the pins connect. Light dots on the 7-seg's black body;
+    // dark ringed dots on the XO's bright metal lid. The XO skips NC
+    // positions the real half-can only has the four corner pins.
+    const isXOCan = comp.type === COMP.CHIP && comp.chipDef && comp.chipDef.name === 'XO';
+    if (comp.type === COMP.SEVEN_SEG || isXOCan) {
       for (const pin of comp.pins) {
+        if (isXOCan && pin.type === 'nc') continue;
         const pos = this.world.getHolePosById(pin.holeId);
         if (!pos) continue;
         ctx.beginPath();
         ctx.arc(pos.x, pos.y, GRID.HOLE_RADIUS, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(210,210,210,0.85)';
+        ctx.fillStyle = isXOCan ? 'rgba(35,32,28,0.9)' : 'rgba(210,210,210,0.85)';
         ctx.fill();
+        if (isXOCan) {
+          ctx.strokeStyle = 'rgba(255,255,255,0.9)';
+          ctx.lineWidth = 1.2;
+          ctx.stroke();
+        }
       }
     }
   }

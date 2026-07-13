@@ -2,7 +2,7 @@
 // Handles all user input: placement modes, wire drawing, selection, deletion,
 // pan/zoom, and component interaction (buttons, switches, resistor editing).
 
-import { MODE, COMP, SNAP_RADIUS, COLORS, COMP_MAX_DIST, GRID } from './constants.js';
+import { MODE, COMP, SNAP_RADIUS, COLORS, COMP_MAX_DIST, GRID, TESTPOINT_COLORS } from './constants.js';
 import { createComponent } from './components.js';
 import { holeId as makeHoleId, parseHoleId } from './breadboard.js';
 import { serializeState } from './storage.js';
@@ -42,7 +42,7 @@ export class Interaction {
     this.wireStart = null;       // { id, pos, ... } of the starting hole
 
     // Component wire-like placement state
-    this.compStart = null;       // starting hole for 2-pin component placement
+    this.compStart = null;       // starting hole for 2 pin component placement
 
     // Pan state
     this.isPanning = false;
@@ -86,11 +86,16 @@ export class Interaction {
     this._moveWireStartScreen = null;  // screen coords at mousedown
     this._moveWireUndoSnapshot = null; // serialized state captured at drag-start
 
-    // Component pin endpoint drag state (wire-like 2-pin: resistor, LED, switch, push-button)
+    // Component pin endpoint drag state (wire-like 2 pin: resistor, LED, switch, push-button)
     this._maybeMovingCompEp = false;    // mousedown on comp pin, threshold not yet crossed
     this._moveCompEp = null;            // { comp, endpoint: 'start'|'end' } being dragged
     this._moveCompEpStartScreen = null; // screen coords at mousedown
     this._moveCompEpUndoSnapshot = null;
+
+    // Multi-item paste preview state
+    this._pasteCompItems = []; // [{ ghost, isWireLike, savedGCol, savedRow, ... }]
+    this._pasteWireItems = []; // [{ color, startGCol, startRow, ... }]
+    this._pasteWireHoles = []; // [{ startHoleId, endHoleId, color }] computed per-frame for rendering
 
     // Right-click rubber-band selection state
     this._maybeRightSelect = false;       // right-mousedown, threshold not crossed yet
@@ -121,11 +126,12 @@ export class Interaction {
 
   // ── Start placement mode ──────────────────────────────────────────────────
   startPlacement(compType, subtype) {
-    // Wire-like 2-pin components use COMP_START/COMP_END flow
+    // Wire-like 2 pin components use COMP_START/COMP_END flow
     if (compType === COMP.RESISTOR || compType === COMP.LED ||
         compType === COMP.SWITCH || compType === COMP.PUSH_BUTTON ||
         compType === COMP.CAPACITOR || compType === COMP.POLARIZED_CAPACITOR ||
-        compType === COMP.DIODE) {
+        compType === COMP.INDUCTOR ||
+        compType === COMP.DIODE || compType === COMP.CRYSTAL) {
       this.mode = MODE.COMP_START;
       this.placementType = compType;
       this.placementSubtype = subtype;
@@ -138,7 +144,9 @@ export class Interaction {
     this.mode = (compType === COMP.CHIP || compType === COMP.BUTTON) ? MODE.PLACE_CHIP :
                 (compType === COMP.SEVEN_SEG) ? MODE.PLACE_OUTPUT :
                 (compType === COMP.SLIDE_SWITCH) ? MODE.PLACE_CHIP :
+                (compType === COMP.DIP_SWITCH) ? MODE.PLACE_CHIP :
                 (compType === COMP.CLOCK) ? MODE.PLACE_CHIP :
+                (compType === COMP.TESTPOINT) ? MODE.PLACE_CHIP :
                 MODE.PLACE_INPUT;
     this.placementType = compType;
     this.placementSubtype = subtype;
@@ -157,6 +165,213 @@ export class Interaction {
     this.app.canvas.style.cursor = 'crosshair';
   }
 
+  // ── Multi-item paste preview ─────────────────────────────────────────────
+  // Builds a ghost cluster (components + wires) from clipboard data. The cluster
+  // shifts horizontally with the cursor; commit on left-click, cancel on Escape
+  // or right-click. Mirrors single-chip ghost paste so all paste flows behave
+  // the same: paste lands where the mouse is.
+  startPastePreview(clipboard) {
+    if (!clipboard) return false;
+    const comps = clipboard.components || [];
+    const wires = clipboard.wires || [];
+    if (comps.length === 0 && wires.length === 0) return false;
+
+    // Compute anchor as the leftmost reference point in global-col space.
+    // Anchor row only used as a hint; vertical translation is locked off
+    // (mirrors MOVE_COMP, which also restricts group drag to horizontal).
+    let anchorGCol = Infinity, anchorRow = 4;
+    const considerHole = (id) => {
+      const p = parseHoleId(id);
+      const gc = p.tileX * GRID.COLS + p.col;
+      if (gc < anchorGCol) { anchorGCol = gc; anchorRow = p.row; }
+    };
+    for (const d of comps) {
+      if (d.startHoleId) { considerHole(d.startHoleId); considerHole(d.endHoleId); }
+      else if (d.col !== undefined) {
+        const gc = (d.tileX || 0) * GRID.COLS + d.col;
+        if (gc < anchorGCol) { anchorGCol = gc; anchorRow = d.row ?? 4; }
+      }
+    }
+    for (const d of wires) {
+      considerHole(d.startHoleId);
+      considerHole(d.endHoleId);
+    }
+    if (!isFinite(anchorGCol)) return false;
+
+    this._pasteAnchorGCol = anchorGCol;
+    this._pasteAnchorRow = anchorRow;
+    this._pasteCompItems = [];
+    this._pasteWireItems = [];
+    this._pasteWireHoles = [];
+
+    for (const data of comps) {
+      const ghost = createComponent(data.type, data.type === COMP.DIP_SWITCH ? data.count : data.chipId);
+      if (!ghost) continue;
+      // Restore state on the ghost so the preview matches the original.
+      if (data.type === COMP.BUTTON && data.vertical) { ghost.vertical = true; ghost.colSpan = 2; }
+      if (data.vertical !== undefined) ghost.vertical = data.vertical;
+      if (data.colSpan !== undefined) ghost.colSpan = data.colSpan;
+      if (data.resistance !== undefined && ghost.setResistance) ghost.setResistance(data.resistance);
+      if (data.capacitance !== undefined && ghost.setCapacitance) ghost.setCapacitance(data.capacitance);
+      if (data.inductance !== undefined && ghost.setInductance) ghost.setInductance(data.inductance);
+      if (data.frequencyHz !== undefined && ghost.frequencyHz !== undefined) ghost.frequencyHz = data.frequencyHz;
+      if (data.color !== undefined && ghost.color !== undefined) ghost.color = data.color;
+      if (data.on !== undefined) ghost.on = data.on;
+      if (data.pressed !== undefined) ghost.pressed = data.pressed;
+      if (data.state !== undefined && data.type === COMP.SLIDE_SWITCH) ghost.state = data.state;
+      if (Array.isArray(data.states) && data.type === COMP.DIP_SWITCH) ghost.states = [...data.states];
+
+      if (data.startHoleId && data.endHoleId && ghost.placeWireLike) {
+        const ps = parseHoleId(data.startHoleId);
+        const pe = parseHoleId(data.endHoleId);
+        this._pasteCompItems.push({
+          ghost,
+          isWireLike: true,
+          startGCol: ps.tileX * GRID.COLS + ps.col, startRow: ps.row, startTileY: ps.tileY, startType: ps.type,
+          endGCol:   pe.tileX * GRID.COLS + pe.col, endRow:   pe.row, endTileY:   pe.tileY, endType:   pe.type,
+        });
+      } else if (data.col !== undefined) {
+        const gc = (data.tileX || 0) * GRID.COLS + data.col;
+        this._pasteCompItems.push({
+          ghost,
+          isWireLike: false,
+          savedGCol: gc, savedRow: data.row, savedTileY: data.tileY ?? 0,
+          colSpan: ghost.colSpan || 1,
+        });
+      }
+    }
+
+    for (const data of wires) {
+      const ps = parseHoleId(data.startHoleId);
+      const pe = parseHoleId(data.endHoleId);
+      this._pasteWireItems.push({
+        color: data.color,
+        startGCol: ps.tileX * GRID.COLS + ps.col, startRow: ps.row, startTileY: ps.tileY, startType: ps.type,
+        endGCol:   pe.tileX * GRID.COLS + pe.col, endRow:   pe.row, endTileY:   pe.tileY, endType:   pe.type,
+      });
+    }
+
+    if (this._pasteCompItems.length === 0 && this._pasteWireItems.length === 0) return false;
+
+    this.mode = MODE.PASTE_PREVIEW;
+    this.ghost = null;
+    this.ghosts = this._pasteCompItems.map(ci => ci.ghost);
+    this.app.canvas.style.cursor = 'crosshair';
+
+    // Initial positioning at current hovered hole (or anchor's original location)
+    const h = this.app.state.hoveredHole;
+    if (h && h.type === 'main') {
+      this._updatePastePreview(h);
+    } else {
+      // Snap to anchor's own location so the cluster is visible immediately.
+      const anchorTileX = Math.floor(anchorGCol / GRID.COLS);
+      const anchorCol   = anchorGCol - anchorTileX * GRID.COLS;
+      this._updatePastePreview({ type: 'main', tileX: anchorTileX, tileY: 0, col: anchorCol, row: anchorRow });
+    }
+    return true;
+  }
+
+  _updatePastePreview(hovered) {
+    if (this.mode !== MODE.PASTE_PREVIEW) return;
+    if (!hovered || hovered.type !== 'main') return;
+    const targetGCol = hovered.tileX * GRID.COLS + hovered.col;
+    const delta = targetGCol - this._pasteAnchorGCol;
+
+    for (const ci of this._pasteCompItems) {
+      if (ci.isWireLike) {
+        const sGC = ci.startGCol + delta;
+        const eGC = ci.endGCol + delta;
+        const sTileX = Math.floor(sGC / GRID.COLS);
+        const sCol   = sGC - sTileX * GRID.COLS;
+        const eTileX = Math.floor(eGC / GRID.COLS);
+        const eCol   = eGC - eTileX * GRID.COLS;
+        if (sCol < 0 || sCol >= GRID.COLS || eCol < 0 || eCol >= GRID.COLS) { ci.ghost.placed = false; continue; }
+        const sId = makeHoleId(sTileX, ci.startTileY, ci.startType, sCol, ci.startRow);
+        const eId = makeHoleId(eTileX, ci.endTileY,   ci.endType,   eCol, ci.endRow);
+        if (!this.app.world.getHolePosById(sId) || !this.app.world.getHolePosById(eId)) { ci.ghost.placed = false; continue; }
+        ci.ghost.placeWireLike(sId, eId);
+      } else {
+        const gc = ci.savedGCol + delta;
+        const newTileX = Math.floor(gc / GRID.COLS);
+        const newCol   = gc - newTileX * GRID.COLS;
+        const span     = ci.colSpan || 1;
+        if (newCol < 0 || newCol + span > GRID.COLS) { ci.ghost.placed = false; continue; }
+        const probeId = makeHoleId(newTileX, ci.savedTileY, 'main', newCol, ci.savedRow);
+        if (!this.app.world.getHolePosById(probeId)) { ci.ghost.placed = false; continue; }
+        ci.ghost.place(newTileX, ci.savedTileY, newCol, ci.savedRow);
+      }
+    }
+
+    this._pasteWireHoles = [];
+    for (const wi of this._pasteWireItems) {
+      const sGC = wi.startGCol + delta;
+      const eGC = wi.endGCol + delta;
+      const sTileX = Math.floor(sGC / GRID.COLS);
+      const sCol   = sGC - sTileX * GRID.COLS;
+      const eTileX = Math.floor(eGC / GRID.COLS);
+      const eCol   = eGC - eTileX * GRID.COLS;
+      if (sCol < 0 || sCol >= GRID.COLS || eCol < 0 || eCol >= GRID.COLS) continue;
+      const sId = makeHoleId(sTileX, wi.startTileY, wi.startType, sCol, wi.startRow);
+      const eId = makeHoleId(eTileX, wi.endTileY,   wi.endType,   eCol, wi.endRow);
+      if (!this.app.world.getHolePosById(sId) || !this.app.world.getHolePosById(eId)) continue;
+      this._pasteWireHoles.push({ startHoleId: sId, endHoleId: eId, color: wi.color });
+    }
+  }
+
+  _commitPastePreview() {
+    if (this.mode !== MODE.PASTE_PREVIEW) return false;
+
+    // All ghost components must be placed and not overlap with existing items
+    for (const ci of this._pasteCompItems) {
+      if (!ci.ghost.placed) return false;
+      if (this._checkOverlap(ci.ghost)) return false;
+    }
+    // Ghost components must not overlap each other
+    const occupied = new Set();
+    for (const ci of this._pasteCompItems) {
+      for (const h of ci.ghost.getOccupiedHoles()) {
+        if (occupied.has(h)) return false;
+        occupied.add(h);
+      }
+    }
+    // Wires: endpoints can't clash with ghost component pins, existing wire endpoints, or each other
+    for (const wh of this._pasteWireHoles) {
+      if (occupied.has(wh.startHoleId) || occupied.has(wh.endHoleId)) return false;
+      if (this.app.state.wireManager.findEndpointAtHole(wh.startHoleId)) return false;
+      if (this.app.state.wireManager.findEndpointAtHole(wh.endHoleId)) return false;
+      occupied.add(wh.startHoleId);
+      occupied.add(wh.endHoleId);
+    }
+
+    this.app.pushUndo();
+    const newItems = [];
+    for (const ci of this._pasteCompItems) {
+      this.app.state.components.push(ci.ghost);
+      newItems.push({ type: 'component', ref: ci.ghost });
+      if (ci.ghost.type === COMP.CHIP && ci.ghost.chipId) this.app.addLastUsedChip(ci.ghost.chipId);
+    }
+    for (const wh of this._pasteWireHoles) {
+      const wire = this.app.state.wireManager.addWire(wh.startHoleId, wh.endHoleId);
+      if (wh.color) wire.color = wh.color;
+      newItems.push({ type: 'wire', ref: wire });
+    }
+    this.app.state.selectedItems = newItems;
+
+    this._endPastePreview();
+    this.app.onCircuitChanged();
+    return true;
+  }
+
+  _endPastePreview() {
+    this.mode = MODE.IDLE;
+    this.ghost = null;
+    this.ghosts = [];
+    this._pasteCompItems = [];
+    this._pasteWireItems = [];
+    this._pasteWireHoles = [];
+    this.app.canvas.style.cursor = 'default';
+  }
+
   cancelMode() {
     // Cancel an in-progress drag-to-move (restores component to origin)
     if (this.mode === MODE.MOVE_COMP) {
@@ -171,6 +386,10 @@ export class Interaction {
     // Cancel an in-progress component pin endpoint drag
     if (this.mode === MODE.MOVE_COMP_EP) {
       this._cancelCompEndpointDrag();
+      return;
+    }
+    if (this.mode === MODE.PASTE_PREVIEW) {
+      this._endPastePreview();
       return;
     }
     this.mode = MODE.IDLE;
@@ -219,6 +438,9 @@ export class Interaction {
     this._rightSelectEnd = null;
     this._maybePanning = false;
     this.isPanning = false;
+    this._pasteCompItems = [];
+    this._pasteWireItems = [];
+    this._pasteWireHoles = [];
     this.mode = MODE.IDLE;
     if (this.app.state) this.app.state.compDragPreview = null;
     if (this.app.canvas) this.app.canvas.style.cursor = 'default';
@@ -272,6 +494,22 @@ export class Interaction {
       this.app.state.hoveredHole = _nearestHole;
     }
 
+    // Cursor mirrors the click target exactly (same hit-test the click uses):
+    // pointer over any clickable component/wire, grab inside a multi-selection
+    // bbox, default over empty board. Gives body hits (chip bodies, lead
+    // segments) visible feedback even though they have no hover circle.
+    if (this.mode === MODE.IDLE && !isDragging && isOverCanvas) {
+      let cursor = 'default';
+      if (this._findComponentAtMouse() || this._findWireAtMouse() ||
+          this._findPlusButtonClick()) {
+        cursor = 'pointer';
+      } else {
+        const gb = this._computeSelectionBBox();
+        if (gb && this._pointInBBox(this.mouseWorld, gb)) cursor = 'grab';
+      }
+      this.app.canvas.style.cursor = cursor;
+    }
+
     // Right-click rubber-band selection tracking
     if (this._maybeRightSelect || this._isRightSelecting) {
       this._rightSelectEnd = { ...this.mouseWorld };
@@ -322,6 +560,12 @@ export class Interaction {
       if (h.type === 'main') {
         this._updateGhostPosition(h);
       }
+    }
+
+    // Multi-item paste preview: ghost cluster follows cursor
+    if (this.mode === MODE.PASTE_PREVIEW && this.app.state.hoveredHole &&
+        this.app.state.hoveredHole.type === 'main') {
+      this._updatePastePreview(this.app.state.hoveredHole);
     }
 
     // Drag threshold: if mousedown was on a component, check if we've moved far enough
@@ -444,7 +688,7 @@ export class Interaction {
       if (this.mode === MODE.IDLE) {
         const comp = this._findComponentAtMouse();
         if (comp) {
-          // If hovering directly over a pin of a wire-like 2-pin component,
+          // If hovering directly over a pin of a wire-like 2 pin component,
           // allow dragging just that pin instead of moving the whole component
           const hh2 = this.app.state.hoveredHole;
           if (hh2 && comp.startHoleId) {
@@ -459,7 +703,7 @@ export class Interaction {
             }
           }
           // Momentary button: press immediately on mousedown.
-          // For 2-pin push buttons, only press when the cursor is over the
+          // For 2 pin push buttons, only press when the cursor is over the
           // body square not when clicking the leads.
           if (comp.type === COMP.BUTTON ||
               (comp.type === COMP.PUSH_BUTTON && this._isOverComponentBody(comp))) {
@@ -482,6 +726,21 @@ export class Interaction {
           this._moveStartScreen = { x: e.clientX, y: e.clientY };
           return;
         }
+        // Wire endpoint under the hover circle: the visible indicator wins, so
+        // dragging moves that endpoint. Exception: if the wire belongs to the
+        // current multi-selection, fall through to the group grab below so the
+        // whole selection moves together (matching the visible bbox outline).
+        const hh = this.app.state.hoveredHole;
+        const ep = hh ? this.app.state.wireManager.findEndpointAtHole(hh.id) : null;
+        const epLocked = !!(ep && this.app.state.lockedWireIds?.has(ep.wire.id));
+        const epInSelection = !!(ep && this.app.state.selectedItems.some(
+          i => i.type === 'wire' && i.ref === ep.wire));
+        if (ep && !epLocked && !epInSelection) {
+          this._maybeMovingWireEp = true;
+          this._moveWireEp = { wire: ep.wire, endpoint: ep.endpoint };
+          this._moveWireStartScreen = { x: e.clientX, y: e.clientY };
+          return;
+        }
         // Group drag: clicking inside the multi-selection bounding box on empty
         // space grabs the whole group, matching the visible bbox outline.
         const groupBBox = this._computeSelectionBBox();
@@ -500,21 +759,16 @@ export class Interaction {
             return;
           }
         }
-        // No component prepare to pan if over empty space or an unoccupied hole
-        const hh = this.app.state.hoveredHole;
-        // Check for wire endpoint enable drag-to-reposition
-        if (hh) {
-          const ep = this.app.state.wireManager.findEndpointAtHole(hh.id);
-          if (ep && !this.app.state.lockedWireIds?.has(ep.wire.id)) {
-            this._maybeMovingWireEp = true;
-            this._moveWireEp = { wire: ep.wire, endpoint: ep.endpoint };
-            this._moveWireStartScreen = { x: e.clientX, y: e.clientY };
-            return;
-          }
+        // Selected wire endpoint that didn't form a draggable group (e.g. the
+        // wire is the only selected item): still drag the endpoint.
+        if (ep && !epLocked) {
+          this._maybeMovingWireEp = true;
+          this._moveWireEp = { wire: ep.wire, endpoint: ep.endpoint };
+          this._moveWireStartScreen = { x: e.clientX, y: e.clientY };
+          return;
         }
         const holeIsEmpty = !hh ||
-          (!this._isHoleOccupiedByComponent(hh.id) &&
-           !this.app.state.wireManager.findEndpointAtHole(hh.id));
+          (!this._isHoleOccupiedByComponent(hh.id) && !ep);
         if (holeIsEmpty) {
           this._maybePanning = true;
           this._panMouseStart = { x: e.clientX, y: e.clientY };
@@ -695,18 +949,32 @@ export class Interaction {
         this.app.showInputContextPanel(comp);
       } else if (comp.type === COMP.SLIDE_SWITCH) {
         this.app.showSlideContextPanel(comp);
+      } else if (comp.type === COMP.DIP_SWITCH) {
+        this.app.showDipSwitchContextPanel(comp);
+      } else if (comp.type === COMP.CLOCK) {
+        this.app.showClockContextPanel(comp);
+      } else if (comp.type === COMP.CRYSTAL) {
+        this.app.showCrystalContextPanel(comp);
+      } else if (comp.type === COMP.LED) {
+        this.app.showProbePanel({ kind: 'led', comp });
+      } else if (comp.type === COMP.RESISTOR) {
+        this.app.showProbePanel({ kind: 'resistor', comp });
+      } else if (comp.type === COMP.CAPACITOR || comp.type === COMP.POLARIZED_CAPACITOR) {
+        this.app.showProbePanel({ kind: 'capacitor', comp });
+      } else if (comp.type === COMP.INDUCTOR) {
+        this.app.showProbePanel({ kind: 'inductor', comp });
       }
       return;
     }
 
-    const hole = this.app.state.hoveredHole;
-    if (!hole) return;
-
-    // Check if there's a wire endpoint at this hole
-    const ep = this.app.state.wireManager.findEndpointAtHole(hole.id);
-    if (ep) {
-      this._editWireNet(ep.wire, ep.endpoint, e);
+    // Right-click on a wire (jumper): show its voltage & current
+    const wire = this._findWireAtMouse();
+    if (wire) {
+      this.app.state.selectedItems = [{ type: 'wire', ref: wire }];
+      this.app.showProbePanel({ kind: 'wire', wire });
+      return;
     }
+
   }
 
   _onKeyDown(e) {
@@ -726,16 +994,13 @@ export class Interaction {
       this.app.state.selectedItems = [];
     }
     if (e.key === 'Delete' || e.key === 'Backspace') {
-      if (!isTextFocused) {
-        e.preventDefault();
-        if (this.app.state.selectedItems.length > 0) {
-          const boardItem = this.app.state.selectedItems.find(i => i.type === 'breadboard');
-          if (boardItem) {
-            this.app.deleteBreadboard(boardItem.tileX, boardItem.tileY);
-            this.app.state.selectedItems = [];
-          } else {
-            this.app.deleteSelected();
-          }
+      if (!isTextFocused && this.app.state.selectedItems.length > 0) {
+        const boardItem = this.app.state.selectedItems.find(i => i.type === 'breadboard');
+        if (boardItem) {
+          this.app.deleteBreadboard(boardItem.tileX, boardItem.tileY);
+          this.app.state.selectedItems = [];
+        } else {
+          this.app.deleteSelected();
         }
       }
     }
@@ -790,6 +1055,17 @@ export class Interaction {
             : null;
         if (placeHole) {
           this._placeComponent(placeHole);
+        }
+        break;
+      }
+
+      case MODE.PASTE_PREVIEW: {
+        // Commit if valid; if blocked (overlap/out-of-bounds), flash red border
+        // briefly so user knows the click was registered but not actionable.
+        const ok = this._commitPastePreview();
+        if (!ok) {
+          this.app.canvas.style.outline = '3px solid #ff4444';
+          setTimeout(() => { this.app.canvas.style.outline = ''; }, 400);
         }
         break;
       }
@@ -918,18 +1194,34 @@ export class Interaction {
         }
       } else if (comp.type === COMP.SLIDE_SWITCH) {
         this.app.pushUndo();
-        if (e.shiftKey) {
-          comp.state = comp.state === 2 ? 0 : 2;
-        } else {
-          comp.nextState();
+        comp.state = e.shiftKey ? 1 : (comp.state === 2 ? 0 : 2);
+        this.app.onCircuitChanged();
+      } else if (comp.type === COMP.DIP_SWITCH) {
+        // Find which individual switch the click landed on (closest column)
+        let closestIdx = 0;
+        let closestDist = Infinity;
+        for (let i = 0; i < comp.count; i++) {
+          const pinPos = this.app.world.getHolePosById(comp.pins[i].holeId);
+          if (pinPos) {
+            const d = Math.abs(this.mouseWorld.x - pinPos.x);
+            if (d < closestDist) { closestDist = d; closestIdx = i; }
+          }
         }
+        this.app.pushUndo();
+        comp.states[closestIdx] = !comp.states[closestIdx];
         this.app.onCircuitChanged();
       } else if (comp.type === COMP.CLOCK) {
         this._editClockFrequency(comp, e);
+      } else if (comp.type === COMP.CRYSTAL) {
+        this._editCrystalFrequency(comp, e);
+      } else if (comp.type === COMP.TESTPOINT) {
+        this._editTestPointLabel(comp, e);
       } else if (comp.type === COMP.RESISTOR) {
         this._editResistance(comp, e);
       } else if (comp.type === COMP.CAPACITOR || comp.type === COMP.POLARIZED_CAPACITOR) {
         this._editCapacitance(comp, e);
+      } else if (comp.type === COMP.INDUCTOR) {
+        this._editInductance(comp, e);
       } else if (comp.type === COMP.CHIP && comp.chipDef) {
         this.app.showChipInfo(comp);
       } else if (comp.type === COMP.SEVEN_SEG) {
@@ -1007,11 +1299,17 @@ export class Interaction {
       if (hole.type !== 'main') return;
       if (hole.col + 2 >= GRID.COLS) return; // needs 3 holes
       this.ghost.place(hole.tileX, hole.tileY, hole.col, hole.row);
+    } else if (this.ghost.type === COMP.DIP_SWITCH) {
+      if (hole.col + this.ghost.count > GRID.COLS) return;
+      this.ghost.place(hole.tileX, hole.tileY, hole.col, 4);
     } else if (this.ghost.type === COMP.CLOCK) {
       if (hole.type !== 'main') return;
       this.ghost.place(hole.tileX, hole.tileY, hole.col, hole.row);
+    } else if (this.ghost.type === COMP.TESTPOINT) {
+      if (hole.type !== 'main') return;
+      this.ghost.place(hole.tileX, hole.tileY, hole.col, hole.row);
     } else {
-      return; // Other 2-pin components use wire-like placement now
+      return; // Other 2 pin components use wire-like placement now
     }
 
     // Check for overlap
@@ -1026,6 +1324,18 @@ export class Interaction {
     // Track last used for chips
     if (this.ghost.type === COMP.CHIP && this.ghost.chipId) {
       this.app.addLastUsedChip(this.ghost.chipId);
+    }
+
+    // Auto-label test points TP1, TP2, … (first free number, so deleting TP1
+    // and placing again reuses it) and cycle a lane color.
+    if (this.ghost.type === COMP.TESTPOINT && !this.ghost.label) {
+      const used = new Set(this.app.state.components
+        .filter(c => c.type === COMP.TESTPOINT && c.label)
+        .map(c => c.label));
+      let n = 1;
+      while (used.has('TP' + n)) n++;
+      this.ghost.label = 'TP' + n;
+      this.ghost.color = TESTPOINT_COLORS[(n - 1) % TESTPOINT_COLORS.length];
     }
 
     // Create new ghost for continued placement
@@ -1054,7 +1364,11 @@ export class Interaction {
       if (hole.type === 'main') {
         this.ghost.place(hole.tileX, hole.tileY, hole.col, hole.row);
       }
-    } else if (this.ghost.type === COMP.CLOCK) {
+    } else if (this.ghost.type === COMP.DIP_SWITCH) {
+      if (hole.type === 'main') {
+        this.ghost.place(hole.tileX, hole.tileY, hole.col, 4);
+      }
+    } else if (this.ghost.type === COMP.CLOCK || this.ghost.type === COMP.TESTPOINT) {
       if (hole.type === 'main') {
         this.ghost.place(hole.tileX, hole.tileY, hole.col, hole.row);
       }
@@ -1123,8 +1437,9 @@ export class Interaction {
     if (idx >= 0) this.app.state.components.splice(idx, 1);
 
     // Create a ghost clone with the same interactive state
-    this.ghost = createComponent(comp.type, comp.chipId);
+    this.ghost = createComponent(comp.type, comp.type === COMP.DIP_SWITCH ? comp.count : comp.chipId);
     if (comp.type === COMP.SLIDE_SWITCH) this.ghost.state = comp.state;
+    if (comp.type === COMP.DIP_SWITCH) this.ghost.states = [...comp.states];
     if (comp.resistance !== undefined && this.ghost.setResistance) {
       this.ghost.setResistance(comp.resistance);
     }
@@ -1133,6 +1448,7 @@ export class Interaction {
     if (comp.vertical !== undefined) this.ghost.vertical = comp.vertical;
     if (comp.colSpan !== undefined) this.ghost.colSpan = comp.colSpan;
     if (comp.color !== undefined) this.ghost.color = comp.color;
+    if (comp.label !== undefined) this.ghost.label = comp.label;
 
     this._movingComp = comp;
 
@@ -1216,8 +1532,9 @@ export class Interaction {
         const savedIdx = secIdx >= 0 ? secIdx : this.app.state.components.length;
         if (secIdx >= 0) this.app.state.components.splice(secIdx, 1);
 
-        const secGhost = createComponent(sc.type, sc.chipId);
+        const secGhost = createComponent(sc.type, sc.type === COMP.DIP_SWITCH ? sc.count : sc.chipId);
         if (sc.type === COMP.SLIDE_SWITCH) secGhost.state = sc.state;
+        if (sc.type === COMP.DIP_SWITCH) secGhost.states = [...sc.states];
         if (sc.resistance !== undefined && secGhost.setResistance) secGhost.setResistance(sc.resistance);
         if (sc.on  !== undefined) secGhost.on  = sc.on;
         if (sc.pressed !== undefined) secGhost.pressed = sc.pressed;
@@ -1370,7 +1687,7 @@ export class Interaction {
       } else {
         placeWLeps(this.ghost, this._movePrimaryStart, this._movePrimaryEnd);
       }
-    } else if (this.ghost.type === COMP.CHIP || this.ghost.type === COMP.SEVEN_SEG) {
+    } else if (this.ghost.type === COMP.CHIP || this.ghost.type === COMP.SEVEN_SEG || this.ghost.type === COMP.DIP_SWITCH) {
       // Rigid horizontal translation by global col; row stays at 4.
       const newGC    = this._movePrimaryAnchorGlobalCol + deltaGlobalCol;
       const newTileX = Math.floor(newGC / GRID.COLS);
@@ -1427,7 +1744,7 @@ export class Interaction {
         const newTileY = mover.savedTileY;
         const savedRow = mover.nonWLSavedRow;
         const tile     = world.getTile(newTileX, newTileY);
-        if (g.type === COMP.CHIP || g.type === COMP.SEVEN_SEG) {
+        if (g.type === COMP.CHIP || g.type === COMP.SEVEN_SEG || g.type === COMP.DIP_SWITCH) {
           const colSpan = g.colSpan || 1;
           if (!tile || newCol < 0 || newCol + colSpan > GRID.COLS) {
             this._moveOutOfBounds = true; g.place(newTileX, newTileY, clampC(newCol, colSpan), 4);
@@ -1769,6 +2086,14 @@ export class Interaction {
       return;
     }
 
+    // Block if this would create a VCC-GND short
+    if (this.app.simulator.netlist.wouldShort(stationaryHoleId, targetHole.id, this.app.world)) {
+      this.app.canvas.style.outline = '3px solid #ff4444';
+      setTimeout(() => { this.app.canvas.style.outline = ''; }, 400);
+      this._cancelWireEndpointDrag();
+      return;
+    }
+
     // Push undo snapshot
     this.app.undoStack.push(this._moveWireUndoSnapshot);
     if (this.app.undoStack.length > 50) this.app.undoStack.shift();
@@ -2023,14 +2348,15 @@ export class Interaction {
   }
 
   // ── Find component at mouse ───────────────────────────────────────────────
-  // Priority order:
-  //   1. terminalHit  2-pin wire-like comp whose pin is the hovered hole
-  //   2. pinHit       chip/SEVEN_SEG/BUTTON whose pin is the hovered hole
-  //   3. closest 2-pin segment within 10px (smallest perpendicular distance wins)
-  //   4. bboxHit      first chip/SEVEN_SEG/BUTTON whose body bbox contains mouse
+  // Single source of truth for click / right-click targeting, kept in lockstep
+  // with the hover circle: when the circle is visible on a hole, that hole's
+  // occupant IS the target — a hole occupied by a wire endpoint returns null
+  // here so callers fall through to _findWireAtMouse(). Body hit-tests (lead
+  // segments, chip bounding boxes) only apply when no hole is hovered, so
+  // what the user sees indicated is always what a click acts on.
   /**
    * Returns true when the current mouse world position is within the
-   * rendered body of a 2-pin SWITCH or PUSH_BUTTON. For other component
+   * rendered body of a 2 pin SWITCH or PUSH_BUTTON. For other component
    * types this returns true (no body restriction).
    */
   _isOverComponentBody(comp) {
@@ -2091,10 +2417,30 @@ export class Interaction {
     return p.x >= bb.minX && p.x <= bb.maxX && p.y >= bb.minY && p.y <= bb.maxY;
   }
 
+  _findComponentAtHole(holeId) {
+    for (const comp of this.app.state.components) {
+      if (!comp.placed) continue;
+      for (const h of comp.getOccupiedHoles()) {
+        if (h === holeId) return comp;
+      }
+    }
+    return null;
+  }
+
   _findComponentAtMouse() {
     const hole = this.app.state.hoveredHole;
-    let terminalHit = null;
-    let pinHit = null;
+    if (hole) {
+      const occupant = this._findComponentAtHole(hole.id);
+      if (occupant) return occupant;
+      // Hovered hole holds a wire endpoint — the wire owns this click, no
+      // component may steal it via a nearby segment or bounding box.
+      if (this.app.state.wireManager.findEndpointAtHole(hole.id)) return null;
+    }
+
+    // No hovered hole: body hit-tests. Segment threshold is constant in
+    // SCREEN pixels (like the hover snap radius) so leads stay equally
+    // grabbable at any zoom level.
+    const segRadius = 10 / this.app.renderer.zoom;
     let bboxHit = null;
     let closestSeg = null;
     let closestSegDist = Infinity;
@@ -2102,53 +2448,31 @@ export class Interaction {
     for (const comp of this.app.state.components) {
       if (!comp.placed) continue;
 
-      const isWireLike = !!(comp.startHoleId && comp.endHoleId);
-
-      // Pin-on-hovered-hole checks
-      if (hole && !terminalHit) {
-        for (const pin of comp.pins) {
-          if (pin.holeId === hole.id) {
-            if (isWireLike) {
-              terminalHit = comp;
-            } else if (!pinHit && (comp.type === COMP.CHIP || comp.type === COMP.SEVEN_SEG || comp.type === COMP.BUTTON || comp.type === COMP.SLIDE_SWITCH || comp.type === COMP.CLOCK)) {
-              pinHit = comp;
-            }
-            break;
-          }
-        }
-      }
-
-      // DIP / button body bbox (first match wins, preserves prior behavior)
-      if (!bboxHit && (comp.type === COMP.CHIP || comp.type === COMP.SEVEN_SEG || comp.type === COMP.BUTTON || comp.type === COMP.SLIDE_SWITCH || comp.type === COMP.CLOCK)) {
-        if (comp.pins.length > 0) {
-          const bounds = this._getComponentBounds(comp);
-          if (bounds &&
-              this.mouseWorld.x >= bounds.x && this.mouseWorld.x <= bounds.x + bounds.w &&
-              this.mouseWorld.y >= bounds.y && this.mouseWorld.y <= bounds.y + bounds.h) {
-            bboxHit = comp;
-          }
-        }
-      }
-
-      // 2-pin wire-like segment proximity track the closest within threshold
-      if (isWireLike) {
+      if (comp.startHoleId && comp.endHoleId) {
+        // 2 pin wire-like: perpendicular distance to the lead segment
         const startPos = this.app.world.getHolePosById(comp.startHoleId);
         const endPos = this.app.world.getHolePosById(comp.endHoleId);
         if (startPos && endPos) {
           const dist = this._pointToSegmentDist(this.mouseWorld, startPos, endPos);
-          if (dist < 10 && dist < closestSegDist) {
+          if (dist < segRadius && dist < closestSegDist) {
             closestSegDist = dist;
             closestSeg = comp;
           }
         }
+      } else if (comp.pins.length > 0) {
+        // Body bbox — last match wins so overlapping bodies resolve to the
+        // one drawn on top (renderer paints components in array order).
+        const bounds = this._getComponentBounds(comp);
+        if (bounds &&
+            this.mouseWorld.x >= bounds.x && this.mouseWorld.x <= bounds.x + bounds.w &&
+            this.mouseWorld.y >= bounds.y && this.mouseWorld.y <= bounds.y + bounds.h) {
+          bboxHit = comp;
+        }
       }
     }
 
-    if (terminalHit) return terminalHit;
-    if (pinHit) return pinHit;
     if (closestSeg) return closestSeg;
-    if (bboxHit) return bboxHit;
-    return null;
+    return bboxHit;
   }
 
   _getComponentBounds(comp) {
@@ -2242,41 +2566,73 @@ export class Interaction {
     );
     // Remove component
     this.app.state.components = this.app.state.components.filter(c => c.id !== comp.id);
-    // Drop the simulator's drive-state entries for this component otherwise
-    // the orphan keeps stamping voltage at its old hole positions and a
-    // replacement chip in the same spot will fight it via MNA voltage divider.
+    // Drop the simulator's drive-state entries (and chip pin couplings) for
+    // this component otherwise the orphan keeps stamping voltage at its old
+    // hole positions and a replacement chip in the same spot will fight it
+    // via MNA voltage divider.
     const sim = this.app.simulator;
-    if (sim && comp.pins) {
-      for (const pin of comp.pins) sim.pinDriveStates.delete(comp.id + ':' + pin.name);
-    }
+    if (sim) sim.purgeComponentStates(new Set([comp.id]));
     if (this.app.currentInfoComp && this.app.currentInfoComp.id === comp.id) {
       this.app._closeInfoPanel();
     }
     this.app.onCircuitChanged();
   }
 
-  // ── Edit wire net number ──────────────────────────────────────────────────
-  _editWireNet(wire, endpoint, event) {
-    const currentNet = endpoint === 'start' ? wire.startNet : wire.endNet;
-    const input = prompt('Enter new net number:', String(currentNet));
-    if (input === null) return;
-    const newNet = parseInt(input);
-    if (isNaN(newNet) || newNet < 0) return;
-    this.app.pushUndo();
-    if (endpoint === 'start') {
-      wire.setStartNet(newNet);
-    } else {
-      wire.setEndNet(newNet);
-    }
-    this.app.onCircuitChanged();
+  // ── Edit test point label ───────────────────────────────────────
+  _editTestPointLabel(comp, event) {
+    this._showFloatingInput(
+      'Test Point Label',
+      comp.label || '',
+      '',
+      (value) => {
+        const label = String(value).trim().slice(0, 12);
+        if (!label) return;
+        this.app.pushUndo();
+        comp.label = label;
+        this.app.onCircuitChanged();
+      },
+      event
+    );
   }
 
   // ── Edit clock frequency ────────────────────────────────────────
   _editClockFrequency(comp, event) {
+    const presets = [
+      { label: '1 Hz',    multiplier: 1,   num: 1 },
+      { label: '2 Hz',    multiplier: 1,   num: 2 },
+      { label: '5 Hz',    multiplier: 1,   num: 5 },
+      { label: '10 Hz',   multiplier: 1,   num: 10 },
+      { label: '100 Hz',  multiplier: 1,   num: 100 },
+      { label: '1 kHz',   multiplier: 1e3, num: 1 },
+      { label: '10 kHz',  multiplier: 1e3, num: 10 },
+      { label: '100 kHz', multiplier: 1e3, num: 100 },
+      { label: '1 MHz',   multiplier: 1e6, num: 1 },
+    ];
     this._showFloatingInput(
-      'Clock Frequency (Hz)',
+      'Clock Frequency',
+      this._formatWithPrefix(comp.frequencyHz, 'frequency'),
+      '',
+      (val) => {
+        if (isNaN(val) || val <= 0) return;
+        this.app.pushUndo();
+        comp.frequencyHz = val;
+        this.app.onCircuitChanged();
+      },
+      event,
+      { prefixType: 'frequency', presets }
+    );
+  }
+
+  // ── Edit crystal frequency ────────────────────────────────────
+  // A real crystal's frequency is fixed by its quartz cut — you change it by
+  // swapping the can. In this simulator it's only ever useful up to ~50 Hz
+  // (faster just blurs the LED — there's no scope), so this is a plain Hz
+  // field: no kHz/MHz unit selector, no preset dropdown.
+  _editCrystalFrequency(comp, event) {
+    this._showFloatingInput(
+      'Crystal Frequency (Hz)',
       String(comp.frequencyHz),
-      'e.g. 1, 10, 0.5',
+      '',
       (value) => {
         const val = parseFloat(value);
         if (isNaN(val) || val <= 0) return;
@@ -2289,16 +2645,6 @@ export class Interaction {
   }
 
   _editResistance(comp, event) {
-    const units = [
-      { label: 'GΩ', multiplier: 1e9 },
-      { label: 'MΩ', multiplier: 1e6 },
-      { label: 'kΩ', multiplier: 1e3 },
-      { label: 'Ω',  multiplier: 1 },
-      { label: 'mΩ', multiplier: 1e-3 },
-      { label: 'µΩ', multiplier: 1e-6 },
-      { label: 'nΩ', multiplier: 1e-9 },
-      { label: 'pΩ', multiplier: 1e-12 },
-    ];
     const presets = [
       { label: '1 Ω',    multiplier: 1,    num: 1 },
       { label: '10 Ω',   multiplier: 1,    num: 10 },
@@ -2319,32 +2665,24 @@ export class Interaction {
       { label: '470 kΩ', multiplier: 1e3,  num: 470 },
       { label: '1 MΩ',   multiplier: 1e6,  num: 1 },
     ];
-    const pick = this._pickUnit(comp.resistance, units);
     this._showFloatingInput(
       'Resistance',
-      this._formatNum(comp.resistance / pick.multiplier),
+      this._formatWithPrefix(comp.resistance, 'resistance'),
       '',
       (val) => {
         if (isNaN(val) || val <= 0) return;
         this.app.pushUndo();
-        comp.setResistance(Math.round(val));
+        comp.setResistance(val);
         this.app.onCircuitChanged();
       },
       event,
-      { units, defaultUnit: pick.label, presets }
+      { prefixType: 'resistance', presets }
     );
   }
 
   // ── Edit capacitor value ──────────────────────────────────────────────────
   _editCapacitance(comp, event) {
     const isPolarized = comp.type === COMP.POLARIZED_CAPACITOR;
-    const units = [
-      { label: 'F',  multiplier: 1 },
-      { label: 'mF', multiplier: 1e-3 },
-      { label: 'µF', multiplier: 1e-6 },
-      { label: 'nF', multiplier: 1e-9 },
-      { label: 'pF', multiplier: 1e-12 },
-    ];
     const presets = isPolarized ? [
       { label: '1 µF',    multiplier: 1e-6, num: 1 },
       { label: '2.2 µF',  multiplier: 1e-6, num: 2.2 },
@@ -2358,6 +2696,7 @@ export class Interaction {
       { label: '1000 µF', multiplier: 1e-6, num: 1000 },
       { label: '2200 µF', multiplier: 1e-6, num: 2200 },
       { label: '4700 µF', multiplier: 1e-6, num: 4700 },
+      { label: '5000 µF', multiplier: 1e-6, num: 5000 },
     ] : [
       { label: '10 pF',  multiplier: 1e-12, num: 10 },
       { label: '22 pF',  multiplier: 1e-12, num: 22 },
@@ -2376,10 +2715,9 @@ export class Interaction {
       { label: '470 nF', multiplier: 1e-9,  num: 470 },
       { label: '1 µF',   multiplier: 1e-6,  num: 1 },
     ];
-    const pick = this._pickUnit(comp.capacitance, units);
     this._showFloatingInput(
       'Capacitance',
-      this._formatNum(comp.capacitance / pick.multiplier),
+      this._formatWithPrefix(comp.capacitance, 'capacitance'),
       '',
       (val) => {
         if (isNaN(val) || val <= 0) return;
@@ -2388,8 +2726,95 @@ export class Interaction {
         this.app.onCircuitChanged();
       },
       event,
-      { units, defaultUnit: pick.label, presets }
+      { prefixType: 'capacitance', presets }
     );
+  }
+
+  // ── Edit inductor value ───────────────────────────────────────────────────
+  _editInductance(comp, event) {
+    const presets = [
+      { label: '100 µH', multiplier: 1e-6, num: 100 },
+      { label: '220 µH', multiplier: 1e-6, num: 220 },
+      { label: '470 µH', multiplier: 1e-6, num: 470 },
+      { label: '1 mH',   multiplier: 1e-3, num: 1 },
+      { label: '2.2 mH', multiplier: 1e-3, num: 2.2 },
+      { label: '4.7 mH', multiplier: 1e-3, num: 4.7 },
+      { label: '10 mH',  multiplier: 1e-3, num: 10 },
+      { label: '22 mH',  multiplier: 1e-3, num: 22 },
+      { label: '47 mH',  multiplier: 1e-3, num: 47 },
+      { label: '100 mH', multiplier: 1e-3, num: 100 },
+      { label: '470 mH', multiplier: 1e-3, num: 470 },
+      { label: '1 H',    multiplier: 1,    num: 1 },
+    ];
+    this._showFloatingInput(
+      'Inductance',
+      this._formatWithPrefix(comp.inductance, 'inductance'),
+      '',
+      (val) => {
+        if (isNaN(val) || val <= 0) return;
+        this.app.pushUndo();
+        comp.setInductance(val);
+        this.app.onCircuitChanged();
+      },
+      event,
+      { prefixType: 'inductance', presets }
+    );
+  }
+
+  // Format a base-unit value with the most appropriate SI prefix letter AND its
+  // unit symbol, so the field reads back as a proper value ("10kΩ", "100nF").
+  // The trailing unit is what a user can't easily type (Ω isn't on a keyboard);
+  // we add it for them, and _parseWithPrefix ignores it on the way back in.
+  // type: 'resistance' → Ω (m…G), 'capacitance' → F / 'inductance' → H (p…bare),
+  //       'frequency' → Hz (bare…G).
+  _formatWithPrefix(value, type) {
+    const unit = { resistance: 'Ω', capacitance: 'F', inductance: 'H', frequency: 'Hz' }[type] || '';
+    const tiers = (type === 'resistance')
+      ? [
+          { s: 'G', m: 1e9  },
+          { s: 'M', m: 1e6  },
+          { s: 'k', m: 1e3  },
+          { s: '',  m: 1    },
+          { s: 'm', m: 1e-3 },
+        ]
+      : (type === 'frequency')
+      ? [
+          { s: 'G', m: 1e9 },
+          { s: 'M', m: 1e6 },
+          { s: 'k', m: 1e3 },
+          { s: '',  m: 1   },
+        ]
+      : [
+          { s: '',  m: 1     },
+          { s: 'm', m: 1e-3  },
+          { s: 'u', m: 1e-6  },
+          { s: 'n', m: 1e-9  },
+          { s: 'p', m: 1e-12 },
+        ];
+    const v = Math.abs(value);
+    for (const t of tiers) {
+      if (v >= t.m * 0.9999) return this._formatNum(value / t.m) + t.s + unit;
+    }
+    return this._formatNum(value) + unit;
+  }
+
+  // Parse a string like "3k", "4.7k", "100n", "3mf", "3m" to a raw base-unit number.
+  // Supported prefixes: p (1e-12), n (1e-9), u/µ (1e-6), m (1e-3),
+  //                     k (1e3), M (1e6), G/g (1e9).
+  // Trailing unit letters (f, r, Ω, ohm …) are ignored.
+  // Returns NaN if the string cannot be parsed.
+  _parseWithPrefix(raw) {
+    const s = raw.trim();
+    // number  +  optional-prefix-letter  +  optional-trailing-unit-text
+    const match = s.match(/^([+-]?(?:\d+\.?\d*|\.\d+))\s*([pnuµmkMGg]?)([a-zA-ZΩΩµ]*)$/);
+    if (!match) return NaN;
+    const num = parseFloat(match[1]);
+    if (isNaN(num)) return NaN;
+    const prefix = match[2];
+    const mult = { p: 1e-12, n: 1e-9, u: 1e-6, µ: 1e-6, m: 1e-3,
+                   '': 1, k: 1e3, K: 1e3, M: 1e6, G: 1e9, g: 1e9 }[prefix];
+    if (mult === undefined) return NaN;
+    return num * mult;
   }
 
   _pickUnit(value, units) {
@@ -2405,12 +2830,17 @@ export class Interaction {
   }
 
   // ── Floating input popup ──────────────────────────────────────────────────
-  // options.units: optional [{label, multiplier}] — adds unit dropdown beside input;
+  // options.prefixType: 'resistance' | 'capacitance' | 'inductance' | 'frequency'
+  //   Replaces the unit dropdown with a "?" prefix-guide button. Callback receives
+  //   the final base-unit value (ohms/farads/henries/hertz) parsed from the typed
+  //   string. User can type "10k", "4.7k", "100n", "3mf", "10kHz" etc.; the field
+  //   redisplays with the unit symbol appended (see _formatWithPrefix).
+  // options.units: (legacy) [{label, multiplier}] adds unit dropdown beside input;
   //                callback then receives a number (raw × multiplier).
   // options.defaultUnit: which unit label to pre-select.
-  // options.presets: optional [{label, multiplier, num}] — common-values dropdown
-  //                  shown below the input row; selecting an entry fills both fields.
-  // No options.units → text-only input; callback receives the raw string.
+  // options.presets: optional [{label, multiplier, num}] common-values dropdown
+  //                  shown below the input row; selecting an entry fills the field.
+  // No options → text-only input; callback receives the raw string.
   _showFloatingInput(title, defaultValue, placeholder, callback, event, options = null) {
     const existing = document.getElementById('floating input-overlay');
     if (existing) existing.remove();
@@ -2421,47 +2851,98 @@ export class Interaction {
     overlay.style.left = (event.clientX + 8) + 'px';
     overlay.style.top  = (event.clientY - 16) + 'px';
 
-    const units = options?.units;
+    const units      = options?.units;
     const defaultUnit = options?.defaultUnit;
-    const presets = options?.presets;
+    const presets    = options?.presets;
+    const prefixType = options?.prefixType;  // 'resistance' | 'capacitance'
+
     const unitsHTML = units ? `
       <select class="floating input-units" id="floating input-units">
         ${units.map(u => `<option value="${u.multiplier}"${u.label === defaultUnit ? ' selected' : ''}>${u.label}</option>`).join('')}
       </select>
     ` : '';
+
+    const helpBtnHTML = prefixType
+      ? `<button class="floating-input-help-btn" id="floating-input-help-btn" tabindex="-1" title="Prefix guide">?</button>`
+      : '';
+
     const presetsHTML = presets ? `
       <select class="floating input-presets" id="floating input-presets">
-        <option value="">-select value-</option>
+        <option value="">Standard values</option>
         ${presets.map((p, i) => `<option value="${i}">${p.label}</option>`).join('')}
       </select>
     ` : '';
 
+    // Help tooltip content (shown when "?" is clicked): a plain SI-prefix ladder,
+    // pico up to giga. Same guide for every field — only the letter you type
+    // changes; the unit symbol (Ω/F/H/Hz) is optional and filled in for you.
+    const prefixRows = [
+      ['pico',  'p',     '10⁻¹²'],
+      ['nano',  'n',     '10⁻⁹'],
+      ['micro', 'µ / u', '10⁻⁶'],
+      ['milli', 'm',     '10⁻³'],
+      ['(base)', '1',    '10⁰'],
+      ['kilo',  'k',     '10³'],
+      ['mega',  'M',     '10⁶'],
+      ['giga',  'G',     '10⁹'],
+    ];
+    const helpTooltipHTML = prefixType ? `
+      <div class="floating-input-help-tooltip" id="floating-input-help-tooltip">
+        ${prefixRows.map(([name, sym, pow]) =>
+          `<div class="fih-row">
+            <span class="fih-name">${name}</span>
+            <span class="fih-sym">${sym}</span>
+            <span class="fih-pow">${pow}</span>
+          </div>`
+        ).join('')}
+      </div>
+    ` : '';
+
     overlay.innerHTML = `
-      <div class="floating input-title">${title}</div>
+      <div class="floating input-title-row">
+        <div class="floating input-title">${title}</div>
+        <button class="floating input-x-btn" id="floating input-x-btn">×</button>
+      </div>
       <div class="floating input-row">
         <input type="text" class="floating input-field" id="floating input-field"
                value="${defaultValue}" placeholder="${placeholder}" autocomplete="off" spellcheck="false">
         ${unitsHTML}
+        ${helpBtnHTML}
       </div>
       ${presetsHTML}
+      ${helpTooltipHTML}
     `;
 
     document.body.appendChild(overlay);
 
-    const input = document.getElementById('floating input-field');
-    const unitsSelect = units ? document.getElementById('floating input-units') : null;
-    const presetsSelect = presets ? document.getElementById('floating input-presets') : null;
+    const input        = document.getElementById('floating input-field');
+    const unitsSelect  = units      ? document.getElementById('floating input-units')        : null;
+    const presetsSelect = presets   ? document.getElementById('floating input-presets')      : null;
+    const helpBtn      = prefixType ? document.getElementById('floating-input-help-btn')     : null;
+    const helpTooltip  = prefixType ? document.getElementById('floating-input-help-tooltip') : null;
+
+    // "?" button toggles the prefix guide
+    if (helpBtn && helpTooltip) {
+      helpBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const open = helpTooltip.classList.toggle('visible');
+        helpBtn.classList.toggle('active', open);
+      });
+    }
 
     if (presetsSelect) {
       presetsSelect.addEventListener('change', () => {
         const idx = presetsSelect.value;
         if (idx === '') return;
         const p = presets[parseInt(idx, 10)];
-        input.value = this._formatNum(p.num);
-        if (unitsSelect) {
-          // find matching option by multiplier
-          for (const opt of unitsSelect.options) {
-            if (parseFloat(opt.value) === p.multiplier) { unitsSelect.value = opt.value; break; }
+        if (prefixType) {
+          input.value = this._formatWithPrefix(p.num * p.multiplier, prefixType);
+        } else {
+          input.value = this._formatNum(p.num);
+          if (unitsSelect) {
+            for (const opt of unitsSelect.options) {
+              if (parseFloat(opt.value) === p.multiplier) { unitsSelect.value = opt.value; break; }
+            }
           }
         }
         presetsSelect.value = ''; // reset so same value can be re-selected
@@ -2474,7 +2955,11 @@ export class Interaction {
       const raw = input.value.trim();
       overlay.remove();
       if (!raw) return;
-      if (units) {
+      if (prefixType) {
+        const val = this._parseWithPrefix(raw);
+        if (isNaN(val)) return;
+        callback(val);
+      } else if (units) {
         const num = parseFloat(raw);
         if (isNaN(num)) return;
         callback(num * parseFloat(unitsSelect.value));
@@ -2483,6 +2968,11 @@ export class Interaction {
       }
     };
     const cancel = () => overlay.remove();
+
+    document.getElementById('floating input-x-btn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      cancel();
+    });
 
     input.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') confirm();

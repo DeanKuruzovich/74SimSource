@@ -1,21 +1,22 @@
 // test-chips59.mjs - Tests for all chips defined in js/chips/chips59.js
 // Chips under test:
-//   74x4305  : Dual 4 bit Inverting Buffer (TRI_NOT_LO, 20-pin)
-//   74x4306  : Dual 4 bit Non-Inverting Buffer (TRI_BUFFER_LO, 20-pin)
-//   74x4316  : Quad Analog Switch (GENERIC_STUB, 14-pin)
-//   74x4351  : 8-Ch Analog Mux with Latch (GENERIC_STUB, 20-pin)
-//   74x4352  : Dual 4-Ch Analog Mux with Latch (GENERIC_STUB, 20-pin)
-//   74x4353  : Triple 2-Ch Analog Mux with Latch (GENERIC_STUB, 20-pin)
-//   74x4374  : 8 bit Dual-Rank Synchronizer (GENERIC_STUB, 20-pin)
-//   74x4510  : BCD Decade Up/Down Counter (COUNTER_BCD_UPDOWN_CD, 16-pin)
-//   74x4511  : BCD to 7-Segment Decoder (BCD_7SEG_4511, 16-pin)
-//   74x4514  : 4-to-16 Decoder Active HIGH, Latched (DEC_4TO16_LATCH_HI, 24-pin)
-//   74x4515  : 4-to-16 Decoder Active LOW, Latched (DEC_4TO16_LATCH_LO, 24-pin)
-//   74x4516  : 4 bit Binary Up/Down Counter (COUNTER_BIN_UPDOWN_CD, 16-pin)
-//   74x4518  : Dual Synchronous BCD Counter (COUNTER_GATED_DECADE, 16-pin)
-//   74x4520  : Dual Synchronous Binary Counter (COUNTER_GATED_BIN, 16-pin)
-//   74x4543  : BCD to 7-Segment LCD Driver (GENERIC_STUB, 16-pin)
-//   74x4560  : 4 bit BCD Adder (GENERIC_STUB, 16-pin)
+//   74x4305  : Dual 4 bit Inverting Buffer (TRI_NOT_LO, 20 pin)
+//   74x4306  : Dual 4 bit Non Inverting Buffer (TRI_BUFFER_LO, 20 pin)
+//   74x4316  : Quad Bilateral Analog Switch w/ Level Translation (BILATERAL_SWITCH, 16 pin)
+//   74x4351  : 8-Ch Analog Mux with Latch (GENERIC_STUB, 20 pin)
+//   74x4352  : Dual 4-Ch Analog Mux with Latch (GENERIC_STUB, 20 pin)
+//   74x4353  : Triple 2-Ch Analog Mux with Latch (GENERIC_STUB, 20 pin)
+//   74x4374  : 8 bit Dual-Rank Synchronizer (GENERIC_STUB, 20 pin)
+//   74x4510  : BCD Decade Up/Down Counter (COUNTER_BCD_UPDOWN_CD, 16 pin)
+//   74x4511  : BCD to 7 Segment Decoder (BCD_7SEG_4511, 16 pin)
+//   74x4514  : 4-to-16 Decoder Active HIGH, Latched (DEC_4TO16_LATCH_HI, 24 pin)
+//   74x4515  : 4-to-16 Decoder Active LOW, Latched (DEC_4TO16_LATCH_LO, 24 pin)
+//   74x4516  : 4 bit Binary Up/Down Counter (COUNTER_BIN_UPDOWN_CD, 16 pin)
+//   74x4518  : Dual Synchronous BCD Counter (COUNTER_GATED_DECADE, 16 pin)
+//   74x4520  : Dual Synchronous Binary Counter (COUNTER_GATED_BIN, 16 pin)
+//   74x4538  : Dual Precision Monostable (MONOSTABLE_4538, 16 pin)
+//   74x4543  : BCD to 7 Segment LCD Driver (GENERIC_STUB, 16 pin)
+//   74x4560  : 4 bit BCD Adder (GENERIC_STUB, 16 pin)
 
 import { CHIPS_BLOCK_59 } from '../chips/chips59.js';
 import { BreadboardWorld, holeId } from '../breadboard.js';
@@ -132,13 +133,13 @@ function readCount(sim, chip, pins) {
 const EXPECTED_IDS = [
   '74x4305', '74x4306', '74x4316', '74x4351', '74x4352', '74x4353',
   '74x4374', '74x4510', '74x4511', '74x4514', '74x4515', '74x4516',
-  '74x4518', '74x4520', '74x4543', '74x4560',
+  '74x4518', '74x4520', '74x4538', '74x4543', '74x4560',
 ];
 
 const EXPECTED_SPECS = {
   '74x4305': { pins: 20, gnd: 10, vcc: 20 },
   '74x4306': { pins: 20, gnd: 10, vcc: 20 },
-  '74x4316': { pins: 14, gnd:  7, vcc: 14 },
+  '74x4316': { pins: 16, gnd:  8, vcc: 16 },
   '74x4351': { pins: 20, gnd: 10, vcc: 20 },
   '74x4352': { pins: 20, gnd: 10, vcc: 20 },
   '74x4353': { pins: 20, gnd: 10, vcc: 20 },
@@ -150,6 +151,7 @@ const EXPECTED_SPECS = {
   '74x4516': { pins: 16, gnd:  8, vcc: 16 },
   '74x4518': { pins: 16, gnd:  8, vcc: 16 },
   '74x4520': { pins: 16, gnd:  8, vcc: 16 },
+  '74x4538': { pins: 16, gnd:  8, vcc: 16 },
   '74x4543': { pins: 16, gnd:  8, vcc: 16 },
   '74x4560': { pins: 16, gnd:  8, vcc: 16 },
 };
@@ -157,7 +159,7 @@ const EXPECTED_SPECS = {
 console.log('\n=== SECTION S: Structure ===');
 
 assert(typeof CHIPS_BLOCK_59 === 'object', 'CHIPS_BLOCK_59 is exported object');
-assert(Object.keys(CHIPS_BLOCK_59).length === 16, 'CHIPS_BLOCK_59 has 16 chips');
+assert(Object.keys(CHIPS_BLOCK_59).length === 17, 'CHIPS_BLOCK_59 has 17 chips');
 
 for (const id of EXPECTED_IDS) {
   const cd = CHIPS_BLOCK_59[id];
@@ -186,7 +188,7 @@ for (const id of EXPECTED_IDS) {
 
 console.log('\n=== SECTION A: Stub chips ===');
 
-const STUB_IDS = ['74x4316', '74x4351', '74x4352', '74x4353', '74x4374', '74x4543', '74x4560'];
+const STUB_IDS = ['74x4351', '74x4352', '74x4353', '74x4374', '74x4543', '74x4560'];
 
 for (const id of STUB_IDS) {
   const cd = CHIPS_BLOCK_59[id];
@@ -194,7 +196,7 @@ for (const id of STUB_IDS) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SECTION B - 74x4305: Dual 4 bit inverting buffer, tri-state
+// SECTION B - 74x4305: Dual 4 bit inverting buffer, tri state
 // ─────────────────────────────────────────────────────────────────────────────
 
 console.log('\n=== SECTION B: 74x4305 Dual 4 bit Inverting Buffer ===');
@@ -271,10 +273,10 @@ console.log('\n=== SECTION B: 74x4305 Dual 4 bit Inverting Buffer ===');
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SECTION C - 74x4306: Dual 4 bit non-inverting buffer, tri-state
+// SECTION C - 74x4306: Dual 4 bit non inverting buffer, tri state
 // ─────────────────────────────────────────────────────────────────────────────
 
-console.log('\n=== SECTION C: 74x4306 Dual 4 bit Non-Inverting Buffer ===');
+console.log('\n=== SECTION C: 74x4306 Dual 4 bit Non Inverting Buffer ===');
 
 {
   // OE enabled, input LOW → output LOW
@@ -422,10 +424,10 @@ console.log('\n=== SECTION D: 74x4510 BCD Decade Up/Down Counter ===');
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SECTION E - 74x4511: BCD to 7-Segment Decoder
+// SECTION E - 74x4511: BCD to 7 Segment Decoder
 // ─────────────────────────────────────────────────────────────────────────────
 
-console.log('\n=== SECTION E: 74x4511 BCD to 7-Segment Decoder ===');
+console.log('\n=== SECTION E: 74x4511 BCD to 7 Segment Decoder ===');
 
 // Expected segment patterns (a,b,c,d,e,f,g):
 //   0: 1110111  1: 0010010  2: 1011101  3: 1011011  4: 0111010

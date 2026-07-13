@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>74Sim Submit an Example Project</title>
+  <link rel="icon" type="image/png" href="assets/Logo74Sim.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/tokens.css">
+  <link rel="stylesheet" href="/css/report-form.css">
+</head>
+<body>
+
+  <div class="content">
+    <div class="page-heading">Submit an Example Project</div>
+
+    <form>
+
+      <div class="form-group">
+        <label class="form-label">Project</label>
+        <input type="file" name="project-file" accept=".json,.74sim">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="description">Explanation / how to use this</label>
+        <textarea id="description" name="description" ></textarea>
+      </div>
+
+      <button type="submit" class="btn-submit">Submit Project</button>
+
+    </form>
+
+    <div class="status-msg" id="submit-status"></div>
+
+  </div>
+
+  <script src="/js/submit-example.js" defer></script>
+<!-- 100% privacy-first analytics -->
+<script async src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
+</body>
+</html>

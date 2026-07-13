@@ -4,23 +4,23 @@
 
 export const CHIPS_BLOCK_11 = {
 
-  // ── 74x112: Dual JK neg-edge FF, preset and clear, 16-pin ─────────────────
+  // ── 74x112: Dual JK neg edge FF, preset and clear, 16-pin ─────────────────
   /* Primary source: Texas Instruments, SN74LS112A datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls112a.pdf
      Wikipedia: https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
-  '74112': {
+  '74x112': {
     name: '74x112',
-    simpleName: 'Dual JK FF (neg-edge)',
-    description: 'Dual J-K negative-edge-triggered flip-flop with individual preset (active low) and clear (active low) (16-pin)',
+    simpleName: 'Dual JK FF (neg edge)',
+    description: 'Dual JK neg-edge flip-flop, individual active-low preset/clear (16-pin)',
     pins: 16,
     vcc: 16,
     gnd: 8,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls112a.pdf',
-    tags: ['flip-flop', 'jk', 'sequential', 'dual', 'preset', 'clear', 'negative-edge'],
-    guideOverview: 'The 74112 contains two independent J-K negative-edge-triggered flip-flops, each with its own preset (active low) and clear (active low). The Q output follows J-K logic on the falling clock edge. Asynchronous preset and clear override the clock at any time.',
+    tags: ['flip flop', 'jk', 'sequential', 'dual', 'preset', 'clear', 'negative edge'],
+    guideOverview: 'The 74x112 contains two independent JK negative edge triggered flip flops, each with its own preset (active low) and clear (active low). The Q output follows JK logic on the falling clock edge. Asynchronous preset and clear override the clock at any time.',
     guidePinDescriptions: {
-      '1CLK': 'Clock input for FF1; the flip-flop captures J and K on the falling edge.',
-      '1K':   'K input for FF1; when K=1 and J=0 the flip-flop resets on the next falling edge.',
-      '1J':   'J input for FF1; when J=1 and K=0 the flip-flop sets on the next falling edge.',
+      '1CLK': 'Clock input for FF1; the flip flop captures J and K on the falling edge.',
+      '1K':   'K input for FF1; when K=1 and J=0 the flip flop resets on the next falling edge.',
+      '1J':   'J input for FF1; when J=1 and K=0 the flip flop sets on the next falling edge.',
       '1PRE': 'Preset for FF1 (active LOW). Asynchronous; forces 1Q HIGH regardless of clock.',
       '1Q':   'Q output of FF1; the stored state.',
       '1Qn':  'Complement Q output of FF1; always the inverse of 1Q.',
@@ -37,9 +37,9 @@ export const CHIPS_BLOCK_11 = {
     },
     guideSections: [
       {
-        title: 'J-K Negative-Edge Operation',
+        title: 'JK Negative Edge Operation',
         paragraphs: [
-          'On the falling (HIGH-to-LOW) edge of CLK the flip-flop samples J and K and updates Q. J=0,K=0 holds; J=1,K=0 sets; J=0,K=1 resets; J=1,K=1 toggles.',
+          'On the falling (HIGH to LOW) edge of CLK the flip flop samples J and K and updates Q. J=0,K=0 holds; J=1,K=0 sets; J=0,K=1 resets; J=1,K=1 toggles.',
         ],
         list: [
           'J=0, K=0 → Q unchanged (hold)',
@@ -52,7 +52,7 @@ export const CHIPS_BLOCK_11 = {
       {
         title: 'Asynchronous Preset and Clear',
         paragraphs: [
-          'Driving 1PRE LOW immediately sets 1Q=1 without waiting for a clock edge. Driving 1CLR LOW immediately resets 1Q=0. The same applies to 2PRE and 2CLR for the second flip-flop.',
+          'Driving 1PRE LOW immediately sets 1Q=1 without waiting for a clock edge. Driving 1CLR LOW immediately resets 1Q=0. The same applies to 2PRE and 2CLR for the second flip flop.',
         ],
       },
     ],
@@ -81,21 +81,21 @@ export const CHIPS_BLOCK_11 = {
     sequential: true,
   },
 
-  // ── 74x113: Dual JK neg-edge FF, preset only, 14-pin ─────────────────────
+  // ── 74x113: Dual JK neg edge FF, preset only, 14-pin ─────────────────────
   /* Primary source: Texas Instruments, SN74LS113A datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls113a.pdf
      Wikipedia: https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
-  '74113': {
+  '74x113': {
     name: '74x113',
     simpleName: 'Dual JK FF (preset only)',
-    description: 'Dual J-K negative-edge-triggered flip-flop with preset (active low), no clear (14-pin)',
+    description: 'Dual JK neg-edge flip-flop, active-low preset, no clear (14-pin)',
     pins: 14,
     vcc: 14,
     gnd: 7,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls113a.pdf',
-    tags: ['flip-flop', 'jk', 'sequential', 'dual', 'preset', 'negative-edge'],
-    guideOverview: 'The 74113 contains two independent J-K negative-edge-triggered flip-flops each with an individual active low preset but no clear. The Q output is updated on the falling clock edge according to standard J-K logic.',
+    tags: ['flip flop', 'jk', 'sequential', 'dual', 'preset', 'negative edge'],
+    guideOverview: 'The 74x113 contains two independent JK negative edge triggered flip flops each with an individual active low preset but no clear. The Q output is updated on the falling clock edge according to standard JK logic.',
     guidePinDescriptions: {
-      '1CLK': 'Clock input for FF1; the flip-flop captures J and K on the falling edge.',
+      '1CLK': 'Clock input for FF1; the flip flop captures J and K on the falling edge.',
       '1K':   'K input for FF1.',
       '1J':   'J input for FF1.',
       '1PRE': 'Asynchronous preset for FF1 (active LOW); forces 1Q HIGH immediately.',
@@ -112,9 +112,9 @@ export const CHIPS_BLOCK_11 = {
     },
     guideSections: [
       {
-        title: 'J-K Negative-Edge Operation (No Clear)',
+        title: 'JK Negative Edge Operation (No Clear)',
         paragraphs: [
-          'Like the 74112, the 74113 updates Q on the falling clock edge using standard J-K logic. There is no CLR input; to reset the flip-flop use J=0, K=1 and apply a clock pulse.',
+          'Like the 74x112, the 74x113 updates Q on the falling clock edge using standard JK logic. There is no CLR input; to reset the flip flop use J=0, K=1 and apply a clock pulse.',
         ],
         list: [
           'J=0, K=0 → Q unchanged',
@@ -124,11 +124,11 @@ export const CHIPS_BLOCK_11 = {
         ],
       },
       {
-        title: 'Preset-Only Asynchronous Control',
+        title: 'Preset Only Asynchronous Control',
         paragraphs: [
-          'Asserting PRE LOW sets Q HIGH asynchronously. Because there is no CLR, the output can only be forced LOW through the J-K clock path.',
+          'Asserting PRE LOW sets Q HIGH asynchronously. Because there is no CLR, the output can only be forced LOW through the JK clock path.',
         ],
-        note: 'For power-on initialization to a known LOW state, clock the FF with J=0, K=1 after power is applied.',
+        note: 'For power on initialization to a known LOW state, clock the FF with J=0, K=1 after power is applied.',
       },
     ],
     pinout: [
@@ -154,19 +154,19 @@ export const CHIPS_BLOCK_11 = {
     sequential: true,
   },
 
-  // ── 74x114: Dual JK neg-edge FF, preset, shared CLK+CLR, 14-pin ──────────
+  // ── 74x114: Dual JK neg edge FF, preset, shared CLK+CLR, 14-pin ──────────
   /* Primary source: Texas Instruments, SN74LS114A datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls114a.pdf
      Wikipedia: https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
-  '74114': {
+  '74x114': {
     name: '74x114',
     simpleName: 'Dual JK FF (shared CLK/CLR)',
-    description: 'Dual J-K negative-edge-triggered flip-flop with individual preset (active low), shared clock and shared clear (active low) (14-pin)',
+    description: 'Dual JK neg-edge flip-flop; active-low preset/clear, shared clock (14-pin)',
     pins: 14,
     vcc: 14,
     gnd: 7,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls114a.pdf',
-    tags: ['flip-flop', 'jk', 'sequential', 'dual', 'preset', 'clear', 'negative-edge', 'shared-clock'],
-    guideOverview: 'The 74114 provides two J-K negative-edge-triggered flip-flops sharing a single clock and a single active low clear. Each flip-flop has its own active low preset, allowing independent synchronous control while minimising pin count.',
+    tags: ['flip flop', 'jk', 'sequential', 'dual', 'preset', 'clear', 'negative edge', 'shared-clock'],
+    guideOverview: 'The 74x114 provides two JK negative edge triggered flip flops sharing a single clock and a single active low clear. Each flip flop has its own active low preset, allowing independent synchronous control while minimising pin count.',
     guidePinDescriptions: {
       CLR:    'Shared asynchronous clear (active LOW); resets both Q1 and Q2 to 0 immediately.',
       '1K':   'K input for FF1.',
@@ -180,18 +180,18 @@ export const CHIPS_BLOCK_11 = {
       '2PRE': 'Asynchronous preset for FF2 (active LOW); forces 2Q HIGH immediately.',
       '2J':   'J input for FF2.',
       '2K':   'K input for FF2.',
-      CLK:    'Shared clock input; both flip-flops trigger on the falling edge.',
+      CLK:    'Shared clock input; both flip flops trigger on the falling edge.',
       VCC:    'Positive supply (+5 V).',
     },
     guideSections: [
       {
         title: 'Shared Clock and Clear',
         paragraphs: [
-          'Both flip-flops share a single CLK pin and a single CLR pin, so both FFs always update on the same falling clock edge. Drive CLR LOW to asynchronously reset both outputs to 0.',
+          'Both flip flops share a single CLK pin and a single CLR pin, so both FFs always update on the same falling clock edge. Drive CLR LOW to asynchronously reset both outputs to 0.',
         ],
       },
       {
-        title: 'J-K Logic on Falling Edge',
+        title: 'JK Logic on Falling Edge',
         paragraphs: [
           'On each falling edge of CLK, each FF evaluates its own J and K inputs independently. Use the individual PRE inputs to set a FF HIGH asynchronously at any time.',
         ],
@@ -229,23 +229,23 @@ export const CHIPS_BLOCK_11 = {
   // ── 74x115: Dual JK MS FF, data lockout, CLR only, 14-pin ────────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
-  '74115': {
+  '74x115': {
     name: '74x115',
     simpleName: 'Dual JK FF (CLR, shared CLK)',
-    description: 'Dual J-K controller-device flip-flop with data lockout, shared clock and individual clear (14-pin)',
+    description: 'Dual JK flip-flop, data lockout, shared clock, individual clear (14-pin)',
     pins: 14,
     vcc: 14,
     gnd: 7,
     datasheet: 'https://en.wikipedia.org/wiki/7400-series_integrated_circuits',
-    tags: ['flip-flop', 'jk', 'sequential', 'dual', 'clear', 'controller-device', 'data-lockout'],
-    guideOverview: 'The 74115 is a dual J-K master-slave flip-flop with data lockout and a shared clock. Each flip-flop has an individual active low clear. The data-lockout feature prevents J and K from affecting the master once the clock goes HIGH, ensuring glitch-free operation.',
+    tags: ['flip flop', 'jk', 'sequential', 'dual', 'clear', 'controller device', 'data-lockout'],
+    guideOverview: 'The 74x115 is a dual JK controller device flip flop with data lockout and a shared clock. Each flip flop has an individual active low clear. The data-lockout feature prevents J and K from affecting the master once the clock goes HIGH, ensuring glitch free operation.',
     guidePinDescriptions: {
       '1J':   'J input for FF1.',
       '1K':   'K input for FF1.',
       '1CLR': 'Asynchronous clear for FF1 (active LOW); forces 1Q LOW immediately.',
       '1Q':   'Q output of FF1.',
       '1Qn':  'Complement Q output of FF1.',
-      CLK:    'Shared clock input for both flip-flops.',
+      CLK:    'Shared clock input for both flip flops.',
       GND:    'Ground (0 V) supply.',
       '2Qn':  'Complement Q output of FF2.',
       '2Q':   'Q output of FF2.',
@@ -257,11 +257,11 @@ export const CHIPS_BLOCK_11 = {
     },
     guideSections: [
       {
-        title: 'Data-Lockout Master-Slave Operation',
+        title: 'Data Lockout controller device Operation',
         paragraphs: [
-          'The 74115 uses a controller-device (master-slave) topology with data lockout: J and K are sampled only at the start of the clock HIGH period and are then locked out, preventing input changes during the clock pulse from affecting the output.',
+          'The 74x115 uses a controller device (master slave) topology with data lockout: J and K are sampled only at the start of the clock HIGH period and are then locked out, preventing input changes during the clock pulse from affecting the output.',
         ],
-        note: 'Data lockout improves noise immunity compared to a simple level-clocked latch.',
+        note: 'Data lockout improves noise immunity compared to a simple level clocked latch.',
       },
       {
         title: 'Shared Clock, Individual Clear',
@@ -293,39 +293,39 @@ export const CHIPS_BLOCK_11 = {
     sequential: true,
   },
 
-  // ── 74x116: AND-gated JK FF, 14-pin ──────────────────────────────────────
+  // ── 74x116: AND gated JK FF, 14-pin ──────────────────────────────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits */
   '74x116': {
     name: '74x116',
-    simpleName: 'JK FF (AND-gated)',
-    description: 'AND-gated J-K controller-device flip-flop with preset and clear (14-pin)',
+    simpleName: 'JK FF (AND gated)',
+    description: 'AND gated JK controller device flip flop with preset and clear (14-pin)',
     pins: 14,
     vcc: 14,
     gnd: 7,
     datasheet: 'https://en.wikipedia.org/wiki/7400-series_integrated_circuits',
-    tags: ['flip-flop', 'jk', 'sequential', 'controller-device'],
-    guideOverview: 'The 74H116 is a single J-K controller-device flip-flop with three-input AND-gate expansion on both J and K. Inputs J1, J2, and J3 are ANDed for the J function; K1, K2, and K3 for the K function. Individual active low preset and clear are provided.',
+    tags: ['flip flop', 'jk', 'sequential', 'controller device'],
+    guideOverview: 'The 74H116 is a single JK controller device flip flop with three input AND gate expansion on both J and K. Inputs J1, J2, and J3 are ANDed for the J function; K1, K2, and K3 for the K function. Individual active low preset and clear are provided.',
     guidePinDescriptions: {
       CLR:  'Asynchronous clear (active LOW); forces Q LOW immediately.',
-      J1:   'J AND-gate input 1; the J function is active only when J1=J2=J3=1.',
-      J2:   'J AND-gate input 2.',
-      J3:   'J AND-gate input 3.',
+      J1:   'J AND gate input 1; the J function is active only when J1=J2=J3=1.',
+      J2:   'J AND gate input 2.',
+      J3:   'J AND gate input 3.',
       PRE:  'Asynchronous preset (active LOW); forces Q HIGH immediately.',
-      K3:   'K AND-gate input 3; the K function is active only when K1=K2=K3=1.',
+      K3:   'K AND gate input 3; the K function is active only when K1=K2=K3=1.',
       GND:  'Ground (0 V) supply.',
       Q:    'Q output.',
       Qn:   'Complement Q output.',
-      K1:   'K AND-gate input 1.',
-      K2:   'K AND-gate input 2.',
+      K1:   'K AND gate input 1.',
+      K2:   'K AND gate input 2.',
       CLK:  'Clock input.',
       NC1:  'No connect leave unconnected.',
       VCC:  'Positive supply (+5 V).',
     },
     guideSections: [
       {
-        title: 'AND-Gated J and K Inputs',
+        title: 'AND Gated J and K Inputs',
         paragraphs: [
-          'The flip-flop sees J=1 only when all three J inputs (J1, J2, J3) are HIGH simultaneously. Similarly K=1 only when K1=K2=K3=1. This allows multiple control signals to gate the set or reset path without external AND gates.',
+          'The flip flop sees J=1 only when all three J inputs (J1, J2, J3) are HIGH simultaneously. Similarly K=1 only when K1=K2=K3=1. This allows multiple control signals to gate the set or reset path without external AND gates.',
         ],
       },
       {
@@ -358,38 +358,38 @@ export const CHIPS_BLOCK_11 = {
     sequential: true,
   },
 
-  // ── 74x117: AND-gated JK FF, J2/K2 inverted, 14-pin ─────────────────────
+  // ── 74x117: AND gated JK FF, J2/K2 inverted, 14-pin ─────────────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
-  '74117': {
+  '74x117': {
     name: '74x117',
-    simpleName: 'JK FF (AND-gated, J2n/K2n)',
-    description: 'AND-gated J-K controller-device flip-flop with J2 and K2 inverted, preset and clear (14-pin)',
+    simpleName: 'JK FF (AND gated, J2n/K2n)',
+    description: 'AND-gated JK flip-flop, J2/K2 inverted, preset and clear (14-pin)',
     pins: 14,
     vcc: 14,
     gnd: 7,
     datasheet: 'https://en.wikipedia.org/wiki/7400-series_integrated_circuits',
-    tags: ['flip-flop', 'jk', 'sequential', 'controller-device', 'inverted'],
-    guideOverview: 'The 74117 is similar to the 74H116 AND-gated J-K flip-flop, but the J2 and K2 inputs are internally inverted (J2n and K2n). This allows active LOW enable signals to be wired directly to the AND-gate inputs without external inverters.',
+    tags: ['flip flop', 'jk', 'sequential', 'controller device', 'inverted'],
+    guideOverview: 'The 74x117 is similar to the 74H116 AND gated JK flip flop, but the J2 and K2 inputs are internally inverted (J2n and K2n). This allows active LOW enable signals to be wired directly to the AND gate inputs without external inverters.',
     guidePinDescriptions: {
       CLR:  'Asynchronous clear (active LOW); forces Q LOW immediately.',
-      J1:   'J AND-gate input 1 (active HIGH).',
-      J2n:  'J AND-gate input 2, internally inverted (active LOW).',
-      J3:   'J AND-gate input 3 (active HIGH).',
+      J1:   'J AND gate input 1 (active HIGH).',
+      J2n:  'J AND gate input 2, internally inverted (active LOW).',
+      J3:   'J AND gate input 3 (active HIGH).',
       PRE:  'Asynchronous preset (active LOW); forces Q HIGH immediately.',
-      K3:   'K AND-gate input 3 (active HIGH).',
+      K3:   'K AND gate input 3 (active HIGH).',
       GND:  'Ground (0 V) supply.',
       Q:    'Q output.',
       Qn:   'Complement Q output.',
-      K1:   'K AND-gate input 1 (active HIGH).',
-      K2n:  'K AND-gate input 2, internally inverted (active LOW).',
+      K1:   'K AND gate input 1 (active HIGH).',
+      K2n:  'K AND gate input 2, internally inverted (active LOW).',
       CLK:  'Clock input.',
       NC1:  'No connect leave unconnected.',
       VCC:  'Positive supply (+5 V).',
     },
     guideSections: [
       {
-        title: 'Inverted AND-Gate Inputs',
+        title: 'Inverted AND Gate Inputs',
         paragraphs: [
           'Compared to the 74H116, J2 and K2 are inverted internally, becoming J2n and K2n. The internal J term is J1 AND (NOT J2n) AND J3; the K term is K1 AND (NOT K2n) AND K3.',
         ],
@@ -427,16 +427,16 @@ export const CHIPS_BLOCK_11 = {
   // ── 74x118: Hex set/reset latch, shared reset, 16-pin ────────────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
-  '74118': {
+  '74x118': {
     name: '74x118',
     simpleName: 'Hex SR Latch (shared CLR)',
-    description: 'Hex set/reset latch with individual set inputs and shared active LOW clear (16-pin)',
+    description: 'Hex set/reset latch, individual sets, shared active-low clear (16-pin)',
     pins: 16,
     vcc: 16,
     gnd: 8,
     datasheet: 'https://en.wikipedia.org/wiki/7400-series_integrated_circuits',
     tags: ['latch', 'sr', 'sequential', 'hex', 'set-reset', 'register'],
-    guideOverview: 'The 74118 contains six independent SR latches sharing a single active low clear. Each latch has its own set (S) input and Q output. Asserting CLR LOW simultaneously resets all six outputs to 0.',
+    guideOverview: 'The 74x118 contains six independent SR latches sharing a single active low clear. Each latch has its own set (S) input and Q output. Asserting CLR LOW simultaneously resets all six outputs to 0.',
     guidePinDescriptions: {
       CLR:  'Shared active LOW clear; forces all Q outputs LOW immediately.',
       S1:   'Set input for latch 1; driving HIGH latches Q1=1.',
@@ -459,7 +459,7 @@ export const CHIPS_BLOCK_11 = {
       {
         title: 'SR Latch Behavior',
         paragraphs: [
-          'Each latch is set-dominant: driving Sn HIGH latches Qn=1. When Sn returns LOW, Qn holds its value. Asserting CLR LOW overrides all set states and resets every Q output to 0 immediately.',
+          'Each latch is set dominant: driving Sn HIGH latches Qn=1. When Sn returns LOW, Qn holds its value. Asserting CLR LOW overrides all set states and resets every Q output to 0 immediately.',
         ],
         list: [
           'CLR=0 → all Q = 0 (asynchronous reset)',
@@ -470,7 +470,7 @@ export const CHIPS_BLOCK_11 = {
       {
         title: 'Shared Clear',
         paragraphs: [
-          'Because CLR is shared among all six latches, a single signal can initialise the entire register to 0. Individual latches can be re-set by pulsing their respective S input after CLR is released HIGH.',
+          'Because CLR is shared among all six latches, a single signal can initialise the entire register to 0. Individual latches can be re set by pulsing their respective S input after CLR is released HIGH.',
         ],
       },
     ],
@@ -508,13 +508,13 @@ export const CHIPS_BLOCK_11 = {
   '74x119': {
     name: '74x119',
     simpleName: 'Dual JK FF (shared CLK/CLR)',
-    description: 'Dual J-K flip-flop with shared clock and clear (14-pin)',
+    description: 'Dual JK flip flop with shared clock and clear (14-pin)',
     pins: 14,
     vcc: 14,
     gnd: 7,
     datasheet: 'https://en.wikipedia.org/wiki/7400-series_integrated_circuits',
-    tags: ['flip-flop', 'jk', 'sequential', 'dual', 'clear'],
-    guideOverview: 'The 74H119 contains two J-K flip-flops sharing both a clock and an active low clear. Each flip-flop has independent J and K inputs. This H-series device is used in compact dual-FF designs where synchronous clocking and a common reset are sufficient.',
+    tags: ['flip flop', 'jk', 'sequential', 'dual', 'clear'],
+    guideOverview: 'The 74H119 contains two JK flip flops sharing both a clock and an active low clear. Each flip flop has independent J and K inputs. This H-series device is used in compact dual FF designs where synchronous clocking and a common reset are sufficient.',
     guidePinDescriptions: {
       '1J':  'J input for FF1.',
       '1K':  'K input for FF1.',
@@ -527,7 +527,7 @@ export const CHIPS_BLOCK_11 = {
       '2Qn': 'Complement Q output of FF2.',
       NC1:   'No connect leave unconnected.',
       CLR:   'Shared asynchronous clear (active LOW); resets both Q outputs to 0.',
-      CLK:   'Shared clock input for both flip-flops.',
+      CLK:   'Shared clock input for both flip flops.',
       NC2:   'No connect leave unconnected.',
       VCC:   'Positive supply (+5 V).',
     },
@@ -535,13 +535,13 @@ export const CHIPS_BLOCK_11 = {
       {
         title: 'Shared CLK and CLR',
         paragraphs: [
-          'Both flip-flops clock together on the same CLK edge and share a single CLR. Independent J and K inputs let each FF respond differently on each clock edge.',
+          'Both flip flops clock together on the same CLK edge and share a single CLR. Independent J and K inputs let each FF respond differently on each clock edge.',
         ],
       },
       {
-        title: 'J-K Truth Table',
+        title: 'JK Truth Table',
         paragraphs: [
-          'Standard J-K behavior applies: hold, set, reset, or toggle depending on J and K values at the active clock edge.',
+          'Standard JK behavior applies: hold, set, reset, or toggle depending on J and K values at the active clock edge.',
         ],
         list: [
           'J=0, K=0 → Q unchanged',
@@ -579,13 +579,13 @@ export const CHIPS_BLOCK_11 = {
   '74x120': {
     name: '74x120',
     simpleName: 'Dual JK FF (separate CLKs)',
-    description: 'Dual J-K flip-flop with separate clock inputs and shared clear (14-pin)',
+    description: 'Dual JK flip flop with separate clock inputs and shared clear (14-pin)',
     pins: 14,
     vcc: 14,
     gnd: 7,
     datasheet: 'https://en.wikipedia.org/wiki/7400-series_integrated_circuits',
-    tags: ['flip-flop', 'jk', 'sequential', 'dual', 'clear'],
-    guideOverview: 'The 74H120 contains two J-K flip-flops with separate clock inputs but a shared active low clear. Each FF clocks independently, making it suitable for circuits that need two flip-flops driven by different clock phases while sharing a common reset.',
+    tags: ['flip flop', 'jk', 'sequential', 'dual', 'clear'],
+    guideOverview: 'The 74H120 contains two JK flip flops with separate clock inputs but a shared active low clear. Each FF clocks independently, making it suitable for circuits that need two flip flops driven by different clock phases while sharing a common reset.',
     guidePinDescriptions: {
       '1J':   'J input for FF1.',
       '1K':   'K input for FF1.',
@@ -606,13 +606,13 @@ export const CHIPS_BLOCK_11 = {
       {
         title: 'Independent Clocks, Shared Clear',
         paragraphs: [
-          'Unlike the 74H119, each flip-flop has its own clock pin. This makes the device suitable for circuits where the two FFs must be triggered by different clock signals or phases, while still sharing a single active LOW reset.',
+          'Unlike the 74H119, each flip flop has its own clock pin. This makes the device suitable for circuits where the two FFs must be triggered by different clock signals or phases, while still sharing a single active LOW reset.',
         ],
       },
       {
-        title: 'J-K Behavior',
+        title: 'JK Behavior',
         paragraphs: [
-          'Each FF evaluates J and K on its own clock edge using standard J-K logic. Both FFs are immediately reset by driving CLR LOW.',
+          'Each FF evaluates J and K on its own clock edge using standard JK logic. Both FFs are immediately reset by driving CLR LOW.',
         ],
         list: [
           'J=0, K=0 → Q unchanged',
@@ -647,16 +647,16 @@ export const CHIPS_BLOCK_11 = {
 
   // ── 74x124: Dual VCO (analog), 16-pin ────────────────────────────────────
   /* Primary source: Texas Instruments, SN74LS124 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls124.pdf */
-  '74124': {
+  '74x124': {
     name: '74x124',
-    simpleName: 'Dual VCO (stub)',
-    description: 'Dual voltage-controlled oscillator (analog simulation stub) (16-pin)',
+    simpleName: 'Dual VCO',
+    description: 'Dual voltage controlled oscillator (behavioral model) (16-pin)',
     pins: 16,
     vcc: 16,
     gnd: 8,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls124.pdf',
     tags: ['vco', 'oscillator', 'analog', 'clock'],
-    guideOverview: 'The 74124 is a dual voltage-controlled oscillator (VCO) providing complementary output pairs (Y and Yn) per channel. The oscillation frequency is set by an analog voltage on the FREQ pin and a range selection on RNG. In this simulator the VCO is approximated as a digital stub.',
+    guideOverview: 'The 74x124 is a dual voltage controlled oscillator (VCO) providing complementary output pairs (Y and Yn) per channel. The oscillation frequency is set by an analog voltage on the FREQ pin and a range selection on RNG. In this simulator the VCO is approximated with a behavioral voltage-to-frequency model (see the note below).',
     guidePinDescriptions: {
       FREQ1: 'Frequency control voltage for VCO 1 (analog input).',
       EN1:   'Enable input for VCO 1; drives the oscillator output when asserted.',
@@ -677,11 +677,11 @@ export const CHIPS_BLOCK_11 = {
     },
     guideSections: [
       {
-        title: 'Voltage-Controlled Oscillation',
+        title: 'Voltage Controlled Oscillation',
         paragraphs: [
-          'The 74124 generates a square-wave output whose frequency is proportional to the analog voltage applied to the FREQ pin. The RNG pin selects a high or low frequency range for the VCO.',
+          'The 74x124 generates a square wave output whose frequency is proportional to the analog voltage applied to the FREQ pin. The RNG pin selects a high or low frequency range for the VCO.',
         ],
-        note: 'In the digital simulator, VCO analog behavior is approximated. The EN pin controls whether the oscillator output is active.',
+        note: 'Simplified VCO model. Y/Yn toggle as a real square wave whose frequency tracks the FREQ pin voltage linearly from ~10 Hz at 0 V to ~1 kHz at VCC. RNG=1 multiplies the frequency by 10. EN=HIGH enables the oscillator; EN=LOW holds the output LOW and freezes the phase. If FREQ is unconnected the frequency defaults to ~100 Hz. The model is a simple V-to-f map, not a real RC oscillator; dt=1 ms in the time loop limits useful resolution to roughly 1 kHz.',
       },
       {
         title: 'Dual Independent Channels',
@@ -716,7 +716,7 @@ export const CHIPS_BLOCK_11 = {
 
   // ── 74x128: quad 2 input NOR gate (50Ω line driver), 14-pin ──────────────
   /* Primary source: Texas Instruments, SN74128 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74128.pdf */
-  '74128': {
+  '74x128': {
     name: '74x128',
     simpleName: 'Quad 2 input NOR (50Ω)',
     description: 'Quad 2 input NOR gate with 50 ohm line driver outputs (14-pin)',
@@ -725,7 +725,7 @@ export const CHIPS_BLOCK_11 = {
     gnd: 7,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74128.pdf',
     tags: ['logic gate', 'nor', 'combinational', 'driver'],
-    guideOverview: 'The 74128 provides four independent 2 input NOR gates with high-drive 50-ohm line driver outputs. Each gate drives Y LOW if either input is HIGH, and HIGH only when both inputs are LOW. The low-impedance outputs can drive transmission lines directly.',
+    guideOverview: 'The 74x128 provides four independent 2 input NOR gates with high drive 50-ohm line driver outputs. Each gate drives Y LOW if either input is HIGH, and HIGH only when both inputs are LOW. The low impedance outputs can drive transmission lines directly.',
     guidePinDescriptions: {
       '1A':  'Input A to NOR gate 1.',
       '1B':  'Input B to NOR gate 1.',
@@ -748,12 +748,14 @@ export const CHIPS_BLOCK_11 = {
         paragraphs: [
           'Each gate produces a LOW output whenever one or both inputs are HIGH. The output is HIGH only when both inputs are LOW, equivalent to an OR gate followed by an inverter.',
         ],
-        formulas: ['Y = NOT(A OR B)'],
+        formulas: [
+          'Y = NOT(A OR B)',
+        ],
       },
       {
         title: '50-Ohm Line Driver',
         paragraphs: [
-          'The outputs are designed to drive 50-ohm transmission lines directly, making the 74128 useful in bus-line or coax-terminated applications where standard TTL logic cannot supply enough current.',
+          'The outputs are designed to drive 50-ohm transmission lines directly, making the 74x128 useful in bus line or coax terminated applications where standard TTL logic cannot supply enough current.',
         ],
       },
     ],
@@ -781,19 +783,19 @@ export const CHIPS_BLOCK_11 = {
     ],
   },
 
-  // ── 74x131/74ALS131: 3-to-8 decoder, address register, 16-pin ───────────
+  // ── 74x131/74ALS131: 3 to 8 decoder, address register, 16-pin ───────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Multiplexer */
-  '74131': {
+  '74x131': {
     name: '74x131',
-    simpleName: '3-to-8 Decoder (registered)',
-    description: '3-to-8 line decoder/demultiplexer with address register, inverting outputs (16-pin)',
+    simpleName: '3 to 8 Decoder (registered)',
+    description: '3-to-8 decoder/demux, address register, inverting outputs (16-pin)',
     pins: 16,
     vcc: 16,
     gnd: 8,
     datasheet: 'https://en.wikipedia.org/wiki/7400-series_integrated_circuits',
-    tags: ['decoder', 'demultiplexer', '3-to-8', 'sequential', 'register', 'inverting'],
-    guideOverview: 'The 74131 is a 3-to-8 line decoder with an internal address register. The three-bit address (A0-A2) is latched on the rising clock edge and decoded to one of eight active LOW outputs. An active HIGH output-enable (OE) disables all outputs when HIGH.',
+    tags: ['decoder', 'demultiplexer', '3 to 8', 'sequential', 'register', 'inverting'],
+    guideOverview: 'The 74x131 is a 3 to 8 line decoder with an internal address register. The three bit address (A0-A2) is latched on the rising clock edge and decoded to one of eight active LOW outputs. An active HIGH output-enable (OE) disables all outputs when HIGH.',
     guidePinDescriptions: {
       A0:  'Address bit 0 (LSB) for the decoder.',
       A1:  'Address bit 1.',
@@ -814,7 +816,7 @@ export const CHIPS_BLOCK_11 = {
     },
     guideSections: [
       {
-        title: '3-to-8 Registered Decoding',
+        title: '3 to 8 Registered Decoding',
         paragraphs: [
           'On each rising edge of CLK the values on A0-A2 are captured into the internal address register. The registered address then drives exactly one of the eight Y outputs LOW while all others remain HIGH.',
         ],
@@ -858,7 +860,7 @@ export const CHIPS_BLOCK_11 = {
 
   // ── 74x133: single 13 input NAND gate, 16-pin ────────────────────────────
   /* Primary source: Texas Instruments, SN74ALS133 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74als133.pdf */
-  '74133': {
+  '74x133': {
     name: '74x133',
     simpleName: '13-Input NAND Gate',
     description: 'Single 13 input NAND gate. (16-pin)',
@@ -867,7 +869,7 @@ export const CHIPS_BLOCK_11 = {
     gnd: 8,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74als133.pdf',
     tags: ['logic gate', 'nand', 'combinational', '13 input'],
-    guideOverview: 'The 74133 contains a single 13 input NAND gate. The output Y is LOW only when all 13 inputs are simultaneously HIGH, and HIGH otherwise. It is useful for large fan-in decoding or bus monitoring applications.',
+    guideOverview: 'The 74x133 contains a single 13 input NAND gate. The output Y is LOW only when all 13 inputs are simultaneously HIGH, and HIGH otherwise. It is useful for large fan in decoding or bus monitoring applications.',
     guidePinDescriptions: {
       A1:  'Input 1 of the 13 input NAND gate.',
       A2:  'Input 2.',
@@ -890,14 +892,16 @@ export const CHIPS_BLOCK_11 = {
       {
         title: '13-Input NAND Logic',
         paragraphs: [
-          'The 74133 performs a NAND operation across all 13 inputs. Any LOW input forces the output HIGH. Only when every input is simultaneously HIGH does the output go LOW.',
+          'The 74x133 performs a NAND operation across all 13 inputs. Any LOW input forces the output HIGH. Only when every input is simultaneously HIGH does the output go LOW.',
         ],
-        formulas: ['Y = NOT(A1 AND A2 AND ... AND A13)'],
+        formulas: [
+          'Y = NOT(A1 AND A2 AND ... AND A13)',
+        ],
       },
       {
         title: 'Unused Inputs',
         paragraphs: [
-          'A 13 input NAND is commonly used as a detect-all-ones circuit: the output pulses LOW only when all monitored lines are asserted HIGH. Unused inputs must be tied HIGH to avoid erroneously holding the output HIGH.',
+          'A 13 input NAND is commonly used as a detect all-ones circuit: the output pulses LOW only when all monitored lines are asserted HIGH. Unused inputs must be tied HIGH to avoid erroneously holding the output HIGH.',
         ],
         note: 'TTL floating inputs are pulled HIGH internally, but explicit pull ups on unused pins improve noise immunity.',
       },
@@ -928,7 +932,7 @@ export const CHIPS_BLOCK_11 = {
   // ── 74x134: single 12 input NAND gate, 3-state, 16-pin ───────────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic */
-  '74134': {
+  '74x134': {
     name: '74x134',
     simpleName: '12 input NAND (3-state)',
     description: 'Single 12 input NAND gate with 3-state output (16-pin)',
@@ -937,7 +941,7 @@ export const CHIPS_BLOCK_11 = {
     gnd: 8,
     datasheet: 'https://en.wikipedia.org/wiki/7400-series_integrated_circuits',
     tags: ['logic gate', 'nand', 'combinational', '12 input', 'three-state'],
-    guideOverview: 'The 74134 contains a single 12 input NAND gate with a three-state output. When the output-enable input (OE) is asserted HIGH the output actively drives the NAND result. When OE is LOW the output is placed in a high-impedance state, allowing bus sharing.',
+    guideOverview: 'The 74x134 contains a single 12 input NAND gate with a three state output. When the output-enable input (OE) is asserted HIGH the output actively drives the NAND result. When OE is LOW the output is placed in a high impedance state, allowing bus sharing.',
     guidePinDescriptions: {
       A1:  'Input 1 of the 12 input NAND gate.',
       A2:  'Input 2.',
@@ -945,9 +949,9 @@ export const CHIPS_BLOCK_11 = {
       A4:  'Input 4.',
       A5:  'Input 5.',
       A6:  'Input 6.',
-      Y:   'Three-state NAND output; active when OE=HIGH, HIGH-Z when OE=LOW.',
+      Y:   'Three state NAND output; active when OE=HIGH, HIGH Z when OE=LOW.',
       GND: 'Ground (0 V) supply.',
-      OE:  'Output enable (active HIGH); HIGH enables the output, LOW forces it to HIGH-Z.',
+      OE:  'Output enable (active HIGH); HIGH enables the output, LOW forces it to HIGH Z.',
       A7:  'Input 7.',
       A8:  'Input 8.',
       A9:  'Input 9.',
@@ -958,16 +962,18 @@ export const CHIPS_BLOCK_11 = {
     },
     guideSections: [
       {
-        title: '12 Input NAND with Three-State Output',
+        title: '12 Input NAND with Three State Output',
         paragraphs: [
-          'The NAND logic covers 12 inputs. When OE is HIGH the output actively drives the NAND result. When OE is LOW the output pin enters a high-impedance state and is effectively disconnected from the bus.',
+          'The NAND logic covers 12 inputs. When OE is HIGH the output actively drives the NAND result. When OE is LOW the output pin enters a high impedance state and is effectively disconnected from the bus.',
         ],
-        formulas: ['Y = NOT(A1 AND A2 AND ... AND A12)  (when OE=HIGH)'],
+        formulas: [
+          'Y = NOT(A1 AND A2 AND ... AND A12)  (when OE=HIGH)',
+        ],
       },
       {
-        title: 'Three-State Bus Sharing',
+        title: 'Three State Bus Sharing',
         paragraphs: [
-          'Only one 74134 on a shared bus should have OE=HIGH at a time to prevent bus contention. Use OE to multiplex several devices onto a common output line.',
+          'Only one 74x134 on a shared bus should have OE=HIGH at a time to prevent bus contention. Use OE to multiplex several devices onto a common output line.',
         ],
         note: 'Unused inputs should be tied HIGH.',
       },
@@ -997,16 +1003,16 @@ export const CHIPS_BLOCK_11 = {
 
   // ── 74x135: quad XOR/XNOR gate with select, 16-pin ───────────────────────
   /* Primary source: Texas Instruments, SN74LS135 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls135.pdf */
-  '74135': {
+  '74x135': {
     name: '74x135',
     simpleName: 'Quad XOR/XNOR (select)',
-    description: 'Quad XOR/XNOR gate with two shared select inputs for logic type selection (16-pin)',
+    description: 'Quad XOR/XNOR gate with two shared select inputs (16-pin)',
     pins: 16,
     vcc: 16,
     gnd: 8,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls135.pdf',
     tags: ['logic gate', 'xor', 'xnor', 'combinational', 'select'],
-    guideOverview: 'The 74135 contains four XOR/XNOR gates with two shared select inputs (C1 and C2). C1 selects XOR or XNOR mode for gates 1 and 2; C2 selects the mode for gates 3 and 4. This makes it easy to switch between complementing and non-complementing logic without rewiring.',
+    guideOverview: 'The 74x135 contains four XOR/XNOR gates with two shared select inputs (C1 and C2). C1 selects XOR or XNOR mode for gates 1 and 2; C2 selects the mode for gates 3 and 4. This makes it easy to switch between complementing and non complementing logic without rewiring.',
     guidePinDescriptions: {
       A1:  'Input A to gate 1.',
       B1:  'Input B to gate 1.',
@@ -1074,38 +1080,38 @@ export const CHIPS_BLOCK_11 = {
   // ── 74x136: quad 2 input XNOR gate, OC, 14-pin ───────────────────────────
   /* Primary source: Texas Instruments, SN74LS136 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls136.pdf
      Wikipedia: https://en.wikipedia.org/wiki/Open_collector */
-  '74136': {
+  '74x136': {
     name: '74x136',
-    simpleName: 'Quad 2 Input XNOR (OC)',
-    description: 'Quad 2 input Exclusive-NOR (XNOR) gate with open-collector outputs. (14-pin)',
+    simpleName: 'Quad 2 Input XOR (OC)',
+    description: 'Quad 2 input Exclusive OR (XOR) gate with open collector outputs. (14-pin)',
     pins: 14,
     vcc: 14,
     gnd: 7,
     openCollector: true,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls136.pdf',
-    tags: ['logic gate', 'xnor', 'combinational', 'open-collector', 'quad'],
-    guideOverview: 'The 74136 contains four independent 2 input XNOR gates with open-collector outputs. Each output is LOW when the two inputs differ and released (HIGH via external pull up) when they match. The open-collector outputs allow wired AND connections on shared bus lines.',
+    tags: ['logic gate', 'xor', 'combinational', 'open collector', 'quad'],
+    guideOverview: 'The 74x136 contains four independent 2 input XOR gates with open collector outputs. Each output sinks LOW when the two inputs match and is released (HIGH via external pull up) when they differ. The open collector outputs allow wired AND connections on shared bus lines.',
     guidePinDescriptions: {
       '1A':  'Input A to gate 1.',
       '1B':  'Input B to gate 1.',
-      '1Y':  'Open-collector XNOR output of gate 1; LOW when inputs differ.',
+      '1Y':  'Open collector XOR output of gate 1; LOW when inputs match.',
       '2A':  'Input A to gate 2.',
       '2B':  'Input B to gate 2.',
-      '2Y':  'Open-collector XNOR output of gate 2.',
+      '2Y':  'Open collector XOR output of gate 2.',
       GND:   'Ground (0 V) supply.',
-      '3Y':  'Open-collector XNOR output of gate 3.',
+      '3Y':  'Open collector XOR output of gate 3.',
       '3A':  'Input A to gate 3.',
       '3B':  'Input B to gate 3.',
-      '4Y':  'Open-collector XNOR output of gate 4.',
+      '4Y':  'Open collector XOR output of gate 4.',
       '4A':  'Input A to gate 4.',
       '4B':  'Input B to gate 4.',
       VCC:   'Positive supply (+5 V).',
     },
     guideSections: [
       {
-        title: 'XNOR Logic',
+        title: 'XOR Logic',
         paragraphs: [
-          'XNOR produces a HIGH output when both inputs are equal (both LOW or both HIGH) and a LOW output when the inputs differ. With open-collector outputs, the HIGH state is produced by an external pull up resistor.',
+          'XOR produces a HIGH output when the inputs differ and a LOW output when they are equal (both LOW or both HIGH). With open collector outputs, the HIGH state is produced by an external pull up resistor.',
         ],
         formulas: ['Y = NOT(A XOR B)'],
         list: [
@@ -1118,7 +1124,7 @@ export const CHIPS_BLOCK_11 = {
       {
         title: 'Open Collector Outputs',
         paragraphs: [
-          'An external pull up resistor (typically 1-10 kOhm to VCC) is required to produce the HIGH output state. Multiple open-collector outputs can be wire-ANDed on the same net.',
+          'An external pull up resistor (typically 1-10 kOhm to VCC) is required to produce the HIGH output state. Multiple open collector outputs can be wire ANDed on the same net.',
         ],
         note: 'Without a pull up resistor the HIGH output will float and may be misread by downstream logic.',
       },
@@ -1126,24 +1132,24 @@ export const CHIPS_BLOCK_11 = {
     pinout: [
       { pin:  1, name: '1A',  type: 'input',  description: 'Input A to gate 1' },
       { pin:  2, name: '1B',  type: 'input',  description: 'Input B to gate 1' },
-      { pin:  3, name: '1Y',  type: 'output', description: 'Open-collector XNOR output of gate 1 (LOW when A≠B)' },
+      { pin:  3, name: '1Y',  type: 'output', description: 'Open collector XOR output of gate 1 (LOW when A=B)' },
       { pin:  4, name: '2A',  type: 'input',  description: 'Input A to gate 2' },
       { pin:  5, name: '2B',  type: 'input',  description: 'Input B to gate 2' },
-      { pin:  6, name: '2Y',  type: 'output', description: 'Open-collector XNOR output of gate 2 (LOW when A≠B)' },
+      { pin:  6, name: '2Y',  type: 'output', description: 'Open collector XOR output of gate 2 (LOW when A=B)' },
       { pin:  7, name: 'GND', type: 'power',  description: 'Ground (0V)' },
-      { pin:  8, name: '3Y',  type: 'output', description: 'Open-collector XNOR output of gate 3 (LOW when A≠B)' },
+      { pin:  8, name: '3Y',  type: 'output', description: 'Open collector XOR output of gate 3 (LOW when A=B)' },
       { pin:  9, name: '3A',  type: 'input',  description: 'Input A to gate 3' },
       { pin: 10, name: '3B',  type: 'input',  description: 'Input B to gate 3' },
-      { pin: 11, name: '4Y',  type: 'output', description: 'Open-collector XNOR output of gate 4 (LOW when A≠B)' },
+      { pin: 11, name: '4Y',  type: 'output', description: 'Open collector XOR output of gate 4 (LOW when A=B)' },
       { pin: 12, name: '4A',  type: 'input',  description: 'Input A to gate 4' },
       { pin: 13, name: '4B',  type: 'input',  description: 'Input B to gate 4' },
       { pin: 14, name: 'VCC', type: 'power',  description: 'Positive supply (+5V)' },
     ],
     gates: [
-      { type: 'XNOR', inputs: ['1A', '1B'], output: '1Y' },
-      { type: 'XNOR', inputs: ['2A', '2B'], output: '2Y' },
-      { type: 'XNOR', inputs: ['3A', '3B'], output: '3Y' },
-      { type: 'XNOR', inputs: ['4A', '4B'], output: '4Y' },
+      { type: 'XOR', inputs: ['1A', '1B'], output: '1Y' },
+      { type: 'XOR', inputs: ['2A', '2B'], output: '2Y' },
+      { type: 'XOR', inputs: ['3A', '3B'], output: '3Y' },
+      { type: 'XOR', inputs: ['4A', '4B'], output: '4Y' },
     ],
   },
 };

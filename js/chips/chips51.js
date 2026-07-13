@@ -10,7 +10,7 @@ export const CHIPS_BLOCK_51 = {
   '74x2163': {
     name: '74x2163',
     simpleName: 'Sync Presettable 4 bit Binary Counter (FCT, 25Ω Series)',
-    description: 'Synchronous presettable 4 bit binary counter with synchronous clear and 25 Ω series resistor (16-pin)',
+    description: 'Sync presettable 4-bit binary counter, sync clear, 25Ω (16-pin)',
     pins: 16, vcc: 16, gnd: 8,
     datasheet: '',
     tags: ['counter', '4 bit', 'synchronous', 'preset', 'clear', 'stub'],
@@ -41,7 +41,7 @@ export const CHIPS_BLOCK_51 = {
   '74x2191': {
     name: '74x2191',
     simpleName: 'Sync Presettable 4 bit Up/Down Counter (25Ω)',
-    description: 'Synchronous presettable 4 bit binary up/down counter with up/down direction pin and 25 Ω series resistor (16-pin)',
+    description: 'Sync presettable 4-bit binary up/down counter, dir pin, 25Ω (16-pin)',
     pins: 16, vcc: 16, gnd: 8,
     datasheet: '',
     tags: ['counter', '4 bit', 'up/down', 'synchronous', 'preset', 'stub'],
@@ -72,7 +72,7 @@ export const CHIPS_BLOCK_51 = {
   '74x2193': {
     name: '74x2193',
     simpleName: 'Sync Presettable 4 bit Counter Sep Up/Down Clocks (25Ω)',
-    description: 'Synchronous presettable 4 bit binary counter with separate up/down clocks and 25 Ω series resistor (16-pin)',
+    description: 'Sync presettable 4-bit binary counter, sep up/down clocks, 25Ω (16-pin)',
     pins: 16, vcc: 16, gnd: 8,
     datasheet: '',
     tags: ['counter', '4 bit', 'up/down', 'synchronous', 'preset', 'stub'],
@@ -107,22 +107,22 @@ export const CHIPS_BLOCK_51 = {
     pins: 24, vcc: 24, gnd: 12,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74act2226.pdf',
     tags: ['FIFO', 'memory', 'dual', 'stub'],
-    guideOverview: 'The 74x2226 contains two independent serial FIFO memories, each 64 bits deep and 1 bit wide. A FIFO, or first-in first-out memory, stores incoming data in order and returns it in that same order later, which makes it useful for buffering between logic blocks that do not read and write at exactly the same time. This style of part was commonly used to decouple timing between subsystems without needing a full microprocessor-controlled RAM interface.',
+    guideOverview: 'The 74x2226 contains two independent serial FIFO memories, each 64 bits deep and 1 bit wide. A FIFO, or first in first out memory, stores incoming data in order and returns it in that same order later, which makes it useful for buffering between logic blocks that do not read and write at exactly the same time. This style of part was commonly used to decouple timing between subsystems without needing a full microprocessor controlled RAM interface.',
     guidePinDescriptions: {
       'SIR': 'Serial input for the right FIFO section. Bits entering here are written into the right-hand queue under control of the right write clock.',
       'SOR': 'Serial output for the right FIFO section. Data emerges here in the same order it was written.',
       'FFUR': 'Status output for the right FIFO section. See the datasheet for the exact flag meaning in the selected operating or expansion mode.',
-      'XMLR': 'Expansion or mode-control input for the right FIFO section. Use it as described in the datasheet when configuring or cascading the device.',
+      'XMLR': 'Expansion or mode control input for the right FIFO section. Use it as described in the datasheet when configuring or cascading the device.',
       'WCLKR': 'Write clock for the right FIFO section. Each active write event shifts a new bit into the right queue.',
       'RCLKR': 'Read clock for the right FIFO section. Each active read event advances data out of the right queue.',
       'RSTRn': 'Reset (active LOW) for the right FIFO section. Pull LOW to initialize that side of the memory.',
       'RSTLn': 'Reset (active LOW) for the left FIFO section. Pull LOW to initialize the left-hand queue.',
       'RCLKL': 'Read clock for the left FIFO section. It advances data out of the left queue.',
       'WCLKL': 'Write clock for the left FIFO section. It shifts new bits into the left queue.',
-      'XMLL': 'Expansion or mode-control input for the left FIFO section. Use it when configuring the left-hand FIFO or cascading devices.',
+      'XMLL': 'Expansion or mode control input for the left FIFO section. Use it when configuring the left-hand FIFO or cascading devices.',
       'GND': 'Ground reference for the package.',
       'FFUL': 'Status output for the left FIFO section. Refer to the datasheet for the exact flag interpretation in the chosen mode.',
-      'SOL': 'Serial output for the left FIFO section. Data leaves here in first-in first-out order.',
+      'SOL': 'Serial output for the left FIFO section. Data leaves here in first in first out order.',
       'SIL': 'Serial input for the left FIFO section. Bits written here enter the left queue.',
       'NC': 'No internal connection. Leave this pin unconnected.',
       'NC2': 'No internal connection. Leave this pin unconnected.',
@@ -189,19 +189,19 @@ export const CHIPS_BLOCK_51 = {
     pins: 24, vcc: 24, gnd: 12,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74act2228.pdf',
     tags: ['FIFO', 'memory', 'dual', 'stub'],
-    guideOverview: 'The 74x2228 expands the same dual-serial FIFO idea to 256 bits per section. Each side behaves like a first-in first-out queue for a single-bit serial stream, making the device useful when longer buffering is needed between producer and consumer logic. Compared with the 74x2226, the deeper queue can absorb larger timing mismatches or longer bursts before data must be read out.',
+    guideOverview: 'The 74x2228 expands the same dual serial FIFO idea to 256 bits per section. Each side behaves like a first in first out queue for a single bit serial stream, making the device useful when longer buffering is needed between producer and consumer logic. Compared with the 74x2226, the deeper queue can absorb larger timing mismatches or longer bursts before data must be read out.',
     guidePinDescriptions: {
       'SIR': 'Serial input for the right FIFO section. Incoming bits are written into the right-hand queue here.',
       'SOR': 'Serial output for the right FIFO section. Bits leave in the same order they were written.',
       'FFUR': 'Status output for the right FIFO section. Use the datasheet to interpret the exact flag meaning in the chosen mode.',
-      'XMLR': 'Expansion or mode-control input for the right FIFO section. It is used when configuring or cascading the queue.',
+      'XMLR': 'Expansion or mode control input for the right FIFO section. It is used when configuring or cascading the queue.',
       'WCLKR': 'Write clock for the right FIFO section. Each write event advances data into the queue.',
       'RCLKR': 'Read clock for the right FIFO section. Each read event advances data toward SOR.',
       'RSTRn': 'Reset (active LOW) for the right FIFO section.',
       'RSTLn': 'Reset (active LOW) for the left FIFO section.',
       'RCLKL': 'Read clock for the left FIFO section.',
       'WCLKL': 'Write clock for the left FIFO section.',
-      'XMLL': 'Expansion or mode-control input for the left FIFO section.',
+      'XMLL': 'Expansion or mode control input for the left FIFO section.',
       'GND': 'Ground reference for the device.',
       'FFUL': 'Status output for the left FIFO section. See the datasheet for the exact flag behavior.',
       'SOL': 'Serial output for the left FIFO section.',
@@ -262,14 +262,14 @@ export const CHIPS_BLOCK_51 = {
     ],
   },
 
-  // 74x2232: 512 bit FIFO memory (64x8), TRI-STATE (24-pin)
+  // 74x2232: 512 bit FIFO memory (64x8), TRI STATE (24-pin)
   '74x2232': {
     name: '74x2232',
     simpleName: '512 bit FIFO Memory (64×8)',
-    description: '512 bit FIFO memory, 64 x 8 organization, TRI-STATE outputs (24-pin)',
+    description: '512 bit FIFO memory, 64 x 8 organization, TRI STATE outputs (24-pin)',
     pins: 24, vcc: 24, gnd: 12,
     datasheet: '',
-    tags: ['FIFO', 'memory', '8 bit', 'tri-state', 'stub'],
+    tags: ['FIFO', 'memory', '8 bit', 'tri state', 'stub'],
     pinout: [
       { pin:  1, name: 'D0',   type: 'input'  },
       { pin:  2, name: 'D1',   type: 'input'  },
@@ -305,7 +305,7 @@ export const CHIPS_BLOCK_51 = {
   '74x2240': {
     name: '74x2240',
     simpleName: 'Dual 4 bit Bidir Buffer Inverting (25Ω)',
-    description: 'Dual 4 bit bidirectional buffer / line driver, inverting, TRI-STATE with 25 Ω series resistor (20-pin)',
+    description: 'Dual 4-bit buffer/line driver, inverting, 3-state, 25Ω (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
     datasheet: '',
     tags: ['buffer', 'bidir', '4 bit', 'inverting', 'stub'],
@@ -336,18 +336,18 @@ export const CHIPS_BLOCK_51 = {
     ],
   },
 
-  // 74x2241: Dual 4 bit bidirectional buffer/line driver, non-inverting, TRI+25Ω (20-pin)
+  // 74x2241: Dual 4 bit bidirectional buffer/line driver, non inverting, TRI+25Ω (20-pin)
   '74x2241': {
     name: '74x2241',
-    simpleName: 'Dual 4 bit Bidir Buffer Non-Inverting (25Ω)',
-    description: 'Dual 4 bit bidirectional buffer / line driver, non-inverting, TRI-STATE with 25 Ω series resistor (20-pin)',
+    simpleName: 'Dual 4 bit Bidir Buffer Non Inverting (25Ω)',
+    description: 'Dual 4-bit buffer/line driver, non inverting, 3-state, 25Ω (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74abt2241.pdf',
-    tags: ['buffer', 'bidir', '4 bit', 'non-inverting', 'stub'],
-    guideOverview: 'The 74x2241 is a dual 4 bit bidirectional buffer/transceiver with non-inverting data paths and built in 25 ohm series resistors on the outputs. The direction control chooses which side of each 4 bit group is currently driving, while the enable input disconnects the bus when the channel should be idle. Devices like this are used when you need to move nibbles between two interfaces but also want a little extra help damping fast edges on short buses or connectors.',
+    tags: ['buffer', 'bidir', '4 bit', 'non inverting', 'stub'],
+    guideOverview: 'The 74x2241 is a dual 4 bit bidirectional buffer/transceiver with non inverting data paths and built in 25 ohm series resistors on the outputs. The direction control chooses which side of each 4 bit group is currently driving, while the enable input disconnects the bus when the channel should be idle. Devices like this are used when you need to move nibbles between two interfaces but also want a little extra help damping fast edges on short buses or connectors.',
     guidePinDescriptions: {
       'T/Rn': 'Transmit/receive direction control. Set this pin according to the datasheet truth table to choose which side of each 4 bit group is driving.',
-      'OEn': 'Output enable (active LOW). Pull LOW to enable the bidirectional buffer paths; drive HIGH to place them in high-impedance.',
+      'OEn': 'Output enable (active LOW). Pull LOW to enable the bidirectional buffer paths; drive HIGH to place them in high impedance.',
       'A1': 'Bit 1 of the first 4 bit bus group. It becomes an input or output depending on T/Rn and OEn.',
       'A2': 'Bit 2 of the first 4 bit bus group.',
       'A3': 'Bit 3 of the first 4 bit bus group.',
@@ -371,13 +371,13 @@ export const CHIPS_BLOCK_51 = {
       {
         title: 'Two 4 bit Bidirectional Paths',
         paragraphs: [
-          'The package really behaves like two nibble-wide bus interfaces. That makes it handy when a design naturally splits into upper and lower 4 bit groups or when two unrelated 4 bit channels need the same style of buffering.',
+          'The package really behaves like two nibble wide bus interfaces. That makes it handy when a design naturally splits into upper and lower 4 bit groups or when two unrelated 4 bit channels need the same style of buffering.',
         ],
       },
       {
         title: 'Why Add 25 Ohm Series Resistance',
         paragraphs: [
-          'A small built in series resistor helps slow the sharpest edge slightly and reduces ringing caused by package, connector, and trace inductance. It is a practical signal-integrity feature for fast buses without needing a separate resistor pack on every line.',
+          'A small built in series resistor helps slow the sharpest edge slightly and reduces ringing caused by package, connector, and trace inductance. It is a practical signal integrity feature for fast buses without needing a separate resistor pack on every line.',
         ],
         note: 'This part is modeled as a stub in the simulator, so the guide focuses on the bus role and controls rather than a full directional transfer model.',
       },
@@ -413,7 +413,7 @@ export const CHIPS_BLOCK_51 = {
   '74x2242': {
     name: '74x2242',
     simpleName: '4 bit Bus Transceiver Inverting (25Ω)',
-    description: '4 bit bus transceiver, inverting, TRI-STATE with 25 Ω series resistor (14-pin)',
+    description: '4-bit bus transceiver, inverting, 3-state, 25Ω (14-pin)',
     pins: 14, vcc: 14, gnd: 7,
     datasheet: '',
     tags: ['transceiver', 'bidir', '4 bit', 'inverting', 'stub'],
@@ -438,14 +438,14 @@ export const CHIPS_BLOCK_51 = {
     ],
   },
 
-  // 74x2243: 4 bit bus transceiver, non-inverting, TRI+25Ω (14-pin)
+  // 74x2243: 4 bit bus transceiver, non inverting, TRI+25Ω (14-pin)
   '74x2243': {
     name: '74x2243',
-    simpleName: '4 bit Bus Transceiver Non-Inverting (25Ω)',
-    description: '4 bit bus transceiver, non-inverting, TRI-STATE with 25 Ω series resistor (14-pin)',
+    simpleName: '4 bit Bus Transceiver Non Inverting (25Ω)',
+    description: '4-bit bus transceiver, non inverting, 3-state, 25Ω (14-pin)',
     pins: 14, vcc: 14, gnd: 7,
     datasheet: '',
-    tags: ['transceiver', 'bidir', '4 bit', 'non-inverting', 'stub'],
+    tags: ['transceiver', 'bidir', '4 bit', 'non inverting', 'stub'],
     pinout: [
       { pin:  1, name: 'GABn', type: 'input'  },
       { pin:  2, name: 'GBAn', type: 'input'  },
@@ -467,19 +467,19 @@ export const CHIPS_BLOCK_51 = {
     ],
   },
 
-  // 74x2244: Dual 4 bit buffer/line driver, non-inverting, TRI+25Ω (20-pin)
+  // 74x2244: Dual 4 bit buffer/line driver, non inverting, TRI+25Ω (20-pin)
   '74x2244': {
     name: '74x2244',
-    simpleName: 'Dual 4 bit Buffer Non-Inverting (25Ω)',
-    description: 'Dual 4 bit buffer / line driver, non-inverting, TRI-STATE with 25 Ω series resistor (20-pin)',
+    simpleName: 'Dual 4 bit Buffer Non Inverting (25Ω)',
+    description: 'Dual 4-bit buffer/line driver, non inverting, 3-state, 25Ω (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74bct2244.pdf',
-    tags: ['buffer', 'dual', '4 bit', 'non-inverting', 'stub'],
-    guideOverview: 'The 74x2244 contains two independent 4 bit non-inverting buffer sections with tri-state outputs and integrated 25 ohm series resistors. A buffer like this is used to refresh or isolate signals without changing their logic sense, while the tri-state controls let the outputs disconnect from a shared bus entirely. The added series resistance helps tame edge-rate related ringing on short high-speed traces and connectors.',
+    tags: ['buffer', 'dual', '4 bit', 'non inverting', 'stub'],
+    guideOverview: 'The 74x2244 contains two independent 4 bit non inverting buffer sections with tri state outputs and integrated 25 ohm series resistors. A buffer like this is used to refresh or isolate signals without changing their logic sense, while the tri state controls let the outputs disconnect from a shared bus entirely. The added series resistance helps tame edge rate related ringing on short high speed traces and connectors.',
     guidePinDescriptions: {
       '1OEn': 'Output enable for section 1 (active LOW). Pull LOW to enable the first 4 bit buffer bank.',
       '1A1': 'Input bit 1 of section 1. Its buffered output appears on 1Y1.',
-      '1A2': 'Input bit 2 of section 1. It is passed through the non-inverting buffer path.',
+      '1A2': 'Input bit 2 of section 1. It is passed through the non inverting buffer path.',
       '1A3': 'Input bit 3 of section 1. Use it like the other section-1 input bits.',
       '1A4': 'Input bit 4 of section 1. It drives output 1Y4 when the section is enabled.',
       '1Y4': 'Output bit 4 of section 1. It follows 1A4 when 1OEn is LOW.',
@@ -502,15 +502,15 @@ export const CHIPS_BLOCK_51 = {
       {
         title: 'Two Independent Buffer Banks',
         paragraphs: [
-          'The package is organized as two 4 bit groups, each with its own enable control. That lets one IC handle two separate nibble-wide paths or two halves of an 8 bit bus without forcing both to be active at once.',
+          'The package is organized as two 4 bit groups, each with its own enable control. That lets one IC handle two separate nibble wide paths or two halves of an 8 bit bus without forcing both to be active at once.',
         ],
       },
       {
         title: 'Buffering with Edge Damping',
         paragraphs: [
-          'A non-inverting buffer copies the input logic level to the output while improving drive capability and isolation. The built in 25 ohm series resistance helps soften the fastest edges enough to reduce ringing on practical board traces.',
+          'A non inverting buffer copies the input logic level to the output while improving drive capability and isolation. The built in 25 ohm series resistance helps soften the fastest edges enough to reduce ringing on practical board traces.',
         ],
-        note: 'This simulator entry is kept as a documented stub rather than a fully behavior-modeled bus buffer.',
+        note: 'This simulator entry is kept as a documented stub rather than a fully behavior modeled bus buffer.',
       },
     ],
     pinout: [
@@ -544,23 +544,23 @@ export const CHIPS_BLOCK_51 = {
   '74x2245': {
     name: '74x2245',
     simpleName: 'Octal Bus Transceiver (25Ω)',
-    description: 'Octal bus transceiver, TRI-STATE with 25 Ω series resistor (20-pin)',
+    description: 'Octal bus transceiver, TRI STATE with 25 Ω series resistor (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74abt2245.pdf',
     tags: ['transceiver', 'octal', 'bidir', 'stub'],
-    guideOverview: 'The 74x2245 is an octal bidirectional bus transceiver with tri-state control and built in 25 ohm series resistors. Functionally it plays the same role as a classic 74x245-style bus interface: it connects two 8 bit buses, lets system logic choose the transfer direction, and disconnects itself when the bus must be idle. The integrated series resistors make it especially attractive on faster boards where edge ringing would otherwise require separate damping resistors.',
+    guideOverview: 'The 74x2245 is an octal bidirectional bus transceiver with tri state control and built in 25 ohm series resistors. Functionally it plays the same role as a classic 74x245-style bus interface: it connects two 8 bit buses, lets system logic choose the transfer direction, and disconnects itself when the bus must be idle. The integrated series resistors make it especially attractive on faster boards where edge ringing would otherwise require separate damping resistors.',
     guidePinDescriptions: {
       'DIR': 'Direction control input. Set it according to the datasheet truth table to choose whether the A side drives the B side or vice versa.',
-      'OEn': 'Output enable (active LOW). Pull LOW to enable the transceiver; drive HIGH to place both bus sides in high-impedance.',
+      'OEn': 'Output enable (active LOW). Pull LOW to enable the transceiver; drive HIGH to place both bus sides in high impedance.',
       'A1': 'Bus line A1. It becomes an input or output depending on DIR and OEn.',
       'A2': 'Bus line A2. Another A-side channel in the octal bus.',
       'A3': 'Bus line A3. Use it as another A-side data bit.',
       'A4': 'Bus line A4. It is part of the controlled bidirectional path.',
       'A5': 'Bus line A5. Another A-side data line.',
-      'A6': 'Bus line A6. It participates in the same direction-controlled bus bridge.',
+      'A6': 'Bus line A6. It participates in the same direction controlled bus bridge.',
       'A7': 'Bus line A7. Another A-side bit.',
       'GND': 'Ground reference for the package.',
-      'A8': 'Bus line A8. This is the highest-numbered A-side channel.',
+      'A8': 'Bus line A8. This is the highest numbered A-side channel.',
       'B8': 'Bus line B8. It is the B-side partner for A8.',
       'B7': 'Bus line B7. Another B-side data line.',
       'B6': 'Bus line B6. Use it as the B-side mate for A6.',
@@ -568,15 +568,15 @@ export const CHIPS_BLOCK_51 = {
       'B4': 'Bus line B4. It is part of the controlled transfer path.',
       'B3': 'Bus line B3. Another B-side channel.',
       'B2': 'Bus line B2. It pairs with A2 through the transceiver.',
-      'B1': 'Bus line B1. This is the lowest-numbered B-side channel.',
+      'B1': 'Bus line B1. This is the lowest numbered B-side channel.',
       'VCC': 'Positive supply for the device.',
     },
     guideSections: [
       {
         title: 'How a Bus Transceiver Helps',
         paragraphs: [
-          'A bus transceiver is a controlled bridge between two multi-bit signal groups. Direction control decides which side currently drives, and the enable control decides whether the bridge is connected at all.',
-          'That is the key to avoiding contention on a shared bus: only the actively selected device drives, while everything else stays high-impedance.',
+          'A bus transceiver is a controlled bridge between two multi bit signal groups. Direction control decides which side currently drives, and the enable control decides whether the bridge is connected at all.',
+          'That is the key to avoiding contention on a shared bus: only the actively selected device drives, while everything else stays high impedance.',
         ],
       },
       {
@@ -584,7 +584,7 @@ export const CHIPS_BLOCK_51 = {
         paragraphs: [
           'The 25 ohm series resistance on each channel acts like a small edge damper. It helps reduce reflections and overshoot on short, fast traces without forcing the board designer to add a separate resistor in series with every line.',
         ],
-        note: 'This entry remains a stub in the simulator, so the guide documents the hardware role and pins rather than a full bus-transfer implementation.',
+        note: 'This entry remains a stub in the simulator, so the guide documents the hardware role and pins rather than a full bus transfer implementation.',
       },
     ],
     pinout: [
@@ -614,14 +614,14 @@ export const CHIPS_BLOCK_51 = {
     ],
   },
 
-  // 74x2253: Dual 4-line to 1-line multiplexer, TRI+25Ω (16-pin)
+  // 74x2253: Dual 4 line to 1 line multiplexer, TRI+25Ω (16-pin)
   '74x2253': {
     name: '74x2253',
-    simpleName: 'Dual 4-Line to 1-Line Multiplexer TRI (25Ω)',
-    description: 'Dual 4-line to 1-line multiplexer, TRI-STATE with 25 Ω series resistor (16-pin)',
+    simpleName: 'Dual 4 Line to 1 Line Multiplexer TRI (25Ω)',
+    description: 'Dual 4-line to 1-line multiplexer, 3-state, 25Ω (16-pin)',
     pins: 16, vcc: 16, gnd: 8,
     datasheet: '',
-    tags: ['multiplexer', '4:1', 'dual', 'tri-state', 'stub'],
+    tags: ['multiplexer', '4:1', 'dual', 'tri state', 'stub'],
     pinout: [
       { pin:  1, name: '1STRn', type: 'input'  },
       { pin:  2, name: 'B',     type: 'input'  },
@@ -645,14 +645,14 @@ export const CHIPS_BLOCK_51 = {
     ],
   },
 
-  // 74x2257: Quad 2-line to 1-line multiplexer, TRI+25Ω (16-pin)
+  // 74x2257: Quad 2 line to 1 line multiplexer, TRI+25Ω (16-pin)
   '74x2257': {
     name: '74x2257',
-    simpleName: 'Quad 2-Line to 1-Line Multiplexer TRI (25Ω)',
-    description: 'Quad 2-line to 1-line multiplexer, TRI-STATE with 25 Ω series resistor (16-pin)',
+    simpleName: 'Quad 2 Line to 1 Line Multiplexer TRI (25Ω)',
+    description: 'Quad 2-line to 1-line multiplexer, 3-state, 25Ω (16-pin)',
     pins: 16, vcc: 16, gnd: 8,
     datasheet: '',
-    tags: ['multiplexer', '2:1', 'quad', 'tri-state', 'stub'],
+    tags: ['multiplexer', '2:1', 'quad', 'tri state', 'stub'],
     pinout: [
       { pin:  1, name: 'SEL',  type: 'input'  },
       { pin:  2, name: '1A',   type: 'input'  },
@@ -676,14 +676,14 @@ export const CHIPS_BLOCK_51 = {
     ],
   },
 
-  // 74x2273: Octal D-type flip-flop, shared clock and clear, 25Ω (20-pin)
+  // 74x2273: Octal D type flip flop, shared clock and clear, 25Ω (20-pin)
   '74x2273': {
     name: '74x2273',
-    simpleName: 'Octal D-Type Flip-Flop Shared CLK+CLRn (25Ω)',
-    description: 'Octal D-type flip-flop with shared clock and clear, 25 Ω series resistor (20-pin)',
+    simpleName: 'Octal D Type Flip Flop Shared CLK+CLRn (25Ω)',
+    description: 'Octal D type flip flop, shared clock and clear, 25Ω (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
     datasheet: '',
-    tags: ['flip-flop', 'octal', 'D-type', 'stub'],
+    tags: ['flip flop', 'octal', 'D type', 'stub'],
     pinout: [
       { pin:  1, name: 'CLRn', type: 'input'  },
       { pin:  2, name: 'D1',   type: 'input'  },

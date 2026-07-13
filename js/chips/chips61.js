@@ -1,5 +1,5 @@
 // chips61.js Block 61: 74x6311 through 74x7060
-// 16 chip definitions
+// 15 chip definitions
 
 export const CHIPS_BLOCK_61 = {
 
@@ -80,38 +80,38 @@ export const CHIPS_BLOCK_61 = {
     gnd: 12,
     datasheet: 'https://www.renesas.com/us/en/document/dst/74fst6800-datasheet',
     tags: ['bus', 'switch', 'fet'],
-    guideOverview: 'The 74x6800 is a 10 bit FET bus switch with output precharge. A bus switch is not a buffered transceiver; it is a bank of low-resistance pass transistors that connect corresponding lines between two buses when enabled. Parts like this are used for hot-plug backplanes, bus isolation, and low-skew signal steering where buffering is not desired.',
+    guideOverview: 'The 74x6800 is a 10 bit FET bus switch with output precharge. A bus switch is not a buffered transceiver; it is a bank of low resistance pass transistors that connect corresponding lines between two buses when enabled. Parts like this are used for hot plug backplanes, bus isolation, and low skew signal steering where buffering is not desired.',
     guidePinDescriptions: {
       'OEn': 'Active LOW switch enable. Pull LOW to connect the A and B sides through the FET switch array.',
-      'A1': 'Bus-side node A1.',
-      'B1': 'Corresponding bus-side node B1.',
-      'A2': 'Bus-side node A2.',
-      'B2': 'Corresponding bus-side node B2.',
-      'A3': 'Bus-side node A3.',
-      'B3': 'Corresponding bus-side node B3.',
-      'A4': 'Bus-side node A4.',
-      'B4': 'Corresponding bus-side node B4.',
-      'A5': 'Bus-side node A5.',
-      'B5': 'Corresponding bus-side node B5.',
+      'A1': 'Bus side node A1.',
+      'B1': 'Corresponding bus side node B1.',
+      'A2': 'Bus side node A2.',
+      'B2': 'Corresponding bus side node B2.',
+      'A3': 'Bus side node A3.',
+      'B3': 'Corresponding bus side node B3.',
+      'A4': 'Bus side node A4.',
+      'B4': 'Corresponding bus side node B4.',
+      'A5': 'Bus side node A5.',
+      'B5': 'Corresponding bus side node B5.',
       'GND': 'Ground reference for the device.',
-      'B6': 'Corresponding bus-side node B6.',
-      'A6': 'Bus-side node A6.',
-      'B7': 'Corresponding bus-side node B7.',
-      'A7': 'Bus-side node A7.',
-      'B8': 'Corresponding bus-side node B8.',
-      'A8': 'Bus-side node A8.',
-      'B9': 'Corresponding bus-side node B9.',
-      'A9': 'Bus-side node A9.',
-      'B10': 'Corresponding bus-side node B10.',
-      'A10': 'Bus-side node A10.',
-      'PRE': 'Precharge control used to bias the bus-switch outputs before connection.',
-      'VCC': 'Positive supply for the switch-control circuitry.',
+      'B6': 'Corresponding bus side node B6.',
+      'A6': 'Bus side node A6.',
+      'B7': 'Corresponding bus side node B7.',
+      'A7': 'Bus side node A7.',
+      'B8': 'Corresponding bus side node B8.',
+      'A8': 'Bus side node A8.',
+      'B9': 'Corresponding bus side node B9.',
+      'A9': 'Bus side node A9.',
+      'B10': 'Corresponding bus side node B10.',
+      'A10': 'Bus side node A10.',
+      'PRE': 'Precharge control used to bias the bus switch outputs before connection.',
+      'VCC': 'Positive supply for the switch control circuitry.',
     },
     guideSections: [
       {
         title: 'Passive Bus Switching',
         paragraphs: [
-          'Unlike a transceiver, a FET bus switch does not actively drive logic HIGH or LOW. It simply connects corresponding lines through a low-resistance path, which keeps delay and skew low.',
+          'Unlike a transceiver, a FET bus switch does not actively drive logic HIGH or LOW. It simply connects corresponding lines through a low resistance path, which keeps delay and skew low.',
         ],
       },
       {
@@ -166,34 +166,34 @@ export const CHIPS_BLOCK_61 = {
     gnd: 10,
     datasheet: 'https://www.ti.com/lit/gpn/sn74cbt6845c',
     tags: ['bus', 'switch', 'fet'],
-    guideOverview: 'The 74x6845 is an 8 bit 1:1 FET bus switch with output precharge. It belongs to the CBT switch family, which is used to connect buses with very low added delay and without the drive behavior of a buffered transceiver. These parts are useful for bus isolation, hot insertion support, and signal-path steering on wide digital buses.',
+    guideOverview: 'The 74x6845 is an 8 bit 1:1 FET bus switch with output precharge. It belongs to the CBT switch family, which is used to connect buses with very low added delay and without the drive behavior of a buffered transceiver. These parts are useful for bus isolation, hot insertion support, and signal path steering on wide digital buses.',
     guidePinDescriptions: {
       'OEn': 'Active LOW switch enable. Pull LOW to connect the A and B nodes through the switch array.',
-      'A1': 'Bus-side node A1.',
-      'B1': 'Corresponding bus-side node B1.',
-      'A2': 'Bus-side node A2.',
-      'B2': 'Corresponding bus-side node B2.',
-      'A3': 'Bus-side node A3.',
-      'B3': 'Corresponding bus-side node B3.',
-      'A4': 'Bus-side node A4.',
-      'B4': 'Corresponding bus-side node B4.',
+      'A1': 'Bus side node A1.',
+      'B1': 'Corresponding bus side node B1.',
+      'A2': 'Bus side node A2.',
+      'B2': 'Corresponding bus side node B2.',
+      'A3': 'Bus side node A3.',
+      'B3': 'Corresponding bus side node B3.',
+      'A4': 'Bus side node A4.',
+      'B4': 'Corresponding bus side node B4.',
       'GND': 'Ground reference for the device.',
-      'B5': 'Corresponding bus-side node B5.',
-      'A5': 'Bus-side node A5.',
-      'B6': 'Corresponding bus-side node B6.',
-      'A6': 'Bus-side node A6.',
-      'B7': 'Corresponding bus-side node B7.',
-      'A7': 'Bus-side node A7.',
-      'B8': 'Corresponding bus-side node B8.',
-      'A8': 'Bus-side node A8.',
-      'PRE': 'Precharge control for the bus-switch outputs.',
+      'B5': 'Corresponding bus side node B5.',
+      'A5': 'Bus side node A5.',
+      'B6': 'Corresponding bus side node B6.',
+      'A6': 'Bus side node A6.',
+      'B7': 'Corresponding bus side node B7.',
+      'A7': 'Bus side node A7.',
+      'B8': 'Corresponding bus side node B8.',
+      'A8': 'Bus side node A8.',
+      'PRE': 'Precharge control for the bus switch outputs.',
       'VCC': 'Positive supply for the control circuitry.',
     },
     guideSections: [
       {
         title: 'CBT Bus Switch Concept',
         paragraphs: [
-          'CBT-family parts use pass transistors rather than active logic drivers. That makes them useful when you want to connect two buses with minimal delay instead of regenerating the logic with buffers.',
+          'CBT family parts use pass transistors rather than active logic drivers. That makes them useful when you want to connect two buses with minimal delay instead of regenerating the logic with buffers.',
         ],
       },
       {
@@ -238,8 +238,9 @@ export const CHIPS_BLOCK_61 = {
   '74x7001': {
     name: '74x7001',
     simpleName: 'Quad AND (Schmitt)',
-    description: 'Four 2 input AND gates with Schmitt-trigger inputs. (14-pin)',
-    guideOverview: 'The 74x7001 provides four independent AND gates with Schmitt-trigger inputs. It is pin-compatible with the 74x08 but offers better noise rejection. Use it anywhere a standard AND gate would work, especially in noisy environments or when building RC oscillators.',
+    description: 'Four 2 input AND gates with Schmitt trigger inputs. (14-pin)',
+    schmittInputs: true,
+    guideOverview: 'The 74x7001 provides four independent AND gates with Schmitt trigger inputs. It is pin compatible with the 74x08 but offers better noise rejection. Use it anywhere a standard AND gate would work, especially in noisy environments or when building RC oscillators.',
     pins: 14,
     vcc: 14,
     gnd: 7,
@@ -265,13 +266,13 @@ export const CHIPS_BLOCK_61 = {
       {
         title: 'AND Logic With Schmitt Inputs',
         paragraphs: [
-          'An AND gate outputs HIGH only when all of its inputs are HIGH. The Schmitt-trigger input stage adds hysteresis, which helps reject slow or noisy input transitions.',
+          'An AND gate outputs HIGH only when all of its inputs are HIGH. The Schmitt trigger input stage adds hysteresis, which helps reject slow or noisy input transitions.',
         ],
       },
       {
         title: 'Where It Helps',
         list: [
-          'Cleaning up switch or RC-shaped inputs before AND logic decisions.',
+          'Cleaning up switch or RC shaped inputs before AND logic decisions.',
           'Combining multiple required conditions in noisy environments.',
           'Building gates around slowly changing sensor signals.',
         ],
@@ -308,8 +309,9 @@ export const CHIPS_BLOCK_61 = {
   '74x7002': {
     name: '74x7002',
     simpleName: 'Quad NOR (Schmitt)',
-    description: 'Four 2 input NOR gates with Schmitt-trigger inputs. (14-pin)',
-    guideOverview: 'The 74x7002 provides four independent NOR gates with Schmitt-trigger inputs. The pinout follows the AND-gate pin ordering (inputs first, output last per gate) rather than the standard 7402 NOR ordering. It works as a drop-in replacement for ordinary NOR gates with extra noise immunity.',
+    description: 'Four 2 input NOR gates with Schmitt trigger inputs. (14-pin)',
+    schmittInputs: true,
+    guideOverview: 'The 74x7002 provides four independent NOR gates with Schmitt trigger inputs. The pinout follows the AND gate pin ordering (inputs first, output last per gate) rather than the standard 74x02 NOR ordering. It works as a drop-in replacement for ordinary NOR gates with extra noise immunity.',
     pins: 14,
     vcc: 14,
     gnd: 7,
@@ -335,13 +337,13 @@ export const CHIPS_BLOCK_61 = {
       {
         title: 'NOR Logic And Hysteresis',
         paragraphs: [
-          'A NOR gate outputs HIGH only when none of its inputs are HIGH. The Schmitt-trigger front end makes the inputs less sensitive to noise and slow edge transitions.',
+          'A NOR gate outputs HIGH only when none of its inputs are HIGH. The Schmitt trigger front end makes the inputs less sensitive to noise and slow edge transitions.',
         ],
       },
       {
         title: 'Pinout Note',
         paragraphs: [
-          'This family keeps the inputs-first ordering rather than the classic 7402 NOR package ordering. The local definition already captures that correctly.',
+          'This family keeps the inputs first ordering rather than the classic 74x02 NOR package ordering. The local definition already captures that correctly.',
         ],
       },
     ],
@@ -369,16 +371,18 @@ export const CHIPS_BLOCK_61 = {
     ],
   },
 
-  // ── 74x7003: Quad 2 input NAND (Schmitt, open-collector) ─────────────
+  // ── 74x7003: Quad 2 input NAND (Schmitt, open collector) ─────────────
   /* Primary source: 74x7003 datasheet   URL not yet verified.
      https://en.wikipedia.org/wiki/Open_collector */
   '74x7003': {
     name: '74x7003',
     simpleName: '2 input NAND (Schmitt OC)',
-    description: 'Quad 2 input NAND gate (Schmitt-trigger inputs, open-collector) (14-pin)',
+    description: 'Quad 2 input NAND gate (Schmitt trigger inputs, open collector) (14-pin)',
+    schmittInputs: true,
     pins: 14,
     vcc: 14,
     gnd: 7,
+    openCollector: true,
     datasheet: '',
     tags: ['nand', 'gate', 'logic', 'quad', 'schmitt', 'open collector'],
     pinout: [
@@ -410,7 +414,7 @@ export const CHIPS_BLOCK_61 = {
   '74x7006': {
     name: '74x7006',
     simpleName: 'Mixed Gate',
-    description: 'Two inverters, one 3 input NAND, one 4 input NAND, one 3 input NOR, one 4 input NOR (24-pin)',
+    description: '2 NOT, 3-in + 4-in NAND, 3-in + 4-in NOR (24-pin)',
     pins: 24,
     vcc: 24,
     gnd: 12,
@@ -538,12 +542,13 @@ export const CHIPS_BLOCK_61 = {
     ],
   },
 
-  // ── 74x7014: Hex Schmitt-trigger buffer ───────────────────────────────
+  // ── 74x7014: Hex Schmitt trigger buffer ───────────────────────────────
   /* Primary source: 74x7014 datasheet   URL not yet verified. */
   '74x7014': {
     name: '74x7014',
     simpleName: 'Buffer (Schmitt)',
-    description: 'Hex Schmitt-trigger buffer (non-inverting) (14-pin)',
+    description: 'Hex Schmitt trigger buffer (non inverting) (14-pin)',
+    schmittInputs: true,
     pins: 14,
     vcc: 14,
     gnd: 7,
@@ -613,8 +618,9 @@ export const CHIPS_BLOCK_61 = {
   '74x7032': {
     name: '74x7032',
     simpleName: 'Quad OR (Schmitt)',
-    description: 'Four 2 input OR gates with Schmitt-trigger inputs. (14-pin)',
-    guideOverview: 'The 74x7032 provides four independent OR gates with Schmitt-trigger inputs. It is pin-compatible with the 74x32 but handles noisy signals better. Useful for wired OR applications and building RC relaxation oscillators.',
+    description: 'Four 2 input OR gates with Schmitt trigger inputs. (14-pin)',
+    schmittInputs: true,
+    guideOverview: 'The 74x7032 provides four independent OR gates with Schmitt trigger inputs. It is pin compatible with the 74x32 but handles noisy signals better. Useful for wired OR applications and building RC relaxation oscillators.',
     pins: 14,
     vcc: 14,
     gnd: 7,
@@ -640,7 +646,7 @@ export const CHIPS_BLOCK_61 = {
       {
         title: 'OR Logic With Schmitt Inputs',
         paragraphs: [
-          'An OR gate outputs HIGH when any input is HIGH. Adding Schmitt-trigger inputs makes the gate better at handling slow, noisy, or RC-shaped signals without chatter.',
+          'An OR gate outputs HIGH when any input is HIGH. Adding Schmitt trigger inputs makes the gate better at handling slow, noisy, or RC shaped signals without chatter.',
         ],
       },
       {
@@ -648,7 +654,7 @@ export const CHIPS_BLOCK_61 = {
         list: [
           'Combining multiple request or alarm signals.',
           'Cleaning up noisy control inputs before OR combination.',
-          'Building simple Schmitt-trigger RC timing tricks around OR logic.',
+          'Building simple Schmitt trigger RC timing tricks around OR logic.',
         ],
       },
     ],
@@ -719,89 +725,13 @@ export const CHIPS_BLOCK_61 = {
     ],
   },
 
-  // ── 74x7046: PLL with VCO and lock detector ──────────────────────────
-  /* Primary source: Texas Instruments, 74x7046 datasheet. [Online]. Available: https://www.ti.com/lit/gpn/cd74hc7046a
-     https://en.wikipedia.org/wiki/Electronic_oscillator */
-  '74x7046': {
-    name: '74x7046',
-    simpleName: 'PLL/VCO',
-    description: 'Phase-locked loop with voltage-controlled oscillator and lock detector (16-pin)',
-    pins: 16,
-    vcc: 16,
-    gnd: 8,
-    datasheet: 'https://www.ti.com/lit/gpn/cd74hc7046a',
-    tags: ['pll', 'vco', 'oscillator', 'analog'],
-    guideOverview: 'The 74x7046 is a phase-locked loop building block with an internal voltage-controlled oscillator, two phase-comparator outputs, and a lock detector. PC1 is an XOR phase comparator; PCout is an edge-triggered frequency-and-phase comparator. VCOo follows SIGi when INH is low. PC3 goes high when the loop is locked (SIGi equals COMPi). DEMo mirrors VCOo and is used as the demodulated output in FM demodulation applications.',
-    guidePinDescriptions: {
-      'PCout': 'Phase comparator 2 (edge-triggered frequency/phase) output; high when SIGi leads COMPi, low when COMPi leads.',
-      'PC1':   'Phase comparator 1 output (XOR): high when SIGi and COMPi differ.',
-      'COMPi': 'Comparator input receives the divided feedback signal for phase comparison.',
-      'VCOo':  'VCO output; follows SIGi when INH is low, forced low when INH is high.',
-      'INH':   'Inhibit: when high, stops VCOo and DEMo (drives both low).',
-      'C1A':   'Timing-capacitor connection A for the external VCO RC network.',
-      'C1B':   'Timing-capacitor connection B for the external VCO RC network.',
-      'GND':   'Ground reference.',
-      'VCOi':  'VCO control-voltage input (analog; not used in digital model).',
-      'DEMo':  'Demodulator output; mirrors VCOo follows SIGi when INH is low.',
-      'R1':    'External VCO timing resistor 1 (analog; not used in digital model).',
-      'R2':    'External VCO timing resistor 2 (analog; not used in digital model).',
-      'PC2':   'Phase comparator 2 complement (XNOR of SIGi and COMPi); low when they differ.',
-      'SIGi':  'Signal input the reference signal the PLL compares against.',
-      'PC3':   'Lock detector output: high when SIGi equals COMPi (loop locked).',
-      'VCC':   'Positive supply.',
-    },
-    guideSections: [
-      {
-        title: 'PLL Concept',
-        paragraphs: [
-          'A phase-locked loop compares an incoming signal with an internal oscillator, then uses the phase error to steer the oscillator toward lock. That makes PLLs useful for recovering clocks, tracking frequencies, and building tunable timing circuits.',
-        ],
-      },
-      {
-        title: 'Phase Comparators',
-        paragraphs: [
-          'PC1 is an XOR detector: its output is high whenever SIGi and COMPi differ. PCout is an edge-triggered frequency-and-phase detector: it goes high when SIGi rises before COMPi, low when COMPi rises first, and resets to zero when both edges coincide. PC2 is the XNOR complement of PC1.',
-        ],
-      },
-      {
-        title: 'Lock Detect And Inhibit',
-        paragraphs: [
-          'PC3 goes high when SIGi and COMPi are equal, indicating a locked loop. Asserting INH high stops both VCOo and DEMo (both forced low), which is useful for power-down or gating the oscillator path.',
-        ],
-      },
-    ],
-    pinout: [
-      { pin: 1,  name: 'PCout', type: 'output' },
-      { pin: 2,  name: 'PC1',   type: 'output' },
-      { pin: 3,  name: 'COMPi', type: 'input'  },
-      { pin: 4,  name: 'VCOo',  type: 'output' },
-      { pin: 5,  name: 'INH',   type: 'input'  },
-      { pin: 6,  name: 'C1A',   type: 'input'  },
-      { pin: 7,  name: 'C1B',   type: 'input'  },
-      { pin: 8,  name: 'GND',   type: 'power'  },
-      { pin: 9,  name: 'VCOi',  type: 'input'  },
-      { pin: 10, name: 'DEMo',  type: 'output' },
-      { pin: 11, name: 'R1',    type: 'input'  },
-      { pin: 12, name: 'R2',    type: 'input'  },
-      { pin: 13, name: 'PC2',   type: 'output' },
-      { pin: 14, name: 'SIGi',  type: 'input'  },
-      { pin: 15, name: 'PC3',   type: 'output' },
-      { pin: 16, name: 'VCC',   type: 'power'  },
-    ],
-    gates: [
-      { type: 'PLL_7046',
-        inputs:  ['COMPi','INH','C1A','C1B','VCOi','R1','R2','SIGi'],
-        outputs: ['PCout','PC1','VCOo','DEMo','PC2','PC3'] },
-    ],
-  },
-
   // ── 74x7060: 14-stage binary counter with oscillator (Schmitt) ───────
   /* Primary source: 74x7060 datasheet   URL not yet verified.
      https://en.wikipedia.org/wiki/Counter_(digital) */
   '74x7060': {
     name: '74x7060',
     simpleName: '14-stage Counter/Osc',
-    description: '14-stage binary counter with oscillator (Schmitt-trigger input) (20-pin)',
+    description: '14-stage binary counter with oscillator (Schmitt trigger input) (20-pin)',
     pins: 20,
     vcc: 20,
     gnd: 10,

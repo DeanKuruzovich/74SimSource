@@ -40,7 +40,7 @@
 html, body {
   height: 100%;
   overflow: hidden;
-  font-family: 'SF Mono', 'Menlo', 'Monaco', 'Consolas', monospace;
+  font-family: var(--font-body);
   background: #1a1a1a;
   color: #ffffff;
 }
@@ -64,7 +64,8 @@ html, body {
   border-bottom: 1px solid #333;
   padding: clamp(4px, 0.5vw, 10px) clamp(8px, 1vw, 18px);
   min-height: clamp(42px, 5.5vh, 72px);
-  z-index: 100;
+  position: relative;
+  z-index: 300;  /* above #side-panel (100 / 150) so toolbar + its dropdowns overlay the side menu */
   flex-shrink: 0;
 }
 
@@ -122,24 +123,6 @@ html, body {
   align-items: center;
 }
 
-/* Small autosave status pill next to the File menu (desktop builds only). */
-.autosave-status {
-  display: inline-flex;
-  align-items: center;
-  font-size: clamp(9px, 0.8vw, 12px);
-  letter-spacing: 0.04em;
-  color: #888;
-  padding: 0 clamp(6px, 0.7vw, 10px);
-  margin-right: clamp(4px, 0.4vw, 8px);
-  font-style: italic;
-  user-select: none;
-  white-space: nowrap;
-  transition: color 0.2s ease;
-}
-.autosave-status.is-saving { color: #d8b25a; }   /* warm amber */
-.autosave-status.is-saved  { color: #6fa86f; }   /* muted green */
-.autosave-status.is-error  { color: #c66666; }   /* muted red */
-
 /* ── Dropdown Panels ─────────────────────────────────────────────────────── */
 
 #dropdown-chip {
@@ -147,6 +130,12 @@ html, body {
 }
 
 #dropdown-chip .dropdown-list {
+  max-height: 480px;
+}
+
+/* More menu: as deep as the chip search so the Example Projects submenu can
+   expand far down instead of scrolling inside a short 300px box. */
+#dropdown-more .dropdown-list {
   max-height: 480px;
 }
 
@@ -183,10 +172,6 @@ html, body {
 
 .dropdown-submenu {
   padding-left: 12px;
-}
-
-.dropdown-submenu-trigger .dropdown-item-name {
-  color: #ffffff;
 }
 
 .dropdown-section-title {
@@ -254,8 +239,23 @@ html, body {
 
 .dropdown-item-desc {
   font-size: 10px;
-  color: #888;
+  color: #fff;
   margin-top: 2px;
+}
+
+/* Non-chip components surfaced in the chip/search list. Inverted
+   (white background, black text) so they stand out from chip rows. */
+.dropdown-item--component {
+  background: #ffffff;
+}
+.dropdown-item--component .dropdown-item-name {
+  color: #000000;
+}
+.dropdown-item--component .dropdown-item-desc {
+  color: #333333;
+}
+.dropdown-item--component:hover {
+  background: #dddddd;
 }
 
 /* Toggle items inside dropdowns circle outline when off, filled when active */
@@ -274,6 +274,99 @@ html, body {
   border: none;
   border-top: 2px solid #555;
   margin: 4px 0;
+}
+
+/* ── Cached Projects ─────────────────────────────────────────────────────── */
+
+.cached-projects-header {
+  padding: 6px 10px 3px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #e0e0e0;
+  letter-spacing: 0.3px;
+  user-select: none;
+}
+
+#cached-projects-list {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.cached-project-empty {
+  padding: 6px 10px 8px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.cached-project-item {
+  padding: 6px 10px;
+  cursor: pointer;
+  border-bottom: 1px solid #2a2a2a;
+}
+
+.cached-project-item:hover {
+  background: #2c2c2c;
+}
+
+.cached-project-active {
+  background: #222;
+  cursor: default;
+}
+
+.cached-project-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cached-project-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.cached-project-name {
+  font-size: 12px;
+  font-weight: bold;
+  color: #f0f0f0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cached-project-badge {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-muted);
+  border: 1px solid var(--border-strong);
+  border-radius: 3px;
+  padding: 0 4px;
+  vertical-align: middle;
+  margin-left: 4px;
+  letter-spacing: 0.2px;
+}
+
+.cached-project-meta {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 1px;
+}
+
+.cached-project-delete {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 2px;
+  flex-shrink: 0;
+  transition: color 0.15s;
+}
+
+.cached-project-delete:hover {
+  color: #c44;
 }
 
 /* ── Main Area ───────────────────────────────────────────────────────────── */
@@ -375,6 +468,8 @@ html, body {
   flex-shrink: 0;
   padding: 12px;
   font-size: 12px;
+  position: relative;
+  z-index: 100;
   transition: width 0.18s ease, transform 0.18s ease;
 }
 
@@ -552,7 +647,7 @@ html, body {
   border-radius: 3px;
   padding: 5px 8px;
   margin-bottom: 4px;
-  font-family: monospace;
+  font-family: var(--font-body);
   font-size: 11px;
   color: #ffffff;
   word-break: break-all;
@@ -612,8 +707,17 @@ html, body {
   border-bottom: none;
 }
 
+.la-state-item--interactive {
+  cursor: pointer;
+  user-select: none;
+}
+
+.la-state-item--interactive:hover {
+  background: #2e2e2e;
+}
+
 .la-state-label {
-  font-family: monospace;
+  font-family: var(--font-body);
   font-weight: bold;
   color: #aaa;
 }
@@ -624,7 +728,7 @@ html, body {
 }
 
 .la-state-val {
-  font-family: monospace;
+  font-family: var(--font-body);
   font-size: 10px;
   font-weight: bold;
 }
@@ -652,7 +756,7 @@ html, body {
   border: 1px solid #383838;
   border-radius: 3px;
   font-size: 10px;
-  font-family: monospace;
+  font-family: var(--font-body);
   padding: 2px 4px;
   cursor: pointer;
   text-transform: none;
@@ -671,7 +775,7 @@ html, body {
 
 .la-kmap-title,
 .la-tt-title {
-  font-family: monospace;
+  font-family: var(--font-body);
   font-size: 10px;
   color: #aaa;
   margin-bottom: 3px;
@@ -680,7 +784,7 @@ html, body {
 .la-kmap,
 .la-tt {
   border-collapse: collapse;
-  font-family: monospace;
+  font-family: var(--font-body);
   font-size: 10px;
   color: #ffffff;
   background: #222;
@@ -760,7 +864,7 @@ html, body {
 
 .la-kmap-empty,
 .la-tt-empty {
-  font-family: monospace;
+  font-family: var(--font-body);
   font-size: 10px;
   color: var(--text-muted);
   font-style: italic;
@@ -815,7 +919,7 @@ html, body {
 }
 
 #welcome-title {
-  font-family: monospace;
+  font-family: var(--font-body);
   font-size: 22px;
   font-weight: 700;
   color: #eee;
@@ -824,7 +928,7 @@ html, body {
 }
 
 #welcome-desc {
-  font-family: monospace;
+  font-family: var(--font-body);
   font-size: 13px;
   color: #999;
   line-height: 1.6;
@@ -839,7 +943,7 @@ html, body {
 }
 
 .welcome-btn {
-  font-family: monospace;
+  font-family: var(--font-body);
   font-size: 13px;
   padding: 7px 16px;
   border-radius: 3px;
@@ -884,7 +988,7 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: monospace;
+  font-family: var(--font-body);
 }
 
 .update-log-modal {
@@ -998,7 +1102,7 @@ html, body {
   color: #111;
   border: 1px solid #eee;
   border-radius: 3px;
-  font-family: monospace;
+  font-family: var(--font-body);
   font-size: 13px;
   font-weight: 700;
   padding: 7px 18px;
@@ -1014,7 +1118,7 @@ html, body {
 /* ── Chip Info Panel ─────────────────────────────────────────────────────── */
 
 .chip-info-desc {
-  color: #aaa;
+  color: #fff;
   font-size: 12px;
   margin-bottom: 10px;
 }
@@ -1145,6 +1249,7 @@ html, body {
 .legend-input { color: #8d8; }
 .legend-output { color: #e88; }
 .legend-power { color: #fd6; }
+.legend-nc { color: #888; }
 
 /* ── SVG DIP Chip Diagram ────────────────────────────────────────────────── */
 
@@ -1186,7 +1291,7 @@ html, body {
   display: flex;
   align-items: baseline;
   gap: 6px;
-  font-family: Menlo, Consolas, monospace;
+  font-family: var(--font-body);
   font-size: 11px;
   color: #aaa;
   padding: 2px 0;
@@ -1285,13 +1390,6 @@ html, body {
   margin-bottom: 2px;
 }
 
-.chip-guide-note {
-  font-size: 11px;
-  color: #888;
-  font-style: italic;
-  margin: 4px 0 8px;
-  line-height: 1.5;
-}
 
 .chip-guide-figure {
   margin: 6px 0 10px;
@@ -1325,7 +1423,7 @@ html, body {
 }
 
 .chip-guide-formula {
-  font-family: 'SF Mono', 'Consolas', monospace;
+  font-family: var(--font-body);
   font-size: 11px;
   color: #cfcfcf;
   background: #151515;
@@ -1366,7 +1464,7 @@ html, body {
 
 .chip-guide-table .cg-name {
   color: #ffffff;
-  font-family: 'SF Mono', 'Consolas', monospace;
+  font-family: var(--font-body);
   white-space: nowrap;
   width: 50px;
 }
@@ -1388,7 +1486,7 @@ html, body {
   line-height: 1.7;
 }
 
-/* ── 7-Segment Info Panel ───────────────────────────────────────────────── */
+/* ── 7 Segment Info Panel ───────────────────────────────────────────────── */
 
 .seven-seg-panel {
   display: flex;
@@ -1525,12 +1623,32 @@ html, body {
   min-width: 200px;
 }
 
+.floating.input-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 7px;
+}
+
 .floating.input-title {
   font-size: 11px;
   font-weight: 600;
   color: var(--text-muted);
   letter-spacing: 0.3px;
-  margin-bottom: 7px;
+}
+
+.floating.input-x-btn {
+  background: none;
+  border: none;
+  color: #666;
+  font-size: 16px;
+  line-height: 1;
+  padding: 0 0 0 8px;
+  cursor: pointer;
+}
+
+.floating.input-x-btn:hover {
+  color: #bbb;
 }
 
 .floating.input-row {
@@ -1590,6 +1708,63 @@ html, body {
   border-color: #888;
 }
 
+/* "?" prefix-guide button inside the floating input row */
+.floating-input-help-btn {
+  background: none;
+  border: 1px solid #555;
+  border-radius: 3px;
+  color: #888;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 4px 7px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: color 0.15s, border-color 0.15s;
+}
+.floating-input-help-btn:hover,
+.floating-input-help-btn.active {
+  color: #ccc;
+  border-color: #888;
+}
+
+/* Prefix-guide tooltip (hidden by default, toggled with .visible) */
+.floating-input-help-tooltip {
+  display: none;
+  margin-top: 8px;
+  padding: 8px 10px;
+  background: #252525;
+  border: 1px solid #444;
+  border-radius: 4px;
+  font-size: 11px;
+  color: #bbb;
+}
+.floating-input-help-tooltip.visible {
+  display: block;
+}
+.fih-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 3px;
+}
+.fih-row:last-child {
+  margin-bottom: 0;
+}
+.fih-name {
+  min-width: 44px;
+  color: #ddd;
+}
+.fih-sym {
+  min-width: 42px;
+  color: #ccc;
+  font-family: var(--font-body);
+}
+.fih-pow {
+  color: #888;
+  font-variant-numeric: tabular-nums;
+}
+
 /* ── Circuit Info Panel ──────────────────────────────────────────────────── */
 
 .ci-section-title {
@@ -1645,20 +1820,20 @@ html, body {
 .ci-lbl {
   font-weight: bold;
   color: #aaa;
-  font-family: monospace;
+  font-family: var(--font-body);
   white-space: nowrap;
   width: 32px;
 }
 
 .ci-val {
-  font-family: monospace;
+  font-family: var(--font-body);
   color: #bbb;
   white-space: nowrap;
   text-align: right;
 }
 
 .ci-conn {
-  font-family: monospace;
+  font-family: var(--font-body);
   font-size: 9px;
   color: #777;
 }
@@ -1675,11 +1850,39 @@ html, body {
   color: var(--text-muted);
 }
 
+/* Probe panel: right-click a wire or LED for a bare voltage/current readout */
+.probe-readout {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.probe-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  background: #222;
+  border: 1px solid #383838;
+  border-radius: 4px;
+  padding: 10px 12px;
+}
+.probe-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.3px;
+}
+.probe-value {
+  font-family: var(--font-body);
+  font-size: 18px;
+  font-weight: bold;
+  color: #fff;
+}
+
 /* Net labels */
-.ci-net-vcc    { color: #f66; font-weight: bold; font-family: monospace; }
-.ci-net-gnd    { color: #6af; font-weight: bold; font-family: monospace; }
-.ci-net-num    { color: #aaa; font-family: monospace; }
-.ci-net-short  { color: #f44; font-weight: bold; font-family: monospace; }
+.ci-net-vcc    { color: #f66; font-weight: bold; font-family: var(--font-body); }
+.ci-net-gnd    { color: #6af; font-weight: bold; font-family: var(--font-body); }
+.ci-net-num    { color: #aaa; font-family: var(--font-body); }
+.ci-net-short  { color: #f44; font-weight: bold; font-family: var(--font-body); }
 
 /* LED state */
 .ci-led-on  { color: #fa0; font-weight: bold; font-size: 10px; }
@@ -1719,7 +1922,7 @@ html, body {
 .ci-over {
   color: #f66;
   font-weight: bold;
-  font-family: monospace;
+  font-family: var(--font-body);
   font-size: 10px;
 }
 
@@ -1793,7 +1996,7 @@ html, body {
   height: 100%;
   padding: 8px 10px;
   color: #ffffff;
-  font-family: 'SF Mono', 'Menlo', 'Monaco', 'Consolas', monospace;
+  font-family: var(--font-body);
   /* Fixed world-pixel font size; pan/zoom is applied via a CSS transform on
      #textbox-layer, so text scales naturally with the canvas. */
   font-size: 13px;
@@ -1832,6 +2035,154 @@ html, body {
 .textbox-handle-ne { top: -5px;    right: -5px;  cursor: ne-resize; }
 .textbox-handle-sw { bottom: -5px; left: -5px;   cursor: sw-resize; }
 .textbox-handle-se { bottom: -5px; right: -5px;  cursor: se-resize; }
+
+/* ── Image Box Annotations ───────────────────────────────────────────────── */
+
+#imagebox-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9; /* below #textbox-layer so text labels sit above pictures */
+}
+
+.imagebox {
+  position: absolute;
+  background: #1c1c1c;
+  border: 1.5px solid #555;
+  border-radius: 2px;
+  box-sizing: border-box;
+  pointer-events: all;
+  cursor: grab;
+  user-select: none;
+}
+
+.imagebox:active {
+  cursor: grabbing;
+}
+
+.imagebox.selected {
+  border-color: #aaa;
+  box-shadow: 0 0 0 1px #555;
+}
+
+.imagebox.dragover {
+  border-color: #6aa9e0;
+  box-shadow: 0 0 0 2px rgba(106, 169, 224, 0.4);
+}
+
+.imagebox-content {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* The image always letterboxes inside the box — never stretches it */
+.imagebox-content img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  pointer-events: none;
+}
+
+.imagebox-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  border: 1.5px dashed #4a4a4a;
+  border-radius: 2px;
+  color: #888;
+  font-family: var(--font-body);
+  font-size: 12px;
+}
+
+.imagebox-btn {
+  pointer-events: all;
+  cursor: pointer;
+  background: #2a2a2a;
+  color: #ddd;
+  border: 1px solid #555;
+  border-radius: 3px;
+  padding: 4px 12px;
+  font-family: var(--font-body);
+  font-size: 12px;
+  line-height: 1.3;
+}
+
+.imagebox-btn:hover {
+  background: #333;
+  border-color: #777;
+}
+
+.imagebox-hint {
+  font-size: 11px;
+  color: #6a6a6a;
+}
+
+/* Top bar (aspect-ratio lock) shown when selected or hovered */
+.imagebox-bar {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  display: none;
+  gap: 4px;
+  z-index: 2;
+}
+
+.imagebox.selected .imagebox-bar,
+.imagebox:hover .imagebox-bar {
+  display: flex;
+}
+
+.imagebox-lock {
+  pointer-events: all;
+  cursor: pointer;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(28, 28, 28, 0.85);
+  border: 1px solid #555;
+  border-radius: 3px;
+  font-size: 12px;
+  line-height: 1;
+  padding: 0;
+}
+
+.imagebox-lock:hover {
+  border-color: #888;
+  background: rgba(45, 45, 45, 0.9);
+}
+
+.imagebox-lock:not(.locked) {
+  opacity: 0.55;
+}
+
+/* Corner resize handles shown only when selected (mirrors .textbox-handle) */
+.imagebox-handle {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  background: #999;
+  border: 1px solid #1c1c1c;
+  border-radius: 1px;
+  display: none;
+  z-index: 2;
+}
+
+.imagebox.selected .imagebox-handle { display: block; }
+
+.imagebox-handle-nw { top: -5px;    left: -5px;   cursor: nw-resize; }
+.imagebox-handle-ne { top: -5px;    right: -5px;  cursor: ne-resize; }
+.imagebox-handle-sw { bottom: -5px; left: -5px;   cursor: sw-resize; }
+.imagebox-handle-se { bottom: -5px; right: -5px;  cursor: se-resize; }
 
 /* ── Right-click context panel controls ──────────────────────────────────── */
 
@@ -1874,6 +2225,134 @@ html, body {
   font-size: 11px;
 }
 
+.ctx-duty-wrap {
+  margin: 4px 4px 14px 4px;
+  padding: 10px;
+  background: #1c1c1c;
+  border: 1px solid #333;
+  border-radius: 4px;
+}
+
+.ctx-duty-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #ddd;
+  margin-bottom: 6px;
+}
+
+.ctx-duty-label span:last-child {
+  color: #7af;
+  font-family: var(--font-body);
+}
+
+.ctx-duty-slider {
+  width: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  background: #444;
+  border-radius: 2px;
+  outline: none;
+  margin: 4px 0;
+}
+
+.ctx-duty-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #7af;
+  cursor: pointer;
+  border: none;
+}
+
+.ctx-duty-slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #7af;
+  cursor: pointer;
+  border: none;
+}
+
+.ctx-duty-help {
+  font-size: 11px;
+  color: #888;
+  margin-top: 6px;
+  line-height: 1.4;
+}
+
+/* Crystal context panel: frequency preset grid + custom entry */
+.ctx-xtal-presets {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  margin: 6px 0;
+}
+
+.ctx-xtal-preset {
+  padding: 5px 2px;
+  font-size: 11px;
+  font-family: var(--font-body);
+  color: #ccc;
+  background: #262626;
+  border: 1px solid #3a3a3a;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.ctx-xtal-preset:hover {
+  background: #333;
+  border-color: #555;
+}
+
+.ctx-xtal-preset.active {
+  color: #0d1b2a;
+  background: #7af;
+  border-color: #7af;
+  font-weight: 600;
+}
+
+.ctx-xtal-custom {
+  display: flex;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.ctx-xtal-custom input {
+  flex: 1;
+  min-width: 0;
+  padding: 5px 8px;
+  font-size: 12px;
+  font-family: var(--font-body);
+  color: #eee;
+  background: #111;
+  border: 1px solid #3a3a3a;
+  border-radius: 3px;
+  outline: none;
+}
+
+.ctx-xtal-custom input:focus {
+  border-color: #7af;
+}
+
+.ctx-xtal-custom button {
+  padding: 5px 12px;
+  font-size: 12px;
+  color: #0d1b2a;
+  background: #7af;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.ctx-xtal-custom button:hover {
+  background: #9cf;
+}
+
 .ctx-pullres-link a {
   color: #7af;
   text-decoration: none;
@@ -1888,6 +2367,37 @@ html, body {
   font-size: 11px;
   color: #aaa;
   line-height: 1.7;
+}
+
+.spdt-state-btns {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  margin: 8px 0 12px;
+}
+
+.spdt-state-btn {
+  flex: 1;
+  padding: 6px 4px;
+  font-size: 11px;
+  font-family: var(--font-body);
+  cursor: pointer;
+  border-radius: 4px;
+  border: 1px solid #404040;
+  background: #1e1e1e;
+  color: #888;
+  user-select: none;
+}
+
+.spdt-state-btn.active {
+  background: #2c2c2c;
+  color: #ffffff;
+  border-color: #666;
+}
+
+.spdt-state-btn:hover:not(.active) {
+  background: #2a2a2a;
+  color: #ddd;
 }
 
 /* ── Responsive side panel ──────────────────────────────────────────────────
@@ -1921,7 +2431,7 @@ html, body {
   display: flex;
   flex-direction: column;
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.8);
-  font-family: 'SF Mono', 'Menlo', monospace;
+  font-family: var(--font-body);
   overflow: hidden;
 }
 
@@ -2088,3 +2598,95 @@ html, body {
   color: var(--text-faint);
 }
 
+
+/* ── Timing Analysis panel ─────────────────────────────────────── */
+/* Segmented run-mode control: Stopped / Real time / Propagation-scale. */
+.timing-modes {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.timing-mode {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  background: #2c2c2c;
+  color: #ccc;
+  border: 1px solid #444;
+  border-radius: 4px;
+  padding: 6px 4px;
+  font-size: 12px;
+  line-height: 1.2;
+  cursor: pointer;
+}
+.timing-mode small { font-size: 10px; color: #888; }
+.timing-mode:hover { background: #3a3a3a; }
+.timing-mode.active {
+  background: #4a4a4a;
+  border-color: #888;
+  color: #fff;
+}
+.timing-mode.active small { color: #ccc; }
+
+.timing-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.timing-btn {
+  background: #2c2c2c;
+  color: #eee;
+  border: 1px solid #444;
+  border-radius: 4px;
+  padding: 4px 10px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.timing-btn:hover { background: #3a3a3a; }
+
+.timing-time {
+  margin-left: auto;
+  font-family: monospace;
+  font-size: 12px;
+  color: #ccc;
+  white-space: nowrap;
+}
+
+.timing-label { font-size: 12px; color: #ccc; }
+
+.timing-select, .timing-num {
+  background: #2c2c2c;
+  color: #eee;
+  border: 1px solid #444;
+  border-radius: 4px;
+  padding: 3px 6px;
+  font-size: 12px;
+}
+.timing-num { width: 56px; }
+
+.timing-behind {
+  color: #ff9f43;
+  font-size: 11px;
+}
+
+#timing-canvas {
+  width: 100%;
+  display: block;
+  background: #141414;
+  border: 1px solid #333;
+  border-radius: 4px;
+  cursor: crosshair;
+  margin-top: 4px;
+}
+
+.timing-hint {
+  color: #777;
+  font-size: 11px;
+  margin-top: 8px;
+  line-height: 1.55;
+}

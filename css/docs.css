@@ -15,7 +15,7 @@
 html, body { height: 100%; }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  font-family: var(--font-body);
   background: var(--bg);
   color: var(--text);
   line-height: 1.65;
@@ -115,6 +115,7 @@ a:hover { color: var(--link-hover); text-decoration: underline; }
   display: flex;
   align-items: center;
   font-size: 13px;
+  font-family: inherit;
   color: var(--text-muted);
   padding: 6px 8px;
   border-radius: 5px;
@@ -125,8 +126,9 @@ a:hover { color: var(--link-hover); text-decoration: underline; }
   background: none;
   width: 100%;
   text-align: left;
+  text-decoration: none;
 }
-.sidebar-link:hover { color: var(--text); background: var(--bg-elev); }
+.sidebar-link:hover { color: var(--text); background: var(--bg-elev); text-decoration: none; }
 .sidebar-link.active { color: var(--text); background: var(--bg-elev-2); font-weight: 500; }
 .sidebar-link::before {
   content: '';
@@ -217,7 +219,7 @@ td { padding: 10px 14px; color: var(--text-dim); border-bottom: 1px solid #27272
 tr:last-child td { border-bottom: none; }
 
 /* ── Kbd ── */
-kbd { display: inline-block; background: var(--bg-elev-2); border: 1px solid var(--border-strong); border-bottom-width: 2px; border-radius: 4px; padding: 1px 7px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; color: var(--text); }
+kbd { display: inline-block; background: var(--bg-elev-2); border: 1px solid var(--border-strong); border-bottom-width: 2px; border-radius: 4px; padding: 1px 7px; font-family: var(--font-body); font-size: 11px; color: var(--text); }
 
 /* ── Example cards ── */
 .example-list { list-style: none; display: flex; flex-direction: column; gap: 10px; margin: 20px 0; }
@@ -317,18 +319,52 @@ kbd { display: inline-block; background: var(--bg-elev-2); border: 1px solid var
 }
 
 /* ── Chip Reference ── */
-.chip-ref-dip-wrap { overflow-x: auto; margin-bottom: 18px; display: flex; justify-content: center; align-items: center; width: 100%; box-sizing: border-box; }
+.chip-ref-dip-wrap { overflow-x: auto; margin-bottom: 6px; display: flex; justify-content: center; align-items: center; width: 100%; box-sizing: border-box; }
+.chip-ref-pinout-legend { display: flex; gap: 10px; justify-content: center; font-size: 11px; margin-bottom: 14px; }
+.chip-ref-legend-input  { color: #8d8; }
+.chip-ref-legend-output { color: #e88; }
+.chip-ref-legend-power  { color: #fd6; }
+.chip-ref-legend-nc     { color: #888; }
 .chip-ref-guide { margin-top: 14px; }
 .chip-ref-guide-overview { font-size: 13px; color: var(--text); line-height: 1.65; margin-bottom: 14px; }
 .chip-ref-guide-subtitle { font-size: 13px; font-weight: 600; color: var(--text); margin: 16px 0 6px; letter-spacing: 0.1px; }
 .chip-ref-guide-paragraph { font-size: 13px; color: var(--text); line-height: 1.65; margin-bottom: 8px; }
 .chip-ref-guide-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 8px; }
 .chip-ref-guide-table td { padding: 4px 8px; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: top; }
-.chip-ref-guide-table .cg-pin { color: var(--text-muted); font-family: Menlo, Consolas, monospace; width: 28px; }
-.chip-ref-guide-table .cg-name { font-family: Menlo, Consolas, monospace; color: var(--text); width: 60px; }
+.chip-ref-guide-table .cg-pin { color: var(--text-muted); font-family: var(--font-body); width: 28px; }
+.chip-ref-guide-table .cg-name { font-family: var(--font-body); color: var(--text); width: 60px; }
 .chip-ref-guide-table .cg-desc { color: var(--text); }
-.chip-ref-guide-formulas { background: var(--bg-elev); border: 1px solid var(--border); border-radius: 5px; padding: 8px 12px; margin-bottom: 10px; font-family: Menlo, Consolas, monospace; font-size: 12px; color: var(--text); }
-.chip-ref-guide-formula { margin: 2px 0; }
+.chip-ref-guide-formulas { background: var(--bg-elev); border: 1px solid var(--border); border-radius: 5px; padding: 10px 14px; margin-bottom: 10px; font-family: var(--font-body); font-size: 15px; color: var(--text); }
+.chip-ref-guide-formula { margin: 6px 0; display: flex; align-items: center; flex-wrap: wrap; gap: 2px; line-height: 1.4; }
+.chip-ref-guide-formula sub { font-size: 0.65em; }
+.chip-ref-guide-formula .formula-op { margin: 0 6px; color: var(--text-muted); font-style: normal; }
+.chip-ref-guide-formula .frac { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; margin: 0 3px; line-height: 1.15; }
+.chip-ref-guide-formula .frac-num { padding: 0 6px 1px; border-bottom: 1px solid var(--text); white-space: nowrap; }
+.chip-ref-guide-formula .frac-den { padding: 1px 6px 0; white-space: nowrap; }
+
+/* ── Inline chip calculators (e.g. 555 timer) ── */
+.chip-calc { border: 1px solid var(--border); border-radius: 6px; background: var(--bg-elev); padding: 12px 14px; margin: 10px 0 14px; font-size: 12px; color: var(--text); }
+.chip-calc-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+.chip-calc-title { font-weight: 600; font-size: 13px; }
+.chip-calc-hint { color: var(--text-muted); font-size: 11px; line-height: 1.5; margin-bottom: 10px; }
+.chip-calc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 22px; }
+.chip-calc-grid-one { grid-template-columns: 1fr; max-width: 320px; }
+.chip-calc-col { display: flex; flex-direction: column; gap: 6px; }
+.chip-calc-colhead { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 2px; }
+.chip-calc-row { display: grid; grid-template-columns: 60px 1fr 28px; align-items: center; gap: 8px; }
+.chip-calc-label { font-family: var(--font-body); font-size: 14px; color: var(--text); }
+.chip-calc-label sub { font-size: 0.7em; }
+.chip-calc-input { background: var(--bg); border: 1px solid var(--border); border-radius: 4px; padding: 5px 8px; color: var(--text); font-family: var(--font-body); font-size: 12px; outline: none; min-width: 0; }
+.chip-calc-input:focus { border-color: var(--accent); }
+.chip-calc-unit { color: var(--text-muted); font-size: 11px; font-family: var(--font-body); }
+.chip-calc-clear { background: transparent; border: 1px solid var(--border-strong); color: var(--text-muted); padding: 2px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; font-family: inherit; }
+.chip-calc-clear:hover { background: var(--bg); color: var(--text); }
+.chip-calc-msg { margin-top: 8px; font-size: 11px; color: var(--text-muted); min-height: 14px; }
+.chip-calc-msg-err { color: #d4a017; }
+@media (max-width: 540px) {
+  .chip-calc-grid { grid-template-columns: 1fr; }
+}
+.chip-ref-guide-list-label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
 .chip-ref-guide-list { font-size: 13px; color: var(--text); padding-left: 22px; margin-bottom: 8px; line-height: 1.7; }
 .chip-ref-guide-note { font-size: 12px; color: var(--text); background: var(--bg-elev); border: 1px solid var(--border); padding: 8px 12px; border-radius: 5px; margin-bottom: 10px; }
 .chip-ref-guide-figure { text-align: center; margin: 14px 0; }
@@ -336,9 +372,16 @@ kbd { display: inline-block; background: var(--bg-elev-2); border: 1px solid var
 .chip-ref-guide-caption { font-size: 11px; color: var(--text-muted); margin-top: 5px; }
 .chip-ref-guide-citation { font-size: 10px; color: var(--text-muted); margin-top: 3px; }
 .chip-ref-guide-citation a { color: var(--text-muted); text-decoration: underline; }
-.chip-ref-datasheet { display: inline-block; font-size: 12px; color: var(--accent); margin-top: 10px; }
+.chip-ref-datasheet { display: inline-block; font-size: 12px; color: var(--accent); margin-bottom: 12px; }
+.chip-ref-chip-description { font-size: 12px; color: #fff; margin-bottom: 4px; text-align: center; }
 .chip-ref-unverified { background: #2e2200; border: 1px solid #664d00; color: #d4a017; padding: 10px 14px; border-radius: 6px; margin-bottom: 16px; font-size: 12px; line-height: 1.6; }
 .chip-ref-unverified a { color: #e8b84b; text-decoration: underline; }
+.chip-ref-stub { background: #2a1414; border: 1px solid #7a2a2a; color: #f0b8b8; padding: 14px 18px; border-radius: 6px; margin-bottom: 16px; font-size: 13px; line-height: 1.6; }
+.chip-ref-stub strong { color: #ff8a8a; display: block; font-size: 14px; margin-bottom: 4px; }
+.chip-ref-stub a { color: #f6c1c1; text-decoration: underline; }
+.chip-ref-notsim { background: #2a1c0e; border: 1px solid #8a5a1f; color: #f0c89a; padding: 14px 18px; border-radius: 6px; margin-bottom: 16px; font-size: 13px; line-height: 1.6; }
+.chip-ref-notsim strong { color: #ffae5e; display: block; font-size: 14px; margin-bottom: 4px; }
+.chip-ref-notsim a { color: #f3cda0; text-decoration: underline; }
 
 /* Chip search article */
 .chip-search-wrap { margin: 20px 0 14px; }
@@ -347,7 +390,7 @@ kbd { display: inline-block; background: var(--bg-elev-2); border: 1px solid var
 .chip-search-results { display: flex; flex-direction: column; }
 .chip-search-result { display: flex; align-items: baseline; gap: 12px; padding: 7px 10px; background: none; border: none; border-radius: 5px; cursor: pointer; text-align: left; width: 100%; }
 .chip-search-result:hover { background: var(--bg-elev); }
-.csr-name { font-family: Menlo, Consolas, monospace; font-size: 13px; color: var(--text); min-width: 72px; flex-shrink: 0; }
+.csr-name { font-family: var(--font-body); font-size: 13px; color: var(--text); min-width: 72px; flex-shrink: 0; }
 .csr-desc { font-size: 12px; color: var(--text-dim); }
 .chip-search-empty { font-size: 13px; color: var(--text-muted); padding: 12px 0; }
 

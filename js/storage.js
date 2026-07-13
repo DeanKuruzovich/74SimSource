@@ -1,24 +1,37 @@
 // ── Storage: Save / Load ─────────────────────────────────────────────────────
 // Serializes and deserializes the complete board state to/from JSON.
-// Supports localStorage auto-save, browser file export/import, and (when
-// running inside Tauri) native filesystem Save/Open + on-disk autosave.
+// Supports localStorage auto-save and file export/import.
 
 import { deserializeComponent, setNextComponentId } from './components.js';
 import { COMP } from './constants.js';
 
 const STORAGE_KEY = '74sim_state';
+const FILENAME_KEY = '74sim_current_filename';
 
-// ── Tauri detection / invoke helper ──────────────────────────────────────────
-export function isTauri() {
-  return !!(globalThis.__TAURI_INTERNALS__ || globalThis.__TAURI__);
+// Sticky filename: once the user saves with a chosen name, or loads a file,
+// that name overrides the auto-suggested name for subsequent saves until the
+// user clears the circuit.
+export function getStoredFilename() {
+  try {
+    return localStorage.getItem(FILENAME_KEY) || null;
+  } catch (_) {
+    return null;
+  }
 }
 
-function tauriInvoke(cmd, args) {
-  const t = globalThis.__TAURI__;
-  if (!t || !t.core || !t.core.invoke) {
-    return Promise.reject(new Error('Tauri runtime not available'));
-  }
-  return t.core.invoke(cmd, args);
+export function setStoredFilename(name) {
+  try {
+    if (!name) return;
+    const trimmed = String(name).trim();
+    if (!trimmed) return;
+    localStorage.setItem(FILENAME_KEY, trimmed);
+  } catch (_) { /* ignore */ }
+}
+
+export function clearStoredFilename() {
+  try {
+    localStorage.removeItem(FILENAME_KEY);
+  } catch (_) { /* ignore */ }
 }
 
 export function saveToLocalStorage(state) {
@@ -47,12 +60,12 @@ export function serializeState(state) {
     wires: state.wireManager.serialize(),
     extraTiles: state.extraTiles || [],
     textBoxes: state.textBoxes || [],
+    imageBoxes: state.imageBoxes || [],
     // User settings
     chipFamily: state.chipFamily,
     showNetPower: state.showNetPower,
     showSimpleChipNames: state.showSimpleChipNames,
     showRealisticBoard: state.showRealisticBoard,
-    pureDigital: state.pureDigital,
     showLogicView: state.showLogicView,
     showCircuitInfo: state.showCircuitInfo,
     showValues: state.showValues,
@@ -80,13 +93,13 @@ export function deserializeState(data, state, world = null) {
 
   state.extraTiles = data.extraTiles || [];
   state.textBoxes = data.textBoxes || [];
+  state.imageBoxes = data.imageBoxes || [];
 
   // Restore user settings if present
   if (data.chipFamily !== undefined) state.chipFamily = data.chipFamily;
   if (data.showNetPower !== undefined) state.showNetPower = data.showNetPower;
   if (data.showSimpleChipNames !== undefined) state.showSimpleChipNames = data.showSimpleChipNames;
   if (data.showRealisticBoard !== undefined) state.showRealisticBoard = data.showRealisticBoard;
-  if (data.pureDigital !== undefined) state.pureDigital = data.pureDigital;
   if (data.showLogicView !== undefined) state.showLogicView = data.showLogicView;
   if (data.showCircuitInfo !== undefined) state.showCircuitInfo = data.showCircuitInfo;
   if (data.showValues !== undefined) state.showValues = data.showValues;
@@ -97,7 +110,7 @@ export function deserializeState(data, state, world = null) {
 }
 
 // ── Circuit Name Suggestion ───────────────────────────────────────────────────
-// Priority: 7-segment > clock/555 > sequential logic > combinational logic
+// Priority: 7 segment > clock/555 > sequential logic > combinational logic
 // Maximum 3 parts in any suggested name.
 
 export function suggestCircuitName(components) {
@@ -179,7 +192,8 @@ export function suggestCircuitName(components) {
 export async function exportToFile(state) {
   const data = serializeState(state);
   const json = JSON.stringify(data, null, 2);
-  const suggestedName = suggestCircuitName(state.components || []);
+  // Stored (sticky) filename takes priority over the auto-suggested one.
+  const suggestedName = getStoredFilename() || suggestCircuitName(state.components || []);
 
   if (window.showSaveFilePicker) {
     try {
@@ -193,6 +207,7 @@ export async function exportToFile(state) {
       const writable = await fileHandle.createWritable();
       await writable.write(json);
       await writable.close();
+      setStoredFilename(fileHandle.name || suggestedName);
       return;
     } catch (e) {
       if (e.name === 'AbortError') return; // user cancelled
@@ -207,6 +222,7 @@ export async function exportToFile(state) {
   a.download = suggestedName;
   a.click();
   URL.revokeObjectURL(url);
+  setStoredFilename(suggestedName);
 }
 
 export function importFromFile(callback) {
@@ -220,7 +236,7 @@ export function importFromFile(callback) {
     reader.onload = () => {
       try {
         const data = JSON.parse(reader.result);
-        callback(data);
+        callback(data, file.name);
       } catch (e) {
         alert('Invalid file format.');
       }
@@ -312,169 +328,5 @@ function _readProjectList() {
     return Array.isArray(parsed) ? parsed : [];
   } catch (_) {
     return [];
-  }
-}
-
-// ── Tauri filesystem Save / Open ─────────────────────────────────────────────
-// "Save" / "Open" target real files on disk via native dialogs.
-// "Import" / "Export" remain the browser-style download/upload functions above.
-
-const CURRENT_FILE_KEY = '74sim_current_file_path';
-const RECENT_FILES_KEY = '74sim_recent_files';
-const RECENT_FILES_LIMIT = 10;
-
-export function getCurrentFilePath() {
-  try { return localStorage.getItem(CURRENT_FILE_KEY) || null; } catch { return null; }
-}
-
-export function setCurrentFilePath(path) {
-  try {
-    if (path) localStorage.setItem(CURRENT_FILE_KEY, path);
-    else localStorage.removeItem(CURRENT_FILE_KEY);
-  } catch {}
-}
-
-export function getRecentFiles() {
-  try {
-    const raw = localStorage.getItem(RECENT_FILES_KEY);
-    if (!raw) return [];
-    const arr = JSON.parse(raw);
-    return Array.isArray(arr) ? arr : [];
-  } catch { return []; }
-}
-
-export function pushRecentFile(path) {
-  if (!path) return;
-  try {
-    const list = getRecentFiles().filter(p => p !== path);
-    list.unshift(path);
-    while (list.length > RECENT_FILES_LIMIT) list.pop();
-    localStorage.setItem(RECENT_FILES_KEY, JSON.stringify(list));
-  } catch {}
-}
-
-export function clearRecentFiles() {
-  try { localStorage.removeItem(RECENT_FILES_KEY); } catch {}
-}
-
-export async function basenameOf(path) {
-  if (!path) return '';
-  if (isTauri()) {
-    try { return await tauriInvoke('path_basename', { path }); }
-    catch {}
-  }
-  // Cheap JS fallback (handles both / and \).
-  return String(path).replace(/^.*[\\/]/, '');
-}
-
-/** Pick a save target via native dialog. Returns the absolute path or null. */
-export async function tauriPickSavePath(defaultName) {
-  if (!isTauri()) return null;
-  return await tauriInvoke('pick_save_path', { defaultName: defaultName || null });
-}
-
-/** Pick a file to open via native dialog. Returns the absolute path or null. */
-export async function tauriPickOpenPath() {
-  if (!isTauri()) return null;
-  return await tauriInvoke('pick_open_path');
-}
-
-/**
- * Save to a known path on disk. If `path` is null, prompt for a Save As target.
- * Returns the path that was written, or null if the user cancelled.
- */
-export async function saveStateToFile(state, path = null) {
-  if (!isTauri()) return null;
-  let target = path;
-  if (!target) {
-    target = await tauriPickSavePath(suggestCircuitName(state.components || []));
-    if (!target) return null;
-  }
-  const json = JSON.stringify(serializeState(state), null, 2);
-  await tauriInvoke('write_text_file', { path: target, contents: json });
-  pushRecentFile(target);
-  return target;
-}
-
-/**
- * Open a circuit from disk. If `path` is null, prompt via the native dialog.
- * Returns `{ path, data }` or null if the user cancelled.
- */
-export async function openStateFromFile(path = null) {
-  if (!isTauri()) return null;
-  let target = path;
-  if (!target) {
-    target = await tauriPickOpenPath();
-    if (!target) return null;
-  }
-  const raw = await tauriInvoke('read_text_file', { path: target });
-  const data = JSON.parse(raw);
-  pushRecentFile(target);
-  return { path: target, data };
-}
-
-// ── Filesystem autosave ──────────────────────────────────────────────────────
-// When the circuit is bound to a file path, autosave writes back to that file.
-// Otherwise it writes a recovery autosave.json in the OS app-data dir so a
-// fresh launch can still recover an unsaved circuit.
-
-const AUTOSAVE_SETTING_KEY = '74sim_autosave_enabled';
-
-export function isAutosaveEnabled() {
-  try {
-    const raw = localStorage.getItem(AUTOSAVE_SETTING_KEY);
-    if (raw === null) return true; // default ON
-    return raw === '1';
-  } catch { return true; }
-}
-
-export function setAutosaveEnabled(enabled) {
-  try { localStorage.setItem(AUTOSAVE_SETTING_KEY, enabled ? '1' : '0'); } catch {}
-}
-
-// Status listeners. Status is one of: 'pending' | 'saving' | 'saved' | 'error' | 'idle'.
-const _autosaveListeners = new Set();
-export function onAutosaveStatus(cb) {
-  _autosaveListeners.add(cb);
-  return () => _autosaveListeners.delete(cb);
-}
-export function emitAutosaveStatus(status, error) {
-  for (const cb of _autosaveListeners) {
-    try { cb(status, error); } catch {}
-  }
-}
-
-let _fsAutosaveTimer = null;
-let _fsAutosaveSeq = 0;
-// `targetPath`: when truthy, autosave writes to this exact path (the user's
-// opened file). When falsy, falls back to the recovery autosave.json.
-export function scheduleFsAutosave(state, targetPath = null) {
-  if (!isTauri() || !isAutosaveEnabled()) return;
-  clearTimeout(_fsAutosaveTimer);
-  emitAutosaveStatus('pending');
-  const seq = ++_fsAutosaveSeq;
-  _fsAutosaveTimer = setTimeout(async () => {
-    if (seq !== _fsAutosaveSeq) return; // a newer schedule superseded us
-    emitAutosaveStatus('saving');
-    try {
-      const path = targetPath || await tauriInvoke('autosave_path');
-      const json = JSON.stringify(serializeState(state), null, 2);
-      await tauriInvoke('write_text_file', { path, contents: json });
-      if (seq === _fsAutosaveSeq) emitAutosaveStatus('saved');
-    } catch (e) {
-      console.warn('FS autosave failed:', e);
-      if (seq === _fsAutosaveSeq) emitAutosaveStatus('error', e);
-    }
-  }, 800);
-}
-
-export async function loadFsAutosave() {
-  if (!isTauri()) return null;
-  try {
-    const path = await tauriInvoke('autosave_path');
-    const raw = await tauriInvoke('read_text_file', { path });
-    return JSON.parse(raw);
-  } catch {
-    return null;
   }
 }

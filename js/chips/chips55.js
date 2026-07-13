@@ -52,10 +52,10 @@ export const CHIPS_BLOCK_55 = {
     pins: 6, vcc: 6, gnd: 3,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74gtl3004.pdf',
     tags: ['reference', 'GTL', 'analog', 'stub'],
-    guideOverview: 'The 74x3004 is not a logic gate at all; it is a small reference-voltage generator for GTL-style buses. GTL receivers rely on a stable threshold voltage rather than a full TTL-style swing, so a dedicated reference source helps multiple devices agree on where the logic switching point should be. A selectable reference part like this is useful when one board needs to support different GTL threshold requirements without building a custom analog bias circuit.',
+    guideOverview: 'The 74x3004 is not a logic gate at all; it is a small reference voltage generator for GTL-style buses. GTL receivers rely on a stable threshold voltage rather than a full TTL style swing, so a dedicated reference source helps multiple devices agree on where the logic switching point should be. A selectable reference part like this is useful when one board needs to support different GTL threshold requirements without building a custom analog bias circuit.',
     guidePinDescriptions: {
-      'VREF1': 'Reference-voltage output 1. This pin provides one of the generated threshold voltages used by GTL receivers.',
-      'VREF0': 'Reference-voltage output 0. Use it as another stable GTL reference output as described in the datasheet.',
+      'VREF1': 'Reference voltage output 1. This pin provides one of the generated threshold voltages used by GTL receivers.',
+      'VREF0': 'Reference voltage output 0. Use it as another stable GTL reference output as described in the datasheet.',
       'GND': 'Ground reference for the internal analog circuitry.',
       'VCC': 'Positive supply for the reference generator.',
       'S1': 'Select input 1. Together with S0 it chooses the output-reference setting.',
@@ -65,7 +65,7 @@ export const CHIPS_BLOCK_55 = {
       {
         title: 'Why GTL Needs a Reference',
         paragraphs: [
-          'GTL signaling uses lower voltage swing than ordinary TTL. Because the logic-high and logic-low regions are closer together, the receiving circuitry depends on a well-defined reference threshold to decide which state is present.',
+          'GTL signaling uses lower voltage swing than ordinary TTL. Because the logic high and logic low regions are closer together, the receiving circuitry depends on a well defined reference threshold to decide which state is present.',
           'A dedicated reference IC makes that threshold more stable and repeatable across a whole board than a simple resistor divider would be on its own.',
         ],
       },
@@ -124,15 +124,15 @@ export const CHIPS_BLOCK_55 = {
     ],
   },
 
-  // 74x3038: Quad 2 input NAND gate, open-collector 30Ω driver (16-pin)
+  // 74x3038: Quad 2 input NAND gate, open collector 30Ω driver (16-pin)
   '74x3038': {
     name: '74x3038',
     simpleName: 'Quad 2 Input NAND Gate Open Collector (30Ω Driver)',
-    description: 'Quad 2 input NAND gate with open-collector 30 Ω output driver (16-pin)',
+    description: 'Quad 2 input NAND gate with open collector 30 Ω output driver (16-pin)',
     pins: 16, vcc: 16, gnd: 8,
     openCollector: true,
     datasheet: '',
-    tags: ['NAND', 'quad', '2 input', 'open-collector', 'driver', 'stub'],
+    tags: ['NAND', 'quad', '2 input', 'open collector', 'driver', 'stub'],
     pinout: [
       { pin:  1, name: 'A1',   type: 'input'  },
       { pin:  2, name: 'B1',   type: 'input'  },
@@ -199,7 +199,7 @@ export const CHIPS_BLOCK_55 = {
     pins: 14, vcc: 14, gnd: 7,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74cbt3125.pdf',
     tags: ['FET', 'bus-switch', 'quad', 'stub'],
-    guideOverview: 'The 74x3125 contains four bilateral FET bus switches. Instead of buffering or regenerating logic like a gate does, each channel behaves more like an electronically controlled switch that directly connects two nodes when enabled and isolates them when disabled. That makes the part useful for bus isolation, hot-plug style segmentation, or temporarily connecting analog or digital signals without adding a fixed logic direction.',
+    guideOverview: 'The 74x3125 contains four bilateral FET bus switches. Instead of buffering or regenerating logic like a gate does, each channel behaves more like an electronically controlled switch that directly connects two nodes when enabled and isolates them when disabled. That makes the part useful for bus isolation, hot plug style segmentation, or temporarily connecting analog or digital signals without adding a fixed logic direction.',
     guidePinDescriptions: {
       'OE1n': 'Enable control (active LOW) for switch 1. Pull LOW to connect A1 and B1; drive HIGH to open the switch.',
       'A1': 'One side of switch channel 1. It is directly connected to B1 when OE1n is LOW.',
@@ -220,7 +220,7 @@ export const CHIPS_BLOCK_55 = {
       {
         title: 'What a Bus Switch Is',
         paragraphs: [
-          'A bus switch is different from a logic buffer. It does not create a new logic level with gain; it simply opens or closes a low-resistance path between two pins using FETs.',
+          'A bus switch is different from a logic buffer. It does not create a new logic level with gain; it simply opens or closes a low resistance path between two pins using FETs.',
           'Because the path is bilateral, signals can usually pass either direction through the same switch channel as long as the voltage levels are within the allowed range.',
         ],
       },
@@ -229,7 +229,7 @@ export const CHIPS_BLOCK_55 = {
         paragraphs: [
           'Each OE pin controls one switch channel independently. Active LOW enables are common in bus hardware because a LOW level is often the asserted control state in memory and peripheral logic.',
         ],
-        note: 'This simulator entry documents the switch role and pins but does not model the analog on-resistance or voltage drop of the FET path.',
+        note: 'This simulator entry documents the switch role and pins but does not model the analog on resistance or voltage drop of the FET path.',
       },
     ],
     pinout: [
@@ -261,7 +261,7 @@ export const CHIPS_BLOCK_55 = {
     pins: 14, vcc: 14, gnd: 7,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74cbt3126.pdf',
     tags: ['FET', 'bus-switch', 'quad', 'stub'],
-    guideOverview: 'The 74x3126 is the active HIGH control companion to the 74x3125. It provides four bilateral FET switch channels that can connect or isolate paired signal nodes with very little logic overhead. Designers use parts like this to partition buses, multiplex raw signal lines, or make temporary point-to-point connections without the direction assumptions built into a normal transceiver.',
+    guideOverview: 'The 74x3126 is the active HIGH control companion to the 74x3125. It provides four bilateral FET switch channels that can connect or isolate paired signal nodes with very little logic overhead. Designers use parts like this to partition buses, multiplex raw signal lines, or make temporary point to point connections without the direction assumptions built into a normal transceiver.',
     guidePinDescriptions: {
       'OE1': 'Enable control (active HIGH) for switch 1. Drive HIGH to connect A1 and B1; drive LOW to open the switch.',
       'A1': 'One side of switch channel 1.',
@@ -318,10 +318,10 @@ export const CHIPS_BLOCK_55 = {
   '74x3244': {
     name: '74x3244',
     simpleName: 'Dual 4 bit Buffer / Line Driver',
-    description: 'Dual 4 bit buffer / line driver, TRI-STATE (20-pin)',
+    description: 'Dual 4 bit buffer / line driver, TRI STATE (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
     datasheet: '',
-    tags: ['buffer', 'dual', '4 bit', 'tri-state', 'stub'],
+    tags: ['buffer', 'dual', '4 bit', 'tri state', 'stub'],
     pinout: [
       { pin:  1, name: 'OE1n', type: 'input'  },
       { pin:  2, name: 'A11',  type: 'input'  },
@@ -355,10 +355,10 @@ export const CHIPS_BLOCK_55 = {
   '74x3245': {
     name: '74x3245',
     simpleName: 'Octal Bidirectional Transceiver',
-    description: 'Octal bidirectional transceiver, TRI-STATE (20-pin)',
+    description: 'Octal bidirectional transceiver, TRI STATE (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
     datasheet: '',
-    tags: ['transceiver', 'octal', 'bidir', 'tri-state', 'stub'],
+    tags: ['transceiver', 'octal', 'bidir', 'tri state'],
     pinout: [
       { pin:  1, name: 'OEn',  type: 'input'  },
       { pin:  2, name: 'DIR',  type: 'input'  },
@@ -382,7 +382,11 @@ export const CHIPS_BLOCK_55 = {
       { pin: 20, name: 'VCC',  type: 'power'  },
     ],
     gates: [
-      { type: 'GENERIC_STUB', inputs: ['OEn','DIR'], outputs: [] },
+      { type: 'TRANSCEIVER_8BIT',
+        inputs:  ['A1','A2','A3','A4','A5','A6','A7','A8',
+                  'B1','B2','B3','B4','B5','B6','B7','B8','DIR','OEn'],
+        outputs: ['A1','A2','A3','A4','A5','A6','A7','A8',
+                  'B1','B2','B3','B4','B5','B6','B7','B8'] },
     ],
   },
 
@@ -392,10 +396,10 @@ export const CHIPS_BLOCK_55 = {
   '74LVX3245': {
     name: '74x3245',
     simpleName: 'Octal Bidirectional Voltage-Translating Transceiver',
-    description: 'Octal bidirectional voltage-translating transceiver, TRI-STATE (24-pin)',
+    description: 'Octal bidirectional voltage-translating transceiver, TRI STATE (24-pin)',
     pins: 24, vcc: 24, gnd: 12,
     datasheet: '',
-    tags: ['transceiver', 'octal', 'voltage-translator', 'bidir', 'tri-state', 'stub'],
+    tags: ['transceiver', 'octal', 'voltage-translator', 'bidir', 'tri state', 'stub'],
     pinout: [
       { pin:  1, name: 'OEn',  type: 'input'  },
       { pin:  2, name: 'DIR',  type: 'input'  },
@@ -427,11 +431,11 @@ export const CHIPS_BLOCK_55 = {
     ],
   },
 
-  // 74x3251: 8-line to 1-line FET multiplexer / demultiplexer (16-pin)
+  // 74x3251: 8 line to 1 line FET multiplexer / demultiplexer (16-pin)
   '74x3251': {
     name: '74x3251',
     simpleName: '8-to-1 FET Multiplexer / Demultiplexer',
-    description: '8-line to 1-line FET multiplexer / demultiplexer (16-pin)',
+    description: '8 line to 1 line FET multiplexer / demultiplexer (16-pin)',
     pins: 16, vcc: 16, gnd: 8,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74cbt3251.pdf',
     tags: ['FET', 'mux', 'demux', '8:1', 'bidir', 'stub'],
@@ -464,7 +468,7 @@ export const CHIPS_BLOCK_55 = {
       {
         title: 'Why Use FET Switching',
         paragraphs: [
-          'A FET switch path is useful when you want a low-resistance connection instead of a logic buffer with fixed direction and full regeneration. That makes devices like the 74x3251 flexible for signal steering, especially when the surrounding circuit may drive from either side.',
+          'A FET switch path is useful when you want a low resistance connection instead of a logic buffer with fixed direction and full regeneration. That makes devices like the 74x3251 flexible for signal steering, especially when the surrounding circuit may drive from either side.',
         ],
         note: 'This simulator entry documents the routing concept and pins, but it does not model detailed analog switch resistance or charge injection.',
       },
@@ -492,15 +496,15 @@ export const CHIPS_BLOCK_55 = {
     ],
   },
 
-  // 74x3253: Dual 4-line to 1-line FET multiplexer / demultiplexer (16-pin)
+  // 74x3253: Dual 4 line to 1 line FET multiplexer / demultiplexer (16-pin)
   '74x3253': {
     name: '74x3253',
     simpleName: 'Dual 4-to-1 FET Multiplexer / Demultiplexer',
-    description: 'Dual 4-line to 1-line FET multiplexer / demultiplexer (16-pin)',
+    description: 'Dual 4 line to 1 line FET multiplexer / demultiplexer (16-pin)',
     pins: 16, vcc: 16, gnd: 8,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74cbt3253.pdf',
     tags: ['FET', 'mux', 'demux', '4:1', 'dual', 'bidir', 'stub'],
-    guideOverview: 'The 74x3253 splits the FET-switch multiplexer idea into two independent 4-channel sections. Both sections share the same two select inputs, but each has its own enable pin and common node, making the part useful for steering paired signals such as two bits of data, two audio/control paths, or two related bus lines together. Because the channels are bilateral FET switches, the part works as either a multiplexer or a demultiplexer depending on which side of the path is being driven.',
+    guideOverview: 'The 74x3253 splits the FET switch multiplexer idea into two independent 4-channel sections. Both sections share the same two select inputs, but each has its own enable pin and common node, making the part useful for steering paired signals such as two bits of data, two audio/control paths, or two related bus lines together. Because the channels are bilateral FET switches, the part works as either a multiplexer or a demultiplexer depending on which side of the path is being driven.',
     guidePinDescriptions: {
       'S0': 'Select input bit 0. Together with S1 it chooses which channel in each section is connected.',
       'S1': 'Select input bit 1. It completes the 2 bit address for both switch sections.',
@@ -517,7 +521,7 @@ export const CHIPS_BLOCK_55 = {
       'A20': 'Channel 0 of section 2.',
       'OE2n': 'Enable for section 2 (active LOW). Pull LOW to connect Z2 to the selected channel.',
       'OE1n': 'Enable for section 1 (active LOW). Pull LOW to connect Z1 to the selected channel.',
-      'VCC': 'Positive supply for the switch-control circuitry.',
+      'VCC': 'Positive supply for the switch control circuitry.',
     },
     guideSections: [
       {
@@ -529,7 +533,7 @@ export const CHIPS_BLOCK_55 = {
       {
         title: 'Bilateral Routing',
         paragraphs: [
-          'As with other CBT-style switch parts, each path is bilateral. The selected channel and common node are simply connected through a FET switch, so the effective direction depends on which side is actively driving.',
+          'As with other CBT style switch parts, each path is bilateral. The selected channel and common node are simply connected through a FET switch, so the effective direction depends on which side is actively driving.',
         ],
         note: 'This entry remains a documented stub in the simulator and does not model the analog resistance of the switch path in detail.',
       },

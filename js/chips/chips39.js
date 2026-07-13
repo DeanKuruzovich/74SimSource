@@ -8,22 +8,22 @@ export const CHIPS_BLOCK_39 = {
   /* Primary source: Texas Instruments, 74758 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74as758.pdf
      https://en.wikipedia.org/wiki/Bus_transceiver */
   // 2× bidirectional paths (A↔B) with separate enables. Modeled as stub.
-  '74758': {
+  '74x758': {
     name: '74x758',
     simpleName: 'Quad Bus Transceiver (Inv, OC)',
-    description: 'Quadruple bus transceivers with inverting open-collector outputs (14-pin)',
+    description: 'Quadruple bus transceivers with inverting open collector outputs (14-pin)',
     pins: 14, vcc: 14, gnd: 7,
     openCollector: true,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74as758.pdf',
-    tags: ['transceiver', 'bus', 'quad', 'inverting', 'open-collector', 'stub'],
-    guideOverview: 'The 74x758 is a 4 bit bus transceiver with open-collector, inverting behavior intended for shared bus lines. GAB and GBA control which direction is active, while OC outputs allow wire-OR style connection with pull up resistors. It is useful in glue logic where multiple devices may need to pull a bus LOW safely.',
+    tags: ['transceiver', 'bus', 'quad', 'inverting', 'open collector', 'stub'],
+    guideOverview: 'The 74x758 is a 4 bit bus transceiver with open collector, inverting behavior intended for shared bus lines. GAB and GBA control which direction is active, while OC outputs allow wire OR style connection with pull up resistors. It is useful in glue logic where multiple devices may need to pull a bus LOW safely.',
     guidePinDescriptions: {
-      'GAB': 'Enable/control for A-to-B transfer path.',
+      'GAB': 'Enable/control for A-to B transfer path.',
       'A0':  'Bus A bit 0, bidirectional transceiver node.',
       'A1':  'Bus A bit 1, bidirectional transceiver node.',
       'A2':  'Bus A bit 2, bidirectional transceiver node.',
       'A3':  'Bus A bit 3, bidirectional transceiver node.',
-      'GBA': 'Enable/control for B-to-A transfer path.',
+      'GBA': 'Enable/control for B-to A transfer path.',
       'GND': 'Ground reference (pin 7).',
       'B3':  'Bus B bit 3 output/transceiver node.',
       'B2':  'Bus B bit 2 output/transceiver node.',
@@ -36,7 +36,7 @@ export const CHIPS_BLOCK_39 = {
       {
         title: 'Open Collector Bus Sharing',
         paragraphs: [
-          'Open-collector transceivers can only pull lines LOW and require pull up resistors to return HIGH. This makes contention-safe shared buses possible, because multiple devices can connect to the same line without one forcing HIGH against another forcing LOW.',
+          'Open collector transceivers can only pull lines LOW and require pull up resistors to return HIGH. This makes contention safe shared buses possible, because multiple devices can connect to the same line without one forcing HIGH against another forcing LOW.',
         ],
         note: 'Modeled as a generic stub in the simulator.',
       },
@@ -62,25 +62,25 @@ export const CHIPS_BLOCK_39 = {
     ],
   },
 
-  // ── 74759: Quadruple bus transceivers, non-inverting, OC (14-pin) ─────────
+  // ── 74759: Quadruple bus transceivers, non inverting, OC (14-pin) ─────────
   /* Primary source: Texas Instruments, 74759 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74as759.pdf
      https://en.wikipedia.org/wiki/Bus_transceiver */
-  '74759': {
+  '74x759': {
     name: '74x759',
-    simpleName: 'Quad Bus Transceiver (Non-Inv, OC)',
-    description: 'Quadruple bus transceivers with non-inverting open-collector outputs (14-pin)',
+    simpleName: 'Quad Bus Transceiver (Non Inv, OC)',
+    description: 'Quad bus transceiver, non-inv open-collector outputs (14-pin)',
     pins: 14, vcc: 14, gnd: 7,
     openCollector: true,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74as759.pdf',
-    tags: ['transceiver', 'bus', 'quad', 'non-inverting', 'open-collector', 'stub'],
-    guideOverview: 'The 74x759 is the non-inverting companion to the 74x758. It provides 4 bit bus transceiver functionality with open-collector outputs for wired bus systems, but preserves signal polarity. Use it when shared-bus compatibility is needed without inversion.',
+    tags: ['transceiver', 'bus', 'quad', 'non inverting', 'open collector', 'stub'],
+    guideOverview: 'The 74x759 is the non inverting companion to the 74x758. It provides 4 bit bus transceiver functionality with open collector outputs for wired bus systems, but preserves signal polarity. Use it when shared bus compatibility is needed without inversion.',
     guidePinDescriptions: {
-      'GAB': 'Enable/control for A-to-B transfer path.',
+      'GAB': 'Enable/control for A-to B transfer path.',
       'A0':  'Bus A bit 0, bidirectional transceiver node.',
       'A1':  'Bus A bit 1, bidirectional transceiver node.',
       'A2':  'Bus A bit 2, bidirectional transceiver node.',
       'A3':  'Bus A bit 3, bidirectional transceiver node.',
-      'GBA': 'Enable/control for B-to-A transfer path.',
+      'GBA': 'Enable/control for B-to A transfer path.',
       'GND': 'Ground reference (pin 7).',
       'B3':  'Bus B bit 3 output/transceiver node.',
       'B2':  'Bus B bit 2 output/transceiver node.',
@@ -93,7 +93,7 @@ export const CHIPS_BLOCK_39 = {
       {
         title: '74x758 vs 74x759',
         paragraphs: [
-          'Both are quad open-collector bus transceivers. The 74x758 inverts data polarity; the 74x759 is non-inverting.',
+          'Both are quad open collector bus transceivers. The 74x758 inverts data polarity; the 74x759 is non inverting.',
         ],
       },
     ],
@@ -118,18 +118,18 @@ export const CHIPS_BLOCK_39 = {
     ],
   },
 
-  // ── 74760: Octal buffer/line driver, non-inverting, OC (20-pin) ──────────
+  // ── 74760: Octal buffer/line driver, non inverting, OC (20-pin) ──────────
   /* Primary source: Texas Instruments, 74760 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74als760.pdf
      https://en.wikipedia.org/wiki/Three-state_logic */
-  '74760': {
+  '74x760': {
     name: '74x760',
-    simpleName: 'Octal Buffer (Non-Inv, OC)',
-    description: 'Octal buffer/line driver with non-inverting open-collector outputs (20-pin)',
+    simpleName: 'Octal Buffer (Non Inv, OC)',
+    description: 'Octal buffer/line driver with non inverting open collector outputs (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
     openCollector: true,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74als760.pdf',
-    tags: ['buffer', 'driver', 'octal', 'non-inverting', 'open-collector', 'stub'],
-    guideOverview: 'The 74x760 is an octal non-inverting buffer/line driver with open-collector outputs. It buffers eight lines and can sink current strongly while relying on pull up resistors for HIGH level. This is commonly used for wired OR buses, level translation, and distributed control lines.',
+    tags: ['buffer', 'driver', 'octal', 'non inverting', 'open collector', 'stub'],
+    guideOverview: 'The 74x760 is an octal non inverting buffer/line driver with open collector outputs. It buffers eight lines and can sink current strongly while relying on pull up resistors for HIGH level. This is commonly used for wired OR buses, level translation, and distributed control lines.',
     guidePinDescriptions: {
       'OEn': 'Output enable control. Disable output stage when not driving the bus.',
       'A0':  'Input bit 0.',
@@ -141,14 +141,14 @@ export const CHIPS_BLOCK_39 = {
       'A6':  'Input bit 6.',
       'A7':  'Input bit 7.',
       'GND': 'Ground reference (pin 10).',
-      'Y7':  'Open-collector non-inverting output bit 7.',
-      'Y6':  'Open-collector non-inverting output bit 6.',
-      'Y5':  'Open-collector non-inverting output bit 5.',
-      'Y4':  'Open-collector non-inverting output bit 4.',
-      'Y3':  'Open-collector non-inverting output bit 3.',
-      'Y2':  'Open-collector non-inverting output bit 2.',
-      'Y1':  'Open-collector non-inverting output bit 1.',
-      'Y0':  'Open-collector non-inverting output bit 0.',
+      'Y7':  'Open collector non inverting output bit 7.',
+      'Y6':  'Open collector non inverting output bit 6.',
+      'Y5':  'Open collector non inverting output bit 5.',
+      'Y4':  'Open collector non inverting output bit 4.',
+      'Y3':  'Open collector non inverting output bit 3.',
+      'Y2':  'Open collector non inverting output bit 2.',
+      'Y1':  'Open collector non inverting output bit 1.',
+      'Y0':  'Open collector non inverting output bit 0.',
       'NC':  'No connect.',
       'VCC': 'Positive supply (+5 V, pin 20).',
     },
@@ -157,7 +157,7 @@ export const CHIPS_BLOCK_39 = {
         title: 'Open Collector Driver Use Cases',
         list: [
           'Wired OR interrupt lines',
-          'Mixed-voltage pull up buses',
+          'Mixed voltage pull up buses',
           'Long backplane control lines',
         ],
       },
@@ -189,18 +189,18 @@ export const CHIPS_BLOCK_39 = {
     ],
   },
 
-  // ── 74762: Octal buffer/line driver, inverting+non-inverting, OC (20-pin) ─
+  // ── 74762: Octal buffer/line driver, inverting+non inverting, OC (20-pin) ─
   /* Primary source: Texas Instruments, 74762 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74als762.pdf
      https://en.wikipedia.org/wiki/Three-state_logic */
-  '74762': {
+  '74x762': {
     name: '74x762',
-    simpleName: 'Octal Buffer (Inv+Non-Inv, OC)',
-    description: 'Octal buffer/line driver with inverting and non-inverting open-collector outputs (20-pin)',
+    simpleName: 'Octal Buffer (Inv+Non Inv, OC)',
+    description: 'Octal buffer/line driver, inv & non-inv open-collector (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
     openCollector: true,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74als762.pdf',
-    tags: ['buffer', 'driver', 'octal', 'inverting', 'non-inverting', 'open-collector', 'stub'],
-    guideOverview: 'The 74x762 provides both true and inverted open-collector outputs from buffered inputs. Having Y and Yn pairs in one package simplifies designs that need both polarities for bus control, decoding, or handshake lines.',
+    tags: ['buffer', 'driver', 'octal', 'inverting', 'non inverting', 'open collector', 'stub'],
+    guideOverview: 'The 74x762 provides both true and inverted open collector outputs from buffered inputs. Having Y and Yn pairs in one package simplifies designs that need both polarities for bus control, decoding, or handshake lines.',
     guidePinDescriptions: {
       'OEn': 'Output enable control for all output channels.',
       'A0':  'Input bit 0.',
@@ -212,20 +212,20 @@ export const CHIPS_BLOCK_39 = {
       'A6':  'Input bit 6.',
       'A7':  'Input bit 7.',
       'GND': 'Ground reference (pin 10).',
-      'Y7n': 'Open-collector inverted output for channel 7.',
-      'Y7':  'Open-collector non-inverted output for channel 7.',
-      'Y6n': 'Open-collector inverted output for channel 6.',
-      'Y6':  'Open-collector non-inverted output for channel 6.',
-      'Y5n': 'Open-collector inverted output for channel 5.',
-      'Y5':  'Open-collector non-inverted output for channel 5.',
-      'Y4n': 'Open-collector inverted output for channel 4.',
-      'Y4':  'Open-collector non-inverted output for channel 4.',
+      'Y7n': 'Open collector inverted output for channel 7.',
+      'Y7':  'Open collector non inverted output for channel 7.',
+      'Y6n': 'Open collector inverted output for channel 6.',
+      'Y6':  'Open collector non inverted output for channel 6.',
+      'Y5n': 'Open collector inverted output for channel 5.',
+      'Y5':  'Open collector non inverted output for channel 5.',
+      'Y4n': 'Open collector inverted output for channel 4.',
+      'Y4':  'Open collector non inverted output for channel 4.',
       'NC':  'No connect.',
       'VCC': 'Positive supply (+5 V, pin 20).',
     },
     guideSections: [
       {
-        title: 'Dual-Polarity Outputs',
+        title: 'Dual Polarity Outputs',
         paragraphs: [
           'Generating both Y and Yn in one IC reduces extra inverter stages and timing skew between complementary control lines. This can simplify state machines and bus arbitration glue logic.',
         ],
@@ -261,15 +261,15 @@ export const CHIPS_BLOCK_39 = {
   // ── 74763: Octal buffer/line driver, inverting, comp. enables, OC (20-pin) ─
   /* Primary source: Texas Instruments, 74763 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74als763.pdf
      https://en.wikipedia.org/wiki/Three-state_logic */
-  '74763': {
+  '74x763': {
     name: '74x763',
     simpleName: 'Octal Buffer (Inv, Comp. En, OC)',
-    description: 'Octal buffer/line driver with inverting outputs and complementary enable inputs, open-collector (20-pin)',
+    description: 'Octal inverting open-collector driver, complementary enables (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
     openCollector: true,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74als763.pdf',
-    tags: ['buffer', 'driver', 'octal', 'inverting', 'open-collector', 'stub'],
-    guideOverview: 'The 74x763 is an octal inverting open-collector line driver with complementary-style enables (OE and OEn). It is intended for robust bus and interface drive where one logic path may need active HIGH gating and another active LOW gating.',
+    tags: ['buffer', 'driver', 'octal', 'inverting', 'open collector', 'stub'],
+    guideOverview: 'The 74x763 is an octal inverting open collector line driver with complementary style enables (OE and OEn). It is intended for robust bus and interface drive where one logic path may need active HIGH gating and another active LOW gating.',
     guidePinDescriptions: {
       'OE':  'Primary output-enable control input.',
       'OEn': 'Complementary output-enable control input (active LOW naming).',
@@ -282,21 +282,21 @@ export const CHIPS_BLOCK_39 = {
       'A6':  'Input bit 6.',
       'GND': 'Ground reference (pin 10).',
       'A7':  'Input bit 7.',
-      'Y7':  'Open-collector inverting output bit 7.',
-      'Y6':  'Open-collector inverting output bit 6.',
-      'Y5':  'Open-collector inverting output bit 5.',
-      'Y4':  'Open-collector inverting output bit 4.',
-      'Y3':  'Open-collector inverting output bit 3.',
-      'Y2':  'Open-collector inverting output bit 2.',
-      'Y1':  'Open-collector inverting output bit 1.',
-      'Y0':  'Open-collector inverting output bit 0.',
+      'Y7':  'Open collector inverting output bit 7.',
+      'Y6':  'Open collector inverting output bit 6.',
+      'Y5':  'Open collector inverting output bit 5.',
+      'Y4':  'Open collector inverting output bit 4.',
+      'Y3':  'Open collector inverting output bit 3.',
+      'Y2':  'Open collector inverting output bit 2.',
+      'Y1':  'Open collector inverting output bit 1.',
+      'Y0':  'Open collector inverting output bit 0.',
       'VCC': 'Positive supply (+5 V, pin 20).',
     },
     guideSections: [
       {
         title: 'Enable Polarity Notes',
         paragraphs: [
-          'Parts with both OE and OEn often appear in board-level glue logic where control signals already exist in opposite polarities. This avoids extra inverter gates and preserves timing margin.',
+          'Parts with both OE and OEn often appear in board level glue logic where control signals already exist in opposite polarities. This avoids extra inverter gates and preserves timing margin.',
         ],
         note: 'Driver behavior is represented as a generic stub in simulation.',
       },
@@ -331,19 +331,19 @@ export const CHIPS_BLOCK_39 = {
   // ── 74777: Triple latched transceiver, TRI+OC (20-pin) ───────────────────
   /* Primary source: Texas Instruments, 74777 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74f777.pdf
      https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
-  '74777': {
+  '74x777': {
     name: '74x777',
     simpleName: 'Triple Latched Transceiver (TRI+OC)',
-    description: 'Triple latched transceiver with three-state and open-collector outputs (20-pin)',
+    description: 'Triple latched transceiver, 3-state & open-collector outputs (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74f777.pdf',
-    tags: ['transceiver', 'latch', 'triple', 'tri-state', 'open-collector', 'stub'],
+    tags: ['transceiver', 'latch', 'triple', 'tri state', 'open collector', 'stub'],
     sequential: true,
-    guideOverview: 'The 74x777 is a triple latched transceiver combining direction control, latching, and mixed output style support. It can capture data with CLK/LATCH and then transfer between A and B sides under GAB/GBA control. This is useful when narrow control buses need staged transfer and contention-safe sharing.',
+    guideOverview: 'The 74x777 is a triple latched transceiver combining direction control, latching, and mixed output style support. It can capture data with CLK/LATCH and then transfer between A and B sides under GAB/GBA control. This is useful when narrow control buses need staged transfer and contention safe sharing.',
     guidePinDescriptions: {
       'CLK':   'Clock input for registered/latch timing functions.',
       'LATCH': 'Latch control input for holding captured bus state.',
-      'GBA':   'Enable/direction control for B-to-A path.',
+      'GBA':   'Enable/direction control for B-to A path.',
       'A0':  'A-side transceiver channel 0; bidirectional.',
       'A1':  'A-side transceiver channel 1; bidirectional.',
       'A2':  'A-side transceiver channel 2; bidirectional.',
@@ -351,7 +351,7 @@ export const CHIPS_BLOCK_39 = {
       'B1':  'B-side transceiver channel 1; bidirectional.',
       'B0':  'B-side transceiver channel 0; bidirectional.',
       'GND':   'Ground reference (pin 10)',
-      'GAB':   'Enable/direction control for A-to-B path.',
+      'GAB':   'Enable/direction control for A-to B path.',
       'NC':    'No connect.',
       'VCC':   'Positive supply (+5 V, pin 20).',
     },
@@ -359,7 +359,7 @@ export const CHIPS_BLOCK_39 = {
       {
         title: 'Latched Transceiver Concept',
         paragraphs: [
-          'A latched transceiver can decouple bus timing domains: data is sampled at one moment and driven later, avoiding race conditions. This is especially helpful in asynchronous or multi-master bus glue logic.',
+          'A latched transceiver can decouple bus timing domains: data is sampled at one moment and driven later, avoiding race conditions. This is especially helpful in asynchronous or multi master bus glue logic.',
         ],
       },
     ],
@@ -390,140 +390,177 @@ export const CHIPS_BLOCK_39 = {
     ],
   },
 
-  // ── 74779: 8 bit bidirectional binary counter, TRI (16-pin) ──────────────
-  /* Primary source: Texas Instruments, 74779 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/mc74f779.pdf
-     https://en.wikipedia.org/wiki/Counter_(digital) */
-  '74779': {
+  // ── 74779: 8 bit bidirectional binary counter, 3-STATE I/O (16-pin) ──────
+  // Source: Fairchild Semiconductor, "74F779 8-Bit Bidirectional Binary Counter
+  //   with 3-STATE Outputs", DS009593 (Apr. 1988, rev. Feb. 2004). [Online].
+  //   Available: https://mm.digikey.com/Volume0/opasdata/d220001/medias/docus/966/74F779.pdf
+  //   Verified: connection diagram (pinout), function table and logic diagram,
+  //   pp.1-3, read as rendered PDF page images (issues.md C4). The hand-entered
+  //   stub pinout was WRONG (issues.md C2): it placed VCC/GND on 16/8 and invented
+  //   a Cn/U_Dn/CEn control set this part does not have. The real DIP-16 map is
+  //   I/O1-3 on pins 1-3, GND=4, I/O4-7 on pins 5-8, OE(LOW)=9, S1=10, S0=11,
+  //   TC(LOW)=12, VCC=13, CET(LOW)=14, CP=15, I/O0=16. The action on each rising
+  //   clock edge is set by S1/S0: 00=load, 10=count up, 01=count down, 11=hold.
+  //   The TI mc74f779 URL in the original stub 404s; the Fairchild sheet above is
+  //   the surviving primary source for this part.
+  '74x779': {
     name: '74x779',
     simpleName: '8 bit Bidirectional Counter (TRI)',
-    description: '8 bit bidirectional binary counter with three-state outputs (16-pin)',
-    pins: 16, vcc: 16, gnd: 8,
-    datasheet: 'https://www.ti.com/lit/ds/symlink/mc74f779.pdf',
-    tags: ['counter', 'binary', '8 bit', 'bidirectional', 'tri-state', 'stub'],
+    description: '8-bit sync up/down binary counter, multiplexed 3-state I/O (16-pin)',
+    pins: 16, vcc: 13, gnd: 4,
+    datasheet: 'https://mm.digikey.com/Volume0/opasdata/d220001/medias/docus/966/74F779.pdf',
+    tags: ['counter', 'binary', '8 bit', 'bidirectional', 'up down', 'tri state'],
     sequential: true,
-    guideOverview: 'The 74x779 is an 8 bit bidirectional binary counter with tri-state I/O style data pins and terminal-count output. U_Dn sets up/down direction, CEn enables counting, and TC flags terminal count for cascading. It is aimed at programmable counting and shared-bus counter readback designs.',
+    guideOverview: 'The 74x779 is an 8-bit binary counter that counts up or down and shares one set of pins for both its outputs and its load inputs. Two select pins, S1 and S0, pick the action taken on each clock edge: load a starting value, count up, count down, or hold. The eight I/O pins carry the count when the output enable is active and accept a value to load when it is not, so the counter can sit directly on a data bus. A terminal-count pin flags the end of the range for chaining counters into wider ones.',
     guidePinDescriptions: {
-      'CLK':  'Clock input; counter updates on active clock edge.',
-      'Cn':   'Carry/cascade control input for chaining counters.',
-      'D0':   'Counter data bit 0 I/O node.',
-      'D1':   'Counter data bit 1 I/O node.',
-      'D2':   'Counter data bit 2 I/O node.',
-      'D3':   'Counter data bit 3 I/O node.',
-      'OEn':  'Output enable (active LOW). Disables bus drive when HIGH.',
-      'GND':  'Ground reference (pin 8).',
-      'D7':   'Counter data bit 7 I/O node.',
-      'D6':   'Counter data bit 6 I/O node.',
-      'D5':   'Counter data bit 5 I/O node.',
-      'D4':   'Counter data bit 4 I/O node.',
-      'TC':   'Terminal count output for cascade and end-of-range detection.',
-      'U_Dn': 'Up/Down direction control input.',
-      'CEn':  'Count enable control input.',
-      'VCC':  'Positive supply (+5 V, pin 16).',
+      'IO1':  'Data bit 1, bidirectional. Counter output when OE is LOW; load input when OE is HIGH.',
+      'IO2':  'Data bit 2, bidirectional.',
+      'IO3':  'Data bit 3, bidirectional.',
+      'GND':  'Ground reference (pin 4).',
+      'IO4':  'Data bit 4, bidirectional.',
+      'IO5':  'Data bit 5, bidirectional.',
+      'IO6':  'Data bit 6, bidirectional.',
+      'IO7':  'Data bit 7 (most significant), bidirectional.',
+      'OEn':  'Output enable (active LOW). LOW drives the count onto the I/O pins; HIGH puts them in high-impedance so they act as load inputs.',
+      'S1':   'Mode select bit 1. With S0, picks load / count up / count down / hold.',
+      'S0':   'Mode select bit 0. S1,S0 = 0,0 load; 1,0 up; 0,1 down; 1,1 hold.',
+      'TCn':  'Terminal count (active LOW). Goes LOW at the end of the range (255 counting up, 0 counting down) while counting is enabled. Wire it to the next stage CET to cascade.',
+      'VCC':  'Positive supply (+5 V, pin 13).',
+      'CETn': 'Count enable (active LOW). LOW lets the counter count; HIGH holds it. Does not block a load.',
+      'CP':   'Clock. All state changes happen on the LOW-to-HIGH edge.',
+      'IO0':  'Data bit 0 (least significant), bidirectional.',
     },
     guideSections: [
       {
-        title: 'Bidirectional Counting',
+        title: 'Up/down counting',
         paragraphs: [
-          'Up/down counters are used in position tracking, reversible timers, and queue-depth tracking. A terminal-count output lets multiple counters be chained into wider counters or bounded count windows.',
+          'The counter advances on the rising edge of CP. S1 and S0 choose what that edge does: S1,S0 = 1,0 counts up, 0,1 counts down, 1,1 holds the current value, and 0,0 loads the value sitting on the I/O pins. Counting wraps: 255 rolls to 0 going up, 0 rolls to 255 going down.',
+          'CET (count enable, active LOW) gates counting. With CET LOW the counter counts as the select pins direct; with CET HIGH it holds no matter what S1 and S0 say. A load still works while CET is HIGH. Up/down counters like this track positions, reversible timers, and queue depth.',
         ],
-        note: 'This device is represented as a stub in the simulator.',
+      },
+      {
+        title: 'Shared I/O bus',
+        paragraphs: [
+          'The eight count outputs and the eight load inputs are the same eight pins. OE (output enable, active LOW) decides which way they face. With OE LOW the chip drives the current count onto the pins. With OE HIGH the pins go high-impedance, so something else on the bus can put a starting value on them; a load edge (S1,S0 = 0,0) then captures it.',
+          'TC (terminal count, active LOW) goes LOW when the counter reaches the end of its range in the active direction: all ones while counting up, all zeros while counting down. Feed it into the CET of the next 74x779 and the chips chain into a wider counter without extra gates.',
+        ],
       },
     ],
     pinout: [
-      { pin:  1, name: 'CLK',  type: 'input'  },
-      { pin:  2, name: 'Cn',   type: 'input'  },
-      { pin:  3, name: 'D0',   type: 'bidir'  },
-      { pin:  4, name: 'D1',   type: 'bidir'  },
-      { pin:  5, name: 'D2',   type: 'bidir'  },
-      { pin:  6, name: 'D3',   type: 'bidir'  },
-      { pin:  7, name: 'OEn',  type: 'input'  },
-      { pin:  8, name: 'GND',  type: 'power'  },
-      { pin:  9, name: 'D7',   type: 'bidir'  },
-      { pin: 10, name: 'D6',   type: 'bidir'  },
-      { pin: 11, name: 'D5',   type: 'bidir'  },
-      { pin: 12, name: 'D4',   type: 'bidir'  },
-      { pin: 13, name: 'TC',   type: 'output' },
-      { pin: 14, name: 'U_Dn', type: 'input'  },
-      { pin: 15, name: 'CEn',  type: 'input'  },
-      { pin: 16, name: 'VCC',  type: 'power'  },
+      { pin:  1, name: 'IO1',  type: 'bidir'  },
+      { pin:  2, name: 'IO2',  type: 'bidir'  },
+      { pin:  3, name: 'IO3',  type: 'bidir'  },
+      { pin:  4, name: 'GND',  type: 'power'  },
+      { pin:  5, name: 'IO4',  type: 'bidir'  },
+      { pin:  6, name: 'IO5',  type: 'bidir'  },
+      { pin:  7, name: 'IO6',  type: 'bidir'  },
+      { pin:  8, name: 'IO7',  type: 'bidir'  },
+      { pin:  9, name: 'OEn',  type: 'input'  },
+      { pin: 10, name: 'S1',   type: 'input'  },
+      { pin: 11, name: 'S0',   type: 'input'  },
+      { pin: 12, name: 'TCn',  type: 'output' },
+      { pin: 13, name: 'VCC',  type: 'power'  },
+      { pin: 14, name: 'CETn', type: 'input'  },
+      { pin: 15, name: 'CP',   type: 'input'  },
+      { pin: 16, name: 'IO0',  type: 'bidir'  },
     ],
     gates: [
-      { type: 'GENERIC_STUB', inputs: ['CLK','Cn','OEn','U_Dn','CEn'], outputs: ['D0','D1','D2','D3','D4','D5','D6','D7','TC'] },
+      { type: 'COUNTER_UPDOWN_TRI_779',
+        inputs: ['CP','S1','S0','CETn','OEn','IO0','IO1','IO2','IO3','IO4','IO5','IO6','IO7'],
+        outputs: ['IO0','IO1','IO2','IO3','IO4','IO5','IO6','IO7','TCn'] },
     ],
   },
 
-  // ── 74784: 8 bit serial/parallel multiplier w/ adder/subtractor (20-pin) ──
-  /* Primary source: Texas Instruments, 74784 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74f784.pdf
-     https://en.wikipedia.org/wiki/Adder_(electronics) */
-  '74784': {
+  // ── 74784: 8-bit serial/parallel multiplier w/ adder-subtractor (20-pin) ──
+  // Source: Signetics, "FAST 74F784 -- 8-Bit Serial/Parallel Multiplier (With
+  //   Adder/Subtracter)", Preliminary Specification, June 1987, in *1987 Signetics
+  //   FAST Data Manual*, pp. 6-767..6-770. [Online]. Available:
+  //   http://www.bitsavers.org/components/signetics/_dataBooks/1987_Signetics_FAST_Data_Manual.pdf.
+  //   Verified: PIN CONFIGURATION + pin-function table + DESCRIPTION, read as a
+  //   300-dpi rendering of PDF page 832 (issues.md C4). The original TI URL
+  //   (sn74f784.pdf) 404s -- TI never carried this Signetics part. The pre-existing
+  //   stub pinout (CLK/A_Bn/OVF/S0..S7/B1..B7) was hand-entered and wrong; the whole
+  //   pinout below was rebuilt from the datasheet page image (issues.md C2). Engine
+  //   behaviour + full terminal list documented at the SERIAL_PARALLEL_MULT_784
+  //   evaluator in js/specificChipsSim.js.
+  '74x784': {
     name: '74x784',
-    simpleName: '8 bit Multiplier/Adder',
-    description: '8 bit serial/parallel multiplier with adder/subtractor (20-pin)',
+    simpleName: '8-bit Serial/Parallel Multiplier',
+    description: '8-bit serial/parallel multiplier with an adder/subtractor stage (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
-    datasheet: 'https://www.ti.com/lit/ds/symlink/sn74f784.pdf',
-    tags: ['multiplier', 'arithmetic', 'adder', 'subtractor', '8 bit', 'stub'],
+    datasheet: 'http://www.bitsavers.org/components/signetics/_dataBooks/1987_Signetics_FAST_Data_Manual.pdf',
+    tags: ['multiplier', 'arithmetic', 'adder', 'subtractor', 'serial', '8 bit'],
     sequential: true,
-    guideOverview: 'The 74x784 is a specialized arithmetic device for serial/parallel multiply-style operations with adder/subtractor support. A_Bn selects arithmetic mode while clocked operation produces S0-S7 and overflow status. It is intended for high-speed arithmetic datapaths where discrete gate implementations would be too large.',
+    guideOverview: 'The 74x784 multiplies an 8-bit number by a stream of bits. The 8-bit multiplicand X is loaded in parallel; the multiplier Y is fed in one bit per clock, least significant bit first. The product leaves the SP pin the same way, one bit per clock, least significant bit first. A second stage adds or subtracts a serial operand B, so the S±B pin gives X·Y plus or minus B in the same serial form. It was built for signal-processing hardware, where a running stream of samples had to be multiplied by a fixed coefficient without a wide parallel multiplier.',
     guidePinDescriptions: {
-      'CLK':  'Clock input for arithmetic pipeline/register timing.',
-      'A_Bn': 'Arithmetic mode control (add/subtract or related function selection).',
-      'OVF':  'Overflow output flag.',
-      'S7':   'Result output bit 7.',
-      'S6':   'Result output bit 6.',
-      'S5':   'Result output bit 5.',
-      'S4':   'Result output bit 4.',
-      'S3':   'Result output bit 3.',
-      'S2':   'Result output bit 2.',
+      'Bn1':  'Serial B input, delayed one clock. Lets B line up with the load clock; feed the same B stream here one bit early.',
+      'PLn':  'Parallel Load, active LOW. On a clock edge with this LOW, X is latched and the multiply restarts from zero.',
+      'X3':   'Multiplicand bit 3 (parallel input).',
+      'X2':   'Multiplicand bit 2 (parallel input).',
+      'X1':   'Multiplicand bit 1 (parallel input).',
+      'X0':   'Multiplicand bit 0, the least significant bit (parallel input).',
+      'SP':   'Serial product output. One bit of X·Y per clock, least significant bit first.',
+      'SPB':  'Serial X·Y ± B output. The product with the B stream added or subtracted, least significant bit first.',
+      'CP':   'Clock. Y is sampled and a product bit is produced on each rising edge.',
       'GND':  'Ground reference (pin 10).',
-      'S1':   'Result output bit 1.',
-      'S0':   'Result output bit 0.',
-      'B7':   'Operand input bit 7.',
-      'B6':   'Operand input bit 6.',
-      'B5':   'Operand input bit 5.',
-      'B4':   'Operand input bit 4.',
-      'B3':   'Operand input bit 3.',
-      'B2':   'Operand input bit 2.',
-      'B1':   'Operand input bit 1.',
+      'M':    'Mode. Selects whether the multiplicand is read as a signed (two\'s complement) or unsigned number.',
+      'K':    'Cascade input. Ties to the output of the more significant chip when several are chained for wider words.',
+      'ASn':  'Add/Subtract select for the B stage. HIGH adds B, LOW subtracts B.',
+      'Bn':   'Serial B input. The operand added to or subtracted from the product, one bit per clock, least significant bit first.',
+      'X7':   'Multiplicand bit 7, the most significant bit (parallel input).',
+      'X6':   'Multiplicand bit 6 (parallel input).',
+      'X5':   'Multiplicand bit 5 (parallel input).',
+      'X4':   'Multiplicand bit 4 (parallel input).',
+      'Y':    'Serial multiplier input. One bit of Y per clock, least significant bit first.',
       'VCC':  'Positive supply (+5 V, pin 20).',
     },
     guideSections: [
       {
-        title: 'Arithmetic Datapath Role',
+        title: 'How serial multiplication works here',
         paragraphs: [
-          'Before compact microcontrollers were common, arithmetic MSI devices handled multiply/accumulate and add/subtract tasks in controllers and signal-processing boards. Clocked arithmetic blocks made high-speed deterministic pipelines practical in TTL logic.',
+          'A normal multiplier takes both numbers in full and produces the whole product at once, which needs a lot of gates. This chip trades width for time: it keeps one number (X) in parallel and reads the other (Y) as a stream of bits.',
+          'Each clock brings in the next Y bit and puts out the next product bit, starting from the least significant. This works because a Y bit of a given weight can only affect product bits at that weight and above, so once a Y bit has arrived, the matching product bit is settled and can leave. To multiply an 8-bit X by an n-bit Y, clock n+8 times and read the product bit by bit.',
+        ],
+      },
+      {
+        title: 'The add/subtract stage',
+        paragraphs: [
+          'A second serial operand B can be added to or subtracted from the product as it comes out, controlled by the A/S pin. This saves a separate adder chip. It was aimed at FFT butterfly stages, where a multiply is almost always followed by an add or subtract.',
         ],
       },
     ],
     pinout: [
-      { pin:  1, name: 'CLK',  type: 'input'  },
-      { pin:  2, name: 'A_Bn', type: 'input'  },
-      { pin:  3, name: 'OVF',  type: 'output' },
-      { pin:  4, name: 'S7',   type: 'output' },
-      { pin:  5, name: 'S6',   type: 'output' },
-      { pin:  6, name: 'S5',   type: 'output' },
-      { pin:  7, name: 'S4',   type: 'output' },
-      { pin:  8, name: 'S3',   type: 'output' },
-      { pin:  9, name: 'S2',   type: 'output' },
+      { pin:  1, name: 'Bn1',  type: 'input'  },
+      { pin:  2, name: 'PLn',  type: 'input'  },
+      { pin:  3, name: 'X3',   type: 'input'  },
+      { pin:  4, name: 'X2',   type: 'input'  },
+      { pin:  5, name: 'X1',   type: 'input'  },
+      { pin:  6, name: 'X0',   type: 'input'  },
+      { pin:  7, name: 'SP',   type: 'output' },
+      { pin:  8, name: 'SPB',  type: 'output' },
+      { pin:  9, name: 'CP',   type: 'input'  },
       { pin: 10, name: 'GND',  type: 'power'  },
-      { pin: 11, name: 'S1',   type: 'output' },
-      { pin: 12, name: 'S0',   type: 'output' },
-      { pin: 13, name: 'B7',   type: 'input'  },
-      { pin: 14, name: 'B6',   type: 'input'  },
-      { pin: 15, name: 'B5',   type: 'input'  },
-      { pin: 16, name: 'B4',   type: 'input'  },
-      { pin: 17, name: 'B3',   type: 'input'  },
-      { pin: 18, name: 'B2',   type: 'input'  },
-      { pin: 19, name: 'B1',   type: 'input'  },
+      { pin: 11, name: 'M',    type: 'input'  },
+      { pin: 12, name: 'K',    type: 'input'  },
+      { pin: 13, name: 'ASn',  type: 'input'  },
+      { pin: 14, name: 'Bn',   type: 'input'  },
+      { pin: 15, name: 'X7',   type: 'input'  },
+      { pin: 16, name: 'X6',   type: 'input'  },
+      { pin: 17, name: 'X5',   type: 'input'  },
+      { pin: 18, name: 'X4',   type: 'input'  },
+      { pin: 19, name: 'Y',    type: 'input'  },
       { pin: 20, name: 'VCC',  type: 'power'  },
     ],
     gates: [
-      { type: 'GENERIC_STUB', inputs: ['CLK','A_Bn','B1','B2','B3','B4','B5','B6','B7'], outputs: ['S0','S1','S2','S3','S4','S5','S6','S7','OVF'] },
+      { type: 'SERIAL_PARALLEL_MULT_784',
+        inputs:  ['CP','PLn','M','ASn','Y','K','Bn','Bn1','X0','X1','X2','X3','X4','X5','X6','X7'],
+        outputs: ['SP','SPB'] },
     ],
   },
 
   // ── 74786: 4 input asynchronous bus arbiter (16-pin) ─────────────────────
   /* Primary source: Texas Instruments, 74786 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74f786.pdf */
-  '74786': {
+  '74x786': {
     name: '74x786',
     simpleName: '4 Input Bus Arbiter',
     description: '4 input asynchronous bus arbiter (16-pin)',
@@ -556,7 +593,7 @@ export const CHIPS_BLOCK_39 = {
         title: 'Common Uses',
         list: [
           'DMA vs CPU bus sharing',
-          'Multi-processor peripheral access',
+          'Multi processor peripheral access',
           'Shared memory bus mastering',
         ],
       },
@@ -587,7 +624,7 @@ export const CHIPS_BLOCK_39 = {
   // ── 74793: 8 bit latch w/ readback (20-pin) ───────────────────────────────
   /* Primary source: Texas Instruments, 74793 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls793.pdf
      https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
-  '74793': {
+  '74x793': {
     name: '74x793',
     simpleName: '8 bit Latch w/ Readback',
     description: '8 bit latch with readback capability (20-pin)',
@@ -595,9 +632,9 @@ export const CHIPS_BLOCK_39 = {
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls793.pdf',
     tags: ['latch', '8 bit', 'readback', 'stub'],
     sequential: true,
-    guideOverview: 'The 74x793 is an 8 bit transparent latch with readback-oriented bus behavior. LE controls when input data is captured, and OEn controls output driving onto a shared bus. It is useful for holding peripheral state or control words while still allowing the host to read the latched value back.',
+    guideOverview: 'The 74x793 is an 8 bit transparent latch with readback oriented bus behavior. LE controls when input data is captured, and OEn controls output driving onto a shared bus. It is useful for holding peripheral state or control words while still allowing the host to read the latched value back.',
     guidePinDescriptions: {
-      'OEn': 'Output enable (active LOW). High places outputs in high-impedance state.',
+      'OEn': 'Output enable (active LOW). High places outputs in high impedance state.',
       'LE':  'Latch enable. Active state allows D inputs to update the latched outputs.',
       'D0':  'Data input bit 0.',
       'D1':  'Data input bit 1.',
@@ -622,7 +659,7 @@ export const CHIPS_BLOCK_39 = {
       {
         title: 'Latch vs Register',
         paragraphs: [
-          'A latch is level-sensitive: while LE is active, output tracks input. A register is edge-triggered: output only changes on a clock edge. Latches are often used in simple I/O decode paths where a dedicated clock is not available.',
+          'A latch is level sensitive: while LE is active, output tracks input. A register is edge triggered: output only changes on a clock edge. Latches are often used in simple I/O decode paths where a dedicated clock is not available.',
         ],
       },
     ],
@@ -655,7 +692,7 @@ export const CHIPS_BLOCK_39 = {
 
   // ── 74794: 8 bit register w/ readback (20-pin) ────────────────────────────
   /* Primary source: Texas Instruments, 74794 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls794.pdf */
-  '74794': {
+  '74x794': {
     name: '74x794',
     simpleName: '8 bit Register w/ Readback',
     description: '8 bit register with readback capability (20-pin)',
@@ -663,7 +700,7 @@ export const CHIPS_BLOCK_39 = {
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls794.pdf',
     tags: ['register', '8 bit', 'readback', 'stub'],
     sequential: true,
-    guideOverview: 'The 74x794 is an 8 bit edge-triggered register with readback capability. On each active clock edge, D0-D7 are captured and presented on Q0-Q7. OEn controls tri-state output drive so the register can share a common bus.',
+    guideOverview: 'The 74x794 is an 8 bit edge triggered register with readback capability. On each active clock edge, D0-D7 are captured and presented on Q0-Q7. OEn controls tri state output drive so the register can share a common bus.',
     guidePinDescriptions: {
       'OEn': 'Output enable (active LOW).',
       'CLK': 'Clock input; captures D inputs on active edge.',
@@ -690,7 +727,7 @@ export const CHIPS_BLOCK_39 = {
       {
         title: 'Readback Register Use',
         paragraphs: [
-          'Readback lets firmware verify that a write reached external hardware correctly. This was common in bus-peripheral interfaces where software needed confidence about programmed control values.',
+          'Readback lets firmware verify that a write reached external hardware correctly. This was common in bus peripheral interfaces where software needed confidence about programmed control values.',
         ],
       },
     ],
@@ -721,17 +758,17 @@ export const CHIPS_BLOCK_39 = {
     ],
   },
 
-  // ── 74795: Octal buffer, non-inverting, shared enable, TRI (20-pin) ───────
+  // ── 74795: Octal buffer, non inverting, shared enable, TRI (20-pin) ───────
   /* Primary source: Texas Instruments, 74795 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls795.pdf
      https://en.wikipedia.org/wiki/Three-state_logic */
-  '74795': {
+  '74x795': {
     name: '74x795',
-    simpleName: 'Octal Buffer (Non-Inv, Shared En, TRI)',
-    description: 'Octal buffer with non-inverting outputs and shared enable, three-state (20-pin)',
+    simpleName: 'Octal Buffer (Non Inv, Shared En, TRI)',
+    description: 'Octal buffer, non-inverting 3-state, shared enable (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls795.pdf',
-    tags: ['buffer', 'octal', 'non-inverting', 'tri-state', 'stub'],
-    guideOverview: 'The 74x795 is an octal non-inverting tri-state buffer with one shared enable input. It is a straightforward bus interface part: present A0-A7 at Y0-Y7 when enabled, otherwise float outputs.',
+    tags: ['buffer', 'octal', 'non inverting', 'tri state', 'stub'],
+    guideOverview: 'The 74x795 is an octal non inverting tri state buffer with one shared enable input. It is a straightforward bus interface part: present A0-A7 at Y0-Y7 when enabled, otherwise float outputs.',
     guidePinDescriptions: {
       'OEn': 'Shared output enable (active LOW).',
       'A0':  'Input bit 0.',
@@ -792,14 +829,14 @@ export const CHIPS_BLOCK_39 = {
   // ── 74796: Octal buffer, inverting, shared enable, TRI (20-pin) ──────────
   /* Primary source: Texas Instruments, 74796 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls796.pdf
      https://en.wikipedia.org/wiki/Three-state_logic */
-  '74796': {
+  '74x796': {
     name: '74x796',
     simpleName: 'Octal Buffer (Inv, Shared En, TRI)',
-    description: 'Octal buffer with inverting outputs and shared enable, three-state (20-pin)',
+    description: 'Octal buffer with inverting outputs and shared enable, three state (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls796.pdf',
-    tags: ['buffer', 'octal', 'inverting', 'tri-state', 'stub'],
-    guideOverview: 'The 74x796 is the inverting counterpart to the 74x795. It buffers eight lines, inverts each channel, and provides a shared tri-state enable. This is useful where active LOW bus conventions are preferred.',
+    tags: ['buffer', 'octal', 'inverting', 'tri state', 'stub'],
+    guideOverview: 'The 74x796 is the inverting counterpart to the 74x795. It buffers eight lines, inverts each channel, and provides a shared tri state enable. This is useful where active LOW bus conventions are preferred.',
     guidePinDescriptions: {
       'OEn': 'Shared output enable (active LOW).',
       'A0':  'Input bit 0.',
@@ -826,7 +863,7 @@ export const CHIPS_BLOCK_39 = {
       {
         title: '74x795 vs 74x796',
         paragraphs: [
-          'Both are shared-enable octal tri-state buffers. 74x795 is non-inverting, while 74x796 inverts every channel.',
+          'Both are shared enable octal tri state buffers. 74x795 is non inverting, while 74x796 inverts every channel.',
         ],
       },
     ],
@@ -857,17 +894,17 @@ export const CHIPS_BLOCK_39 = {
     ],
   },
 
-  // ── 74797: Octal buffer, non-inverting, enable for 4 each, TRI (20-pin) ──
+  // ── 74797: Octal buffer, non inverting, enable for 4 each, TRI (20-pin) ──
   /* Primary source: Texas Instruments, 74797 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls797.pdf
      https://en.wikipedia.org/wiki/Three-state_logic */
-  '74797': {
+  '74x797': {
     name: '74x797',
-    simpleName: 'Octal Buffer (Non-Inv, Split En, TRI)',
-    description: 'Octal buffer with non-inverting outputs and separate enables for each group of 4, three-state (20-pin)',
+    simpleName: 'Octal Buffer (Non Inv, Split En, TRI)',
+    description: 'Octal buffer, non-inverting 3-state, split 4-bit enables (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls797.pdf',
-    tags: ['buffer', 'octal', 'non-inverting', 'tri-state', 'stub'],
-    guideOverview: 'The 74x797 is an octal non-inverting tri-state buffer with split enables, letting two 4 bit groups be controlled independently. This is useful when upper and lower nibbles belong to different bus phases or devices.',
+    tags: ['buffer', 'octal', 'non inverting', 'tri state', 'stub'],
+    guideOverview: 'The 74x797 is an octal non inverting tri state buffer with split enables, letting two 4 bit groups be controlled independently. This is useful when upper and lower nibbles belong to different bus phases or devices.',
     guidePinDescriptions: {
       'OE1n': 'Enable for one 4 bit output group (active LOW).',
       'A0':   'Input bit 0.',
@@ -892,9 +929,9 @@ export const CHIPS_BLOCK_39 = {
     },
     guideSections: [
       {
-        title: 'Split-Nibble Bus Control',
+        title: 'Split Nibble Bus Control',
         paragraphs: [
-          'Independent nibble enables are handy in BCD systems, half-byte peripherals, and multiplexed bus designs where only four bits should drive at a given time.',
+          'Independent nibble enables are handy in BCD systems, half byte peripherals, and multiplexed bus designs where only four bits should drive at a given time.',
         ],
       },
     ],
@@ -928,14 +965,14 @@ export const CHIPS_BLOCK_39 = {
   // ── 74798: Octal buffer, inverting, enable for 4 each, TRI (20-pin) ──────
   /* Primary source: Texas Instruments, 74798 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls798.pdf
      https://en.wikipedia.org/wiki/Three-state_logic */
-  '74798': {
+  '74x798': {
     name: '74x798',
     simpleName: 'Octal Buffer (Inv, Split En, TRI)',
-    description: 'Octal buffer with inverting outputs and separate enables for each group of 4, three-state (20-pin)',
+    description: 'Octal buffer, inverting 3-state, split 4-bit enables (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls798.pdf',
-    tags: ['buffer', 'octal', 'inverting', 'tri-state', 'stub'],
-    guideOverview: 'The 74x798 is the inverting split-enable version of the 74x797. It provides two independently enabled 4 bit output groups and inverts data polarity on each channel.',
+    tags: ['buffer', 'octal', 'inverting', 'tri state', 'stub'],
+    guideOverview: 'The 74x798 is the inverting split enable version of the 74x797. It provides two independently enabled 4 bit output groups and inverts data polarity on each channel.',
     guidePinDescriptions: {
       'OE1n': 'Enable for one 4 bit output group (active LOW).',
       'A0':   'Input bit 0.',
@@ -993,78 +1030,96 @@ export const CHIPS_BLOCK_39 = {
     ],
   },
 
-  // ── 74800: Triple 4 input AND/NAND drivers (20-pin) ──────────────────────
-  /* Primary source: Texas Instruments, 74800 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74as800.pdf */
-  '74800': {
+  // ── 74800: Triple 4-input AND/NAND drivers (20-pin) ──────────────────────
+  // Source: Texas Instruments, "Types SN54AS800, SN74AS800 Triple 4-Input
+  //   AND/NAND Drivers", doc D2661 (Dec 1982, rev. Dec 1983), in "The TTL Data
+  //   Book, Vol. 3" (1984), pp. 2-505/2-506. [Online]. Available:
+  //   https://archive.org/details/bitsavers_tidataBookVol3_25840031 (leaf 537).
+  //   Verified: terminal assignment (N package, TOP VIEW) + logic symbol read as
+  //   300-dpi PDF page images. Pin map: 1A=1, 2A=2, 2B=3, 2C=4, 2D=5, 3A=6, 3B=7,
+  //   3C=8, 3D=9, GND=10, 3Z=11, 3Y=12, 2Y=13, 2Z=14, 1Z=15, 1Y=16, 1B=17, 1C=18,
+  //   1D=19, VCC=20. Each channel n: nY = AnBnCnDn (AND, true), nZ = ~(AnBnCnDn)
+  //   (NAND). NOTE: the original stub pinout was hand-entered and wrong (it used
+  //   sequential 0/1/2 channels with adjacent I/O); corrected against the
+  //   datasheet here (issues.md C2 — never trust a hand-entered/sibling pinout).
+  //   The TI part is the SN74AS800; the prior sn74as800.pdf symlink 404s, so the
+  //   archived 1984 data book is the source. AND/NAND are exact in the digital
+  //   engine; the part's analog selling points (≤0.5 ns true/complement skew,
+  //   48 mA drive) are not modeled and are not claimed in user-facing text.
+  '74x800': {
     name: '74x800',
-    simpleName: 'Triple 4 Input AND/NAND Driver',
-    description: 'Triple 4 input AND/NAND drivers (20-pin)',
+    simpleName: 'Triple 4-Input AND/NAND Driver',
+    description: 'Triple 4-input AND/NAND drivers (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
-    datasheet: 'https://www.ti.com/lit/ds/symlink/sn74as800.pdf',
-    tags: ['AND', 'NAND', 'gate', 'driver', 'quad-input', 'stub'],
-    guideOverview: 'The 74x800 includes three 4 input logic driver sections that provide both true AND outputs and inverted NAND outputs for each channel. Having Y and Yn together is convenient for control logic where both polarities are needed without extra gates.',
+    datasheet: 'https://archive.org/details/bitsavers_tidataBookVol3_25840031',
+    tags: ['AND', 'NAND', 'gate', 'driver', 'quad-input'],
+    guideOverview: 'The 74x800 has three independent 4-input sections. Each section gives you both polarities at once: a true AND output (Y) and an inverted NAND output (Z) of the same four inputs. That saves an inverter when a circuit needs a signal and its complement, which is why the part is sold as a driver for clock lines, decoders, and differential line drivers.',
     guidePinDescriptions: {
-      'A0':  'Input A of channel 0.',
-      'B0':  'Input B of channel 0.',
-      'C0':  'Input C of channel 0.',
-      'D0':  'Input D of channel 0.',
-      'Y0n': 'NAND output of channel 0 (inverted).',
-      'Y0':  'AND output of channel 0 (true polarity).',
-      'A1':  'Input A of channel 1.',
-      'B1':  'Input B of channel 1.',
-      'C1':  'Input C of channel 1.',
+      '1A':  'Input A of section 1.',
+      '1B':  'Input B of section 1.',
+      '1C':  'Input C of section 1.',
+      '1D':  'Input D of section 1.',
+      '1Y':  'AND output of section 1: HIGH when 1A, 1B, 1C, 1D are all HIGH.',
+      '1Z':  'NAND output of section 1: the inverse of 1Y.',
+      '2A':  'Input A of section 2.',
+      '2B':  'Input B of section 2.',
+      '2C':  'Input C of section 2.',
+      '2D':  'Input D of section 2.',
+      '2Y':  'AND output of section 2: HIGH when 2A, 2B, 2C, 2D are all HIGH.',
+      '2Z':  'NAND output of section 2: the inverse of 2Y.',
+      '3A':  'Input A of section 3.',
+      '3B':  'Input B of section 3.',
+      '3C':  'Input C of section 3.',
+      '3D':  'Input D of section 3.',
+      '3Y':  'AND output of section 3: HIGH when 3A, 3B, 3C, 3D are all HIGH.',
+      '3Z':  'NAND output of section 3: the inverse of 3Y.',
       'GND': 'Ground reference (pin 10).',
-      'D1':  'Input D of channel 1.',
-      'Y1n': 'NAND output of channel 1 (inverted).',
-      'Y1':  'AND output of channel 1 (true polarity).',
-      'A2':  'Input A of channel 2.',
-      'B2':  'Input B of channel 2.',
-      'C2':  'Input C of channel 2.',
-      'D2':  'Input D of channel 2.',
-      'Y2n': 'NAND output of channel 2 (inverted).',
-      'Y2':  'AND output of channel 2 (true polarity).',
       'VCC': 'Positive supply (+5 V, pin 20).',
     },
     guideSections: [
       {
-        title: 'AND and NAND Together',
+        title: 'Both polarities from one section',
         paragraphs: [
-          'Because NAND is the complement of AND, providing both outputs from one section reduces part count in complex combinational networks. Designers can route whichever polarity they need directly.',
+          'Each section drives Y and Z from the same four inputs, and Z is always the inverse of Y. When a design needs a signal and its complement (a clock and its inverse, or the true and false sides of a decode line), you take both straight off one section instead of adding an inverter that would arrive a little later.',
         ],
       },
       {
-        title: 'Logic Formula',
+        title: 'Logic',
         formulas: [
           'Y = A * B * C * D',
-          'Yn = (A * B * C * D)',
+          'Z = NOT(A * B * C * D)',
         ],
-        note: 'Functional behavior is currently represented as a generic stub in simulation.',
       },
     ],
     pinout: [
-      { pin:  1, name: 'A0',   type: 'input'  },
-      { pin:  2, name: 'B0',   type: 'input'  },
-      { pin:  3, name: 'C0',   type: 'input'  },
-      { pin:  4, name: 'D0',   type: 'input'  },
-      { pin:  5, name: 'Y0n',  type: 'output' },
-      { pin:  6, name: 'Y0',   type: 'output' },
-      { pin:  7, name: 'A1',   type: 'input'  },
-      { pin:  8, name: 'B1',   type: 'input'  },
-      { pin:  9, name: 'C1',   type: 'input'  },
+      { pin:  1, name: '1A',   type: 'input'  },
+      { pin:  2, name: '2A',   type: 'input'  },
+      { pin:  3, name: '2B',   type: 'input'  },
+      { pin:  4, name: '2C',   type: 'input'  },
+      { pin:  5, name: '2D',   type: 'input'  },
+      { pin:  6, name: '3A',   type: 'input'  },
+      { pin:  7, name: '3B',   type: 'input'  },
+      { pin:  8, name: '3C',   type: 'input'  },
+      { pin:  9, name: '3D',   type: 'input'  },
       { pin: 10, name: 'GND',  type: 'power'  },
-      { pin: 11, name: 'D1',   type: 'input'  },
-      { pin: 12, name: 'Y1n',  type: 'output' },
-      { pin: 13, name: 'Y1',   type: 'output' },
-      { pin: 14, name: 'A2',   type: 'input'  },
-      { pin: 15, name: 'B2',   type: 'input'  },
-      { pin: 16, name: 'C2',   type: 'input'  },
-      { pin: 17, name: 'D2',   type: 'input'  },
-      { pin: 18, name: 'Y2n',  type: 'output' },
-      { pin: 19, name: 'Y2',   type: 'output' },
+      { pin: 11, name: '3Z',   type: 'output' },
+      { pin: 12, name: '3Y',   type: 'output' },
+      { pin: 13, name: '2Y',   type: 'output' },
+      { pin: 14, name: '2Z',   type: 'output' },
+      { pin: 15, name: '1Z',   type: 'output' },
+      { pin: 16, name: '1Y',   type: 'output' },
+      { pin: 17, name: '1B',   type: 'input'  },
+      { pin: 18, name: '1C',   type: 'input'  },
+      { pin: 19, name: '1D',   type: 'input'  },
       { pin: 20, name: 'VCC',  type: 'power'  },
     ],
     gates: [
-      { type: 'GENERIC_STUB', inputs: ['A0','B0','C0','D0','A1','B1','C1','D1','A2','B2','C2','D2'], outputs: ['Y0','Y0n','Y1','Y1n','Y2','Y2n'] },
+      { type: 'AND',  inputs: ['1A', '1B', '1C', '1D'], output: '1Y' },
+      { type: 'NAND', inputs: ['1A', '1B', '1C', '1D'], output: '1Z' },
+      { type: 'AND',  inputs: ['2A', '2B', '2C', '2D'], output: '2Y' },
+      { type: 'NAND', inputs: ['2A', '2B', '2C', '2D'], output: '2Z' },
+      { type: 'AND',  inputs: ['3A', '3B', '3C', '3D'], output: '3Y' },
+      { type: 'NAND', inputs: ['3A', '3B', '3C', '3D'], output: '3Z' },
     ],
   },
 

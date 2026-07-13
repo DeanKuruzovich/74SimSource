@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>74Sim — Introduction to Digital Hardware</title>
+  <link rel="icon" type="image/png" href="/assets/Logo74Sim.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/tokens.css">
+  <link rel="stylesheet" href="/css/onramp-lessons.css">
+</head>
+<body>
+
+  <div class="card">
+    <!-- Filled from the course registry (js/onramp-courses.js) by
+         onramp-lessons-page.js; the markup carries the default (intro)
+         course text so the page reads right even before the JS runs. -->
+    <h1 id="course-title">Introduction to Digital Hardware</h1>
+
+    <p id="course-blurb">New to digital logic or the 74 series? This introduction walks you through the
+    fundamentals step by step. No prior experience required. Each lesson builds on the
+    last, from a single logic gate all the way to flip flops and counters.</p>
+
+    <!-- Links to the other available courses (filled by onramp-lessons-page.js) -->
+    <p id="course-switch" class="course-switch"></p>
+
+    <h2 data-i18n="onramp.chooseLesson">Choose a Lesson</h2>
+
+    <div class="lesson-list" id="lesson-list"></div>
+  </div>
+
+  <!-- Lesson-complete popup (shown when arriving with ?completed=<idx>) -->
+  <div id="lesson-complete-overlay" class="modal-overlay" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="lc-title">
+      <h2 id="lc-title" class="modal-title"></h2>
+      <p id="lc-body" class="modal-body"></p>
+      <div class="modal-actions" id="lc-actions"></div>
+    </div>
+  </div>
+
+  <script type="module" src="/js/i18n.js"></script>
+  <script type="module" src="/js/onramp-lessons-page.js"></script>
+<!-- 100% privacy-first analytics -->
+<script async src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
+</body>
+</html>

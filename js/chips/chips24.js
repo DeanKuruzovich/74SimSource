@@ -3,20 +3,20 @@
 //                              74407, 74410, 74412, 74413
 export const CHIPS_BLOCK_24 = {
 
-  // ── 74388: 4 bit D-type register, tri-state + standard outputs ────────────
+  // ── 74388: 4 bit D type register, tri state + standard outputs ────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Flip-flop_(electronics)
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic */
-  '74388': {
+  '74x388': {
     name: '74x388',
     simpleName: '4 bit D-FF (3-state)',
-    description: '4 bit D-type register with tri-state and standard outputs (16-pin)',
+    description: '4 bit D type register with tri state and standard outputs (16-pin)',
     pins: 16, vcc: 16, gnd: 8,
     sequential: true,
-    tags: ['d-flip-flop', '4 bit', 'register', 'tri-state'],
-    guideOverview: 'The 74x388 is a 4 bit D-type register with both standard and 3-state outputs. Q1-Q4 are always-active; Q1n-Q4n are 3-state, enabled when OEn is LOW. This gives the chip flexibility to drive a bus via the 3-state outputs while also providing direct complementary signals.',
+    tags: ['d-flip flop', '4 bit', 'register', 'tri state'],
+    guideOverview: 'The 74x388 is a 4 bit D type register with both standard and 3-state outputs. Q1-Q4 are always active; Q1n-Q4n are 3-state, enabled when OEn is LOW. This gives the chip flexibility to drive a bus via the 3-state outputs while also providing direct complementary signals.',
     guidePinDescriptions: {
-      'OEn': 'Output Enable for 3-state outputs Q1-Q4 (active LOW). When HIGH, Q1-Q4 are tri-stated. Qn outputs are unaffected.',
+      'OEn': 'Output Enable for 3-state outputs Q1-Q4 (active LOW). When HIGH, Q1-Q4 are tri stated. Qn outputs are unaffected.',
       'D1':  'Data input 1.',
       'D2':  'Data input 2.',
       'D3':  'Data input 3.',
@@ -67,7 +67,7 @@ export const CHIPS_BLOCK_24 = {
   // ── 74390: Dual 4 bit decade counter, asynchronous clear ────────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Counter_(digital) */
-  '74390': {
+  '74x390': {
     name: '74x390',
     simpleName: 'Dual Decade Counter',
     description: 'Dual 4 bit decade counter with asynchronous clear (16-pin)',
@@ -128,37 +128,85 @@ export const CHIPS_BLOCK_24 = {
   },
 
   // ── 74393: Dual 4 bit binary counter, asynchronous clear ─────────────────
-  /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
-     Wikipedia: https://en.wikipedia.org/wiki/Counter_(digital) */
-  '74393': {
+  // Source: Texas Instruments, "SN54390, SN54LS390, SN54393, SN54LS393, SN74390,
+  //   SN74LS390, SN74393, SN74LS393 Dual 4-Bit Decade and Binary Counters",
+  //   SDLS107 (Oct. 1976, rev. Mar. 1988). [Online]. Available:
+  //   https://www.ti.com/lit/ds/symlink/sn74ls393.pdf. Verified: terminal
+  //   assignment (D/J/N/W package, top view) pins 1-14, the '393/'LS393
+  //   count-sequence (function) table, and the logic diagram, pages 1-3, read as
+  //   ~200-dpi PDF page images. Confirms: pinout below is exact; clock = 1A(1)/
+  //   2A(13) counts on the HIGH→LOW (falling) edge; clear = 1CLR(2)/2CLR(12) is a
+  //   direct (asynchronous) active-HIGH reset; outputs are buffered totem-pole
+  //   (not open-collector), so no pull-up is needed; internal 4-stage ripple
+  //   counter, QA=LSB..QD=MSB, 0-15 then wraps. Datasheet clock label "A" is
+  //   renamed CLK1/CLK2 here for readability; behaviour is unchanged.
+  '74x393': {
     name: '74x393',
-    simpleName: 'Dual 4 bit Binary Counter',
-    description: 'Dual 4 bit binary counter with asynchronous clear (14-pin)',
+    simpleName: 'Dual 4-bit Binary Counter',
+    description: 'Two independent 4-bit binary ripple counters, async clear each (14-pin)',
     pins: 14, vcc: 14, gnd: 7,
+    datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls393.pdf',
     sequential: true,
     tags: ['counter', 'binary', 'dual', '4 bit'],
-    guideOverview: 'The 74x393 contains two independent 4 bit binary ripple counters in a 14-pin package. Each counter has a falling-edge clock and an asynchronous active HIGH clear. It counts 0-15 and wraps around. Cascade QD to the next CLK for longer counters.',
+    guideOverview: 'The 74x393 packs two separate 4 bit binary counters into one 14-pin chip. Each has its own clock and its own clear and shares nothing with the other, so you get two independent counters (or dividers) in a single package. Each one counts 0 to 15 on the falling edge of its clock and wraps back to 0. The clear is active HIGH and asynchronous: drive it HIGH and all four of that counter\'s outputs snap to 0 at once, without waiting for a clock edge. Inside it is a ripple counter each output stage toggles the next which keeps it small and cheap but means the outputs do not all switch at exactly the same instant. People reach for it as a frequency divider, a small event counter, or a step-sequence generator, and cascade QD into the next clock for longer counts. Its sibling the 74x390 is the decade (divide by 10) version.',
     guidePinDescriptions: {
-      'CLK1': 'Clock for counter 1 (falls on negative edge).',
-      'CLR1': 'Clear for counter 1 (active HIGH).',
-      'QA1':  'Output A (bit 0) of counter 1.',
-      'QB1':  'Output B of counter 1.',
-      'QC1':  'Output C of counter 1.',
-      'QD1':  'Output D (bit 3) of counter 1.',
+      'CLK1': 'Clock for counter 1 (pin 1, labeled 1A on the datasheet). The count advances on each HIGH→LOW (falling) edge.',
+      'CLR1': 'Clear for counter 1 (pin 2). Active HIGH and asynchronous: a HIGH forces QA1-QD1 to 0 immediately. Tie it LOW to let the counter run.',
+      'QA1':  'Counter 1 output bit 0, the least significant bit (pin 3). Toggles on every clock edge (clock ÷2).',
+      'QB1':  'Counter 1 output bit 1 (pin 4). Clock ÷4.',
+      'QC1':  'Counter 1 output bit 2 (pin 5). Clock ÷8.',
+      'QD1':  'Counter 1 output bit 3, the most significant bit (pin 6). Clock ÷16; cascade this into another counter\'s clock for more bits.',
       'GND':  'Ground reference (pin 7).',
-      'QD2':  'Output D of counter 2.',
-      'QC2':  'Output C of counter 2.',
-      'QB2':  'Output B of counter 2.',
-      'QA2':  'Output A of counter 2.',
-      'CLR2': 'Clear for counter 2 (active HIGH).',
-      'CLK2': 'Clock for counter 2.',
+      'QD2':  'Counter 2 output bit 3, the most significant bit (pin 8). Note counter 2\'s outputs run high-to-low down this side of the chip.',
+      'QC2':  'Counter 2 output bit 2 (pin 9).',
+      'QB2':  'Counter 2 output bit 1 (pin 10).',
+      'QA2':  'Counter 2 output bit 0, the least significant bit (pin 11).',
+      'CLR2': 'Clear for counter 2 (pin 12). Active HIGH and asynchronous, same as CLR1.',
+      'CLK2': 'Clock for counter 2 (pin 13, labeled 2A on the datasheet). Counts on the falling edge.',
       'VCC':  'Positive supply (+5 V, pin 14).',
     },
     guideSections: [
       {
-        title: 'Cascading for Longer Counts',
+        title: 'How It Counts',
         paragraphs: [
-          'Connect QD of counter 1 to CLK of counter 2 for an 8 bit binary counter (0-255). Each output bit divides the clock by 2, so QA=÷2, QB=÷4, QC=÷8, QD=÷16.',
+          'Each counter is four toggle flip-flops in a chain a ripple counter. The clock feeds the first stage (QA); QA\'s output clocks the second stage (QB), QB clocks QC, and QC clocks QD. On every falling edge of the clock, QA flips. Each time a stage flips from HIGH to LOW it flips the next stage along.',
+          'The four outputs together read as a plain binary number, QA the least significant bit and QD the most significant. The count runs 0 (0000) up to 15 (1111), then rolls over to 0 and keeps going.',
+        ],
+        formulas: [
+          'Value = QD·8 + QC·4 + QB·2 + QA·1',
+          '0:0000  1:0001  2:0010  3:0011  4:0100  5:0101  6:0110  7:0111',
+          '8:1000  9:1001  10:1010  11:1011  12:1100  13:1101  14:1110  15:1111',
+        ],
+      },
+      {
+        title: 'Clearing and the Falling-Edge Clock',
+        paragraphs: [
+          'Two details trip up beginners. First, the clock is falling-edge: the count changes when the clock drops from HIGH to LOW, not when it rises. Second, the clear (CLR) is active HIGH and asynchronous "asynchronous" meaning it does not wait for a clock edge. The moment CLR goes HIGH, all four of that counter\'s outputs go to 0 and stay there until CLR returns LOW.',
+          'So to let a counter run freely, tie its CLR pin LOW (to ground). Pulse CLR HIGH whenever you want to reset the count to 0. Note this is the opposite of many chips, whose reset is active LOW watch the polarity when you wire it.',
+        ],
+      },
+      {
+        title: 'Cascading and Dividing Frequency',
+        paragraphs: [
+          'Each output halves the frequency of the stage before it. Feed a steady clock into the A input and QA is the clock ÷2, QB is ÷4, QC is ÷8, and QD is ÷16. That alone makes one counter a handy frequency divider.',
+          'To count past 15, chain the two counters: wire QD of counter 1 to the clock input of counter 2. QD ticks once every 16 input pulses, so counter 2 takes over each time counter 1 rolls over. The pair now acts as one 8 bit counter running 0 to 255 (a divide by 256). You can keep chaining across chips for as many bits as you need.',
+        ],
+      },
+      {
+        title: 'Ripple Counters Have a Catch',
+        paragraphs: [
+          'Because the stages clock each other in turn, the four output bits do not all change at the same instant on real hardware there is a tiny delay as the change ripples from QA up to QD. For a moment the outputs can show a wrong in-between number. Going from 7 (0111) to 8 (1000), for example, the bits flip one after another, so the outputs might briefly read 6, then 4, then 0, before settling on 8.',
+          'Usually this does not matter. But if you feed the outputs into a decoder or comparator that reacts quickly, those brief wrong values can produce short false pulses ("glitches"). When that matters, engineers use a synchronous counter (such as the 74x161 or 74x163) whose outputs all switch together.',
+          'Simplification: this simulator updates all four bits in a single step, so you will not see the ripple glitch here. It is a real-hardware timing effect the model leaves out.',
+        ],
+      },
+      {
+        title: 'Common Uses',
+        list: [
+          'Frequency divider or clock prescaler (÷2 up to ÷256 when cascaded).',
+          'Counting events or pulses in a simple project.',
+          'Generating an address or step sequence for scanning memory or driving a small state machine.',
+          'Fitting two dividers into one 14-pin package to save board space.',
         ],
       },
     ],
@@ -185,18 +233,18 @@ export const CHIPS_BLOCK_24 = {
     ],
   },
 
-  // ── 74395: 4 bit cascadable shift register, tri-state ───────────────────
+  // ── 74395: 4 bit cascadable shift register, tri state ───────────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Shift_register
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic */
-  '74395': {
+  '74x395': {
     name: '74x395',
     simpleName: '4 bit Shift Reg (3-state)',
-    description: '4 bit cascadable shift register with tri-state outputs (16-pin)',
+    description: '4 bit cascadable shift register with tri state outputs (16-pin)',
     pins: 16, vcc: 16, gnd: 8,
     sequential: true,
-    tags: ['shift register', '4 bit', 'tri-state', 'cascadable'],
-    guideOverview: 'The 74x395 is a 4 bit cascadable shift register with tri-state outputs, a serial input (SER), parallel load inputs (A-D), clear (CLRn), and a load/shift mode select (SRn). When SRn=LOW the register shifts right; when HIGH it loads parallel data. OEn enables the tri-state Q outputs.',
+    tags: ['shift register', '4 bit', 'tri state', 'cascadable'],
+    guideOverview: 'The 74x395 is a 4 bit cascadable shift register with tri state outputs, a serial input (SER), parallel load inputs (A-D), clear (CLRn), and a load/shift mode select (SRn). When SRn=LOW the register shifts right; when HIGH it loads parallel data. OEn enables the tri state Q outputs.',
     guidePinDescriptions: {
       'SRn':  'Mode: LOW = shift right, HIGH = parallel load.',
       'SER':  'Serial input (enters at QA during shift).',
@@ -204,10 +252,10 @@ export const CHIPS_BLOCK_24 = {
       'B':    'Parallel data input B.',
       'C':    'Parallel data input C.',
       'D':    'Parallel data input D.',
-      'OEn':  'Output Enable (active LOW). When HIGH, QA-QD are tri-stated.',
+      'OEn':  'Output Enable (active LOW). When HIGH, QA-QD are tri stated.',
       'GND':  'Ground reference (pin 8).',
       'CLK':  'Clock. Rising edge captures data.',
-      'QD':   'Output D (tri-state).',
+      'QD':   'Output D (tri state).',
       'QDn':  'Complementary output D (standard).',
       'QC':   'Output C.',
       'QB':   'Output B.',
@@ -219,7 +267,7 @@ export const CHIPS_BLOCK_24 = {
       {
         title: 'Cascading Shift Registers',
         paragraphs: [
-          'Connect QDn of one 74x395 to SER of the next for a longer serial shift path. The complementary output QDn is always-active and used for cascading without needing the tri-state QD pin.',
+          'Connect QDn of one 74x395 to SER of the next for a longer serial shift path. The complementary output QDn is always active and used for cascading without needing the tri state QD pin.',
         ],
       },
     ],
@@ -251,17 +299,18 @@ export const CHIPS_BLOCK_24 = {
   // ── 74396: Octal storage register (parallel access, OC) ─────────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Open_collector */
-  '74396': {
+  '74x396': {
     name: '74x396',
     simpleName: 'Octal Storage Reg',
     description: 'Octal storage registers with parallel access (16-pin)',
     pins: 16, vcc: 16, gnd: 8,
+    openCollector: true,
     sequential: true,
-    tags: ['register', 'octal', '8 bit', 'storage'],
-    guideOverview: 'The 74x396 is an 8 bit storage register with open-collector outputs. On the rising clock edge all eight D inputs are captured. Unlike the 74x374/373, there is no output enable outputs are always active (OC). Add pull up resistors on all Q outputs.',
+    tags: ['register', 'octal', '8 bit', 'storage', 'open collector'],
+    guideOverview: 'The 74x396 is an 8 bit storage register with open collector outputs. On the rising clock edge all eight D inputs are captured. Unlike the 74x374/373, there is no output enable outputs are always active (OC). Add pull up resistors on all Q outputs.',
     guidePinDescriptions: {
       'D1':  'Data input 1.',
-      'Q1':  'Registered output 1 (open-collector).',
+      'Q1':  'Registered output 1 (open collector).',
       'D2':  'Data input 2.',
       'Q2':  'Output 2.',
       'D3':  'Data input 3.',
@@ -281,7 +330,7 @@ export const CHIPS_BLOCK_24 = {
       {
         title: 'OC Storage Register',
         paragraphs: [
-          'Open-collector outputs require external pull up resistors. This allows multiple devices to share the same output bus with wired AND logic.',
+          'Open collector outputs require external pull up resistors. This allows multiple devices to share the same output bus with wired AND logic.',
         ],
       },
     ],
@@ -313,7 +362,7 @@ export const CHIPS_BLOCK_24 = {
   // ── 74398: Quad 2 input MUX with storage and complementary outputs ───────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Multiplexer */
-  '74398': {
+  '74x398': {
     name: '74x398',
     simpleName: 'Quad 2:1 MUX (storage, Q/Qn)',
     description: 'Quad 2 input multiplexers with storage and complementary outputs (20-pin)',
@@ -384,7 +433,7 @@ export const CHIPS_BLOCK_24 = {
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Multiplexer
      Wikipedia: https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
-  '74399': {
+  '74x399': {
     name: '74x399',
     simpleName: 'Quad 2:1 MUX (storage)',
     description: 'Quad 2 input multiplexer with storage (16-pin)',
@@ -444,61 +493,67 @@ export const CHIPS_BLOCK_24 = {
   },
 
   // ── 74401: CRC generator/checker ─────────────────────────────────────────
-  /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
-     Wikipedia: https://en.wikipedia.org/wiki/Shift_register */
-  '74401': {
+  /* Primary source: National Semiconductor, "54F/74F401 CRC Generator/Checker,"
+     1988 FAST Advanced Schottky Databook, pp. 4-312..4-314. (9401 equivalent) */
+  '74x401': {
     name: '74x401',
     simpleName: 'CRC Generator/Checker',
-    description: 'CRC generator/checker (16 bit CCITT polynomial) (14-pin)',
+    description: 'CRC generator/checker, 8 selectable polynomials (14-pin)',
     pins: 14, vcc: 14, gnd: 7,
     sequential: true,
     tags: ['crc', 'serial', 'polynomial', 'complex'],
-    guideOverview: 'The 74x401 is a CRC (Cyclic Redundancy Check) generator/checker using the 16 bit CCITT polynomial (x^16 + x^12 + x^5 + 1). Serial data is clocked in one bit at a time; the internal 16 bit shift register accumulates the remainder. At end of transmission the ERR output flags a mismatch between received and expected CRC.',
+    guideOverview: 'The 74x401 (9401 equivalent) is a CRC (Cyclic Redundancy Check) generator/checker for serial data. A 3 bit select code (S0 S2) chooses one of eight standard generator polynomials including CRC-16 and CRC-CCITT and their reverse (reciprocal) forms. Serial data is clocked in one bit at a time through D on the HIGH-to-LOW transition of CP; an internal 16 bit register accumulates the remainder. After the message, the ER output flags whether a transmission error was detected.',
     guidePinDescriptions: {
-      'CLK':  'Serial clock. Each rising edge shifts one bit of DATA through the polynomial logic.',
-      'DATA': 'Serial data input, MSB first.',
-      'SYNn': 'Sync (active LOW). Begin a new frame check.',
-      'RESn': 'Reset (active LOW). Clears the internal register.',
-      'P2':   'Polynomial select bit 2.',
-      'P1':   'Polynomial select bit 1.',
+      'CP':   'Clock input. Data shifts through the polynomial logic on each HIGH-to-LOW (falling) transition.',
+      'D':    'Serial data input.',
+      'S0':   'Polynomial select bit 0.',
+      'S1':   'Polynomial select bit 1.',
+      'S2':   'Polynomial select bit 2.',
+      'CWE':  'Check Word Enable. Held HIGH while data is entered; brought LOW to append (shift out) the accumulated check bits.',
+      'P':    'Preset (active LOW). Asynchronously sets the register for the selected polynomial.',
+      'MR':   'Master Reset (active HIGH). Asynchronously clears the register.',
+      'Q':    'Serial data/check-bit output (most significant register bit).',
+      'ER':   'Error output. Goes HIGH after the check frame if a CRC mismatch is detected.',
+      'NC1':  'No connect.',
+      'NC2':  'No connect.',
       'GND':  'Ground reference (pin 7).',
-      'ERR':  'Error flag. Goes HIGH at end of check frame if CRC mismatch detected.',
-      'SO':   'Serial output. Allows reading the accumulated CRC pattern.',
-      'STS':  'Status output.',
-      'DR':   'Data ready output.',
-      'COR':  'Correction output.',
-      'CEn':  'Chip Enable (active LOW). Disable to hold outputs.',
       'VCC':  'Positive supply (+5 V, pin 14).',
     },
     guideSections: [
       {
         title: 'How CRC Works',
         paragraphs: [
-          'CRC treats a data stream as a binary polynomial and divides it by a standard generator polynomial. The remainder (the CRC) is appended at the transmitter. The receiver recomputes the CRC over the received data plus appended CRC if error-free the remainder is zero.',
-          'The CCITT 16 bit polynomial provides good burst-error detection for data communication protocols such as HDLC, X.25, and V.42.',
+          'CRC treats a serial data stream as a binary polynomial and divides it by a standard generator polynomial. The remainder (the CRC) is appended to the message at the transmitter. The receiver re-divides the data plus appended CRC by the same polynomial if the message is error free the remainder is zero and ER stays LOW.',
+          'The 74x401 selects among eight standard polynomials (CRC-16, CRC-CCITT, CRC-12, LRC-8 and their reverses) via S0 S2, giving good burst error detection for disk storage and data communication systems.',
         ],
       },
     ],
     pinout: [
-      { pin:  7, name: 'GND',  type: 'power' },
-      { pin:  8, name: 'ERR',  type: 'output' },
-      { pin:  9, name: 'SO',   type: 'output' },
-      { pin: 10, name: 'STS',  type: 'output' },
-      { pin: 11, name: 'DR',   type: 'output' },
-      { pin: 12, name: 'COR',  type: 'output' },
-      { pin: 13, name: 'CEn',  type: 'input' },
-      { pin: 14, name: 'VCC',  type: 'power' },
+      { pin:  1, name: 'CP',  type: 'input' },
+      { pin:  2, name: 'P',   type: 'input' },
+      { pin:  3, name: 'S0',  type: 'input' },
+      { pin:  4, name: 'MR',  type: 'input' },
+      { pin:  5, name: 'S1',  type: 'input' },
+      { pin:  6, name: 'NC1', type: 'nc' },
+      { pin:  7, name: 'GND', type: 'power' },
+      { pin:  8, name: 'S2',  type: 'input' },
+      { pin:  9, name: 'NC2', type: 'nc' },
+      { pin: 10, name: 'CWE', type: 'input' },
+      { pin: 11, name: 'D',   type: 'input' },
+      { pin: 12, name: 'Q',   type: 'output' },
+      { pin: 13, name: 'ER',  type: 'output' },
+      { pin: 14, name: 'VCC', type: 'power' },
     ],
     gates: [
       { type: 'CRC_16BIT',
-        inputs:  ['CLK','DATA','SYNn','RESn','P2','P1','CEn'],
-        outputs: ['ERR','SO','STS','DR','COR'] },
+        inputs:  ['CP','D','S0','S1','S2','CWE','P','MR'],
+        outputs: ['Q','ER'] },
     ],
   },
 
   // ── 74402: Serial data polynomial generator/checker ─────────────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits */
-  '74402': {
+  '74x402': {
     name: '74x402',
     simpleName: 'Serial Polynomial Checker',
     description: 'Serial data polynomial generator/checker (16-pin)',
@@ -528,7 +583,7 @@ export const CHIPS_BLOCK_24 = {
       {
         title: 'Programmable vs Fixed Polynomial',
         paragraphs: [
-          'The 74x402 accepts custom polynomial coefficients on P0-P3 making it adaptable to CRC-CCITT, CRC-16, CRC-12, or application-specific polynomials. The 74x401 is the fixed-polynomial CCITT-only variant.',
+          'The 74x402 accepts custom polynomial coefficients on P0-P3 making it adaptable to CRC-CCITT, CRC-16, CRC-12, or application specific polynomials. The 74x401 is the fixed polynomial CCITT only variant.',
         ],
       },
     ],
@@ -557,18 +612,18 @@ export const CHIPS_BLOCK_24 = {
     ],
   },
 
-  // ── 74403: 64 bit FIFO memory (16×4), tri-state ─────────────────────────
+  // ── 74403: 64 bit FIFO memory (16×4), tri state ─────────────────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic
      Wikipedia: https://en.wikipedia.org/wiki/Random-access_memory */
-  '74403': {
+  '74x403': {
     name: '74x403',
     simpleName: '16×4 FIFO (3-state)',
-    description: '64 bit FIFO memory (16×4) with tri-state outputs (24-pin)',
+    description: '64 bit FIFO memory (16×4) with tri state outputs (24-pin)',
     pins: 24, vcc: 24, gnd: 12,
     sequential: true,
-    tags: ['fifo', '16x4', 'memory', 'tri-state'],
-    guideOverview: 'The 74x403 is a 64 bit (16-word × 4 bit) first-in first-out (FIFO) memory with tri-state outputs, separate read and write clocks, and full/empty status flags. Data written at WR_CLK is independently read at RD_CLK, making it ideal for interfacing circuits running at different clock rates.',
+    tags: ['fifo', '16x4', 'memory', 'tri state'],
+    guideOverview: 'The 74x403 is a 64 bit (16 word × 4 bit) first in first out (FIFO) memory with tri state outputs, separate read and write clocks, and full/empty status flags. Data written at WR_CLK is independently read at RD_CLK, making it ideal for interfacing circuits running at different clock rates.',
     guidePinDescriptions: {
       'DIN0':   'Data input bit 0.',
       'DIN1':   'Data input bit 1.',
@@ -578,7 +633,7 @@ export const CHIPS_BLOCK_24 = {
       'WR_EN':  'Write Enable. HIGH to write; data is lost if FF (full) is HIGH.',
       'RD_EN':  'Read Enable. HIGH to advance the read pointer on RD_CLK rising edge.',
       'RSTn':   'Reset (active LOW). Clears the FIFO to empty.',
-      'OEn':    'Output Enable (active LOW). When HIGH, DOUT0-DOUT3 are tri-stated.',
+      'OEn':    'Output Enable (active LOW). When HIGH, DOUT0-DOUT3 are tri stated.',
       'MRSn':   'Master Reset (active LOW).',
       'EF':     'Empty Flag. HIGH when FIFO has no valid data to read.',
       'GND':    'Ground reference (pin 12).',
@@ -599,9 +654,10 @@ export const CHIPS_BLOCK_24 = {
       {
         title: 'What Is a FIFO',
         paragraphs: [
-          'A FIFO (First-In First-Out) memory stores data in order and delivers it in the same order. Unlike RAM, there is no address you simply write to one end and read from the other. It is used as an elastic buffer between a fast producer and a slower consumer.',
+          'A FIFO (First In First Out) memory stores data in order and delivers it in the same order. Unlike RAM, there is no address you simply write to one end and read from the other. It is used as an elastic buffer between a fast producer and a slower consumer.',
           'The EF (empty) and FF (full) flags prevent underrun and overrun. Always check EF before reading and FF before writing.',
         ],
+        note: 'Simulation note: the core FIFO is modelled — write on rising WR_CLK (when WR_EN active and not full), read on rising RD_CLK (when RD_EN active and not empty), with working EF and FF flags and OEn tri-stating the data outputs. Not modelled: the RSTn/MRSn reset pins and the IR (input-ready) / OR (output-ready) handshake outputs, which are held LOW.',
       },
     ],
     pinout: [
@@ -637,16 +693,16 @@ export const CHIPS_BLOCK_24 = {
     ],
   },
 
-  // ── 74405: 3-to-8 line decoder (equivalent to Intel 8205) ───────────────
+  // ── 74405: 3 to 8 line decoder (equivalent to Intel 8205) ───────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Multiplexer */
-  '74405': {
+  '74x405': {
     name: '74x405',
-    simpleName: '3-to-8 Decoder (8205)',
-    description: '3-to-8 line decoder, equivalent to Intel 8205 (16-pin)',
+    simpleName: '3 to 8 Decoder (8205)',
+    description: '3 to 8 line decoder, equivalent to Intel 8205 (16-pin)',
     pins: 16, vcc: 16, gnd: 8,
-    tags: ['decoder', '3-to-8', 'demultiplexer', 'address'],
-    guideOverview: 'The 74x405 is a 3-to-8 line decoder functionally equivalent to the Intel 8205. Binary address A0-A2 selects one of eight active LOW outputs Y0n-Y7n. Three enable inputs (E0n, E1n active LOW and E2 active HIGH) must all be asserted for any output to be driven LOW.',
+    tags: ['decoder', '3 to 8', 'demultiplexer', 'address'],
+    guideOverview: 'The 74x405 is a 3 to 8 line decoder functionally equivalent to the Intel 8205. Binary address A0-A2 selects one of eight active LOW outputs Y0n-Y7n. Three enable inputs (E0n, E1n active LOW and E2 active HIGH) must all be asserted for any output to be driven LOW.',
     guidePinDescriptions: {
       'A0':  'Address bit 0 (LSB).',
       'A1':  'Address bit 1.',
@@ -699,17 +755,17 @@ export const CHIPS_BLOCK_24 = {
     ],
   },
 
-  // ── 74407: Data access register, tri-state ──────────────────────────────
+  // ── 74407: Data access register, tri state ──────────────────────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic */
-  '74407': {
+  '74x407': {
     name: '74x407',
     simpleName: 'Data Access Register',
-    description: 'Data access register, tri-state (24-pin)',
+    description: 'Data access register, tri state (24-pin)',
     pins: 24, vcc: 24, gnd: 12,
     sequential: true,
-    tags: ['register', 'tri-state', 'data-access', 'complex'],
-    guideOverview: 'The 74x407 is an 8 bit data access register combining a D-type register with a separate load strobe (LD) and an output enable (OEn). The LD signal controls when new data is captured from D0-D7; the CLK provides the clocking edge. CLRn asynchronously resets all outputs. Useful as a programmable I/O port.',
+    tags: ['register', 'tri state', 'data-access', 'complex'],
+    guideOverview: 'The 74x407 is an 8 bit data access register combining a D type register with a separate load strobe (LD) and an output enable (OEn). The LD signal controls when new data is captured from D0-D7; the CLK provides the clocking edge. CLRn asynchronously resets all outputs. Useful as a programmable I/O port.',
     guidePinDescriptions: {
       'D0':   'Data input bit 0.',
       'D1':   'Data input bit 1.',
@@ -720,7 +776,7 @@ export const CHIPS_BLOCK_24 = {
       'D6':   'Data input bit 6.',
       'D7':   'Data input bit 7.',
       'CLK':  'Clock. Captures data on rising edge when LD is asserted.',
-      'OEn':  'Output Enable (active LOW). When HIGH, Q0-Q7 are tri-stated.',
+      'OEn':  'Output Enable (active LOW). When HIGH, Q0-Q7 are tri stated.',
       'LD':   'Load Enable. Must be HIGH during CLK rising edge to capture new data.',
       'GND':  'Ground reference (pin 12).',
       'CLRn': 'Clear (active LOW). Asynchronously resets Q0-Q7 to 0.',
@@ -738,9 +794,9 @@ export const CHIPS_BLOCK_24 = {
     },
     guideSections: [
       {
-        title: 'Load-Enable Register',
+        title: 'Load Enable Register',
         paragraphs: [
-          'The separate LD input allows the register to hold its current value across many clock cycles, capturing new data only when LD is asserted. This is useful for bus-width registers in microprocessor I/O ports where data should not change on every clock.',
+          'The separate LD input allows the register to hold its current value across many clock cycles, capturing new data only when LD is asserted. This is useful for bus width registers in microprocessor I/O ports where data should not change on every clock.',
         ],
       },
     ],
@@ -777,19 +833,19 @@ export const CHIPS_BLOCK_24 = {
     ],
   },
 
-  // ── 74410: 64 bit RAM (16×4) with output register, tri-state ────────────
+  // ── 74410: 64 bit RAM (16×4) with output register, tri state ────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Flip-flop_(electronics)
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic
      Wikipedia: https://en.wikipedia.org/wiki/Random-access_memory */
-  '74410': {
+  '74x410': {
     name: '74x410',
     simpleName: '16×4 RAM + Output Reg (3-state)',
-    description: '64 bit RAM (16×4) with output register, tri-state (18-pin)',
+    description: '64 bit RAM (16×4) with output register, tri state (18-pin)',
     pins: 18, vcc: 18, gnd: 9,
     sequential: true,
-    tags: ['ram', '16x4', 'memory', 'tri-state', 'output-register'],
-    guideOverview: 'The 74x410 is a 64 bit (16-word × 4 bit) static RAM with a registered (clocked) output stage and tri-state outputs. The RAM array is written synchronously when WEn is LOW; the output register latches the read data on the CLK rising edge, holding it stable for downstream logic even as the address changes.',
+    tags: ['ram', '16x4', 'memory', 'tri state', 'output-register'],
+    guideOverview: 'The 74x410 is a 64 bit (16 word × 4 bit) static RAM with a registered (clocked) output stage and tri state outputs. The RAM array is written synchronously when WEn is LOW; the output register latches the read data on the CLK rising edge, holding it stable for downstream logic even as the address changes.',
     guidePinDescriptions: {
       'A0':  'Address bit 0.',
       'A1':  'Address bit 1.',
@@ -801,7 +857,7 @@ export const CHIPS_BLOCK_24 = {
       'DI3': 'Data input bit 3.',
       'GND': 'Ground reference (pin 9).',
       'WEn': 'Write Enable (active LOW). When LOW on rising CLK, DI is written to RAM.',
-      'OEn': 'Output Enable (active LOW). When HIGH, DO0-DO3 are tri-stated.',
+      'OEn': 'Output Enable (active LOW). When HIGH, DO0-DO3 are tri stated.',
       'CLK': 'Clock. Rising edge latches RAM read data into the output register.',
       'DO3': 'Registered output bit 3.',
       'DO2': 'Registered output bit 2.',
@@ -845,18 +901,18 @@ export const CHIPS_BLOCK_24 = {
     ],
   },
 
-  // ── 74412: Multi-mode 8 bit latches (Intel 3212/8212 equiv) ─────────────
+  // ── 74412: Multi mode 8 bit latches (Intel 3212/8212 equiv) ─────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Flip-flop_(electronics)
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic */
-  '74412': {
+  '74x412': {
     name: '74x412',
-    simpleName: '8 bit Multi-mode Latch (3212)',
-    description: 'Multi-mode buffered 8 bit latches, equivalent to Intel 3212/8212 (24-pin)',
+    simpleName: '8 bit Multi mode Latch (3212)',
+    description: 'Multi mode buffered 8 bit latches, equivalent to Intel 3212/8212 (24-pin)',
     pins: 24, vcc: 24, gnd: 12,
     sequential: true,
-    tags: ['latch', '8 bit', 'tri-state', 'multi-mode', 'intel-8212'],
-    guideOverview: 'The 74x412 is an 8 bit multi-mode latch functionally equivalent to the Intel 3212/8212 I/O port device. The MD (mode) input selects between output port mode (MD=0) and input port mode (MD=1). A strobe (STB) loads data and asserts an interrupt (INT) to notify a CPU that new data is available.',
+    tags: ['latch', '8 bit', 'tri state', 'multi-mode', 'intel-8212'],
+    guideOverview: 'The 74x412 is an 8 bit multi mode latch functionally equivalent to the Intel 3212/8212 I/O port device. The MD (mode) input selects between output port mode (MD=0) and input port mode (MD=1). A strobe (STB) loads data and asserts an interrupt (INT) to notify a CPU that new data is available.',
     guidePinDescriptions: {
       'DS1':  'Device Select 1. One of two enables for the device.',
       'DI0':  'Data input bit 0.',
@@ -870,7 +926,7 @@ export const CHIPS_BLOCK_24 = {
       'STB':  'Strobe. Rising edge latches DI0-DI7 and asserts INT.',
       'MD':   'Mode. LOW = output port, HIGH = input port.',
       'GND':  'Ground reference (pin 12).',
-      'OEn':  'Output Enable (active LOW). Tri-states DO0-DO7 when HIGH.',
+      'OEn':  'Output Enable (active LOW). Tri states DO0-DO7 when HIGH.',
       'INT':  'Interrupt output. Asserted after STB, cleared when OEn is used.',
       'DO7':  'Latched output bit 7.',
       'DO6':  'Latched output bit 6.',
@@ -927,14 +983,14 @@ export const CHIPS_BLOCK_24 = {
   // ── 74413: 256 bit FIFO memory (64×4) ───────────────────────────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Random-access_memory */
-  '74413': {
+  '74x413': {
     name: '74x413',
     simpleName: '64×4 FIFO',
     description: '256 bit FIFO memory (64×4) (16-pin)',
     pins: 16, vcc: 16, gnd: 8,
     sequential: true,
     tags: ['fifo', '64x4', 'memory'],
-    guideOverview: 'The 74x413 is a 256 bit (64-word × 4 bit) FIFO memory in a 16-pin package. Like the 74x403 (16×4 FIFO), it provides separate read and write clocks and empty/full status flags (EF, FF), but with four times the storage depth. No output enable outputs are always active.',
+    guideOverview: 'The 74x413 is a 256 bit (64 word × 4 bit) FIFO memory in a 16-pin package. Like the 74x403 (16×4 FIFO), it provides separate read and write clocks and empty/full status flags (EF, FF), but with four times the storage depth. No output enable outputs are always active.',
     guidePinDescriptions: {
       'DIN0':   'Data input bit 0.',
       'DIN1':   'Data input bit 1.',
@@ -957,7 +1013,7 @@ export const CHIPS_BLOCK_24 = {
       {
         title: '64-Deep FIFO Buffer',
         paragraphs: [
-          'With 64 words of depth, the 74x413 can absorb bursts of data from a fast source before a slower consumer reads them. It is useful in serial communication buffering, printer spooling, and any producer-consumer asynchronous interface.',
+          'With 64 words of depth, the 74x413 can absorb bursts of data from a fast source before a slower consumer reads them. It is useful in serial communication buffering, printer spooling, and any producer consumer asynchronous interface.',
           'Always check EF before reading and FF before writing to avoid data corruption.',
         ],
       },

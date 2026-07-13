@@ -1,21 +1,21 @@
 // test-chips58.mjs - Tests for all chips defined in js/chips/chips58.js
 // Chips under test:
-//   74x4059  : Programmable Divide-by-N Counter (GENERIC_STUB, 24-pin)
-//   74x4060  : 14-Stage Binary Counter with Oscillator (GENERIC_STUB, 16-pin)
-//   74x4061  : 14-Stage Async Binary Counter with Oscillator (GENERIC_STUB, 16-pin)
-//   74x4066  : Quad Bilateral Analog Switch (GENERIC_STUB, bidir, 14-pin)
-//   74x4067  : 16-Channel Analog Mux/Demux (GENERIC_STUB, bidir, 24-pin)
-//   74x4072  : Dual 4 Input OR Gate (OR logic, 14-pin)
-//   74x4075  : Triple 3-Input OR Gate (OR logic, 14-pin)
-//   74x4078  : Single 8-Input OR/NOR Gate (OR+NOR logic, 14-pin)
-//   74x4094  : 8 bit Shift Register/Latch (SHIFT_REG_LATCH_4094, 16-pin)
-//   74x4102  : 2-Digit BCD Down Counter (GENERIC_STUB, 16-pin)
-//   74x4103  : 8 bit Binary Down Counter (GENERIC_STUB, 16-pin)
-//   74x4245  : 8 bit Translating Transceiver (TRANSCEIVER_8BIT, 24-pin)
-//   74x4301  : 8 bit Inverting Latch (D_LATCH_OCTAL_TRI_INV, 20-pin)
-//   74x4302  : 8 bit Non-Inverting Latch (D_LATCH_OCTAL_TRI, 20-pin)
-//   74x4303  : 8 bit Inverting D Flip-Flop (D_FF_OCTAL_TRI_INV, 20-pin)
-//   74x4304  : 8 bit Non-Inverting D Flip-Flop (D_FF_OCTAL_TRI, 20-pin)
+//   74x4059  : Programmable Divide by-N Counter (GENERIC_STUB, 24 pin)
+//   74x4060  : 14-Stage Binary Counter with Oscillator (GENERIC_STUB, 16 pin)
+//   74x4061  : 14-Stage Async Binary Counter with Oscillator (GENERIC_STUB, 16 pin)
+//   74x4066  : Quad Bilateral Analog Switch (GENERIC_STUB, bidir, 14 pin)
+//   74x4067  : 16-Channel Analog Mux/Demux (GENERIC_STUB, bidir, 24 pin)
+//   74x4072  : Dual 4 Input OR Gate (OR logic, 14 pin)
+//   74x4075  : Triple 3-Input OR Gate (OR logic, 14 pin)
+//   74x4078  : Single 8-Input OR/NOR Gate (OR+NOR logic, 14 pin)
+//   74x4094  : 8 bit Shift Register/Latch (SHIFT_REG_LATCH_4094, 16 pin)
+//   74x4102  : 2-Digit BCD Down Counter (GENERIC_STUB, 16 pin)
+//   74x4103  : 8 bit Binary Down Counter (GENERIC_STUB, 16 pin)
+//   74x4245  : 8 bit Translating Transceiver (TRANSCEIVER_8BIT, 24 pin)
+//   74x4301  : 8 bit Inverting Latch (D_LATCH_OCTAL_TRI_INV, 20 pin)
+//   74x4302  : 8 bit Non Inverting Latch (D_LATCH_OCTAL_TRI, 20 pin)
+//   74x4303  : 8 bit Inverting D Flip Flop (D_FF_OCTAL_TRI_INV, 20 pin)
+//   74x4304  : 8 bit Non Inverting D Flip Flop (D_FF_OCTAL_TRI, 20 pin)
 
 import { CHIPS_BLOCK_58 } from '../chips/chips58.js';
 import { BreadboardWorld, holeId } from '../breadboard.js';
@@ -471,7 +471,7 @@ function setup4245() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SECTION G - 74x4301: 8 bit inverting latch (tri-state)
+// SECTION G - 74x4301: 8 bit inverting latch (tri state)
 // ─────────────────────────────────────────────────────────────────────────────
 
 console.log('\n=== SECTION G: 74x4301 8 bit Inverting Latch ===');
@@ -537,10 +537,10 @@ console.log('\n=== SECTION G: 74x4301 8 bit Inverting Latch ===');
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SECTION H - 74x4302: 8 bit non-inverting latch (tri-state)
+// SECTION H - 74x4302: 8 bit non inverting latch (tri state)
 // ─────────────────────────────────────────────────────────────────────────────
 
-console.log('\n=== SECTION H: 74x4302 8 bit Non-Inverting Latch ===');
+console.log('\n=== SECTION H: 74x4302 8 bit Non Inverting Latch ===');
 
 {
   // OEn=HIGH → outputs HiZ
@@ -579,10 +579,10 @@ console.log('\n=== SECTION H: 74x4302 8 bit Non-Inverting Latch ===');
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SECTION I - 74x4303: 8 bit inverting D flip-flop (tri-state)
+// SECTION I - 74x4303: 8 bit inverting D flip flop (tri state)
 // ─────────────────────────────────────────────────────────────────────────────
 
-console.log('\n=== SECTION I: 74x4303 8 bit Inverting D Flip-Flop ===');
+console.log('\n=== SECTION I: 74x4303 8 bit Inverting D Flip Flop ===');
 
 {
   // OEn=HIGH → outputs HiZ
@@ -659,10 +659,10 @@ console.log('\n=== SECTION I: 74x4303 8 bit Inverting D Flip-Flop ===');
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SECTION J - 74x4304: 8 bit non-inverting D flip-flop (tri-state)
+// SECTION J - 74x4304: 8 bit non inverting D flip flop (tri state)
 // ─────────────────────────────────────────────────────────────────────────────
 
-console.log('\n=== SECTION J: 74x4304 8 bit Non-Inverting D Flip-Flop ===');
+console.log('\n=== SECTION J: 74x4304 8 bit Non Inverting D Flip Flop ===');
 
 {
   // OEn=HIGH → outputs HiZ

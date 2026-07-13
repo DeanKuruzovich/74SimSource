@@ -5,13 +5,13 @@
 
 export const CHIPS_BLOCK_56 = {
 
-  // 74x3257: Quad 2-line to 1-line FET multiplexer / demultiplexer (16-pin)
+  // 74x3257: Quad 2 line to 1 line FET multiplexer / demultiplexer (16-pin)
   // Shared S (select) and OEn (active low); 4 channels each with A/B (bidir) and Z (common bidir)
   // Pinout follows 74x157/257 family convention -- mirrors 74x3253 (dual 4:1) structure
   '74x3257': {
     name: '74x3257',
     simpleName: 'Quad 2-to-1 FET Multiplexer / Demultiplexer',
-    description: 'Quad 2-line to 1-line FET multiplexer / demultiplexer (16-pin)',
+    description: 'Quad 2 line to 1 line FET multiplexer / demultiplexer (16-pin)',
     pins: 16, vcc: 16, gnd: 8,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74cbt3257.pdf',
     tags: ['FET', 'mux', 'demux', '2:1', 'quad', 'bidir', 'stub'],
@@ -24,7 +24,7 @@ export const CHIPS_BLOCK_56 = {
       'A2': 'A-side node for channel 2.',
       'B2': 'B-side node for channel 2.',
       'Z2': 'Common node for channel 2.',
-      'GND': 'Ground reference for the switch-control circuitry.',
+      'GND': 'Ground reference for the switch control circuitry.',
       'Z3': 'Common node for channel 3.',
       'B3': 'B-side node for channel 3.',
       'A3': 'A-side node for channel 3.',
@@ -52,7 +52,7 @@ export const CHIPS_BLOCK_56 = {
         paragraphs: [
           'A FET switch adds very little logic behavior of its own. That makes it useful when you want routing flexibility more than signal restoration, such as steering buses, selecting among data sources, or making temporary links between two parts of a board.',
         ],
-        note: 'This simulator entry is a documented stub. It describes the intended switching behavior, but it does not model analog switch resistance or detailed pass-transistor effects.',
+        note: 'This simulator entry is a documented stub. It describes the intended switching behavior, but it does not model analog switch resistance or detailed pass transistor effects.',
       },
     ],
     pinout: [
@@ -78,16 +78,16 @@ export const CHIPS_BLOCK_56 = {
     ],
   },
 
-  // 74x3305: Dual FET bus switch with extended voltage range, active HIGH per-switch OE (8-pin)
+  // 74x3305: Dual FET bus switch with extended voltage range, active HIGH per switch OE (8-pin)
   // SN74CBT3305C -- two independent switches each with its own active high OE
   '74x3305': {
     name: '74x3305',
     simpleName: 'Dual FET Bus Switch (Active High OE, Extended Voltage)',
-    description: 'Dual FET bus switch with extended voltage range and active high per-switch output enable (8-pin)',
+    description: 'Dual FET bus switch, wide voltage range, per-switch active-HIGH OE (8-pin)',
     pins: 8, vcc: 8, gnd: 4,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74cbt3305c.pdf',
     tags: ['FET', 'bus-switch', 'dual', 'bidir', 'stub'],
-    guideOverview: 'The 74x3305 contains two independent bilateral FET bus switches. Each channel has its own active HIGH enable, so you can turn the two connections on and off separately. Designers use parts like this when they need very simple, low-delay routing between two nodes without forcing a fixed signal direction.',
+    guideOverview: 'The 74x3305 contains two independent bilateral FET bus switches. Each channel has its own active HIGH enable, so you can turn the two connections on and off separately. Designers use parts like this when they need very simple, low delay routing between two nodes without forcing a fixed signal direction.',
     guidePinDescriptions: {
       'OE1': 'Enable control (active HIGH) for switch channel 1. Drive HIGH to connect A1 and B1; drive LOW to open the path.',
       'A1': 'One side of switch channel 1.',
@@ -110,7 +110,7 @@ export const CHIPS_BLOCK_56 = {
         paragraphs: [
           'Each channel behaves like an electronically controlled connection, not a logic buffer. Signals can pass either direction through the closed switch as long as they stay within the device limits.',
         ],
-        note: 'The simulator documents the control and routing role of this part but does not model analog on-resistance in detail.',
+        note: 'The simulator documents the control and routing role of this part but does not model analog on resistance in detail.',
       },
     ],
     pinout: [
@@ -137,7 +137,7 @@ export const CHIPS_BLOCK_56 = {
     pins: 8, vcc: 8, gnd: 4,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74cbt3306.pdf',
     tags: ['FET', 'bus-switch', 'dual', 'bidir', 'stub'],
-    guideOverview: 'The 74x3306 is a dual bilateral FET bus switch with one shared active LOW enable control. When enabled, both channels behave like low-resistance links between their A and B pins; when disabled, both paths open at once. It is a simple way to isolate or reconnect a pair of lines with very little added propagation delay.',
+    guideOverview: 'The 74x3306 is a dual bilateral FET bus switch with one shared active LOW enable control. When enabled, both channels behave like low resistance links between their A and B pins; when disabled, both paths open at once. It is a simple way to isolate or reconnect a pair of lines with very little added propagation delay.',
     guidePinDescriptions: {
       'OEn': 'Shared enable control for both switch channels (active LOW). Pull LOW to close both switches; drive HIGH to open both paths.',
       'A1': 'One side of switch channel 1.',
@@ -187,7 +187,7 @@ export const CHIPS_BLOCK_56 = {
     pins: 20, vcc: 20, gnd: 10,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74cbt3345.pdf',
     tags: ['FET', 'bus-switch', 'octal', 'bidir', 'stub'],
-    guideOverview: 'The 74x3345 extends the bilateral FET-switch idea to eight signal paths. It is not a transceiver with a chosen direction; instead it is eight electronically controlled pass switches that can connect one 8 bit group to another with minimal added delay. Dual enable inputs make it easier to fit the part into shared-bus control logic where more than one condition must be true before the bus can connect.',
+    guideOverview: 'The 74x3345 extends the bilateral FET switch idea to eight signal paths. It is not a transceiver with a chosen direction; instead it is eight electronically controlled pass switches that can connect one 8 bit group to another with minimal added delay. Dual enable inputs make it easier to fit the part into shared bus control logic where more than one condition must be true before the bus can connect.',
     guidePinDescriptions: {
       'OE1n': 'One of the active LOW enable controls. In the local definition both enables must be asserted to allow all eight switch paths to conduct.',
       'A1': 'Bit 1 on the A-side bus.',
@@ -220,7 +220,7 @@ export const CHIPS_BLOCK_56 = {
       {
         title: 'Why Use Two Enable Inputs',
         paragraphs: [
-          'Dual enables let the switch bank participate in more complex control schemes. For example, one enable might come from address decoding while the other comes from a bus-ownership signal.',
+          'Dual enables let the switch bank participate in more complex control schemes. For example, one enable might come from address decoding while the other comes from a bus ownership signal.',
         ],
         note: 'This simulator entry remains a documented stub and does not model analog resistance or contention effects through the pass switches.',
       },
@@ -252,15 +252,15 @@ export const CHIPS_BLOCK_56 = {
     ],
   },
 
-  // 74x3374: 8 bit metastable-resistant D-type flip-flop, three-state (20-pin)
-  // SN74AS3374 -- follows standard 74374 pin convention (D/Q interleaved per bit, not bus style)
+  // 74x3374: 8 bit metastable resistant D type flip flop, three state (20-pin)
+  // SN74AS3374 -- follows standard 74374-pin convention (D/Q interleaved per bit, not bus style)
   '74x3374': {
     name: '74x3374',
-    simpleName: '8 bit Metastable-Resistant D Flip-Flop (TS)',
-    description: '8 bit metastable-resistant D-type flip-flop with three-state outputs (20-pin)',
+    simpleName: '8 bit Metastable Resistant D Flip Flop (TS)',
+    description: '8-bit metastable-resistant D-type flip-flop, 3-state outputs (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
     datasheet: '',
-    tags: ['flip-flop', '8 bit', 'D-type', 'metastable', 'tri-state', 'stub'],
+    tags: ['flip flop', '8 bit', 'D type', 'metastable', 'tri state', 'stub'],
     pinout: [
       { pin:  1, name: 'OE',   type: 'input'  },
       { pin:  2, name: '1Q',   type: 'output' },
@@ -297,9 +297,9 @@ export const CHIPS_BLOCK_56 = {
     pins: 24, vcc: 24, gnd: 12,
     datasheet: 'https://www.renesas.com/en/products/74fst3383',
     tags: ['FET', 'bus-switch', '5 bit', '4-port', 'exchange', 'bidir', 'stub'],
-    guideOverview: 'The 74x3383 is a multiport FET bus-switch device that groups its channels into two independently enabled 5 bit connections. Instead of buffering data, it creates low-delay bilateral links between paired ports, which is useful when a board needs to rearrange or isolate bus segments without committing to one signal direction. Devices in this class are commonly used in routing fabrics, bus sharing, and connection management between logic blocks.',
+    guideOverview: 'The 74x3383 is a multiport FET bus switch device that groups its channels into two independently enabled 5 bit connections. Instead of buffering data, it creates low delay bilateral links between paired ports, which is useful when a board needs to rearrange or isolate bus segments without committing to one signal direction. Devices in this class are commonly used in routing fabrics, bus sharing, and connection management between logic blocks.',
     guidePinDescriptions: {
-      'OE1n': 'Active LOW enable for the A-to-B switch group. Pull LOW to allow the A and B channels to connect.',
+      'OE1n': 'Active LOW enable for the A-to B switch group. Pull LOW to allow the A and B channels to connect.',
       'A1': 'Bit 1 of port A.',
       'A2': 'Bit 2 of port A.',
       'A3': 'Bit 3 of port A.',
@@ -310,7 +310,7 @@ export const CHIPS_BLOCK_56 = {
       'B3': 'Bit 3 of port B.',
       'B2': 'Bit 2 of port B.',
       'B1': 'Bit 1 of port B.',
-      'GND': 'Ground reference for the switch-control circuitry.',
+      'GND': 'Ground reference for the switch control circuitry.',
       'C1': 'Bit 1 of port C.',
       'C2': 'Bit 2 of port C.',
       'C3': 'Bit 3 of port C.',
@@ -321,7 +321,7 @@ export const CHIPS_BLOCK_56 = {
       'D3': 'Bit 3 of port D.',
       'D2': 'Bit 2 of port D.',
       'D1': 'Bit 1 of port D.',
-      'OE2n': 'Active LOW enable for the C-to-D switch group.',
+      'OE2n': 'Active LOW enable for the C-to D switch group.',
       'VCC': 'Positive supply for the device.',
     },
     guideSections: [
@@ -336,7 +336,7 @@ export const CHIPS_BLOCK_56 = {
         paragraphs: [
           'Multiport bus switches are useful when signals need to be rerouted or conditionally connected without adding logic inversion or clocked storage. They behave more like electronically controlled wiring than like ordinary gates.',
         ],
-        note: 'The simulator keeps this as a documented stub. It captures the control intent and pin roles, but not detailed analog pass-switch behavior.',
+        note: 'The simulator keeps this as a documented stub. It captures the control intent and pin roles, but not detailed analog pass switch behavior.',
       },
     ],
     pinout: [
@@ -379,7 +379,7 @@ export const CHIPS_BLOCK_56 = {
     pins: 24, vcc: 24, gnd: 12,
     datasheet: 'https://www.renesas.com/en/products/74fst3384',
     tags: ['FET', 'bus-switch', 'dual', '5 bit', 'bidir', 'stub'],
-    guideOverview: 'The 74x3384 provides two separately controlled 5 bit bilateral bus-switch banks. Each bank can connect one 5 bit group of pins to another with little delay and without imposing a fixed data direction. This is useful when several bus groups need to be connected only under certain operating modes or board configurations.',
+    guideOverview: 'The 74x3384 provides two separately controlled 5 bit bilateral bus switch banks. Each bank can connect one 5 bit group of pins to another with little delay and without imposing a fixed data direction. This is useful when several bus groups need to be connected only under certain operating modes or board configurations.',
     guidePinDescriptions: {
       'OE1n': 'Active LOW enable for bank 1. Pull LOW to connect the 1A and 1B signals.',
       '1A1': 'Bit 1 on bank 1, side A.',
@@ -492,16 +492,16 @@ export const CHIPS_BLOCK_56 = {
     ],
   },
 
-  // 74x3573: Octal transparent D-type latch, three-state (20-pin)
+  // 74x3573: Octal transparent D type latch, three state (20-pin)
   // IDT74FCT3573 -- FCT version of 74573; identical pinout to standard 74x573
   '74x3573': {
     name: '74x3573',
     simpleName: 'Octal Transparent Latch (TS)',
-    description: 'Octal transparent D-type latch with three-state outputs (20-pin)',
+    description: 'Octal transparent D type latch with three state outputs (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
     datasheet: 'https://www.renesas.com/en/products/74fct3573',
-    tags: ['latch', 'octal', '8 bit', 'transparent', 'tri-state', 'stub'],
-    guideOverview: 'The 74x3573 is an octal transparent latch with three-state outputs. A transparent latch lets data flow directly from D to Q while the latch-enable input is active, then holds the last value when the enable is removed. This makes the part useful for temporarily capturing bus values, holding addresses, or isolating one logic stage from timing changes in another.',
+    tags: ['latch', 'octal', '8 bit', 'transparent', 'tri state', 'stub'],
+    guideOverview: 'The 74x3573 is an octal transparent latch with three state outputs. A transparent latch lets data flow directly from D to Q while the latch enable input is active, then holds the last value when the enable is removed. This makes the part useful for temporarily capturing bus values, holding addresses, or isolating one logic stage from timing changes in another.',
     guidePinDescriptions: {
       'OE': 'Output-enable control. On 573-style latches this control is typically active LOW and is used to place the outputs in high impedance when the stored data should not drive a bus.',
       '1D': 'Data input for bit 1.',
@@ -528,13 +528,13 @@ export const CHIPS_BLOCK_56 = {
       {
         title: 'Transparent Latch Behavior',
         paragraphs: [
-          'A transparent latch is level-sensitive. When LE is active, each Q output follows its matching D input in real time. When LE becomes inactive, the most recent state is stored and held.',
+          'A transparent latch is level sensitive. When LE is active, each Q output follows its matching D input in real time. When LE becomes inactive, the most recent state is stored and held.',
         ],
       },
       {
-        title: 'Why Three-State Outputs Matter',
+        title: 'Why Three State Outputs Matter',
         paragraphs: [
-          'Three-state outputs let the latch hold data internally without necessarily driving the shared bus. That makes latches like the 74x3573 useful in bused systems where several devices share the same lines.',
+          'Three state outputs let the latch hold data internally without necessarily driving the shared bus. That makes latches like the 74x3573 useful in bused systems where several devices share the same lines.',
         ],
         note: 'The simulator documents the role of this latch, but the entry remains a stub rather than a full stateful implementation.',
       },
@@ -566,16 +566,16 @@ export const CHIPS_BLOCK_56 = {
     ],
   },
 
-  // 74x3574: Octal D-type edge-triggered flip-flop, three-state (20-pin)
+  // 74x3574: Octal D type edge triggered flip flop, three state (20-pin)
   // IDT74FCT3574 -- FCT version of 74574; identical pinout to standard 74x574
   '74x3574': {
     name: '74x3574',
-    simpleName: 'Octal D Flip-Flop (TS)',
-    description: 'Octal D-type edge-triggered flip-flop with three-state outputs (20-pin)',
+    simpleName: 'Octal D Flip Flop (TS)',
+    description: 'Octal D type edge triggered flip flop with three state outputs (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
     datasheet: 'https://www.renesas.com/en/products/74fct3574',
-    tags: ['flip-flop', 'octal', '8 bit', 'D-type', 'tri-state', 'stub'],
-    guideOverview: 'The 74x3574 is an octal edge-triggered D flip-flop with three-state outputs. Unlike a transparent latch, a flip-flop captures data only on a clock edge, which makes it better suited for synchronous digital designs. Breadboard builders reach for parts like this when they need to register bus data cleanly on a clock and hold it stable between clock events.',
+    tags: ['flip flop', 'octal', '8 bit', 'D type', 'tri state', 'stub'],
+    guideOverview: 'The 74x3574 is an octal edge triggered D flip flop with three state outputs. Unlike a transparent latch, a flip flop captures data only on a clock edge, which makes it better suited for synchronous digital designs. Breadboard builders reach for parts like this when they need to register bus data cleanly on a clock and hold it stable between clock events.',
     guidePinDescriptions: {
       'OE': 'Output-enable control. On 574-style devices this control is typically active LOW and disconnects the outputs from the bus when not asserted.',
       '1D': 'Data input for bit 1.',
@@ -596,19 +596,19 @@ export const CHIPS_BLOCK_56 = {
       '3Q': 'Registered output for bit 3.',
       '2Q': 'Registered output for bit 2.',
       '1Q': 'Registered output for bit 1.',
-      'VCC': 'Positive supply for the flip-flop.',
+      'VCC': 'Positive supply for the flip flop.',
     },
     guideSections: [
       {
-        title: 'Edge-Triggered Storage',
+        title: 'Edge Triggered Storage',
         paragraphs: [
-          'A D flip-flop samples data only at a clock transition. That makes the outputs less sensitive to input chatter between clock edges and gives the system a clear synchronous timing point.',
+          'A D flip flop samples data only at a clock transition. That makes the outputs less sensitive to input chatter between clock edges and gives the system a clear synchronous timing point.',
         ],
       },
       {
         title: 'Registered Bus Operation',
         paragraphs: [
-          'Three-state registered outputs let the device hold a byte internally and then present it onto a shared bus only when allowed. That is a common pattern in CPUs, peripheral interfaces, and pipeline stages.',
+          'Three state registered outputs let the device hold a byte internally and then present it onto a shared bus only when allowed. That is a common pattern in CPUs, peripheral interfaces, and pipeline stages.',
         ],
         note: 'This chip remains a documented stub in the simulator rather than a full clocked implementation.',
       },
@@ -680,13 +680,13 @@ export const CHIPS_BLOCK_56 = {
     ],
   },
 
-  // 74x3807: 3.3V CMOS 1-to-10 low-skew clock driver (20-pin)
+  // 74x3807: 3.3V CMOS 1-to-10 low skew clock driver (20-pin)
   // IDT74FCT3807 -- OEn at pin 1, A (clock input) at pin 2, Y0-Y4 top half, Y5-Y9 bottom half
   // Multiple internal power/ground bonds for low noise; NCs on unused package pins
   '74x3807': {
     name: '74x3807',
     simpleName: '1-to-10 Clock Driver',
-    description: '3.3V CMOS 1-to-10 low-skew clock driver (20-pin)',
+    description: '3.3V CMOS 1-to-10 low skew clock driver (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
     datasheet: 'https://www.renesas.com/en/products/74fct3807',
     tags: ['clock', 'driver', 'buffer', '1:10', 'fanout', 'stub'],
@@ -711,21 +711,21 @@ export const CHIPS_BLOCK_56 = {
       'Y9': 'Clock output 9.',
       'NC5': 'No internal connection. Leave unconnected.',
       'NC6': 'No internal connection. Leave unconnected.',
-      'VCC': 'Positive supply for the clock-driver circuitry.',
+      'VCC': 'Positive supply for the clock driver circuitry.',
     },
     guideSections: [
       {
         title: 'Clock Fanout and Skew',
         paragraphs: [
-          'A plain logic buffer can duplicate a clock, but when many destinations need the same edge, the timing difference between outputs becomes important. A low-skew clock driver is designed so those output-to-output differences stay small.',
+          'A plain logic buffer can duplicate a clock, but when many destinations need the same edge, the timing difference between outputs becomes important. A low skew clock driver is designed so those output to output differences stay small.',
         ],
       },
       {
         title: 'Why a Dedicated Clock Driver Helps',
         paragraphs: [
-          'Using one part to fan a clock out to many loads is often cleaner than cascading ordinary gates. It reduces uncertainty, keeps loading more predictable, and simplifies clock-distribution wiring.',
+          'Using one part to fan a clock out to many loads is often cleaner than cascading ordinary gates. It reduces uncertainty, keeps loading more predictable, and simplifies clock distribution wiring.',
         ],
-        note: 'This entry is documented as a stub in the simulator. It describes the chip role and pins, but it does not model fine-grained timing skew.',
+        note: 'This entry is documented as a stub in the simulator. It describes the chip role and pins, but it does not model fine grained timing skew.',
       },
     ],
     pinout: [
@@ -755,16 +755,16 @@ export const CHIPS_BLOCK_56 = {
     ],
   },
 
-  // 74x3827: 10 bit non-inverting buffer, three-state (24-pin)
+  // 74x3827: 10 bit non inverting buffer, three state (24-pin)
   // IDT74FCT3827 -- same pinout structure as 74x2827 (SN74BCT2827), without 25 Ohm series resistor
   '74x3827': {
     name: '74x3827',
-    simpleName: '10 bit Non-Inverting Buffer (TS)',
-    description: '10 bit non-inverting buffer with three-state outputs (24-pin)',
+    simpleName: '10 bit Non Inverting Buffer (TS)',
+    description: '10 bit non inverting buffer with three state outputs (24-pin)',
     pins: 24, vcc: 24, gnd: 12,
     datasheet: 'https://www.renesas.com/en/products/74fct3827',
-    tags: ['buffer', '10 bit', 'non-inverting', 'tri-state', 'stub'],
-    guideOverview: 'The 74x3827 is a 10 bit non-inverting buffer with three-state outputs. It is meant to strengthen and isolate a wide parallel signal group without changing the bit values. Devices like this are common in bus interfaces, where one source needs enough drive strength to feed several loads or where a bus should be disconnectable under control.',
+    tags: ['buffer', '10 bit', 'non inverting', 'tri state', 'stub'],
+    guideOverview: 'The 74x3827 is a 10 bit non inverting buffer with three state outputs. It is meant to strengthen and isolate a wide parallel signal group without changing the bit values. Devices like this are common in bus interfaces, where one source needs enough drive strength to feed several loads or where a bus should be disconnectable under control.',
     guidePinDescriptions: {
       'OE1n': 'Active LOW output-enable control for one side of the output bank. Assert it to let the related outputs drive.',
       'A0': 'Input bit 0.',
@@ -795,15 +795,15 @@ export const CHIPS_BLOCK_56 = {
       {
         title: 'Why Buffer a Wide Bus',
         paragraphs: [
-          'Wide buffers isolate the source from heavy bus loading and help preserve clean logic levels across a board. A non-inverting buffer reproduces the same bit values at the outputs, just with more drive capability and controlled enable behavior.',
+          'Wide buffers isolate the source from heavy bus loading and help preserve clean logic levels across a board. A non inverting buffer reproduces the same bit values at the outputs, just with more drive capability and controlled enable behavior.',
         ],
       },
       {
-        title: 'Three-State Control',
+        title: 'Three State Control',
         paragraphs: [
-          'The output-enable inputs let the device disconnect from the bus when another device should be driving. That is essential in shared-bus systems where multiple sources take turns using the same traces.',
+          'The output-enable inputs let the device disconnect from the bus when another device should be driving. That is essential in shared bus systems where multiple sources take turns using the same traces.',
         ],
-        note: 'The simulator keeps this device as a documented stub rather than a detailed bus-driver model.',
+        note: 'The simulator keeps this device as a documented stub rather than a detailed bus driver model.',
       },
     ],
     pinout: [
@@ -846,7 +846,7 @@ export const CHIPS_BLOCK_56 = {
     pins: 24, vcc: 24, gnd: 12,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74cbt3861.pdf',
     tags: ['FET', 'bus-switch', '10 bit', 'bidir', 'stub'],
-    guideOverview: 'The 74x3861 is a 10 bit bilateral bus switch. One active LOW enable controls ten separate pass-switch channels, making it a compact way to connect or isolate an entire 10 bit group in one action. This is useful for wide buses, shared backplanes, or board sections that should only be linked in certain modes.',
+    guideOverview: 'The 74x3861 is a 10 bit bilateral bus switch. One active LOW enable controls ten separate pass switch channels, making it a compact way to connect or isolate an entire 10 bit group in one action. This is useful for wide buses, shared backplanes, or board sections that should only be linked in certain modes.',
     guidePinDescriptions: {
       'OEn': 'Active LOW global enable for all ten switch channels. Pull LOW to connect the A and B buses; drive HIGH to isolate them.',
       'A1': 'Bit 1 on the A-side bus.',
@@ -883,9 +883,9 @@ export const CHIPS_BLOCK_56 = {
       {
         title: 'Where Wide Bus Switches Help',
         paragraphs: [
-          'Wide pass-switch parts are useful where many parallel lines must be joined or separated together, such as memory interfaces, plug-in options, and segmented buses.',
+          'Wide pass switch parts are useful where many parallel lines must be joined or separated together, such as memory interfaces, plug in options, and segmented buses.',
         ],
-        note: 'The simulator documents the intended control behavior but does not model analog pass-transistor details.',
+        note: 'The simulator documents the intended control behavior but does not model analog pass transistor details.',
       },
     ],
     pinout: [
@@ -920,7 +920,7 @@ export const CHIPS_BLOCK_56 = {
   },
 
   // 74x3862: 10 bit FET bus switch with dual output enable (24-pin)
-  // IDT74CBTLV3862 -- CBTLV (low-voltage) technology; OE1 (active HIGH, pin 1) and OE2n (active LOW, pin 23) for wired OR control
+  // IDT74CBTLV3862 -- CBTLV (low voltage) technology; OE1 (active HIGH, pin 1) and OE2n (active LOW, pin 23) for wired OR control
   '74x3862': {
     name: '74x3862',
     simpleName: '10 bit FET Bus Switch (Dual Output Enable)',
@@ -959,7 +959,7 @@ export const CHIPS_BLOCK_56 = {
       {
         title: 'Wide Bilateral Switching',
         paragraphs: [
-          'The core job of the device is still straightforward: it conditionally links ten A/B signal pairs through pass switches. That makes it suitable for bus isolation and wide-path routing with little added propagation delay.',
+          'The core job of the device is still straightforward: it conditionally links ten A/B signal pairs through pass switches. That makes it suitable for bus isolation and wide path routing with little added propagation delay.',
         ],
       },
       {

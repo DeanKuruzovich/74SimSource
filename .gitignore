@@ -1,38 +1,44 @@
-# OS files
-.DS_Store
-Thumbs.db
+# ── Python ────────────────────────────────────────────────────────────────────
+*.pyc
+__pycache__/
+*.egg-info/
 
-# Node
-node_modules/
-
-# Build artifacts
-dist-app/
-src-tauri/target/
-
-# Environment / secrets (never commit these)
+# ── Local secrets / env ───────────────────────────────────────────────────────
+backend/.env
 .env
-.env.local
-spaces.env
 
-# Backup files
-*.bak
-*.backup
-*.orig
+# ── Local SQLite database (development only) ────────────────────────────────
+74sim_local.db
+74sim_local.db-shm
+74sim_local.db-wal
 
-# IDE
-.vscode/
-.idea/
+# ── Virtualenvs ──────────────────────────────────────────────────────────────
+backend/.venv/
+.venv/
+.venv-chipadder/
 
-helperscripts
-updatingTools
-scripts
+# ── Uploaded user content (ephemeral on App Platform; never commit) ──────────
+reports/
+submissions/
 
-# Deployment/release files
-desktop-latest.json
-latestVersionInfo.json
-releases
-reports
+# ── Editor / OS noise ────────────────────────────────────────────────────────
+.DS_Store
+.claude/worktrees/relaxed-ellis/
 
-# Claude / internal dev docs
-CLAUDE.md
-DesktopGuide.md
+# ── Tauri build output ───────────────────────────────────────────────────────
+src-tauri/target/
+dist-app/
+
+# ── Desktop installer cache (uploaded to Spaces, never committed) ────────────
+# Per-platform buildDesktop*.sh scripts cache their build output here for the
+# uploader; the bucket is the authoritative store. Keep .gitkeep so the dir
+# exists for the LocalStorage fallback in dev mode.
+releases/*
+!releases/.gitkeep
+
+desktopVersionReference/
+
+.pdf
+
+# ── claudChipAdder per-agent transcripts (local only) ────────────────────────
+claudChipAdder-logs/

@@ -3,7 +3,7 @@
 
 export const CHIPS_BLOCK_62 = {
 
-  // ── 74x7074: Two inverters, one 2-in NAND, one 2-in NOR, two D flip-flops ──
+  // ── 74x7074: Two inverters, one 2-in NAND, one 2-in NOR, two D flip flops ──
   /* Primary source: 74x7074 datasheet   URL not yet verified.
      https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
   // 24-pin mixed-function chip (VCC=24, GND=12)
@@ -19,12 +19,12 @@ export const CHIPS_BLOCK_62 = {
   '74x7074': {
     name: '74x7074',
     simpleName: 'Mixed Gate+FF',
-    description: 'Two inverters, one 2 input NAND, one 2 input NOR, two D-type flip-flops (24-pin)',
+    description: '2 NOT, 2-in NAND, 2-in NOR, 2 D flip-flops (24-pin)',
     pins: 24,
     vcc: 24,
     gnd: 12,
     datasheet: '',
-    tags: ['mixed', 'gate', 'logic', 'nand', 'nor', 'not', 'flip-flop', 'd'],
+    tags: ['mixed', 'gate', 'logic', 'nand', 'nor', 'not', 'flip flop', 'd'],
     pinout: [
       { pin: 1,  name: '1A',    type: 'input'  },
       { pin: 2,  name: '1Y',    type: 'output' },
@@ -62,18 +62,18 @@ export const CHIPS_BLOCK_62 = {
     sequential: true,
   },
 
-  // ── 74x7075: Two inverters, two 2-in NAND, two D flip-flops ───────────────
+  // ── 74x7075: Two inverters, two 2-in NAND, two D flip flops ───────────────
   /* Primary source: 74x7075 datasheet   URL not yet verified.
      https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
   '74x7075': {
     name: '74x7075',
     simpleName: 'Mixed Gate+FF',
-    description: 'Two inverters, two 2 input NAND gates, two D-type flip-flops (24-pin)',
+    description: 'Two inverters, two 2 input NAND gates, two D type flip flops (24-pin)',
     pins: 24,
     vcc: 24,
     gnd: 12,
     datasheet: '',
-    tags: ['mixed', 'gate', 'logic', 'nand', 'not', 'flip-flop', 'd'],
+    tags: ['mixed', 'gate', 'logic', 'nand', 'not', 'flip flop', 'd'],
     pinout: [
       { pin: 1,  name: '1A',    type: 'input'  },
       { pin: 2,  name: '1Y',    type: 'output' },
@@ -111,18 +111,18 @@ export const CHIPS_BLOCK_62 = {
     sequential: true,
   },
 
-  // ── 74x7076: Two inverters, two 2-in NOR, two D flip-flops ────────────────
+  // ── 74x7076: Two inverters, two 2-in NOR, two D flip flops ────────────────
   /* Primary source: 74x7076 datasheet   URL not yet verified.
      https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
   '74x7076': {
     name: '74x7076',
     simpleName: 'Mixed Gate+FF',
-    description: 'Two inverters, two 2 input NOR gates, two D-type flip-flops (24-pin)',
+    description: 'Two inverters, two 2 input NOR gates, two D type flip flops (24-pin)',
     pins: 24,
     vcc: 24,
     gnd: 12,
     datasheet: '',
-    tags: ['mixed', 'gate', 'logic', 'nor', 'not', 'flip-flop', 'd'],
+    tags: ['mixed', 'gate', 'logic', 'nor', 'not', 'flip flop', 'd'],
     pinout: [
       { pin: 1,  name: '1A',    type: 'input'  },
       { pin: 2,  name: '1Y',    type: 'output' },
@@ -205,12 +205,12 @@ export const CHIPS_BLOCK_62 = {
   '74x7132': {
     name: '74x7132',
     simpleName: 'Adj Comparator',
-    description: 'Quad adjustable comparator with output latches (Schmitt trigger, tri-state) (14-pin)',
+    description: 'Quad adjustable comparator, output latches, Schmitt, 3-state (14-pin)',
     pins: 14,
     vcc: 14,
     gnd: 7,
     datasheet: '',
-    tags: ['comparator', 'latch', 'schmitt', 'tri-state'],
+    tags: ['comparator', 'latch', 'schmitt', 'tri state'],
     pinout: [
       { pin: 1,  name: 'A1',   type: 'input'  },
       { pin: 2,  name: 'Y1',   type: 'output' },
@@ -243,7 +243,7 @@ export const CHIPS_BLOCK_62 = {
     gnd: 4,
     datasheet: 'https://www.ti.com/lit/gpn/SN74HCU7204',
     tags: ['inverter', 'not', 'gate', 'unbuffered'],
-    guideOverview: 'The 74x7204 contains two unbuffered inverters in a small 8-pin package. An unbuffered inverter has less internal gain staging than a regular buffered logic inverter, which makes it useful not only for logic inversion but also for analog-ish timing tricks such as crystal oscillators and RC oscillators. On a breadboard, it is a compact way to get two NOT gates with behavior closer to the underlying CMOS stage.',
+    guideOverview: 'The 74x7204 contains two unbuffered inverters in a small 8-pin package. An unbuffered inverter has less internal gain staging than a regular buffered logic inverter, which makes it useful not only for logic inversion but also for analog ish timing tricks such as crystal oscillators and RC oscillators. On a breadboard, it is a compact way to get two NOT gates with behavior closer to the underlying CMOS stage.',
     guidePinDescriptions: {
       '1A': 'Input to inverter 1.',
       '1Y': 'Inverted output of inverter 1.',
@@ -258,7 +258,7 @@ export const CHIPS_BLOCK_62 = {
       {
         title: 'Unbuffered Inverter Concept',
         paragraphs: [
-          'An unbuffered inverter uses a simpler signal path than a heavily buffered logic gate. That makes it better suited to oscillator and analog-threshold applications, while still working as an ordinary logic inverter.',
+          'An unbuffered inverter uses a simpler signal path than a heavily buffered logic gate. That makes it better suited to oscillator and analog threshold applications, while still working as an ordinary logic inverter.',
         ],
       },
       {
@@ -266,7 +266,7 @@ export const CHIPS_BLOCK_62 = {
         list: [
           'Plain logic inversion.',
           'RC and crystal oscillator stages.',
-          'Simple wave-shaping circuits where buffered gates are too aggressive.',
+          'Simple wave shaping circuits where buffered gates are too aggressive.',
         ],
       },
     ],
@@ -286,45 +286,45 @@ export const CHIPS_BLOCK_62 = {
     ],
   },
 
-  // ── 74x7240: Octal inverting buffer (Schmitt, tri-state) ──────────────────
+  // ── 74x7240: Octal inverting buffer (Schmitt, tri state) ──────────────────
   /* Primary source: Toshiba, TC74HC7240 datasheet. [Online]. Available: https://toshiba.semicon-storage.com/info/docget.jsp?did=16661&prodName=TC74HC7240AP
      https://en.wikipedia.org/wiki/Three-state_logic */
   // Same pinout and logic as 74x240
   '74x7240': {
     name: '74x7240',
     simpleName: 'Octal Inv Buffer',
-    description: 'Octal inverting buffer/line driver with Schmitt trigger inputs and tri-state outputs (20-pin)',
+    description: 'Octal inverting buffer/line driver, Schmitt inputs, 3-state (20-pin)',
     pins: 20,
     vcc: 20,
     gnd: 10,
     datasheet: 'https://toshiba.semicon-storage.com/info/docget.jsp?did=16661&prodName=TC74HC7240AP',
-    tags: ['buffer', 'driver', 'octal', 'tri-state', 'inverting', 'schmitt'],
-    guideOverview: 'The 74x7240 is an octal inverting buffer and line driver with Schmitt-trigger inputs and three-state outputs. It behaves like a 240-family driver, but the Schmitt front end gives better noise immunity and cleaner switching when inputs have slow or ragged edges. This makes it useful for bus isolation, cable-driven signals, and digital lines that come from switches, RC networks, or noisy logic.',
+    tags: ['buffer', 'driver', 'octal', 'tri state', 'inverting', 'schmitt'],
+    guideOverview: 'The 74x7240 is an octal inverting buffer and line driver with Schmitt trigger inputs and three state outputs. It behaves like a 240-family driver, but the Schmitt front end gives better noise immunity and cleaner switching when inputs have slow or ragged edges. This makes it useful for bus isolation, cable driven signals, and digital lines that come from switches, RC networks, or noisy logic.',
     guidePinDescriptions: {
       '1OE': 'Active LOW enable for bank 1. Pull LOW to let outputs 1Y1 through 1Y4 drive.',
       '1A1': 'Input bit 1 of bank 1.',
-      '2Y4': 'Inverting three-state output bit 4 of bank 2.',
+      '2Y4': 'Inverting three state output bit 4 of bank 2.',
       '1A2': 'Input bit 2 of bank 1.',
-      '2Y3': 'Inverting three-state output bit 3 of bank 2.',
+      '2Y3': 'Inverting three state output bit 3 of bank 2.',
       '1A3': 'Input bit 3 of bank 1.',
-      '2Y2': 'Inverting three-state output bit 2 of bank 2.',
+      '2Y2': 'Inverting three state output bit 2 of bank 2.',
       '1A4': 'Input bit 4 of bank 1.',
-      '2Y1': 'Inverting three-state output bit 1 of bank 2.',
+      '2Y1': 'Inverting three state output bit 1 of bank 2.',
       'GND': 'Ground reference for the package.',
       '2A1': 'Input bit 1 of bank 2.',
-      '1Y4': 'Inverting three-state output bit 4 of bank 1.',
+      '1Y4': 'Inverting three state output bit 4 of bank 1.',
       '2A2': 'Input bit 2 of bank 2.',
-      '1Y3': 'Inverting three-state output bit 3 of bank 1.',
+      '1Y3': 'Inverting three state output bit 3 of bank 1.',
       '2A3': 'Input bit 3 of bank 2.',
-      '1Y2': 'Inverting three-state output bit 2 of bank 1.',
+      '1Y2': 'Inverting three state output bit 2 of bank 1.',
       '2A4': 'Input bit 4 of bank 2.',
-      '1Y1': 'Inverting three-state output bit 1 of bank 1.',
+      '1Y1': 'Inverting three state output bit 1 of bank 1.',
       '2OE': 'Active LOW enable for bank 2.',
       'VCC': 'Positive supply for the device.',
     },
     guideSections: [
       {
-        title: 'Inverting Tri-State Driver',
+        title: 'Inverting Tri State Driver',
         paragraphs: [
           'Each channel outputs the opposite logic state of its input when enabled, and disconnects from the bus when disabled. That makes the chip suitable for shared buses and line-driving jobs where polarity inversion is acceptable or desired.',
         ],
@@ -332,7 +332,7 @@ export const CHIPS_BLOCK_62 = {
       {
         title: 'Why Schmitt Inputs Matter',
         paragraphs: [
-          'Schmitt-trigger inputs add hysteresis, so the input must move farther before the logic state flips back. That reduces chatter and false switching with slow edges or noisy signals.',
+          'Schmitt trigger inputs add hysteresis, so the input must move farther before the logic state flips back. That reduces chatter and false switching with slow edges or noisy signals.',
         ],
       },
     ],
@@ -370,39 +370,39 @@ export const CHIPS_BLOCK_62 = {
     ],
   },
 
-  // ── 74x7241: Octal non-inverting buffer (Schmitt, tri-state) ──────────────
+  // ── 74x7241: Octal non inverting buffer (Schmitt, tri state) ──────────────
   /* Primary source: Texas Instruments, 74x7241 datasheet. [Online]. Available: https://www.ti.com/lit/gpn/SN74LS241
      https://en.wikipedia.org/wiki/Three-state_logic */
   // Same pinout as 74x241: bank 1 uses active low OE, bank 2 uses active high OE
   '74x7241': {
     name: '74x7241',
     simpleName: 'Octal Buffer',
-    description: 'Octal non-inverting buffer/line driver with Schmitt trigger inputs and tri-state outputs (20-pin)',
+    description: 'Octal non inverting buffer/line driver, Schmitt inputs, 3-state (20-pin)',
     pins: 20,
     vcc: 20,
     gnd: 10,
     datasheet: 'https://www.ti.com/lit/gpn/SN74LS241',
-    tags: ['buffer', 'driver', 'octal', 'tri-state', 'non-inverting', 'schmitt'],
-    guideOverview: 'The 74x7241 is an octal non-inverting buffer and line driver with tri-state outputs, organized like a 241-family part. One bank uses an active LOW enable and the other uses an active HIGH enable, which is handy when two groups of lines need complementary control logic. In this simulator, the 241-family behavior is the right functional reference; the Schmitt-trigger input detail is an electrical refinement rather than a different truth table.',
+    tags: ['buffer', 'driver', 'octal', 'tri state', 'non inverting', 'schmitt'],
+    guideOverview: 'The 74x7241 is an octal non inverting buffer and line driver with tri state outputs, organized like a 241-family part. One bank uses an active LOW enable and the other uses an active HIGH enable, which is handy when two groups of lines need complementary control logic. In this simulator, the 241-family behavior is the right functional reference; the Schmitt trigger input detail is an electrical refinement rather than a different truth table.',
     guidePinDescriptions: {
       '1OE': 'Active LOW enable for bank 1. Pull LOW to let outputs 1Y1 through 1Y4 drive.',
       '1A1': 'Input bit 1 of bank 1.',
-      '2Y4': 'Three-state output bit 4 of bank 2.',
+      '2Y4': 'Three state output bit 4 of bank 2.',
       '1A2': 'Input bit 2 of bank 1.',
-      '2Y3': 'Three-state output bit 3 of bank 2.',
+      '2Y3': 'Three state output bit 3 of bank 2.',
       '1A3': 'Input bit 3 of bank 1.',
-      '2Y2': 'Three-state output bit 2 of bank 2.',
+      '2Y2': 'Three state output bit 2 of bank 2.',
       '1A4': 'Input bit 4 of bank 1.',
-      '2Y1': 'Three-state output bit 1 of bank 2.',
+      '2Y1': 'Three state output bit 1 of bank 2.',
       'GND': 'Ground reference for the package.',
       '2A1': 'Input bit 1 of bank 2.',
-      '1Y4': 'Three-state output bit 4 of bank 1.',
+      '1Y4': 'Three state output bit 4 of bank 1.',
       '2A2': 'Input bit 2 of bank 2.',
-      '1Y3': 'Three-state output bit 3 of bank 1.',
+      '1Y3': 'Three state output bit 3 of bank 1.',
       '2A3': 'Input bit 3 of bank 2.',
-      '1Y2': 'Three-state output bit 2 of bank 1.',
+      '1Y2': 'Three state output bit 2 of bank 1.',
       '2A4': 'Input bit 4 of bank 2.',
-      '1Y1': 'Three-state output bit 1 of bank 1.',
+      '1Y1': 'Three state output bit 1 of bank 1.',
       '2OE': 'Active HIGH enable for bank 2 in this 241-style family mapping.',
       'VCC': 'Positive supply for the device.',
     },
@@ -410,11 +410,11 @@ export const CHIPS_BLOCK_62 = {
       {
         title: '241-Style Buffer Organization',
         paragraphs: [
-          'The chip is split into two four-bit banks, each with its own enable polarity. That makes it easier to interface with control logic that already has one active LOW and one active HIGH control signal available.',
+          'The chip is split into two four bit banks, each with its own enable polarity. That makes it easier to interface with control logic that already has one active LOW and one active HIGH control signal available.',
         ],
       },
       {
-        title: 'Three-State Bus Use',
+        title: 'Three State Bus Use',
         paragraphs: [
           'When a bank is disabled, its outputs disconnect from the bus instead of driving HIGH or LOW. That is essential when multiple devices share the same data lines.',
         ],
@@ -454,53 +454,53 @@ export const CHIPS_BLOCK_62 = {
     ],
   },
 
-  // ── 74x7244: Octal non-inverting buffer (Schmitt, tri-state) ──────────────
+  // ── 74x7244: Octal non inverting buffer (Schmitt, tri state) ──────────────
   /* Primary source: Toshiba, TC74HC7244 datasheet. [Online]. Available: https://toshiba.semicon-storage.com/info/docget.jsp?did=16661&prodName=TC74HC7244AP
      https://en.wikipedia.org/wiki/Three-state_logic */
   // Same pinout as 74x244: both banks use active low OE
   '74x7244': {
     name: '74x7244',
     simpleName: 'Octal Buffer',
-    description: 'Octal non-inverting buffer/line driver with Schmitt trigger inputs and tri-state outputs (20-pin)',
+    description: 'Octal non inverting buffer/line driver, Schmitt inputs, 3-state (20-pin)',
     pins: 20,
     vcc: 20,
     gnd: 10,
     datasheet: 'https://toshiba.semicon-storage.com/info/docget.jsp?did=16661&prodName=TC74HC7244AP',
-    tags: ['buffer', 'driver', 'octal', 'tri-state', 'non-inverting', 'schmitt'],
-    guideOverview: 'The 74x7244 is an octal non-inverting buffer and line driver with Schmitt-trigger inputs and three-state outputs. It follows the familiar 244-family organization, with two independent active LOW enable pins controlling two banks of four outputs. This makes it useful for bus driving, fan-out improvement, and isolating noisy or slow-edge signals before they reach the rest of a logic system.',
+    tags: ['buffer', 'driver', 'octal', 'tri state', 'non inverting', 'schmitt'],
+    guideOverview: 'The 74x7244 is an octal non inverting buffer and line driver with Schmitt trigger inputs and three state outputs. It follows the familiar 244-family organization, with two independent active LOW enable pins controlling two banks of four outputs. This makes it useful for bus driving, fan out improvement, and isolating noisy or slow edge signals before they reach the rest of a logic system.',
     guidePinDescriptions: {
       '1OE': 'Active LOW enable for bank 1.',
       '1A1': 'Input bit 1 of bank 1.',
-      '2Y4': 'Three-state output bit 4 of bank 2.',
+      '2Y4': 'Three state output bit 4 of bank 2.',
       '1A2': 'Input bit 2 of bank 1.',
-      '2Y3': 'Three-state output bit 3 of bank 2.',
+      '2Y3': 'Three state output bit 3 of bank 2.',
       '1A3': 'Input bit 3 of bank 1.',
-      '2Y2': 'Three-state output bit 2 of bank 2.',
+      '2Y2': 'Three state output bit 2 of bank 2.',
       '1A4': 'Input bit 4 of bank 1.',
-      '2Y1': 'Three-state output bit 1 of bank 2.',
+      '2Y1': 'Three state output bit 1 of bank 2.',
       'GND': 'Ground reference for the package.',
       '2A1': 'Input bit 1 of bank 2.',
-      '1Y4': 'Three-state output bit 4 of bank 1.',
+      '1Y4': 'Three state output bit 4 of bank 1.',
       '2A2': 'Input bit 2 of bank 2.',
-      '1Y3': 'Three-state output bit 3 of bank 1.',
+      '1Y3': 'Three state output bit 3 of bank 1.',
       '2A3': 'Input bit 3 of bank 2.',
-      '1Y2': 'Three-state output bit 2 of bank 1.',
+      '1Y2': 'Three state output bit 2 of bank 1.',
       '2A4': 'Input bit 4 of bank 2.',
-      '1Y1': 'Three-state output bit 1 of bank 1.',
+      '1Y1': 'Three state output bit 1 of bank 1.',
       '2OE': 'Active LOW enable for bank 2.',
       'VCC': 'Positive supply for the device.',
     },
     guideSections: [
       {
-        title: '244-Style Non-Inverting Driver',
+        title: '244-Style Non Inverting Driver',
         paragraphs: [
-          'Each output follows its input without inversion when enabled. The two bank enables let you control four-bit groups independently, which is convenient in bus-oriented designs.',
+          'Each output follows its input without inversion when enabled. The two bank enables let you control four bit groups independently, which is convenient in bus oriented designs.',
         ],
       },
       {
-        title: 'Noise-Tolerant Inputs',
+        title: 'Noise Tolerant Inputs',
         paragraphs: [
-          'Schmitt-trigger inputs are less likely to chatter when fed from slow or noisy sources. That makes the part a better line conditioner than a plain buffer when wiring is long or signals are ragged.',
+          'Schmitt trigger inputs are less likely to chatter when fed from slow or noisy sources. That makes the part a better line conditioner than a plain buffer when wiring is long or signals are ragged.',
         ],
       },
     ],
@@ -538,20 +538,20 @@ export const CHIPS_BLOCK_62 = {
     ],
   },
 
-  // ── 74x7245: Octal bus transceiver (Schmitt, tri-state) ───────────────────
+  // ── 74x7245: Octal bus transceiver (Schmitt, tri state) ───────────────────
   /* Primary source: Texas Instruments, 74x7245 datasheet. [Online]. Available: https://www.ti.com/lit/gpn/SN74LS245
      https://en.wikipedia.org/wiki/Bus_transceiver */
   // Same pinout and logic as 74x245
   '74x7245': {
     name: '74x7245',
     simpleName: 'Octal Transceiver',
-    description: 'Octal bus transceiver with Schmitt trigger inputs and tri-state outputs (20-pin)',
+    description: 'Octal bus transceiver, Schmitt inputs, 3-state (20-pin)',
     pins: 20,
     vcc: 20,
     gnd: 10,
     datasheet: 'https://www.ti.com/lit/gpn/SN74LS245',
-    tags: ['transceiver', 'bus', 'octal', 'tri-state', 'bidirectional', 'schmitt'],
-    guideOverview: 'The 74x7245 is an octal bidirectional bus transceiver in the 245 family. It can pass eight bits from bus A to bus B or the reverse, with the direction pin selecting the source side and the enable pin disconnecting the device when needed. In the simulator, standard 245-family digital behavior is the right reference; the Schmitt-trigger feature is an electrical improvement on the inputs rather than a different logic function.',
+    tags: ['transceiver', 'bus', 'octal', 'tri state', 'bidirectional', 'schmitt'],
+    guideOverview: 'The 74x7245 is an octal bidirectional bus transceiver in the 245 family. It can pass eight bits from bus A to bus B or the reverse, with the direction pin selecting the source side and the enable pin disconnecting the device when needed. In the simulator, standard 245-family digital behavior is the right reference; the Schmitt trigger feature is an electrical improvement on the inputs rather than a different logic function.',
     guidePinDescriptions: {
       'DIR': 'Direction control. It selects whether data flows from A to B or from B to A.',
       'A1': 'Bit 1 on the A-side bus.',
@@ -578,13 +578,13 @@ export const CHIPS_BLOCK_62 = {
       {
         title: 'Bidirectional Bus Transfer',
         paragraphs: [
-          'A transceiver lets one multi-bit bus drive another in either direction. This is useful whenever two subsystems share a data path but should not always be directly tied together.',
+          'A transceiver lets one multi bit bus drive another in either direction. This is useful whenever two subsystems share a data path but should not always be directly tied together.',
         ],
       },
       {
         title: 'Why It Matters On A Breadboard',
         paragraphs: [
-          'A 245-style part helps isolate loading, control which side is currently driving, and avoid bus contention. That makes it a standard building block in processor, peripheral, and bus-expansion circuits.',
+          'A 245-style part helps isolate loading, control which side is currently driving, and avoid bus contention. That makes it a standard building block in processor, peripheral, and bus expansion circuits.',
         ],
       },
     ],
@@ -626,8 +626,8 @@ export const CHIPS_BLOCK_62 = {
   '74x7266': {
     name: '74x7266',
     simpleName: 'Quad XNOR',
-    description: 'Four 2 input XNOR (Exclusive-NOR) gates. (14-pin)',
-    guideOverview: 'The 74x7266 provides four independent XNOR gates. A common use is edge-detection: combine the XNOR with an RC delay to generate a pulse whenever the input changes state. Note the non-uniform pin ordering check the pinout carefully before wiring.',
+    description: 'Four 2 input XNOR (Exclusive NOR) gates. (14-pin)',
+    guideOverview: 'The 74x7266 provides four independent XNOR gates. A common use is edge detection: combine the XNOR with an RC delay to generate a pulse whenever the input changes state. Note the non uniform pin ordering check the pinout carefully before wiring.',
     pins: 14,
     vcc: 14,
     gnd: 7,
@@ -657,20 +657,20 @@ export const CHIPS_BLOCK_62 = {
     ],
   },
 
-  // ── 74x7273: Octal D flip-flop with reset ─────────────────────────────────
+  // ── 74x7273: Octal D flip flop with reset ─────────────────────────────────
   /* Primary source: Texas Instruments, 74x7273 datasheet. [Online]. Available: https://www.ti.com/lit/gpn/SN74LS273
      https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
   // Same pinout as 74x273 (D_FF_OCTAL)
   '74x7273': {
     name: '74x7273',
     simpleName: 'Octal D FF',
-    description: 'Octal positive edge-triggered D-type flip-flop with reset (20-pin)',
+    description: 'Octal positive edge triggered D type flip flop with reset (20-pin)',
     pins: 20,
     vcc: 20,
     gnd: 10,
     datasheet: 'https://www.ti.com/lit/gpn/SN74LS273',
-    tags: ['flip-flop', 'flip flop', 'd', 'octal', 'sequential', 'register'],
-    guideOverview: 'The 74x7273 is an octal edge-triggered D-type register with a shared clock and asynchronous clear, functionally aligned with the 273 family. It captures eight input bits at the clock edge and holds them until the next capture event. This makes it useful for latching data buses, building output registers, and creating synchronous storage stages in digital systems.',
+    tags: ['flip flop', 'flip flop', 'd', 'octal', 'sequential', 'register'],
+    guideOverview: 'The 74x7273 is an octal edge triggered D type register with a shared clock and asynchronous clear, functionally aligned with the 273 family. It captures eight input bits at the clock edge and holds them until the next capture event. This makes it useful for latching data buses, building output registers, and creating synchronous storage stages in digital systems.',
     guidePinDescriptions: {
       'CLR': 'Asynchronous clear for the whole register. Assert it to reset all outputs without waiting for a clock.',
       '1Q': 'Stored output bit 1.',
@@ -703,7 +703,7 @@ export const CHIPS_BLOCK_62 = {
       {
         title: 'Why Shared Clear Is Useful',
         paragraphs: [
-          'The asynchronous clear input can force the register to a known reset state immediately. That is useful when power-up or system reset must bring all stored outputs to a predictable value.',
+          'The asynchronous clear input can force the register to a known reset state immediately. That is useful when power up or system reset must bring all stored outputs to a predictable value.',
         ],
       },
     ],
@@ -751,7 +751,7 @@ export const CHIPS_BLOCK_62 = {
     sequential: true,
     datasheet: 'https://toshiba.semicon-storage.com/info/docget.jsp?did=16705&prodName=TC74HC7292AP',
     tags: ['timer', 'divider', 'counter'],
-    guideOverview: 'The TC74HC7292AP is a 12 bit programmable frequency divider. Twelve program inputs D0 D11 set a binary divisor N (0 4095). The chip counts N+1 falling edges of CLK, toggles OUT, then reloads producing an output that divides the input clock by N+1 with approximately 50% duty cycle when the divisor is even. Maximum division ratio is 4096 (all program inputs HIGH). Minimum is 1 (all program inputs LOW).',
+    guideOverview: 'The TC74HC7292AP is a 12 bit programmable frequency divider. Twelve program inputs D0-D11 set a binary divisor N (0 4095). The chip counts N+1 falling edges of CLK, toggles OUT, then reloads producing an output that divides the input clock by N+1 with approximately 50% duty cycle when the divisor is even. Maximum division ratio is 4096 (all program inputs HIGH). Minimum is 1 (all program inputs LOW).',
     guidePinDescriptions: {
       'CLK': 'Clock input. Division is triggered on falling edges.',
       'D0':  'Program bit 0 (LSB). Sets divisor N bit 0.',
@@ -774,7 +774,7 @@ export const CHIPS_BLOCK_62 = {
       {
         title: 'Programmable Division Ratio',
         paragraphs: [
-          'Set D0 D11 to hard-wire the division ratio. The 12 bits form a binary integer N. The output frequency is f_CLK / (N+1), giving ratios from 1 (N=0) to 4096 (N=4095).',
+          'Set D0-D11 to hard wire the division ratio. The 12 bits form a binary integer N. The output frequency is f_CLK / (N+1), giving ratios from 1 (N=0) to 4096 (N=4095).',
         ],
         formulas: [
           'N = D0 + D1×2 + D2×4 + ... + D11×2048',
@@ -784,7 +784,7 @@ export const CHIPS_BLOCK_62 = {
       {
         title: 'Output Waveform',
         paragraphs: [
-          'OUT toggles every time the internal down-counter reaches zero and reloads. When N+1 is even the duty cycle is exactly 50%. When N+1 is odd OUT is HIGH for ⌈(N+1)/2⌉ cycles and LOW for ⌊(N+1)/2⌋ cycles.',
+          'OUT toggles every time the internal down counter reaches zero and reloads. When N+1 is even the duty cycle is exactly 50%. When N+1 is odd OUT is HIGH for ⌈(N+1)/2⌉ cycles and LOW for ⌊(N+1)/2⌋ cycles.',
         ],
       },
     ],
@@ -851,12 +851,12 @@ export const CHIPS_BLOCK_62 = {
   '74x7340': {
     name: '74x7340',
     simpleName: 'Bus Driver/Reg',
-    description: '8 bit bus driver with bidirectional registers (tri-state) (24-pin)',
+    description: '8 bit bus driver with bidirectional registers (tri state) (24-pin)',
     pins: 24,
     vcc: 24,
     gnd: 12,
     datasheet: '',
-    tags: ['bus', 'driver', 'register', 'tri-state', 'bidirectional'],
+    tags: ['bus', 'driver', 'register', 'tri state', 'bidirectional'],
     pinout: [
       { pin: 1,  name: 'OE',    type: 'input'  },
       { pin: 2,  name: 'D1',    type: 'input'  },
@@ -894,12 +894,12 @@ export const CHIPS_BLOCK_62 = {
   '74x7403': {
     name: '74x7403',
     simpleName: 'FIFO 64x4',
-    description: '256 bit FIFO memory (64x4) with tri-state outputs (16-pin)',
+    description: '256 bit FIFO memory (64x4) with tri state outputs (16-pin)',
     pins: 16,
     vcc: 16,
     gnd: 8,
     datasheet: '',
-    tags: ['fifo', 'memory', 'tri-state'],
+    tags: ['fifo', 'memory', 'tri state'],
     pinout: [
       { pin: 1,  name: 'D0',    type: 'input'  },
       { pin: 2,  name: 'D1',    type: 'input'  },

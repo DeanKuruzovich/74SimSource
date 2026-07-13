@@ -1,21 +1,20 @@
 // test-chips43.mjs - Tests for all chips defined in js/chips/chips43.js
 // Chips under test:
-//   74877        : 8 bit univ transceiver port controller      (GENERIC_STUB, bidir, 24-pin)
-//   74878        : Dual 4 bit D-FF, sync CLR, non-inv, TRI    (GENERIC_STUB, 24-pin)
-//   74879        : Dual 4 bit D-FF, sync CLR, inv, TRI        (GENERIC_STUB, 24-pin)
-//   74880        : Dual 4 bit latch, CLR, inv, TRI            (GENERIC_STUB, 24-pin)
-//   74881        : 4 bit ALU                                   (ALU_4BIT, 24-pin)
-//   74882        : 32 bit lookahead carry generator            (GENERIC_STUB, 24-pin)
-//   74885        : 8 bit magnitude comparator                  (GENERIC_STUB, 24-pin)
-//   74900        : Quad 2 input NAND driver                    (NAND, 14-pin)
-//   74901        : Hex inverting TTL buffer                    (NOT, 14-pin)
-//   74C902       : Hex non-inverting TTL buffer                (BUFFER, 14-pin)
-//   74ALS902     : Quad 2 input NOR driver                    (NOR, 14-pin)
-//   74C903       : Hex inverting PMOS buffer                  (NOT, 14-pin)
-//   74ALS903     : Quad 2 input NAND OC driver                (NAND+OC, 14-pin)
-//   74904        : Hex non-inverting PMOS buffer               (BUFFER, 14-pin)
-//   74905        : 12 bit successive approximation register    (GENERIC_STUB, 24-pin)
-//   74906        : Hex open drain n-channel buffer             (BUFFER+OC, 14-pin)
+//   74877        : 8 bit univ transceiver port controller      (GENERIC_STUB, bidir, 24 pin)
+//   74878        : Dual 4 bit D-FF, sync CLR, non-inv, TRI    (GENERIC_STUB, 24 pin)
+//   74879        : Dual 4 bit D-FF, sync CLR, inv, TRI        (GENERIC_STUB, 24 pin)
+//   74880        : Dual 4 bit latch, CLR, inv, TRI            (GENERIC_STUB, 24 pin)
+//   74881        : 4 bit ALU                                   (ALU_4BIT, 24 pin)
+//   74882        : 32 bit lookahead carry generator            (GENERIC_STUB, 24 pin)
+//   74885        : 8 bit magnitude comparator                  (GENERIC_STUB, 24 pin)
+//   74900        : Quad 2 input NAND driver                    (NAND, 14 pin)
+//   74901        : Hex inverting TTL buffer                    (NOT, 14 pin)
+//   74C902       : Hex non inverting TTL buffer                (BUFFER, 14 pin)
+//   74ALS902     : Quad 2 input NOR driver                    (NOR, 14 pin)
+//   74C903       : Hex inverting PMOS buffer                  (NOT, 14 pin)
+//   74ALS903     : Quad 2 input NAND OC driver                (NAND+OC, 14 pin)
+//   74904        : Hex non inverting PMOS buffer               (BUFFER, 14 pin)
+//   74906        : Hex open drain n-channel buffer             (BUFFER+OC, 14 pin)
 
 import { CHIPS_BLOCK_43 } from '../chips/chips43.js';
 import { BreadboardWorld, holeId } from '../breadboard.js';
@@ -91,31 +90,30 @@ function connectLow(wm, chip, name) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const EXPECTED_IDS = [
-  '74877','74878','74879','74880','74881','74882','74885',
-  '74900','74901','74C902','74ALS902','74C903','74ALS903',
-  '74904','74905','74906',
+  '74x877','74x878','74x879','74x880','74x881','74x882','74x885',
+  '74x900','74x901','74C902','74ALS902','74C903','74ALS903',
+  '74x904','74x906',
 ];
 
 const EXPECTED_SPECS = {
-  '74877':   { pins: 24, gnd: 12, vcc: 24 },
-  '74878':   { pins: 24, gnd: 12, vcc: 24 },
-  '74879':   { pins: 24, gnd: 12, vcc: 24 },
-  '74880':   { pins: 24, gnd: 12, vcc: 24 },
-  '74881':   { pins: 24, gnd: 12, vcc: 24 },
-  '74882':   { pins: 24, gnd: 12, vcc: 24 },
-  '74885':   { pins: 24, gnd: 12, vcc: 24 },
-  '74900':   { pins: 14, gnd:  7, vcc: 14 },
-  '74901':   { pins: 14, gnd:  7, vcc: 14 },
+  '74x877':   { pins: 24, gnd: 12, vcc: 24 },
+  '74x878':   { pins: 24, gnd: 12, vcc: 24 },
+  '74x879':   { pins: 24, gnd: 12, vcc: 24 },
+  '74x880':   { pins: 24, gnd: 12, vcc: 24 },
+  '74x881':   { pins: 24, gnd: 12, vcc: 24 },
+  '74x882':   { pins: 24, gnd: 12, vcc: 24 },
+  '74x885':   { pins: 24, gnd: 12, vcc: 24 },
+  '74x900':   { pins: 14, gnd:  7, vcc: 14 },
+  '74x901':   { pins: 14, gnd:  7, vcc: 14 },
   '74C902':  { pins: 14, gnd:  7, vcc: 14 },
   '74ALS902':{ pins: 14, gnd:  7, vcc: 14 },
   '74C903':  { pins: 14, gnd:  7, vcc: 14 },
   '74ALS903':{ pins: 14, gnd:  7, vcc: 14 },
-  '74904':   { pins: 14, gnd:  7, vcc: 14 },
-  '74905':   { pins: 24, gnd: 12, vcc: 24 },
-  '74906':   { pins: 14, gnd:  7, vcc: 14 },
+  '74x904':   { pins: 14, gnd:  7, vcc: 14 },
+  '74x906':   { pins: 14, gnd:  7, vcc: 14 },
 };
 
-const OC_IDS = ['74ALS903','74906'];
+const OC_IDS = ['74ALS903','74x906'];
 
 console.log('\n=== SECTION S: Structure ===');
 
@@ -155,12 +153,11 @@ for (const id of EXPECTED_IDS) {
 console.log('\n=== SECTION A: Stub chips (HiZ outputs) ===');
 
 const STUB_CONFIGS = [
-  { id: '74878', outputs: ['Q10','Q11','Q12','Q13','Q20','Q21','Q22','Q23'] },
-  { id: '74879', outputs: ['Q10n','Q11n','Q12n','Q13n','Q20n','Q21n','Q22n','Q23n'] },
-  { id: '74880', outputs: ['Q10n','Q11n','Q12n','Q13n','Q20n','Q21n','Q22n','Q23n'] },
-  { id: '74882', outputs: ['Cn8','Cn16','Cn24','Cn32','GG'] },
-  { id: '74885', outputs: ['AGEB','ALTB','AEQB','AGTB'] },
-  { id: '74905', outputs: ['SC','D0','D1','D2','D3','D4','D5','D6','D7','D8','D9','D10','D11','EOC'] },
+  { id: '74x878', outputs: ['Q10','Q11','Q12','Q13','Q20','Q21','Q22','Q23'] },
+  { id: '74x879', outputs: ['Q10n','Q11n','Q12n','Q13n','Q20n','Q21n','Q22n','Q23n'] },
+  { id: '74x880', outputs: ['Q10n','Q11n','Q12n','Q13n','Q20n','Q21n','Q22n','Q23n'] },
+  { id: '74x882', outputs: ['Cn8','Cn16','Cn24','Cn32','GG'] },
+  { id: '74x885', outputs: ['AGEB','ALTB','AEQB','AGTB'] },
 ];
 
 for (const { id, outputs } of STUB_CONFIGS) {
@@ -194,7 +191,7 @@ console.log('\n=== SECTION B: OC chips (outputs pulled HIGH) ===');
 
 // 74906: OC buffer - all inputs LOW → buffer outputs LOW (open drain active)
 {
-  const { world, chip, wm } = setupChipWithPower('74906');
+  const { world, chip, wm } = setupChipWithPower('74x906');
   connectLow(wm, chip, '1A'); connectLow(wm, chip, '2A');
   connectLow(wm, chip, '3A'); connectLow(wm, chip, '4A');
   connectLow(wm, chip, '5A'); connectLow(wm, chip, '6A');
@@ -207,7 +204,7 @@ console.log('\n=== SECTION B: OC chips (outputs pulled HIGH) ===');
 
 // 74906: OC buffer - all inputs HIGH → outputs pulled HIGH (OC output inactive)
 {
-  const { world, chip, wm } = setupChipWithPower('74906');
+  const { world, chip, wm } = setupChipWithPower('74x906');
   connectHigh(wm, chip, '1A'); connectHigh(wm, chip, '2A');
   connectHigh(wm, chip, '3A'); connectHigh(wm, chip, '4A');
   connectHigh(wm, chip, '5A'); connectHigh(wm, chip, '6A');
@@ -230,21 +227,21 @@ console.log('\n=== SECTION C: Logic gate chips ===');
   for (const [inA, inB, out] of gates) {
     // Both HIGH → NAND = LOW
     {
-      const { world, chip, wm } = setupChipWithPower('74900');
+      const { world, chip, wm } = setupChipWithPower('74x900');
       connectHigh(wm, chip, inA); connectHigh(wm, chip, inB);
       const sim = new CircuitSimulator(); sim.evaluate(world, [chip], wm);
       assertPinBit(sim, chip, out, 0, `74900 NAND(${inA}=H,${inB}=H) → LOW`);
     }
     // One LOW → NAND = HIGH
     {
-      const { world, chip, wm } = setupChipWithPower('74900');
+      const { world, chip, wm } = setupChipWithPower('74x900');
       connectLow(wm, chip, inA); connectHigh(wm, chip, inB);
       const sim = new CircuitSimulator(); sim.evaluate(world, [chip], wm);
       assertPinBit(sim, chip, out, 1, `74900 NAND(${inA}=L,${inB}=H) → HIGH`);
     }
     // Both LOW → NAND = HIGH
     {
-      const { world, chip, wm } = setupChipWithPower('74900');
+      const { world, chip, wm } = setupChipWithPower('74x900');
       connectLow(wm, chip, inA); connectLow(wm, chip, inB);
       const sim = new CircuitSimulator(); sim.evaluate(world, [chip], wm);
       assertPinBit(sim, chip, out, 1, `74900 NAND(${inA}=L,${inB}=L) → HIGH`);
@@ -257,13 +254,13 @@ console.log('\n=== SECTION C: Logic gate chips ===');
   const gates = [['1A','1Y'],['2A','2Y'],['3A','3Y'],['4A','4Y'],['5A','5Y'],['6A','6Y']];
   for (const [inp, out] of gates) {
     {
-      const { world, chip, wm } = setupChipWithPower('74901');
+      const { world, chip, wm } = setupChipWithPower('74x901');
       connectHigh(wm, chip, inp);
       const sim = new CircuitSimulator(); sim.evaluate(world, [chip], wm);
       assertPinBit(sim, chip, out, 0, `74901 NOT(${inp}=H) → LOW`);
     }
     {
-      const { world, chip, wm } = setupChipWithPower('74901');
+      const { world, chip, wm } = setupChipWithPower('74x901');
       connectLow(wm, chip, inp);
       const sim = new CircuitSimulator(); sim.evaluate(world, [chip], wm);
       assertPinBit(sim, chip, out, 1, `74901 NOT(${inp}=L) → HIGH`);
@@ -271,7 +268,7 @@ console.log('\n=== SECTION C: Logic gate chips ===');
   }
 }
 
-// C3: 74C902 - Hex non-inverting buffer (BUFFER)
+// C3: 74C902 - Hex non inverting buffer (BUFFER)
 {
   const gates = [['1A','1Y'],['2A','2Y'],['3A','3Y'],['4A','4Y'],['5A','5Y'],['6A','6Y']];
   for (const [inp, out] of gates) {
@@ -337,18 +334,18 @@ console.log('\n=== SECTION C: Logic gate chips ===');
   }
 }
 
-// C6: 74904 - Hex non-inverting PMOS buffer (BUFFER)
+// C6: 74904 - Hex non inverting PMOS buffer (BUFFER)
 {
   const gates = [['1A','1Y'],['2A','2Y'],['3A','3Y'],['4A','4Y'],['5A','5Y'],['6A','6Y']];
   for (const [inp, out] of gates) {
     {
-      const { world, chip, wm } = setupChipWithPower('74904');
+      const { world, chip, wm } = setupChipWithPower('74x904');
       connectHigh(wm, chip, inp);
       const sim = new CircuitSimulator(); sim.evaluate(world, [chip], wm);
       assertPinBit(sim, chip, out, 1, `74904 BUFFER(${inp}=H) → HIGH`);
     }
     {
-      const { world, chip, wm } = setupChipWithPower('74904');
+      const { world, chip, wm } = setupChipWithPower('74x904');
       connectLow(wm, chip, inp);
       const sim = new CircuitSimulator(); sim.evaluate(world, [chip], wm);
       assertPinBit(sim, chip, out, 0, `74904 BUFFER(${inp}=L) → LOW`);
@@ -375,7 +372,7 @@ console.log('\n=== SECTION C: Logic gate chips ===');
 
 // C8: 74877 bidir transceiver - instantiation check
 {
-  const { world, chip, wm } = setupChipWithPower('74877');
+  const { world, chip, wm } = setupChipWithPower('74x877');
   let threw = false;
   try { new CircuitSimulator().evaluate(world, [chip], wm); } catch(e) { threw = true; }
   assert(!threw, `74877: evaluate() does not throw`);
@@ -393,7 +390,7 @@ console.log('\n=== SECTION D: 74881 ALU ===');
 //   F = A XNOR B with M=1 => F = NOT(A XOR B) - depends on implementaton
 //   Just test that evaluate doesn't throw and F pins are driven
 {
-  const { world, chip, wm } = setupChipWithPower('74881');
+  const { world, chip, wm } = setupChipWithPower('74x881');
   // Set M=1 (logic mode), Cn=1, S=0000 (A AND B logic function), A=1111, B=0000
   connectHigh(wm, chip, 'M');
   connectHigh(wm, chip, 'Cn');
@@ -415,7 +412,7 @@ console.log('\n=== SECTION D: 74881 ALU ===');
 
 // D2: Logic mode M=1, S=1111 (A): A=0b1010=A2,A0 high; F should equal A
 {
-  const { world, chip, wm } = setupChipWithPower('74881');
+  const { world, chip, wm } = setupChipWithPower('74x881');
   connectHigh(wm, chip, 'M');
   connectHigh(wm, chip, 'Cn');
   connectHigh(wm, chip, 'S0'); connectHigh(wm, chip, 'S1');

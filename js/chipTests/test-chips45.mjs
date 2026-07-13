@@ -1,21 +1,21 @@
 // test-chips45.mjs - Tests for all chips defined in js/chips/chips45.js
 // Chips under test:
-//   74929        : 1024 bit RAM 1024x1, single chip select TRI  (GENERIC_STUB, 16-pin)
-//   74930        : 1024 bit RAM 1024x1, three chip selects TRI   (GENERIC_STUB, 18-pin)
-//   74932        : Phase comparator                              (GENERIC_STUB, 8-pin)
-//   74933        : 7 bit address bus comparator                  (GENERIC_STUB, 20-pin)
-//   74936        : ADC 3.75-digit DVM, 7-seg display             (GENERIC_STUB, 28-pin)
-//   74937        : ADC 3.5-digit DVM, BCD outputs                (GENERIC_STUB, 24-pin)
-//   74938        : ADC 3.75-digit DVM, BCD outputs               (GENERIC_STUB, 24-pin)
-//   74940        : Octal bus/line driver, Schmitt TRI             (GENERIC_STUB, 20-pin)
-//   74941        : Octal bus/line driver inv, Schmitt TRI         (GENERIC_STUB, 20-pin)
-//   74942        : 300 baud modem +/-5V                          (GENERIC_STUB, 20-pin)
-//   74943        : 300 baud modem 5V                             (GENERIC_STUB, 20-pin)
-//   74952        : Dual rank 8 bit shift reg sync CLR TRI         (GENERIC_STUB, 18-pin)
-//   74BCT956     : Octal bus transceiver and latch TRI            (GENERIC_STUB, 24-pin)
-//   74962        : Dual rank 8 bit shift reg exchange TRI         (GENERIC_STUB, 18-pin)
-//   74963        : Dual rank 8 bit shift reg sync CLR TRI         (GENERIC_STUB, 20-pin)
-//   74964        : Dual rank 8 bit shift reg sync+async CLR TRI   (GENERIC_STUB, 20-pin)
+//   74929        : 1024 bit RAM 1024x1, single chip select TRI  (GENERIC_STUB, 16 pin)
+//   74930        : 1024 bit RAM 1024x1, three chip selects TRI   (GENERIC_STUB, 18 pin)
+//   74932        : Phase comparator                              (GENERIC_STUB, 8 pin)
+//   74933        : 7 bit address bus comparator                  (GENERIC_STUB, 20 pin)
+//   74936        : ADC 3.75-digit DVM, 7-seg display             (GENERIC_STUB, 28 pin)
+//   74937        : ADC 3.5-digit DVM, BCD outputs                (GENERIC_STUB, 24 pin)
+//   74938        : ADC 3.75-digit DVM, BCD outputs               (GENERIC_STUB, 24 pin)
+//   74940        : Octal bus/line driver, Schmitt TRI             (GENERIC_STUB, 20 pin)
+//   74941        : Octal bus/line driver inv, Schmitt TRI         (GENERIC_STUB, 20 pin)
+//   74942        : 300 baud modem +/-5V                          (GENERIC_STUB, 20 pin)
+//   74943        : 300 baud modem 5V                             (GENERIC_STUB, 20 pin)
+//   74952        : Dual rank 8 bit shift reg sync CLR TRI         (GENERIC_STUB, 18 pin)
+//   74BCT956     : Octal bus transceiver and latch TRI            (GENERIC_STUB, 24 pin)
+//   74962        : Dual rank 8 bit shift reg exchange TRI         (GENERIC_STUB, 18 pin)
+//   74963        : Dual rank 8 bit shift reg sync CLR TRI         (SHIFT_REG_DUAL_RANK_963, 20 pin)
+//   74964        : Dual rank 8 bit shift reg sync+async CLR TRI   (GENERIC_STUB, 20 pin)
 
 import { CHIPS_BLOCK_45 } from '../chips/chips45.js';
 import { BreadboardWorld, holeId } from '../breadboard.js';
@@ -79,25 +79,25 @@ function connectLow(wm, chip, name) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const EXPECTED_IDS = [
-  '74929','74930','74932','74933','74936','74937','74938',
-  '74940','74941','74952','74BCT956','74962','74963','74964',
+  '74x929','74x930','74x932','74x933','74x936','74x937','74x938',
+  '74x940','74x941','74x952','74BCT956','74x962','74x963','74x964',
 ];
 
 const EXPECTED_SPECS = {
-  '74929':    { pins: 16, gnd:  8, vcc: 16 },
-  '74930':    { pins: 18, gnd:  9, vcc: 18 },
-  '74932':    { pins:  8, gnd:  4, vcc:  8 },
-  '74933':    { pins: 20, gnd: 10, vcc: 20 },
-  '74936':    { pins: 28, gnd: 14, vcc: 28 },
-  '74937':    { pins: 24, gnd: 12, vcc: 24 },
-  '74938':    { pins: 24, gnd: 12, vcc: 24 },
-  '74940':    { pins: 20, gnd: 10, vcc: 20 },
-  '74941':    { pins: 20, gnd: 10, vcc: 20 },
-  '74952':    { pins: 18, gnd:  9, vcc: 18 },
+  '74x929':    { pins: 16, gnd:  8, vcc: 16 },
+  '74x930':    { pins: 18, gnd:  9, vcc: 18 },
+  '74x932':    { pins:  8, gnd:  4, vcc:  8 },
+  '74x933':    { pins: 20, gnd: 10, vcc: 20 },
+  '74x936':    { pins: 28, gnd: 14, vcc: 28 },
+  '74x937':    { pins: 24, gnd: 12, vcc: 24 },
+  '74x938':    { pins: 24, gnd: 12, vcc: 24 },
+  '74x940':    { pins: 20, gnd: 10, vcc: 20 },
+  '74x941':    { pins: 20, gnd: 10, vcc: 20 },
+  '74x952':    { pins: 18, gnd:  9, vcc: 18 },
   '74BCT956': { pins: 24, gnd: 12, vcc: 24 },
-  '74962':    { pins: 18, gnd:  9, vcc: 18 },
-  '74963':    { pins: 20, gnd: 10, vcc: 20 },
-  '74964':    { pins: 20, gnd: 10, vcc: 20 },
+  '74x962':    { pins: 18, gnd:  9, vcc: 18 },
+  '74x963':    { pins: 20, gnd: 10, vcc: 20 },
+  '74x964':    { pins: 20, gnd: 10, vcc: 20 },
 };
 
 console.log('\n=== SECTION S: Structure ===');
@@ -136,20 +136,20 @@ for (const id of EXPECTED_IDS) {
 console.log('\n=== SECTION A: Stub chips (HiZ outputs) ===');
 
 const STUB_CONFIGS = [
-  { id: '74929', outputs: ['DOUT'] },
-  { id: '74930', outputs: ['DOUT'] },
-  { id: '74932', outputs: ['UP','DN'] },
-  { id: '74933', outputs: ['EQ'] },
-  { id: '74936', outputs: ['STB','a','b','c','d','e','f','g','POL','D1','D2','D3','D4','HV'] },
-  { id: '74937', outputs: ['STB','Q0','Q1','Q2','Q3','POL','D1','D2','D3','D4','HV'] },
-  { id: '74938', outputs: ['STB','Q0','Q1','Q2','Q3','POL','D1','D2','D3','D4','HV'] },
-  { id: '74940', outputs: ['1Y','2Y','3Y','4Y','5Y','6Y','7Y','8Y'] },
-  { id: '74941', outputs: ['1Y','2Y','3Y','4Y','5Y','6Y','7Y','8Y'] },
-  { id: '74952', outputs: ['Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7'] },
+  { id: '74x929', outputs: ['DOUT'] },
+  { id: '74x930', outputs: ['DOUT'] },
+  { id: '74x932', outputs: ['UP','DN'] },
+  { id: '74x933', outputs: ['EQ'] },
+  { id: '74x936', outputs: ['STB','a','b','c','d','e','f','g','POL','D1','D2','D3','D4','HV'] },
+  { id: '74x937', outputs: ['STB','Q0','Q1','Q2','Q3','POL','D1','D2','D3','D4','HV'] },
+  { id: '74x938', outputs: ['STB','Q0','Q1','Q2','Q3','POL','D1','D2','D3','D4','HV'] },
+  { id: '74x940', outputs: ['1Y','2Y','3Y','4Y','5Y','6Y','7Y','8Y'] },
+  { id: '74x941', outputs: ['1Y','2Y','3Y','4Y','5Y','6Y','7Y','8Y'] },
+  { id: '74x952', outputs: ['Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7'] },
   { id: '74BCT956', outputs: [] },  // bidir pins, no driven outputs
-  { id: '74962', outputs: ['Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7'] },
-  { id: '74963', outputs: ['Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7','QA0','QA1','QA2','QA3'] },
-  { id: '74964', outputs: ['Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7','QA0','QA1','QA2','QA3'] },
+  { id: '74x962', outputs: ['Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7'] },
+  { id: '74x963', outputs: [] },  // no longer a stub: real dual-rank shift reg with bidir I/O bus (SHIFT_REG_DUAL_RANK_963)
+  { id: '74x964', outputs: ['Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7','QA0','QA1','QA2','QA3'] },
 ];
 
 for (const { id, outputs } of STUB_CONFIGS) {

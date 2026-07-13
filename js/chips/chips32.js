@@ -3,22 +3,22 @@
 
 export const CHIPS_BLOCK_32 = {
 
-  // ── 74589: 8 bit shift register with input latch, tri-state ─────────────
+  // ── 74589: 8 bit shift register with input latch, tri state ─────────────
   /* Primary source: Texas Instruments, 74589 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls589.pdf
      https://en.wikipedia.org/wiki/Shift_register */
   // 8 bit input latch (transparent on RCK high) feeds shift register.
   // Rising SRCK shifts serial data; QH* is the serial output (last SR stage).
   // OE=0 enables QH* output; CKEN gates shift clock.
-  '74589': {
+  '74x589': {
     name: '74x589',
     simpleName: '8 bit Shift Reg+Latch (TRI)',
-    description: '8 bit serial-in/parallel-out shift register with input latch and tri-state output (16-pin)',
+    description: '8-bit SIPO shift register, input latch, 3-state output (16-pin)',
     pins: 16,
     vcc: 16,
     gnd: 8,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls589.pdf',
-    tags: ['shift register', 'latch', 'serial', '8 bit', 'sequential', 'sipo', 'tri-state'],
-    guideOverview: 'The 74x589 is an 8 bit serial-in/parallel-out shift register with a parallel input latch. D0-D7 are first captured into a transparent latch when RCK is HIGH. On each rising SRCK edge (gated by CKEN), data is shifted into the shift register from SER. QH is the serial output (last stage). OE (active LOW) enables QH. Useful for converting a parallel bus byte into a serial stream.',
+    tags: ['shift register', 'latch', 'serial', '8 bit', 'sequential', 'sipo', 'tri state'],
+    guideOverview: 'The 74x589 is an 8 bit serial in/parallel out shift register with a parallel input latch. D0-D7 are first captured into a transparent latch when RCK is HIGH. On each rising SRCK edge (gated by CKEN), data is shifted into the shift register from SER. QH is the serial output (last stage). OE (active LOW) enables QH. Useful for converting a parallel bus byte into a serial stream.',
     guidePinDescriptions: {
       'QH':   'Serial output (MSB of shift register). Enabled by OE.',
       'SER':  'Serial data input. Enters the first stage on each SRCK edge.',
@@ -39,7 +39,7 @@ export const CHIPS_BLOCK_32 = {
     },
     guideSections: [
       {
-        title: 'Parallel-In Serial-Out via Input Latch',
+        title: 'Parallel In Serial Out via Input Latch',
         paragraphs: [
           'The input latch decouples the D0-D7 bus from the shift register. First, assert RCK HIGH to capture the parallel byte; then shift out 8 bits serially via SRCK. The latch holds the value stable during shifting even if the D bus changes.',
         ],
@@ -71,23 +71,23 @@ export const CHIPS_BLOCK_32 = {
     sequential: true,
   },
 
-  // ── 74590: 8 bit binary counter with output registers, tri-state ─────────
+  // ── 74590: 8 bit binary counter with output registers, tri state ─────────
   /* Primary source: Texas Instruments, 74590 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls590.pdf
      https://en.wikipedia.org/wiki/Counter_(digital) */
   // Separate counter clock (CCLKn, active LOW) and register clock (RClk).
   // CCLR=0: async clear counter. RCLR=0: async clear output register.
   // RClk rising edge: latch counter→output register. OEn=0: drive Q0-Q7.
   // RC output = carry (RCO) from counter.
-  '74590': {
+  '74x590': {
     name: '74x590',
     simpleName: '8 bit Counter+OutReg (TRI)',
-    description: '8 bit binary counter with output registers and tri-state outputs (16-pin)',
+    description: '8 bit binary counter with output registers and tri state outputs (16-pin)',
     pins: 16,
     vcc: 16,
     gnd: 8,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls590.pdf',
-    tags: ['counter', 'register', '8 bit', 'binary', 'sequential', 'tri-state'],
-    guideOverview: 'The 74x590 is an 8 bit binary counter (0-255) with a separate 8 bit output register and tri-state outputs. CCLKn (active LOW falling edge) increments the counter; RCLK rising edge latches the counter value into the output register. OEn (active LOW) enables the register outputs. Separate CCLR and RCLR clear the counter and register independently.',
+    tags: ['counter', 'register', '8 bit', 'binary', 'sequential', 'tri state'],
+    guideOverview: 'The 74x590 is an 8 bit binary counter (0-255) with a separate 8 bit output register and tri state outputs. CCLKn (active LOW falling edge) increments the counter; RCLK rising edge latches the counter value into the output register. OEn (active LOW) enables the register outputs. Separate CCLR and RCLR clear the counter and register independently.',
     guidePinDescriptions: {
       'Q1':    'Output register bit 1.',
       'Q2':    'Output register bit 2.',
@@ -140,27 +140,28 @@ export const CHIPS_BLOCK_32 = {
     sequential: true,
   },
 
-  // ── 74591: 8 bit binary counter with output registers, open-collector ────
+  // ── 74591: 8 bit binary counter with output registers, open collector ────
   /* Primary source: Texas Instruments, 74591 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls591.pdf
      https://en.wikipedia.org/wiki/Counter_(digital) */
-  '74591': {
+  '74x591': {
     name: '74x591',
     simpleName: '8 bit Counter+OutReg (OC)',
-    description: '8 bit binary counter with output registers and open-collector outputs (16-pin)',
+    description: '8-bit binary counter, output registers, open-collector out (16-pin)',
     pins: 16,
     vcc: 16,
     gnd: 8,
+    openCollector: true,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls591.pdf',
-    tags: ['counter', 'register', '8 bit', 'binary', 'sequential', 'open-collector'],
-    guideOverview: 'The 74x591 is functionally identical to the 74x590 but with open-collector outputs instead of tri-state. The OEn pin still exists; with OC outputs, external pull up resistors are required. This allows wire-OR combinations on shared bus lines.',
+    tags: ['counter', 'register', '8 bit', 'binary', 'sequential', 'open collector'],
+    guideOverview: 'The 74x591 is functionally identical to the 74x590 but with open collector outputs instead of tri state. The OEn pin still exists; with OC outputs, external pull up resistors are required. This allows wire OR combinations on shared bus lines.',
     guidePinDescriptions: {
-      'Q1':    'Open-collector output bit 1.',
-      'Q2':    'Open-collector output bit 2.',
-      'Q3':    'Open-collector output bit 3.',
-      'Q4':    'Open-collector output bit 4.',
-      'Q5':    'Open-collector output bit 5.',
-      'Q6':    'Open-collector output bit 6.',
-      'Q7':    'Open-collector output bit 7.',
+      'Q1':    'Open collector output bit 1.',
+      'Q2':    'Open collector output bit 2.',
+      'Q3':    'Open collector output bit 3.',
+      'Q4':    'Open collector output bit 4.',
+      'Q5':    'Open collector output bit 5.',
+      'Q6':    'Open collector output bit 6.',
+      'Q7':    'Open collector output bit 7.',
       'GND':   'Ground reference (pin 8).',
       'RC':    'Ripple Carry out.',
       'CCLKn': 'Counter Clock (active LOW).',
@@ -168,14 +169,14 @@ export const CHIPS_BLOCK_32 = {
       'RCLK':  'Register Clock (rising edge).',
       'RCLR':  'Async Register Clear.',
       'OEn':   'Output Enable (active LOW).',
-      'Q0':    'Open-collector output bit 0.',
+      'Q0':    'Open collector output bit 0.',
       'VCC':   'Positive supply (+5 V, pin 16).',
     },
     guideSections: [
       {
         title: '74x590 vs 74x591',
         paragraphs: [
-          '74x590 has tri-state outputs; 74x591 has open-collector. Use 74x591 with pull ups when multiple counters share a bus via wire-OR, or when driving optocouplers or relay drivers directly.',
+          '74x590 has tri state outputs; 74x591 has open collector. Use 74x591 with pull ups when multiple counters share a bus via wire OR, or when driving optocouplers or relay drivers directly.',
         ],
         note: 'External pull up resistors (typically 1-4.7 kΩ) are required on all Q outputs for proper HIGH levels.',
       },
@@ -213,7 +214,7 @@ export const CHIPS_BLOCK_32 = {
   // register on rising CCK when CCLR=1 and CKEN=0. Counter increments on
   // rising CCK when CKEN=1. CCLR=0: async clear counter.
   // RC output = ripple carry (counter==255).
-  '74592': {
+  '74x592': {
     name: '74x592',
     simpleName: '8 bit Counter+InReg',
     description: '8 bit binary counter with input registers for parallel loading (16-pin)',
@@ -275,19 +276,19 @@ export const CHIPS_BLOCK_32 = {
     sequential: true,
   },
 
-  // ── 74593: 8 bit binary counter with input registers, tri-state ──────────
+  // ── 74593: 8 bit binary counter with input registers, tri state ──────────
   /* Primary source: Texas Instruments, 74593 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls593.pdf
      https://en.wikipedia.org/wiki/Counter_(digital) */
-  '74593': {
+  '74x593': {
     name: '74x593',
     simpleName: '8 bit Counter+InReg (TRI)',
-    description: '8 bit binary counter with input registers and tri-state outputs (20-pin)',
+    description: '8 bit binary counter with input registers and tri state outputs (20-pin)',
     pins: 20,
     vcc: 20,
     gnd: 10,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls593.pdf',
-    tags: ['counter', 'register', '8 bit', 'binary', 'sequential', 'tri-state', 'load'],
-    guideOverview: 'The 74x593 is the tri-state output version of the 74x592. D0-D7 are bidirectional: used as inputs for parallel load (via RCK) and as outputs (Q0-D7) when OEn is LOW. Q4-Q7 are dedicated output pins. RC is the ripple carry. CKEN selects load vs count on each CCK edge.',
+    tags: ['counter', 'register', '8 bit', 'binary', 'sequential', 'tri state', 'load'],
+    guideOverview: 'The 74x593 is the tri state output version of the 74x592. D0-D7 are bidirectional: used as inputs for parallel load (via RCK) and as outputs (Q0-D7) when OEn is LOW. Q4-Q7 are dedicated output pins. RC is the ripple carry. CKEN selects load vs count on each CCK edge.',
     guidePinDescriptions: {
       'OEn':  'Output Enable (active LOW).',
       'D0':   'Bidirectional data/output bit 0.',
@@ -314,7 +315,7 @@ export const CHIPS_BLOCK_32 = {
       {
         title: '74x592 vs 74x593',
         paragraphs: [
-          '74x592 has no output pins; 74x593 adds tri-state outputs on D0-D7 and dedicated Q4-Q7 outputs. Use 74x593 when counter contents must be read back over a shared bus.',
+          '74x592 has no output pins; 74x593 adds tri state outputs on D0-D7 and dedicated Q4-Q7 outputs. Use 74x593 when counter contents must be read back over a shared bus.',
         ],
       },
     ],
@@ -351,18 +352,18 @@ export const CHIPS_BLOCK_32 = {
   // ── 74594: 8 bit SIPO shift register with output latch, buffered ─────────
   /* Primary source: Texas Instruments, 74594 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls594.pdf
      https://en.wikipedia.org/wiki/Shift_register */
-  // Like 74595 but WITHOUT tri-state OE outputs always driven.
+  // Like 74595 but WITHOUT tri state OE outputs always driven.
   // SRCLR=0: async clear shift register. No OE pin.
-  '74594': {
+  '74x594': {
     name: '74x594',
     simpleName: '8 bit Shift Reg+Latch (Buf)',
-    description: '8 bit serial-in/parallel-out shift register with output latch (buffered) (16-pin)',
+    description: '8-bit SIPO shift register, buffered output latch (16-pin)',
     pins: 16,
     vcc: 16,
     gnd: 8,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls594.pdf',
     tags: ['shift register', 'latch', 'serial', '8 bit', 'sequential', 'sipo'],
-    guideOverview: 'The 74x594 is an 8 bit serial-in/parallel-out shift register with a separate 8 bit output latch. SER data is shifted on rising SRCLK edges; the current shift register state is latched to outputs QA-QH on rising RCLK. Unlike the 74x595, there is no OEn tri-state outputs are always actively driven. SRCLR clears the shift register; RCLR clears the output latch.',
+    guideOverview: 'The 74x594 is an 8 bit serial in/parallel out shift register with a separate 8 bit output latch. SER data is shifted on rising SRCLK edges; the current shift register state is latched to outputs QA-QH on rising RCLK. Unlike the 74x595, there is no OEn tri state outputs are always actively driven. SRCLR clears the shift register; RCLR clears the output latch.',
     guidePinDescriptions: {
       'QB':    'Output latch bit B.',
       'QC':    'Output latch bit C.',
@@ -383,9 +384,9 @@ export const CHIPS_BLOCK_32 = {
     },
     guideSections: [
       {
-        title: 'Two-Stage Shift Register',
+        title: 'Two Stage Shift Register',
         paragraphs: [
-          'The two-stage design (shift register → output latch) prevents glitches on the outputs during shifting. All outputs update simultaneously on RCLK, not one bit at a time as the shift register loads.',
+          'The two stage design (shift register → output latch) prevents glitches on the outputs during shifting. All outputs update simultaneously on RCLK, not one bit at a time as the shift register loads.',
         ],
       },
     ],
@@ -419,16 +420,16 @@ export const CHIPS_BLOCK_32 = {
   /* Primary source: Texas Instruments, 74596 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls596.pdf
      https://en.wikipedia.org/wiki/Shift_register */
   // Like 74595 but OC outputs with OEn pin. OEn=0: drive outputs; else HiZ.
-  '74596': {
+  '74x596': {
     name: '74x596',
     simpleName: '8 bit Shift Reg+Latch (OC)',
-    description: '8 bit serial-in/parallel-out shift register with output latch and open-collector outputs (16-pin)',
+    description: '8-bit SIPO shift register, output latch, open-collector (16-pin)',
     pins: 16,
     vcc: 16,
     gnd: 8,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls596.pdf',
-    tags: ['shift register', 'latch', 'serial', '8 bit', 'sequential', 'sipo', 'open-collector'],
-    guideOverview: 'The 74x596 is an 8 bit SIPO shift register with a two-stage output latch and open-collector outputs. Same SRCLK/RCLK/SRCLR shift-then-latch operation as the 74x595, but outputs are open-collector requiring external pull ups. OEn (active LOW) enables the outputs.',
+    tags: ['shift register', 'latch', 'serial', '8 bit', 'sequential', 'sipo', 'open collector'],
+    guideOverview: 'The 74x596 is an 8 bit SIPO shift register with a two stage output latch and open collector outputs. Same SRCLK/RCLK/SRCLR shift then latch operation as the 74x595, but outputs are open collector requiring external pull ups. OEn (active LOW) enables the outputs.',
     guidePinDescriptions: {
       'QB':    'OC output bit B.',
       'QC':    'OC output bit C.',
@@ -451,7 +452,7 @@ export const CHIPS_BLOCK_32 = {
       {
         title: 'Open Collector SIPO Register',
         paragraphs: [
-          'OC outputs allow wire-OR of multiple shift registers on a common bus and direct driving of high-voltage or high-current loads. External pull ups (1-4.7 kΩ) are required.',
+          'OC outputs allow wire OR of multiple shift registers on a common bus and direct driving of high voltage or high current loads. External pull ups (1-4.7 kΩ) are required.',
         ],
       },
     ],
@@ -481,70 +482,124 @@ export const CHIPS_BLOCK_32 = {
     sequential: true,
   },
 
-  // ── 74597: 8 bit PISO shift register with input latches ─────────────────
-  /* Primary source: Texas Instruments, 74597 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls597.pdf
-     https://en.wikipedia.org/wiki/Shift_register */
-  // D0-D7 captured into input latch on rising RCK.
-  // SHLD=0: async parallel load from latch into shift register.
-  // SHLD=1 + rising SRCK: shift right (SER→QA→QH); QH is serial output.
-  '74597': {
+  // ── 74597: 8-bit PISO shift register with input storage latch ────────────
+  /* Primary source: Texas Instruments, "SN54LS597, SN54LS598, SN74LS597, SN74LS598
+       8-Bit Shift Registers With Input Latches," SDLS007 (Jan. 1981, rev. Mar. 1988).
+       [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls597.pdf.
+       Verified: 'LS597 terminal assignment (N-package top view), logic diagram, and
+       recommended operating conditions — pages 1, 3 and 5 — read as PDF page images.
+     Family/behavior corroboration: Wikipedia contributors, "Shift register,"
+       https://en.wikipedia.org/wiki/Shift_register. */
+  // Corrected pinout (16-pin DIP), from the verified terminal diagram:
+  //   1-7 = B,C,D,E,F,G,H (parallel data inputs), 8 = GND, 9 = QH' (serial out),
+  //   10 = SRCLR (async clear, active low), 11 = SRCK (shift clock),
+  //   12 = RCK (storage-latch clock), 13 = SRLOAD (async load, active low),
+  //   14 = SER (serial in), 15 = A (parallel input), 16 = VCC.
+  // Behavior: rising RCK latches A-H into the storage latch; SRLOAD low copies the
+  //   storage latch into the shift register (async); SRCLR low clears it (async,
+  //   dominates); rising SRCK shifts SER->A..H->QH'. QH' (shown here as QHs) is the
+  //   only serial output. The old hand-entered pinout was wrong (see issues.md).
+  '74x597': {
     name: '74x597',
-    simpleName: '8 bit PISO Shift+InLatch',
-    description: '8 bit parallel-in/serial-out shift register with input latches (16-pin)',
+    simpleName: '8-bit PISO + Input Latch',
+    description: '8-bit PISO shift register, 8-bit input storage latch (16-pin)',
     pins: 16,
     vcc: 16,
     gnd: 8,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls597.pdf',
     tags: ['shift register', 'latch', 'serial', 'parallel', '8 bit', 'sequential', 'piso'],
-    guideOverview: 'The 74x597 is an 8 bit parallel-in/serial-out shift register with an input latch. D0-D7 are first captured into the input latch on rising RCK. SHLD=0 loads the latched value into the shift register asynchronously; SHLD=1 enables serial shifting on SRCK. QH is the serial output. Cascade QH to SER of the next chip for wider serial chains.',
+    guideOverview: 'The 74x597 reads 8 bits in parallel and streams them out one at a time on a single serial pin — the input-side mirror of the 74x595, which does the reverse. It has two stages inside: a storage latch that grabs pins A–H on a rising edge of RCK, and a shift register the latched byte is loaded into and clocked out of. Pull SRLOAD low to copy the latch into the shift register, then clock SRCK to shift the byte out on QHs, the H bit first. SER feeds bits in from another chip, so several 597s chain into a wider input. It is the classic way to read a bank of switches or sensors into a microcontroller over just a few wires. Two things trip people up: there are two separate clocks (RCK loads the latch, SRCK shifts), and SRLOAD and SRCLR are both active-low and asynchronous — they act the instant they go low, no clock needed.',
     guidePinDescriptions: {
-      'SER':  'Serial data input for cascading (enters when shifting).',
-      'D0':   'Parallel input bit 0.',
-      'D1':   'Parallel input bit 1.',
-      'D2':   'Parallel input bit 2.',
-      'D3':   'Parallel input bit 3.',
-      'D4':   'Parallel input bit 4.',
-      'D5':   'Parallel input bit 5.',
-      'GND':  'Ground reference (pin 8).',
-      'D6':   'Parallel input bit 6.',
-      'D7':   'Parallel input bit 7.',
-      'SRCK': 'Shift Clock (rising edge, when SHLD=1).',
-      'RCK':  'Register Clock. Rising edge captures D0-D7 into input latch.',
-      'SHLD': 'Shift/Load. HIGH = shift; LOW = parallel load into shift reg.',
-      'QH':   'Serial output (MSB of shift register).',
-      'QG':   'Second serial output stage output.',
-      'VCC':  'Positive supply (+5 V, pin 16).',
+      'B':      'Parallel data input B (pin 1).',
+      'C':      'Parallel data input C (pin 2).',
+      'D':      'Parallel data input D (pin 3).',
+      'E':      'Parallel data input E (pin 4).',
+      'F':      'Parallel data input F (pin 5).',
+      'G':      'Parallel data input G (pin 6).',
+      'H':      'Parallel data input H — the last shift stage, read out first on QHs (pin 7).',
+      'GND':    'Ground reference (pin 8).',
+      'QHs':    'Serial output — the H (last) stage of the shift register. The datasheet labels it QH′; wire it to SER of the next chip to cascade (pin 9).',
+      'SRCLR':  'Shift Register Clear. A LOW clears the shift register to all zeros at once, no clock needed (asynchronous, active LOW, pin 10).',
+      'SRCK':   'Shift Register Clock. A rising edge shifts the register one place, but only while SRLOAD and SRCLR are HIGH (pin 11).',
+      'RCK':    'Register Clock. A rising edge captures inputs A–H into the storage latch (pin 12).',
+      'SRLOAD': 'Shift Register Load. A LOW copies the storage latch into the shift register at once, no clock needed (asynchronous, active LOW, pin 13).',
+      'SER':    'Serial data input. New bits enter here at stage A during a shift; used to cascade chips (pin 14).',
+      'A':      'Parallel data input A — the first shift stage, next to SER (pin 15).',
+      'VCC':    'Positive supply (+5 V, pin 16).',
     },
     guideSections: [
       {
-        title: 'Parallel-In Serial-Out with Input Latch',
+        title: 'Two stages: latch, then shift register',
         paragraphs: [
-          'First capture the parallel byte with RCK, then assert SHLD=0 to load it into the shift register, then set SHLD=1 and clock SRCK 8 times to shift it out serially on QH.',
+          'The 597 is really two 8-bit registers back to back. The first is a storage latch: on each rising edge of RCK it takes a snapshot of the eight parallel inputs A–H and holds it. Nothing shifts yet — this just freezes the inputs so they can not change under you while you read them out.',
+          'The second is the shift register, the part that produces the serial output. Pulling SRLOAD low copies the latched snapshot into it in one step — no clock edge, the load is asynchronous. After that, every rising edge of SRCK moves the whole register one place toward QHs. The bit that falls off the end appears on QHs; the bit that enters the other end comes from SER.',
+          'Splitting the capture (RCK) from the shift-out (SRCK) lets you grab a fresh snapshot at a precise moment and then read the previous one out at your own pace on a separate clock.',
+        ],
+      },
+      {
+        title: 'Control inputs',
+        paragraphs: [
+          'RCK and SRCK are edge-triggered (they act on a rising edge). SRLOAD and SRCLR are level-sensitive and asynchronous: they take effect the moment they go low and stay in effect the whole time they are held low. SRCLR wins over SRLOAD — hold both low and you get zeros, not the latched byte.',
+        ],
+        formulas: [
+          'SRCLR=0                      → shift register cleared to 0 (async, overrides all)',
+          'SRCLR=1, SRLOAD=0            → load storage latch into shift register (async)',
+          'SRCLR=1, SRLOAD=1, SRCK↑     → shift one place toward QHs (SER enters at A)',
+          'RCK↑                         → latch A–H into storage (works at any time)',
+        ],
+      },
+      {
+        title: 'Reading a byte out',
+        list: [
+          'Put the 8 bits on A–H and pulse RCK high to latch them.',
+          'Pulse SRLOAD low (then back high) to copy the latched byte into the shift register.',
+          'QHs now shows bit H. Each SRCK rising edge then brings the next bit to QHs, in the order H, G, F, … A.',
+          'RCK can re-latch a fresh A–H at any time without disturbing a shift already in progress.',
+        ],
+      },
+      {
+        title: 'Common uses',
+        list: [
+          'Reading a bank of 8 switches, jumpers, or sensor outputs into a microcontroller over ~4 wires instead of 8.',
+          'Chaining several 597s (QHs → SER of the next) to read 16, 24, or more inputs on the same few wires.',
+          'Snapshotting a fast parallel bus at one instant with RCK, then clocking it into a slower processor at leisure with SRCK.',
+          'Pairing with a 74x595 (serial-out) to build a serial input/output port from two shift registers.',
+        ],
+      },
+      {
+        title: 'Gotchas',
+        list: [
+          'Two clocks, two jobs: RCK loads the input latch, SRCK shifts. Pulsing the wrong one does nothing useful.',
+          'SRLOAD and SRCLR are active LOW and asynchronous — no clock edge, and they hold as long as the pin is low. Tie them high when not in use.',
+          'SRCLR beats SRLOAD: hold both low and the register clears to zero instead of loading the latch.',
+          'H comes out first, A last. If your bytes read back bit-reversed, that ordering is why.',
+          'The datasheet names the parallel inputs A–H and the serial output QH′; this simulator shows QH′ as QHs.',
         ],
       },
     ],
     pinout: [
-      { pin: 1,  name: 'SER',   type: 'input' },
-      { pin: 2,  name: 'D0',    type: 'input' },
-      { pin: 3,  name: 'D1',    type: 'input' },
-      { pin: 4,  name: 'D2',    type: 'input' },
-      { pin: 5,  name: 'D3',    type: 'input' },
-      { pin: 6,  name: 'D4',    type: 'input' },
-      { pin: 7,  name: 'D5',    type: 'input' },
-      { pin: 8,  name: 'GND',   type: 'power' },
-      { pin: 9,  name: 'D6',    type: 'input' },
-      { pin: 10, name: 'D7',    type: 'input' },
-      { pin: 11, name: 'SRCK',  type: 'input' },
-      { pin: 12, name: 'RCK',   type: 'input' },
-      { pin: 13, name: 'SHLD',  type: 'input' },
-      { pin: 14, name: 'QH',    type: 'output' },
-      { pin: 15, name: 'QG',    type: 'output' },
-      { pin: 16, name: 'VCC',   type: 'power' },
+      { pin: 1,  name: 'B',      type: 'input'  },
+      { pin: 2,  name: 'C',      type: 'input'  },
+      { pin: 3,  name: 'D',      type: 'input'  },
+      { pin: 4,  name: 'E',      type: 'input'  },
+      { pin: 5,  name: 'F',      type: 'input'  },
+      { pin: 6,  name: 'G',      type: 'input'  },
+      { pin: 7,  name: 'H',      type: 'input'  },
+      { pin: 8,  name: 'GND',    type: 'power'  },
+      { pin: 9,  name: 'QHs',    type: 'output' },
+      { pin: 10, name: 'SRCLR',  type: 'input'  },
+      { pin: 11, name: 'SRCK',   type: 'input'  },
+      { pin: 12, name: 'RCK',    type: 'input'  },
+      { pin: 13, name: 'SRLOAD', type: 'input'  },
+      { pin: 14, name: 'SER',    type: 'input'  },
+      { pin: 15, name: 'A',      type: 'input'  },
+      { pin: 16, name: 'VCC',    type: 'power'  },
     ],
     gates: [
       { type: 'SHIFT_REG_8BIT_PISO_LATCH',
-        inputs:  ['SER', 'SRCK', 'RCK', 'SHLD', 'D0', 'D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7'],
-        outputs: ['QH'] },
+        inputs:  ['SER', 'SRCK', 'RCK', 'SRLOAD', 'SRCLR',
+                  'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'],
+        outputs: ['QHs'] },
     ],
     sequential: true,
   },
@@ -554,18 +609,18 @@ export const CHIPS_BLOCK_32 = {
      https://en.wikipedia.org/wiki/Shift_register */
   // Complex: S1/S0 mode select. D0-D7 latched on RCK.
   // Mode 00: hold. Mode 01: shift right. Mode 10: parallel load. Mode 11: parallel out.
-  '74598': {
+  '74x598': {
     name: '74x598',
     simpleName: '8 bit Shift Reg Sel (TRI)',
-    description: '8 bit shift register with selectable parallel-in/out and input latches, tri-state (20-pin)',
+    description: '8-bit shift register, selectable parallel I/O, latches, 3-state (20-pin)',
     pins: 20,
     vcc: 20,
     gnd: 10,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls598.pdf',
-    tags: ['shift register', 'latch', 'serial', 'parallel', '8 bit', 'sequential', 'tri-state'],
-    guideOverview: 'The 74x598 is an 8 bit shift register with selectable modes. S1/S0 control the operation: hold, shift-right, parallel load from the input latch (captured on RCK), or parallel output onto the D bus. OEn enables the D bus output. Provides the most flexible shift register operation of the 74x59x family.',
+    tags: ['shift register', 'latch', 'serial', 'parallel', '8 bit', 'sequential', 'tri state'],
+    guideOverview: 'The 74x598 is an 8 bit shift register with selectable modes. S1/S0 control the operation: hold, shift right, parallel load from the input latch (captured on RCK), or parallel output onto the D bus. OEn enables the D bus output. Provides the most flexible shift register operation of the 74x59x family.',
     guidePinDescriptions: {
-      'SER':  'Serial input for shift-right mode.',
+      'SER':  'Serial input for shift right mode.',
       'D0':   'Bidirectional data bus bit 0.',
       'D1':   'Bidirectional data bus bit 1.',
       'D2':   'Bidirectional data bus bit 2.',
@@ -627,18 +682,18 @@ export const CHIPS_BLOCK_32 = {
   // ── 74599: 8 bit SIPO shift register with output latches, OC ────────────
   /* Primary source: Texas Instruments, 74599 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls599.pdf
      https://en.wikipedia.org/wiki/Shift_register */
-  // Like 74595 but OC outputs (no OEn tri-state always drives low or HiZ by OC).
+  // Like 74595 but OC outputs (no OEn tri state always drives low or HiZ by OC).
   // SRCLR=0: async clear SR. RCLR=0: async clear output reg.
-  '74599': {
+  '74x599': {
     name: '74x599',
     simpleName: '8 bit Shift Reg+Latch (OC2)',
-    description: '8 bit serial-in/parallel-out shift register with output latches and open-collector outputs (16-pin)',
+    description: '8-bit SIPO shift register, output latches, open-collector (16-pin)',
     pins: 16,
     vcc: 16,
     gnd: 8,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls599.pdf',
-    tags: ['shift register', 'latch', 'serial', '8 bit', 'sequential', 'sipo', 'open-collector'],
-    guideOverview: 'The 74x599 is an 8 bit SIPO shift register with two-stage output latch and open-collector outputs. Similar to the 74x596 but replaces OEn with RCLR (output register clear, active LOW). Outputs are always enabled (OC style). SRCLR clears the shift register.',
+    tags: ['shift register', 'latch', 'serial', '8 bit', 'sequential', 'sipo', 'open collector'],
+    guideOverview: 'The 74x599 is an 8 bit SIPO shift register with two stage output latch and open collector outputs. Similar to the 74x596 but replaces OEn with RCLR (output register clear, active LOW). Outputs are always enabled (OC style). SRCLR clears the shift register.',
     guidePinDescriptions: {
       'QB':    'OC output bit B.',
       'QC':    'OC output bit C.',
@@ -661,7 +716,7 @@ export const CHIPS_BLOCK_32 = {
       {
         title: '74x596 vs 74x599',
         paragraphs: [
-          'Both are OC SIPO registers. 74x596 has OEn (disable all outputs); 74x599 has RCLR (clear output latch asynchronously). Choose 74x599 when you need hardware reset of the output latch rather than high-impedance.',
+          'Both are OC SIPO registers. 74x596 has OEn (disable all outputs); 74x599 has RCLR (clear output latch asynchronously). Choose 74x599 when you need hardware reset of the output latch rather than high impedance.',
         ],
       },
     ],
@@ -694,16 +749,16 @@ export const CHIPS_BLOCK_32 = {
   // ── 74600: DRAM refresh controller, 4K/16K, transparent+burst, TRI ───────
   /* Primary source: Texas Instruments, 74600 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls600.pdf
      https://en.wikipedia.org/wiki/Random-access_memory */
-  '74600': {
+  '74x600': {
     name: '74x600',
     simpleName: 'DRAM Refresh 4K/16K (TRI)',
-    description: 'Dynamic memory refresh controller for 4K or 16K DRAM, transparent and burst modes (20-pin)',
+    description: '4K/16K DRAM refresh controller, transparent/burst modes (20-pin)',
     pins: 20,
     vcc: 20,
     gnd: 10,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls600.pdf',
     tags: ['dram', 'refresh', 'controller', 'memory'],
-    guideOverview: 'The 74x600 is a DRAM refresh controller for 4K and 16K DRAM devices. It generates periodic RAS (Row Address Strobe) and CAS (Column Address Strobe) refresh cycles based on an input oscillator (OSC). BURST mode performs a run of refreshes back-to-back; transparent mode steals a single cycle. TC indicates terminal count of the refresh address counter.',
+    guideOverview: 'The 74x600 is a DRAM refresh controller for 4K and 16K DRAM devices. It generates periodic RAS (Row Address Strobe) and CAS (Column Address Strobe) refresh cycles based on an input oscillator (OSC). BURST mode performs a run of refreshes back to back; transparent mode steals a single cycle. TC indicates terminal count of the refresh address counter.',
     guidePinDescriptions: {
       'OSC':   'Oscillator input. Controls refresh timing.',
       'IN0':   'Address input bit 0 for multiplexed address output.',
@@ -767,10 +822,10 @@ export const CHIPS_BLOCK_32 = {
   // ── 74601: DRAM refresh controller, 64K, transparent+burst, TRI ──────────
   /* Primary source: Texas Instruments, 74601 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls601.pdf
      https://en.wikipedia.org/wiki/Random-access_memory */
-  '74601': {
+  '74x601': {
     name: '74x601',
     simpleName: 'DRAM Refresh 64K (TRI)',
-    description: 'Dynamic memory refresh controller for 64K DRAM, transparent and burst modes (20-pin)',
+    description: '64K DRAM refresh controller, transparent/burst modes (20-pin)',
     pins: 20,
     vcc: 20,
     gnd: 10,
@@ -840,16 +895,16 @@ export const CHIPS_BLOCK_32 = {
   // ── 74602: DRAM refresh controller, 4K/16K, cycle steal + burst, TRI ─────
   /* Primary source: Texas Instruments, 74602 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls602.pdf
      https://en.wikipedia.org/wiki/Random-access_memory */
-  '74602': {
+  '74x602': {
     name: '74x602',
     simpleName: 'DRAM Refresh 4K/16K CS (TRI)',
-    description: 'Dynamic memory refresh controller for 4K or 16K DRAM, cycle-steal and burst modes (20-pin)',
+    description: '4K/16K DRAM refresh controller, cycle-steal/burst modes (20-pin)',
     pins: 20,
     vcc: 20,
     gnd: 10,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls602.pdf',
     tags: ['dram', 'refresh', 'controller', 'memory', 'cycle-steal'],
-    guideOverview: 'The 74x602 is a DRAM refresh controller for 4K/16K DRAM using cycle-steal mode. Unlike transparent mode, cycle-steal actively halts the CPU bus to perform a refresh cycle. BURST mode runs consecutive refreshes. Pin-compatible with 74x600 but with different internal refresh arbitration logic.',
+    guideOverview: 'The 74x602 is a DRAM refresh controller for 4K/16K DRAM using cycle steal mode. Unlike transparent mode, cycle steal actively halts the CPU bus to perform a refresh cycle. BURST mode runs consecutive refreshes. Pin compatible with 74x600 but with different internal refresh arbitration logic.',
     guidePinDescriptions: {
       'OSC':   'Oscillator input.',
       'IN0':   'Address input bit 0.',
@@ -874,9 +929,9 @@ export const CHIPS_BLOCK_32 = {
     },
     guideSections: [
       {
-        title: 'Cycle-Steal vs Transparent Refresh',
+        title: 'Cycle Steal vs Transparent Refresh',
         paragraphs: [
-          'Cycle-steal refresh asserts a HOLD/WAIT signal to the CPU, pausing the bus for one cycle to perform a refresh. Transparent mode attempts to sneak a refresh into unused bus cycles without stalling the CPU.',
+          'Cycle steal refresh asserts a HOLD/WAIT signal to the CPU, pausing the bus for one cycle to perform a refresh. Transparent mode attempts to sneak a refresh into unused bus cycles without stalling the CPU.',
         ],
       },
     ],
@@ -913,16 +968,16 @@ export const CHIPS_BLOCK_32 = {
   // ── 74603: DRAM refresh controller, 64K, cycle steal + burst, TRI ────────
   /* Primary source: Texas Instruments, 74603 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls603.pdf
      https://en.wikipedia.org/wiki/Random-access_memory */
-  '74603': {
+  '74x603': {
     name: '74x603',
     simpleName: 'DRAM Refresh 64K CS (TRI)',
-    description: 'Dynamic memory refresh controller for 64K DRAM, cycle-steal and burst modes (20-pin)',
+    description: '64K DRAM refresh controller, cycle-steal/burst modes (20-pin)',
     pins: 20,
     vcc: 20,
     gnd: 10,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls603.pdf',
     tags: ['dram', 'refresh', 'controller', 'memory', '64k', 'cycle-steal'],
-    guideOverview: 'The 74x603 is the 64K DRAM version of the cycle-steal refresh controller (74x602). It handles 256 row refresh cycles for 64K DRAM. Cycle-steal mode halts the CPU for each refresh; BURST performs all refreshes consecutively.',
+    guideOverview: 'The 74x603 is the 64K DRAM version of the cycle steal refresh controller (74x602). It handles 256 row refresh cycles for 64K DRAM. Cycle steal mode halts the CPU for each refresh; BURST performs all refreshes consecutively.',
     guidePinDescriptions: {
       'OSC':   'Oscillator input.',
       'IN0':   'Address input bit 0.',
@@ -951,8 +1006,8 @@ export const CHIPS_BLOCK_32 = {
         list: [
           '74x600: 4K/16K, transparent mode',
           '74x601: 64K, transparent mode',
-          '74x602: 4K/16K, cycle-steal mode',
-          '74x603: 64K, cycle-steal mode',
+          '74x602: 4K/16K, cycle steal mode',
+          '74x603: 64K, cycle steal mode',
         ],
       },
     ],
@@ -989,7 +1044,7 @@ export const CHIPS_BLOCK_32 = {
   // ── 74608: Memory cycle controller ───────────────────────────────────────
   /* Primary source: Texas Instruments, 74608 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls608.pdf
      https://en.wikipedia.org/wiki/Random-access_memory */
-  '74608': {
+  '74x608': {
     name: '74x608',
     simpleName: 'Memory Cycle Ctrl',
     description: 'Memory cycle controller (16-pin)',
@@ -1021,8 +1076,9 @@ export const CHIPS_BLOCK_32 = {
       {
         title: 'Memory Bus Glue Logic',
         paragraphs: [
-          'The 74x608 reduces the discrete logic needed to interface a CPU to memory by integrating address decode, read/write qualification, and wait-state generation into one chip.',
+          'The 74x608 reduces the discrete logic needed to interface a CPU to memory by integrating address decode, read/write qualification, and wait state generation into one chip.',
         ],
+        note: 'Simplification: 74Sim models only the combinational enable path — CS goes active (LOW) when EN1=EN2=LOW and MR=HIGH; OE follows CS AND RD; WE follows CS AND WR. The address inputs A0..A3, the CLK-synchronised cycle state machine, and wait-state generation are not modelled — WAIT is always held inactive (HIGH).',
       },
     ],
     pinout: [
@@ -1054,24 +1110,25 @@ export const CHIPS_BLOCK_32 = {
   // ── 74614: Octal bus transceiver and register, inverting, OC ─────────────
   /* Primary source: Texas Instruments, 74614 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74als614.pdf
      https://en.wikipedia.org/wiki/Bus_transceiver */
-  // Like 74566 (TRANSCEIVER_OCTAL_REG_INV) but with open-collector outputs.
+  // Like 74566 (TRANSCEIVER_OCTAL_REG_INV) but with open collector outputs.
   // DIR=1: A→B direction; DIR=0: B→A direction.
   // CLK: register clock. OEABn=0: enables A→B path; OEBAn=0: enables B→A.
-  '74614': {
+  '74x614': {
     name: '74x614',
     simpleName: 'Octal Reg Xcvr Inv (OC)',
-    description: 'Octal bus transceiver and register with inverting outputs (open-collector) (24-pin)',
+    description: 'Octal bus transceiver/register, inverting open-collector out (24-pin)',
     pins: 24,
     vcc: 24,
     gnd: 12,
+    openCollector: true,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74als614.pdf',
-    tags: ['transceiver', 'registered', 'bidirectional', 'inverting', 'octal', 'open-collector'],
-    guideOverview: 'The 74x614 is an octal registered bidirectional transceiver with inverting open-collector outputs. It has the same OEABn/OEBAn/LEAB/LEBA/CLK/DIR control structure as the 74x566 (tri-state), but outputs are open-collector. External pull up resistors are required. Useful for wired AND bus designs.',
+    tags: ['transceiver', 'registered', 'bidirectional', 'inverting', 'octal', 'open collector'],
+    guideOverview: 'The 74x614 is an octal registered bidirectional transceiver with inverting open collector outputs. It has the same OEABn/OEBAn/LEAB/LEBA/CLK/DIR control structure as the 74x566 (tri state), but outputs are open collector. External pull up resistors are required. Useful for wired AND bus designs.',
     guidePinDescriptions: {
-      'OEABn': 'A-to-B Output Enable (active LOW).',
-      'OEBAn': 'B-to-A Output Enable (active LOW).',
-      'LEAB':  'Latch Enable A-to-B.',
-      'LEBA':  'Latch Enable B-to-A.',
+      'OEABn': 'A-to B Output Enable (active LOW).',
+      'OEBAn': 'B-to A Output Enable (active LOW).',
+      'LEAB':  'Latch Enable A-to B.',
+      'LEBA':  'Latch Enable B-to A.',
       'CLK':   'Register clock.',
       'DIR':   'Direction select.',
       'A0':    'Port A bit 0.',
@@ -1097,7 +1154,7 @@ export const CHIPS_BLOCK_32 = {
       {
         title: '74x566 vs 74x614',
         paragraphs: [
-          '74x566 has tri-state outputs; 74x614 has open-collector. Both invert data and use the same LEAB/LEBA/CLK/DIR control scheme. Use 74x614 for wired AND multi-master bus architectures.',
+          '74x566 has tri state outputs; 74x614 has open collector. Both invert data and use the same LEAB/LEBA/CLK/DIR control scheme. Use 74x614 for wired AND multi master bus architectures.',
         ],
         note: 'External pull up resistors required on all bidirectional A/B pins.',
       },

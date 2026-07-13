@@ -1,16 +1,16 @@
 // chips30.js - Chips Block 30: 74538-74563
 export const CHIPS_BLOCK_30 = {
 
-  // ── 74538: 3-to-8 Line Decoder (3-state), 20-pin ───────────────────────────
+  // ── 74538: 3 to 8 Line Decoder (3-state), 20-pin ───────────────────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Multiplexer
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic */
-  '74538': {
-    name: '74x538', simpleName: '3-to-8 Line Decoder (3-state)',
-    description: '3-to-8 line decoder/demultiplexer with three-state outputs (20-pin)',
+  '74x538': {
+    name: '74x538', simpleName: '3 to 8 Line Decoder (3-state)',
+    description: '3 to 8 line decoder/demultiplexer with three-state outputs (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
-    tags: ['decoder', '3-to-8', 'demultiplexer', 'tri-state'],
-    guideOverview: 'The 74x538 is a 3-to-8 line decoder/demultiplexer with three-state outputs. Three address inputs (A, B, C) select one of eight outputs; two active LOW enables (G2A and G2B) and one active HIGH enable (G1) must all be satisfied. An additional OE (active LOW) tri-states the selected output. Useful as a demux or address decoder when a third enable level is needed.',
+    tags: ['decoder', '3 to 8', 'demultiplexer', 'tri state'],
+    guideOverview: 'The 74x538 is a 3 to 8 line decoder/demultiplexer with three state outputs. Three address inputs (A, B, C) select one of eight outputs; two active LOW enables (G2A and G2B) and one active HIGH enable (G1) must all be satisfied. An additional OE (active LOW) tri states the selected output. Useful as a demux or address decoder when a third enable level is needed.',
     guidePinDescriptions: {
       'A':    'Address bit A (weight 1).',
       'B':    'Address bit B (weight 2).',
@@ -18,7 +18,7 @@ export const CHIPS_BLOCK_30 = {
       'G2An': 'Enable 2A (active LOW). Must be asserted for chip enable.',
       'G2Bn': 'Enable 2B (active LOW). Must be asserted for chip enable.',
       'G1':   'Enable 1 (active HIGH). Must be asserted for chip enable.',
-      'OEn':  'Output Enable (active LOW). When negated (HIGH), all Y outputs tri-stated.',
+      'OEn':  'Output Enable (active LOW). When negated (HIGH), all Y outputs tri stated.',
       'Y7':   'Active LOW output 7 (selected when A=1,B=1,C=1).',
       'Y6':   'Active LOW output 6.',
       'GND':  'Ground reference (pin 10).',
@@ -35,9 +35,9 @@ export const CHIPS_BLOCK_30 = {
     },
     guideSections: [
       {
-        title: '3-to-8 Decoder with Tri-State',
+        title: '3 to 8 Decoder with Tri State',
         paragraphs: [
-          'Identical enable structure to the 74x138 but adds OEn to individually tri-state the output bus. Useful when the Y outputs drive a shared bus where only one decoder is active at a time.',
+          'Identical enable structure to the 74x138 but adds OEn to individually tri state the output bus. Useful when the Y outputs drive a shared bus where only one decoder is active at a time.',
         ],
       },
     ],
@@ -62,12 +62,12 @@ export const CHIPS_BLOCK_30 = {
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Multiplexer
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic */
-  '74539': {
+  '74x539': {
     name: '74x539', simpleName: 'Dual 2-to-4 Line Decoder (3-state)',
     description: 'Dual 2-to-4 line decoder/demultiplexer with three-state outputs (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
-    tags: ['decoder', '2-to-4', 'demultiplexer', 'dual', 'tri-state'],
-    guideOverview: 'The 74x539 contains two independent 2-to-4 line decoders, each with an active LOW enable (G), an active LOW OE for tri-state control, and four outputs. Both sections share the same 20-pin package. Equivalent to two 74x139 sections but with additional tri-state output control.',
+    tags: ['decoder', '2-to-4', 'demultiplexer', 'dual', 'tri state'],
+    guideOverview: 'The 74x539 contains two independent 2-to-4 line decoders, each with an active LOW enable (G), an active LOW OE for tri state control, and four outputs. Both sections share the same 20-pin package. Equivalent to two 74x139 sections but with additional tri state output control.',
     guidePinDescriptions: {
       '1OEn': 'Output Enable for section 1 (active LOW).',
       '1G':   'Enable for section 1 (active LOW).',
@@ -121,60 +121,102 @@ export const CHIPS_BLOCK_30 = {
   },
 
   // ── 74540: Octal Buffer Inverting (3-state), 20-pin ────────────────────────
-  /* Primary source: Texas Instruments, SN74ALS540 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74als540.pdf
-     Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic */
-  '74540': {
-    name: '74x540', simpleName: 'Octal Buffer Inverting (3-state)',
-    description: 'Octal buffer with Schmitt trigger inputs, inverting outputs, and three-state output enable (20-pin)',
+  /* Source: Texas Instruments, "SN54ALS541, SN74ALS540, SN74ALS541 Octal Buffers
+     and Line Drivers With 3-State Outputs," SDAS025D, Apr. 1982, rev. Mar. 2002.
+     [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74als540.pdf.
+     Verified: 20-pin N/DW/NS terminal assignment (TOP VIEW, p.1), the SN74ALS540
+     logic diagram + "2-input NOR" 3-state-control description (p.2), and the
+     switching table with tPZH/tPZL/tPHZ/tPLZ measured from OE (p.4) — read as
+     rendered PDF page images per issues.md C4, NOT the WebFetch summarizer.
+     Key facts: pin 1 = OE1, pin 19 = OE2 (both active-LOW; either HIGH → Hi-Z);
+     the '540 INVERTS (Y = NOT A), the '541 passes data through. The datasheet
+     lists "pnp inputs" for low dc loading — there are NO Schmitt-trigger inputs
+     (the prior entry's Schmitt claim + pin-19 NC were both wrong; issues.md C108).
+     Three-state background: https://en.wikipedia.org/wiki/Three-state_logic */
+  '74x540': {
+    name: '74x540', simpleName: 'Octal Inverting Buffer',
+    description: 'Octal inverting buffer, 3-state, dual active-low enable (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74als540.pdf',
-    tags: ['buffer', 'octal', 'inverting', 'tri-state', 'schmitt'],
-    guideOverview: 'The 74x540 is an octal inverting buffer with Schmitt trigger inputs and tri-state outputs. OE (active LOW) enables the outputs; each Y output is the complement of its A input. Schmitt trigger inputs improve noise immunity by using hysteresis useful on slow or noisy signal edges. Active low version of the 74x541.',
+    tags: ['buffer', 'driver', 'octal', 'inverting', 'tri state', 'line driver'],
+    guideOverview: 'The 74x540 is an octal (8-bit) inverting buffer and line driver with 3-state outputs. Each output Y is the inverse of its matching A input, and all eight outputs share two active-low enables, OE1 and OE2. Both must be LOW for the chip to drive the bus; raise either one HIGH and all eight outputs go to high impedance. Its defining feature is the pinout: every input is on one side of the package and every output on the other, so a byte-wide bus flows straight across a board without traces crossing. It does the same job as the 74x240 but with this layout-friendly arrangement, and it is the inverting twin of the 74x541, which passes data through unchanged.',
     guidePinDescriptions: {
-      'OEn': 'Output Enable (active LOW). When negated (HIGH), all outputs tri-stated.',
-      'A0':  'Data input 0 (Schmitt trigger).',
-      'A1':  'Data input 1.',
-      'A2':  'Data input 2.',
-      'A3':  'Data input 3.',
-      'A4':  'Data input 4.',
-      'A5':  'Data input 5.',
-      'A6':  'Data input 6.',
-      'A7':  'Data input 7.',
+      'OE1': 'Output Enable 1 (active LOW). Must be LOW, together with OE2, for the outputs to drive. HIGH forces all eight outputs to high impedance.',
+      'OE2': 'Output Enable 2 (active LOW). Same effect as OE1: HIGH forces all eight outputs to high impedance.',
+      'A1':  'Data input 1. Drives output Y1.',
+      'A2':  'Data input 2. Drives output Y2.',
+      'A3':  'Data input 3. Drives output Y3.',
+      'A4':  'Data input 4. Drives output Y4.',
+      'A5':  'Data input 5. Drives output Y5.',
+      'A6':  'Data input 6. Drives output Y6.',
+      'A7':  'Data input 7. Drives output Y7.',
+      'A8':  'Data input 8. Drives output Y8.',
       'GND': 'Ground reference (pin 10).',
-      'Y7':  'Inverted tri-state output 7.',
-      'Y6':  'Inverted tri-state output 6.',
-      'Y5':  'Inverted tri-state output 5.',
-      'Y4':  'Inverted tri-state output 4.',
-      'Y3':  'Inverted tri-state output 3.',
-      'Y2':  'Inverted tri-state output 2.',
-      'Y1':  'Inverted tri-state output 1.',
-      'Y0':  'Inverted tri-state output 0.',
-      'NC':  'No connect.',
+      'Y1':  'Inverted 3-state output 1: NOT(A1) when enabled, else high impedance.',
+      'Y2':  'Inverted 3-state output 2: NOT(A2) when enabled, else high impedance.',
+      'Y3':  'Inverted 3-state output 3: NOT(A3) when enabled, else high impedance.',
+      'Y4':  'Inverted 3-state output 4: NOT(A4) when enabled, else high impedance.',
+      'Y5':  'Inverted 3-state output 5: NOT(A5) when enabled, else high impedance.',
+      'Y6':  'Inverted 3-state output 6: NOT(A6) when enabled, else high impedance.',
+      'Y7':  'Inverted 3-state output 7: NOT(A7) when enabled, else high impedance.',
+      'Y8':  'Inverted 3-state output 8: NOT(A8) when enabled, else high impedance.',
       'VCC': 'Positive supply (+5 V, pin 20).',
     },
     guideSections: [
       {
-        title: 'Schmitt Trigger Buffering',
+        title: 'Inverting Buffer With Two Enables',
         paragraphs: [
-          'Schmitt trigger inputs add hysteresis: the switching threshold on the LOW-to-HIGH transition is higher than on HIGH-to-LOW. This prevents output chatter on slowly changing or noisy inputs typical in long-cable or mixed-logic environments.',
+          'A buffer copies its input to its output. This one also inverts: each output is the opposite logic level of its matching input (Y1 tracks A1, Y2 tracks A2, and so on). The point of a buffer is not to change the logic but to redrive it. The output is a fresh, strong copy that can feed a heavily loaded bus without slowing or weakening the original signal, which is why the datasheet also calls it a line driver.',
+          'The outputs are 3-state: besides HIGH and LOW, each one has a third state, high impedance, where it is effectively disconnected so other chips can drive the same wire. Two pins control this, OE1 and OE2, and both are active LOW. Internally they feed a NOR gate, so the outputs drive only when OE1 and OE2 are both LOW. Take either one HIGH and all eight outputs release the bus at once.',
+          'Simplification: the simulator switches the outputs instantly. A real 74x540 takes a few nanoseconds for an output to follow its input, or to enter and leave high impedance.',
+        ],
+        formulas: [
+          'Y = NOT(A)   when OE1 = 0 and OE2 = 0',
+          'Y = Hi-Z     when OE1 = 1 or OE2 = 1',
+          'A=0 → Y=1 | A=1 → Y=0   (outputs enabled)',
+        ],
+      },
+      {
+        title: 'Flow-Through Pinout',
+        paragraphs: [
+          'The 74x540 does the same job as the 74x240 octal inverting buffer, but its pins are arranged differently. All eight inputs (A1 to A8) run down pins 2 to 9 on one side, and all eight outputs (Y1 to Y8) run down pins 11 to 18 on the other. On a circuit board this lets a byte-wide bus pass straight through the chip without traces crossing over each other. The datasheet calls this a data flow-through pinout, and it is the main reason to pick a 540 or 541 over a 240 or 244.',
+          'The enables differ too. The 74x240 splits its eight outputs into two groups of four, each with its own enable. The 540 instead gives you two enables that both act on all eight outputs together. That is useful when two conditions, say a chip-select and a read strobe, must both be true before the buffer is allowed onto the bus, with no external AND gate needed.',
+        ],
+      },
+      {
+        title: 'Common Uses',
+        list: [
+          'Driving an 8-bit address or data bus, refreshing the signal so it can fan out to many inputs.',
+          'Sharing a bus between several devices: each 540 stays in high impedance until its turn, then both enables go LOW and it drives.',
+          'Gating a byte onto a bus only when two separate control signals agree, using OE1 and OE2 as the two conditions.',
+          'Inverting a whole byte in one step, when the inversion is wanted rather than a nuisance.',
+        ],
+      },
+      {
+        title: 'Gotchas',
+        list: [
+          'Both enables must be LOW to drive. If you only need one, tie the unused enable to ground; leaving it HIGH keeps the entire chip in high impedance and nothing reaches the outputs.',
+          'The outputs invert. Forget that and every bit comes out backwards. Reach for the 74x541 when you want the data unchanged.',
+          'Do not let two enabled 3-state outputs drive the same wire at once. If one pushes HIGH and another LOW you get bus contention, a near short that wastes current and can overheat parts. Enable only one driver per wire at a time.',
+          'Inputs and outputs are numbered to match (A1 pairs with Y1) even though they sit on opposite sides of the package. Wire by pin name, not by physical position.',
         ],
       },
     ],
     pinout: [
-      { pin:  1, name: 'OEn', type: 'input'  }, { pin:  2, name: 'A0',  type: 'input'  },
-      { pin:  3, name: 'A1',  type: 'input'  }, { pin:  4, name: 'A2',  type: 'input'  },
-      { pin:  5, name: 'A3',  type: 'input'  }, { pin:  6, name: 'A4',  type: 'input'  },
-      { pin:  7, name: 'A5',  type: 'input'  }, { pin:  8, name: 'A6',  type: 'input'  },
-      { pin:  9, name: 'A7',  type: 'input'  }, { pin: 10, name: 'GND', type: 'power'  },
-      { pin: 11, name: 'Y7',  type: 'output' }, { pin: 12, name: 'Y6',  type: 'output' },
-      { pin: 13, name: 'Y5',  type: 'output' }, { pin: 14, name: 'Y4',  type: 'output' },
-      { pin: 15, name: 'Y3',  type: 'output' }, { pin: 16, name: 'Y2',  type: 'output' },
-      { pin: 17, name: 'Y1',  type: 'output' }, { pin: 18, name: 'Y0',  type: 'output' },
-      { pin: 19, name: 'NC',  type: 'nc'    }, { pin: 20, name: 'VCC', type: 'power'  },
+      { pin:  1, name: 'OE1', type: 'input'  }, { pin:  2, name: 'A1',  type: 'input'  },
+      { pin:  3, name: 'A2',  type: 'input'  }, { pin:  4, name: 'A3',  type: 'input'  },
+      { pin:  5, name: 'A4',  type: 'input'  }, { pin:  6, name: 'A5',  type: 'input'  },
+      { pin:  7, name: 'A6',  type: 'input'  }, { pin:  8, name: 'A7',  type: 'input'  },
+      { pin:  9, name: 'A8',  type: 'input'  }, { pin: 10, name: 'GND', type: 'power'  },
+      { pin: 11, name: 'Y8',  type: 'output' }, { pin: 12, name: 'Y7',  type: 'output' },
+      { pin: 13, name: 'Y6',  type: 'output' }, { pin: 14, name: 'Y5',  type: 'output' },
+      { pin: 15, name: 'Y4',  type: 'output' }, { pin: 16, name: 'Y3',  type: 'output' },
+      { pin: 17, name: 'Y2',  type: 'output' }, { pin: 18, name: 'Y1',  type: 'output' },
+      { pin: 19, name: 'OE2', type: 'input'  }, { pin: 20, name: 'VCC', type: 'power'  },
     ],
     gates: [{ type: 'BUF_OCTAL_INV_TRI',
-      inputs:  ['OEn','A0','A1','A2','A3','A4','A5','A6','A7'],
-      outputs: ['Y0','Y1','Y2','Y3','Y4','Y5','Y6','Y7'] }],
+      inputs:  ['OE1','OE2','A1','A2','A3','A4','A5','A6','A7','A8'],
+      outputs: ['Y1','Y2','Y3','Y4','Y5','Y6','Y7','Y8'] }],
   },
 
   // ── 74543: Octal Registered Transceiver, 24-pin ────────────────────────────
@@ -182,38 +224,38 @@ export const CHIPS_BLOCK_30 = {
      Wikipedia: https://en.wikipedia.org/wiki/Flip-flop_(electronics)
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic
      Wikipedia: https://en.wikipedia.org/wiki/Bus_transceiver */
-  '74543': {
+  '74x543': {
     name: '74x543', simpleName: 'Octal Registered Transceiver',
-    description: 'Octal registered transceiver with non-inverting three-state outputs (24-pin)',
+    description: 'Octal registered transceiver, non-inverting 3-state (24-pin)',
     pins: 24, vcc: 24, gnd: 12, sequential: true,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74f543.pdf',
-    tags: ['transceiver', 'octal', 'registered', 'tri-state'],
-    guideOverview: 'The 74x543 is an octal registered transceiver that stores data before driving it in either direction. LEAB and LEBA are latch-enable inputs for A-to-B and B-to-A paths respectively. CLK optionally registers the latch output. OEABn and OEBAn independently enable each direction. Non-inverting outputs.',
+    tags: ['transceiver', 'octal', 'registered', 'tri state'],
+    guideOverview: 'The 74x543 is an octal registered transceiver that stores data before driving it in either direction. LEAB and LEBA are latch enable inputs for A-to B and B-to A paths respectively. CLK optionally registers the latch output. OEABn and OEBAn independently enable each direction. Non inverting outputs.',
     guidePinDescriptions: {
-      'OEABn': 'Output Enable A-to-B (active LOW).',
-      'OEBAn': 'Output Enable B-to-A (active LOW).',
-      'LEAB':  'Latch Enable A-to-B. HIGH = transparent; LOW = hold.',
-      'LEBA':  'Latch Enable B-to-A.',
-      'A0':    'Port A bit 0.',
-      'B0':    'Port B bit 0.',
-      'A1':    'Port A bit 1.',
-      'B1':    'Port B bit 1.',
-      'A2':    'Port A bit 2.',
-      'B2':    'Port B bit 2.',
-      'A3':    'Port A bit 3.',
-      'GND':   'Ground reference (pin 12).',
-      'B3':    'Port B bit 3.',
-      'A4':    'Port A bit 4.',
-      'B4':    'Port B bit 4.',
-      'A5':    'Port A bit 5.',
-      'B5':    'Port B bit 5.',
-      'A6':    'Port A bit 6.',
-      'B6':    'Port B bit 6.',
-      'A7':    'Port A bit 7.',
-      'B7':    'Port B bit 7.',
-      'CLK':   'Clock for registered mode.',
-      'DIR':   'Direction control.',
-      'VCC':   'Positive supply (+5 V, pin 24).',
+      'OEABn': 'Output Enable A-to B (active LOW).',
+      'OEBAn': 'Output Enable B-to A (active LOW).',
+      'LEAB': 'Latch Enable A-to B. HIGH = transparent; LOW = hold.',
+      'LEBA': 'Latch Enable B-to A.',
+      'A0': 'Port A bit 0.',
+      'B0': 'Port B bit 0.',
+      'A1': 'Port A bit 1.',
+      'B1': 'Port B bit 1.',
+      'A2': 'Port A bit 2.',
+      'B2': 'Port B bit 2.',
+      'A3': 'Port A bit 3.',
+      'GND': 'Ground reference (pin 12).',
+      'B3': 'Port B bit 3.',
+      'A4': 'Port A bit 4.',
+      'B4': 'Port B bit 4.',
+      'A5': 'Port A bit 5.',
+      'B5': 'Port B bit 5.',
+      'A6': 'Port A bit 6.',
+      'B6': 'Port B bit 6.',
+      'A7': 'Port A bit 7.',
+      'B7': 'Port B bit 7.',
+      'CLK': 'Clock for registered mode.',
+      'DIR': 'Direction control.',
+      'VCC': 'Positive supply (+5 V, pin 24).',
     },
     guideSections: [
       {
@@ -249,43 +291,43 @@ export const CHIPS_BLOCK_30 = {
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic
      Wikipedia: https://en.wikipedia.org/wiki/Bus_transceiver */
-  '74544': {
+  '74x544': {
     name: '74x544', simpleName: 'Octal Registered Transceiver Inverting',
     description: 'Octal registered transceiver with inverting three-state outputs (24-pin)',
     pins: 24, vcc: 24, gnd: 12, sequential: true,
-    tags: ['transceiver', 'octal', 'registered', 'inverting', 'tri-state'],
-    guideOverview: 'The 74x544 is the inverting-output version of the 74x543. Same registered transceiver structure with LEAB, LEBA, CLK, DIR, OEABn, and OEBAn controls, but all data paths invert the data as it passes through the register.',
+    tags: ['transceiver', 'octal', 'registered', 'inverting', 'tri state'],
+    guideOverview: 'The 74x544 is the inverting output version of the 74x543. Same registered transceiver structure with LEAB, LEBA, CLK, DIR, OEABn, and OEBAn controls, but all data paths invert the data as it passes through the register.',
     guidePinDescriptions: {
-      'OEABn': 'Output Enable A-to-B (active LOW).',
-      'OEBAn': 'Output Enable B-to-A (active LOW).',
-      'LEAB':  'Latch Enable A-to-B.',
-      'LEBA':  'Latch Enable B-to-A.',
-      'A0':    'Port A bit 0.',
-      'B0':    'Port B bit 0.',
-      'A1':    'Port A bit 1.',
-      'B1':    'Port B bit 1.',
-      'A2':    'Port A bit 2.',
-      'B2':    'Port B bit 2.',
-      'A3':    'Port A bit 3.',
-      'GND':   'Ground reference (pin 12).',
-      'B3':    'Port B bit 3.',
-      'A4':    'Port A bit 4.',
-      'B4':    'Port B bit 4.',
-      'A5':    'Port A bit 5.',
-      'B5':    'Port B bit 5.',
-      'A6':    'Port A bit 6.',
-      'B6':    'Port B bit 6.',
-      'A7':    'Port A bit 7.',
-      'B7':    'Port B bit 7.',
-      'CLK':   'Clock.',
-      'DIR':   'Direction control.',
-      'VCC':   'Positive supply (+5 V, pin 24).',
+      'OEABn': 'Output Enable A-to B (active LOW).',
+      'OEBAn': 'Output Enable B-to A (active LOW).',
+      'LEAB': 'Latch Enable A-to B.',
+      'LEBA': 'Latch Enable B-to A.',
+      'A0': 'Port A bit 0.',
+      'B0': 'Port B bit 0.',
+      'A1': 'Port A bit 1.',
+      'B1': 'Port B bit 1.',
+      'A2': 'Port A bit 2.',
+      'B2': 'Port B bit 2.',
+      'A3': 'Port A bit 3.',
+      'GND': 'Ground reference (pin 12).',
+      'B3': 'Port B bit 3.',
+      'A4': 'Port A bit 4.',
+      'B4': 'Port B bit 4.',
+      'A5': 'Port A bit 5.',
+      'B5': 'Port B bit 5.',
+      'A6': 'Port A bit 6.',
+      'B6': 'Port B bit 6.',
+      'A7': 'Port A bit 7.',
+      'B7': 'Port B bit 7.',
+      'CLK': 'Clock.',
+      'DIR': 'Direction control.',
+      'VCC': 'Positive supply (+5 V, pin 24).',
     },
     guideSections: [
       {
         title: '74x543 vs 74x544',
         paragraphs: [
-          '74x543 passes data non-inverted; 74x544 inverts data through the register. Both have the same control structure. Use 74x544 when the receiving bus uses complemented logic.',
+          '74x543 passes data non inverted; 74x544 inverts data through the register. Both have the same control structure. Use 74x544 when the receiving bus uses complemented logic.',
         ],
       },
     ],
@@ -315,13 +357,13 @@ export const CHIPS_BLOCK_30 = {
   /* Primary source: Texas Instruments, SN74HC545 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74hc545.pdf
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic
      Wikipedia: https://en.wikipedia.org/wiki/Bus_transceiver */
-  '74545': {
+  '74x545': {
     name: '74x545', simpleName: 'Octal Bidirectional Transceiver',
-    description: 'Octal bidirectional bus transceiver with non-inverting three-state outputs (20-pin)',
+    description: 'Octal bidirectional bus transceiver, non-inverting 3-state (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74hc545.pdf',
-    tags: ['transceiver', 'octal', 'bidirectional', 'tri-state'],
-    guideOverview: 'The 74x545 is an octal bidirectional bus transceiver. DIR selects direction (HIGH = A-to-B, LOW = B-to-A) and OE (active LOW) enables the drive. Outputs are non-inverting. It is functionally equivalent to the 74x245 with the same simple DIR/OE interface.',
+    tags: ['transceiver', 'octal', 'bidirectional', 'tri state'],
+    guideOverview: 'The 74x545 is an octal bidirectional bus transceiver. DIR selects direction (HIGH = A-to B, LOW = B-to A) and OE (active LOW) enables the drive. Outputs are non inverting. It is functionally equivalent to the 74x245 with the same simple DIR/OE interface.',
     guidePinDescriptions: {
       'DIR': 'Direction. HIGH = A drives B; LOW = B drives A.',
       'A0':  'Port A bit 0.',
@@ -350,7 +392,7 @@ export const CHIPS_BLOCK_30 = {
         paragraphs: [
           'Bidirectional transceivers are essential in microprocessor data buses where the CPU must both read from and write to the same bus lines. The DIR pin determines which side is driving at any time.',
         ],
-        note: 'Never assert OE while switching DIR without a brief tri-state interval to prevent bus contention.',
+        note: 'Never assert OE while switching DIR without a brief tri state interval to prevent bus contention.',
       },
     ],
     pinout: [
@@ -377,37 +419,37 @@ export const CHIPS_BLOCK_30 = {
      Wikipedia: https://en.wikipedia.org/wiki/Flip-flop_(electronics)
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic
      Wikipedia: https://en.wikipedia.org/wiki/Bus_transceiver */
-  '74546': {
+  '74x546': {
     name: '74x546', simpleName: '8 bit Bidirectional Registered Transceiver',
-    description: '8 bit bidirectional registered transceiver with non-inverting three-state outputs (24-pin)',
+    description: '8-bit bidirectional registered transceiver, non-inverting 3-state (24-pin)',
     pins: 24, vcc: 24, gnd: 12, sequential: true,
-    tags: ['transceiver', 'octal', 'registered', 'bidirectional', 'tri-state'],
-    guideOverview: 'The 74x546 is an 8 bit bidirectional registered transceiver. It includes register stages in both A-to-B and B-to-A paths, gated by CLK and the LEAB/LEBA latch enables, with separate OEABn/OEBAn output enables per direction. It allows safe, registered bus data exchange in both directions.',
+    tags: ['transceiver', 'octal', 'registered', 'bidirectional', 'tri state'],
+    guideOverview: 'The 74x546 is an 8 bit bidirectional registered transceiver. It includes register stages in both A-to B and B-to A paths, gated by CLK and the LEAB/LEBA latch enables, with separate OEABn/OEBAn output enables per direction. It allows safe, registered bus data exchange in both directions.',
     guidePinDescriptions: {
-      'OEABn': 'A-to-B Output Enable (active LOW).',
-      'OEBAn': 'B-to-A Output Enable (active LOW).',
-      'LEAB':  'Latch Enable for A-to-B path.',
-      'LEBA':  'Latch Enable for B-to-A path.',
-      'A0':    'Port A bit 0.',
-      'B0':    'Port B bit 0.',
-      'A1':    'Port A bit 1.',
-      'B1':    'Port B bit 1.',
-      'A2':    'Port A bit 2.',
-      'B2':    'Port B bit 2.',
-      'A3':    'Port A bit 3.',
-      'GND':   'Ground reference (pin 12).',
-      'B3':    'Port B bit 3.',
-      'A4':    'Port A bit 4.',
-      'B4':    'Port B bit 4.',
-      'A5':    'Port A bit 5.',
-      'B5':    'Port B bit 5.',
-      'A6':    'Port A bit 6.',
-      'B6':    'Port B bit 6.',
-      'A7':    'Port A bit 7.',
-      'B7':    'Port B bit 7.',
-      'CLK':   'Clock for register capture.',
-      'DIR':   'Direction select.',
-      'VCC':   'Positive supply (+5 V, pin 24).',
+      'OEABn': 'A-to B Output Enable (active LOW).',
+      'OEBAn': 'B-to A Output Enable (active LOW).',
+      'LEAB': 'Latch Enable for A-to B path.',
+      'LEBA': 'Latch Enable for B-to A path.',
+      'A0': 'Port A bit 0.',
+      'B0': 'Port B bit 0.',
+      'A1': 'Port A bit 1.',
+      'B1': 'Port B bit 1.',
+      'A2': 'Port A bit 2.',
+      'B2': 'Port B bit 2.',
+      'A3': 'Port A bit 3.',
+      'GND': 'Ground reference (pin 12).',
+      'B3': 'Port B bit 3.',
+      'A4': 'Port A bit 4.',
+      'B4': 'Port B bit 4.',
+      'A5': 'Port A bit 5.',
+      'B5': 'Port B bit 5.',
+      'A6': 'Port A bit 6.',
+      'B6': 'Port B bit 6.',
+      'A7': 'Port A bit 7.',
+      'B7': 'Port B bit 7.',
+      'CLK': 'Clock for register capture.',
+      'DIR': 'Direction select.',
+      'VCC': 'Positive supply (+5 V, pin 24).',
     },
     guideSections: [
       {
@@ -444,38 +486,38 @@ export const CHIPS_BLOCK_30 = {
      Wikipedia: https://en.wikipedia.org/wiki/Flip-flop_(electronics)
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic
      Wikipedia: https://en.wikipedia.org/wiki/Bus_transceiver */
-  '74547': {
+  '74x547': {
     name: '74x547', simpleName: '8 bit Bidirectional Latched Transceiver',
-    description: '8 bit bidirectional latched transceiver with non-inverting three-state outputs (24-pin)',
+    description: '8-bit bidirectional latched transceiver, non-inverting 3-state (24-pin)',
     pins: 24, vcc: 24, gnd: 12, sequential: true,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74als547.pdf',
-    tags: ['transceiver', 'octal', 'latch', 'bidirectional', 'tri-state'],
-    guideOverview: 'The 74x547 is an 8 bit bidirectional latched transceiver. It includes transparent latches (LEAB for A-to-B, LEBA for B-to-A) in each data path, with separate OEABn/OEBAn output enables. Unlike the 74x546, there is no separate clock; the latch operates level-triggered (transparent when LE is HIGH).',
+    tags: ['transceiver', 'octal', 'latch', 'bidirectional', 'tri state'],
+    guideOverview: 'The 74x547 is an 8 bit bidirectional latched transceiver. It includes transparent latches (LEAB for A-to B, LEBA for B-to A) in each data path, with separate OEABn/OEBAn output enables. Unlike the 74x546, there is no separate clock; the latch operates level triggered (transparent when LE is HIGH).',
     guidePinDescriptions: {
-      'OEABn': 'A-to-B Output Enable (active LOW).',
-      'OEBAn': 'B-to-A Output Enable (active LOW).',
-      'LEAB':  'Latch Enable A-to-B. HIGH = transparent; LOW = hold.',
-      'LEBA':  'Latch Enable B-to-A.',
-      'A0':    'Port A bit 0.',
-      'B0':    'Port B bit 0.',
-      'A1':    'Port A bit 1.',
-      'B1':    'Port B bit 1.',
-      'A2':    'Port A bit 2.',
-      'B2':    'Port B bit 2.',
-      'A3':    'Port A bit 3.',
-      'GND':   'Ground reference (pin 12).',
-      'B3':    'Port B bit 3.',
-      'A4':    'Port A bit 4.',
-      'B4':    'Port B bit 4.',
-      'A5':    'Port A bit 5.',
-      'B5':    'Port B bit 5.',
-      'A6':    'Port A bit 6.',
-      'B6':    'Port B bit 6.',
-      'A7':    'Port A bit 7.',
-      'B7':    'Port B bit 7.',
-      'DIR':   'Direction select.',
-      'NC':    'No connect.',
-      'VCC':   'Positive supply (+5 V, pin 24).',
+      'OEABn': 'A-to B Output Enable (active LOW).',
+      'OEBAn': 'B-to A Output Enable (active LOW).',
+      'LEAB': 'Latch Enable A-to B. HIGH = transparent; LOW = hold.',
+      'LEBA': 'Latch Enable B-to A.',
+      'A0': 'Port A bit 0.',
+      'B0': 'Port B bit 0.',
+      'A1': 'Port A bit 1.',
+      'B1': 'Port B bit 1.',
+      'A2': 'Port A bit 2.',
+      'B2': 'Port B bit 2.',
+      'A3': 'Port A bit 3.',
+      'GND': 'Ground reference (pin 12).',
+      'B3': 'Port B bit 3.',
+      'A4': 'Port A bit 4.',
+      'B4': 'Port B bit 4.',
+      'A5': 'Port A bit 5.',
+      'B5': 'Port B bit 5.',
+      'A6': 'Port A bit 6.',
+      'B6': 'Port B bit 6.',
+      'A7': 'Port A bit 7.',
+      'B7': 'Port B bit 7.',
+      'DIR': 'Direction select.',
+      'NC': 'No connect.',
+      'VCC': 'Positive supply (+5 V, pin 24).',
     },
     guideSections: [
       {
@@ -507,16 +549,16 @@ export const CHIPS_BLOCK_30 = {
                 'B0','B1','B2','B3','B4','B5','B6','B7'] }],
   },
 
-  // ── 74547F: 3-to-8 Decoder/Demux with Latch & ACK, 20-pin ──────────────────
+  // ── 74547F: 3 to 8 Decoder/Demux with Latch & ACK, 20-pin ──────────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Multiplexer
      Wikipedia: https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
   '74547F': {
-    name: '74x547', simpleName: '3-to-8 Decoder/Demux with Latch & ACK',
-    description: '3-to-8 line decoder/demultiplexer with address latches and acknowledge output (20-pin)',
+    name: '74x547', simpleName: '3 to 8 Decoder/Demux with Latch & ACK',
+    description: '3-to-8 decoder/demux, address latches, acknowledge out (20-pin)',
     pins: 20, vcc: 20, gnd: 10, sequential: true,
-    tags: ['decoder', '3-to-8', 'latch', 'acknowledge'],
-    guideOverview: 'The 74x547F is a 3-to-8 decoder/demultiplexer with address latches and an ACK (acknowledge) output. STB latches the address inputs A0-A2 on the appropriate edge; G enables the decode. ACK provides handshaking feedback for bus or DMA acknowledge protocols.',
+    tags: ['decoder', '3 to 8', 'latch', 'acknowledge'],
+    guideOverview: 'The 74x547F is a 3 to 8 decoder/demultiplexer with address latches and an ACK (acknowledge) output. STB latches the address inputs A0-A2 on the appropriate edge; G enables the decode. ACK provides handshaking feedback for bus or DMA acknowledge protocols.',
     guidePinDescriptions: {
       'A0':  'Address input bit 0.',
       'A1':  'Address input bit 1.',
@@ -567,13 +609,13 @@ export const CHIPS_BLOCK_30 = {
   // ── 74548: 8 bit Two-Stage Pipelined Register, 24-pin ──────────────────────
   /* Primary source: Texas Instruments, SN74ALS548 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74als548.pdf
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic */
-  '74548': {
+  '74x548': {
     name: '74x548', simpleName: '8 bit Two-Stage Pipelined Register',
-    description: '8 bit two-stage pipelined D-type register with three-state output (24-pin)',
+    description: '8 bit two-stage pipelined D type register with three-state output (24-pin)',
     pins: 24, vcc: 24, gnd: 12, sequential: true,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74als548.pdf',
-    tags: ['register', 'pipeline', 'octal', 'tri-state'],
-    guideOverview: 'The 74x548 is an 8 bit two-stage pipelined register with separate stage clocks (CLK1, CLK2). Data is clocked from D inputs into stage 1 on CLK1, then from stage 1 to stage 2 on CLK2. The tri-state output (OEn) reads stage 2. This creates a 2-cycle pipeline delay useful in high-speed datapath designs.',
+    tags: ['register', 'pipeline', 'octal', 'tri state'],
+    guideOverview: 'The 74x548 is an 8 bit two stage pipelined register with separate stage clocks (CLK1, CLK2). Data is clocked from D inputs into stage 1 on CLK1, then from stage 1 to stage 2 on CLK2. The tri state output (OEn) reads stage 2. This creates a 2-cycle pipeline delay useful in high speed datapath designs.',
     guidePinDescriptions: {
       'OEn':  'Output Enable (active LOW).',
       'CLK1': 'Clock for stage 1 (D inputs to internal register).',
@@ -602,9 +644,9 @@ export const CHIPS_BLOCK_30 = {
     },
     guideSections: [
       {
-        title: 'Two-Stage Pipeline',
+        title: 'Two Stage Pipeline',
         paragraphs: [
-          'A two-stage register pipeline adds a 2-cycle latency but allows each pipeline stage to be clocked at the timing of a different downstream circuit. CLK1 and CLK2 can run at different phases or frequencies.',
+          'A two stage register pipeline adds a 2-cycle latency but allows each pipeline stage to be clocked at the timing of a different downstream circuit. CLK1 and CLK2 can run at different phases or frequencies.',
         ],
       },
     ],
@@ -627,16 +669,16 @@ export const CHIPS_BLOCK_30 = {
       outputs: ['Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7'] }],
   },
 
-  // ── 74548F: 3-to-8 Decoder/Demux with ACK, 20-pin ──────────────────────────
+  // ── 74548F: 3 to 8 Decoder/Demux with ACK, 20-pin ──────────────────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Multiplexer
      Wikipedia: https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
   '74548F': {
-    name: '74x548', simpleName: '3-to-8 Decoder/Demux with ACK',
-    description: '3-to-8 line decoder/demultiplexer with acknowledge output (20-pin)',
+    name: '74x548', simpleName: '3 to 8 Decoder/Demux with ACK',
+    description: '3 to 8 line decoder/demultiplexer with acknowledge output (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
-    tags: ['decoder', '3-to-8', 'acknowledge'],
-    guideOverview: 'The 74x548F is a 3-to-8 decoder/demultiplexer with an ACK (acknowledge) output but without the address latch of the 74x547F. Enable G must be HIGH; address inputs A0-A2 immediately select one of Y0-Y7; ACK signals a completed decode for bus handshaking.',
+    tags: ['decoder', '3 to 8', 'acknowledge'],
+    guideOverview: 'The 74x548F is a 3 to 8 decoder/demultiplexer with an ACK (acknowledge) output but without the address latch of the 74x547F. Enable G must be HIGH; address inputs A0-A2 immediately select one of Y0-Y7; ACK signals a completed decode for bus handshaking.',
     guidePinDescriptions: {
       'A0':  'Address input bit 0.',
       'A1':  'Address input bit 1.',
@@ -661,7 +703,7 @@ export const CHIPS_BLOCK_30 = {
     },
     guideSections: [
       {
-        title: '3-to-8 with ACK',
+        title: '3 to 8 with ACK',
         paragraphs: [
           'Like 74x547F but without the latching. ACK is asserted after the output has settled to confirm decode completion.',
         ],
@@ -688,12 +730,12 @@ export const CHIPS_BLOCK_30 = {
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Flip-flop_(electronics)
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic */
-  '74549': {
+  '74x549': {
     name: '74x549', simpleName: '8 bit Two-Stage Pipelined Latch',
-    description: '8 bit two-stage pipelined transparent latch with three-state output (24-pin)',
+    description: '8-bit two-stage pipelined transparent latch, 3-state (24-pin)',
     pins: 24, vcc: 24, gnd: 12, sequential: true,
-    tags: ['latch', 'pipeline', 'octal', 'tri-state'],
-    guideOverview: 'The 74x549 is an 8 bit two-stage pipelined transparent latch. LE1 controls the first latch stage and LE2 the second. OEn tri-states the output. The double-latch pipeline is used in bus interfaces needing two stable hold stages before the output is driven.',
+    tags: ['latch', 'pipeline', 'octal', 'tri state'],
+    guideOverview: 'The 74x549 is an 8 bit two stage pipelined transparent latch. LE1 controls the first latch stage and LE2 the second. OEn tri states the output. The double latch pipeline is used in bus interfaces needing two stable hold stages before the output is driven.',
     guidePinDescriptions: {
       'OEn': 'Output Enable (active LOW).',
       'LE1': 'Latch Enable for stage 1. HIGH = transparent; LOW = hold.',
@@ -724,7 +766,7 @@ export const CHIPS_BLOCK_30 = {
       {
         title: '74x548 vs 74x549',
         paragraphs: [
-          '74x548 is edge-triggered (clock); 74x549 is level-triggered (latch). Use 74x549 for gated transparent pipelines and 74x548 where clean edge-triggered sampling is required.',
+          '74x548 is edge triggered (clock); 74x549 is level triggered (latch). Use 74x549 for gated transparent pipelines and 74x548 where clean edge triggered sampling is required.',
         ],
       },
     ],
@@ -749,12 +791,12 @@ export const CHIPS_BLOCK_30 = {
 
   // ── 74559: 8 bit Multiplier/Divider, 24-pin ────────────────────────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits */
-  '74559': {
+  '74x559': {
     name: '74x559', simpleName: '8 bit Multiplier/Divider',
     description: '8 bit expandable two\'s complement multiplier/divider (24-pin)',
     pins: 24, vcc: 24, gnd: 12,
     tags: ['multiplier', 'divider', 'arithmetic'],
-    guideOverview: "The 74x559 is an 8 bit expandable two's complement multiplier/divider slice. It computes a partial product using A (8 bit) and a 3 bit portion of B (B0-B2), with carry-in (TCn) and carry-out (TCp) for cascading. Cascade multiple chips to handle wider B operands.",
+    guideOverview: "The 74x559 is an 8 bit expandable two's complement multiplier/divider slice. It computes a partial product using A (8 bit) and a 3 bit portion of B (B0-B2), with carry in (TCn) and carry out (TCp) for cascading. Cascade multiple chips to handle wider B operands.",
     guidePinDescriptions: {
       'A0':  'Multiplicand bit 0.',
       'A1':  'Multiplicand bit 1.',
@@ -765,8 +807,8 @@ export const CHIPS_BLOCK_30 = {
       'A6':  'Multiplicand bit 6.',
       'A7':  'Multiplicand bit 7.',
       'OEn': 'Output Enable (active LOW).',
-      'TCn': 'Two\'s complement carry-in (cascade input).',
-      'TCp': 'Two\'s complement carry-out (cascade output).',
+      'TCn': 'Two\'s complement carry in (cascade input).',
+      'TCp': 'Two\'s complement carry out (cascade output).',
       'GND': 'Ground reference (pin 12).',
       'P0':  'Product bit 0.',
       'P1':  'Product bit 1.',
@@ -785,7 +827,7 @@ export const CHIPS_BLOCK_30 = {
       {
         title: 'Expandable Multiplier Slice',
         paragraphs: [
-          'Chain multiple 74x559 chips to build a wider multiplier. TCp from the lower-significance chip feeds TCn of the higher. The OEn allows the result bus to be shared.',
+          'Chain multiple 74x559 chips to build a wider multiplier. TCp from the lower significance chip feeds TCn of the higher. The OEn allows the result bus to be shared.',
         ],
       },
     ],
@@ -812,12 +854,12 @@ export const CHIPS_BLOCK_30 = {
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Counter_(digital)
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic */
-  '74560': {
+  '74x560': {
     name: '74x560', simpleName: '4 bit Decade Counter (3-state)',
     description: 'Synchronous 4 bit decade counter with three-state outputs (20-pin)',
     pins: 20, vcc: 20, gnd: 10, sequential: true,
-    tags: ['counter', 'decade', 'synchronous', '4 bit', 'tri-state'],
-    guideOverview: 'The 74x560 is a synchronous 4 bit decade (BCD, 0-9) counter with tri-state outputs and synchronous active LOW clear. Parallel load (active HIGH LOAD), two count enables (ENP, ENT), and ripple carry output (RCO) allow full cascading. OEn tri-states QA-QD.',
+    tags: ['counter', 'decade', 'synchronous', '4 bit', 'tri state'],
+    guideOverview: 'The 74x560 is a synchronous 4 bit decade (BCD, 0-9) counter with tri state outputs and synchronous active LOW clear. Parallel load (active HIGH LOAD), two count enables (ENP, ENT), and ripple carry output (RCO) allow full cascading. OEn tri states QA-QD.',
     guidePinDescriptions: {
       'CLRn': 'Synchronous Clear (active LOW). Resets to 0 on next CLK.',
       'CLK':  'Clock (rising edge).',
@@ -844,7 +886,7 @@ export const CHIPS_BLOCK_30 = {
       {
         title: 'Synchronous Decade Counter',
         paragraphs: [
-          'The 74x560 counts 0 through 9 in BCD. RCO goes HIGH at count 9 (when ENT is HIGH), providing the cascade carry for chaining multiple counters into multi-digit counters.',
+          'The 74x560 counts 0 through 9 in BCD. RCO goes HIGH at count 9 (when ENT is HIGH), providing the cascade carry for chaining multiple counters into multi digit counters.',
         ],
       },
     ],
@@ -869,13 +911,13 @@ export const CHIPS_BLOCK_30 = {
   /* Primary source: Texas Instruments, SN74HC561 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74hc561.pdf
      Wikipedia: https://en.wikipedia.org/wiki/Counter_(digital)
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic */
-  '74561': {
+  '74x561': {
     name: '74x561', simpleName: '4 bit Binary Counter (3-state)',
     description: 'Synchronous 4 bit binary counter with three-state outputs (20-pin)',
     pins: 20, vcc: 20, gnd: 10, sequential: true,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74hc561.pdf',
-    tags: ['counter', 'binary', 'synchronous', '4 bit', 'tri-state'],
-    guideOverview: 'The 74x561 is a synchronous 4 bit binary (0-15) counter with tri-state outputs, synchronous clear, parallel load, two count enables (ENP, ENT), and ripple carry output. It is the binary version of the 74x560, counting modulo-16 rather than modulo-10.',
+    tags: ['counter', 'binary', 'synchronous', '4 bit', 'tri state'],
+    guideOverview: 'The 74x561 is a synchronous 4 bit binary (0-15) counter with tri state outputs, synchronous clear, parallel load, two count enables (ENP, ENT), and ripple carry output. It is the binary version of the 74x560, counting modulo-16 rather than modulo-10.',
     guidePinDescriptions: {
       'CLRn': 'Synchronous Clear (active LOW).',
       'CLK':  'Clock (rising edge).',
@@ -923,17 +965,17 @@ export const CHIPS_BLOCK_30 = {
       outputs: ['QA','QB','QC','QD','RCO'] }],
   },
 
-  // ── 74563: Octal D-type Latch Inverting (3-state), 20-pin ──────────────────
+  // ── 74563: Octal D type Latch Inverting (3-state), 20-pin ──────────────────
   /* Primary source: Texas Instruments, SN74F563 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74f563.pdf
      Wikipedia: https://en.wikipedia.org/wiki/Flip-flop_(electronics)
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic */
-  '74563': {
-    name: '74x563', simpleName: 'Octal D-type Latch Inverting (3-state)',
-    description: 'Octal D-type transparent latch with inverting outputs and three-state output enable (20-pin)',
+  '74x563': {
+    name: '74x563', simpleName: 'Octal D type Latch Inverting (3-state)',
+    description: 'Octal D-type transparent latch, inverting outputs, 3-state (20-pin)',
     pins: 20, vcc: 20, gnd: 10, sequential: true,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74f563.pdf',
-    tags: ['latch', 'octal', 'transparent', 'inverting', 'tri-state'],
-    guideOverview: 'The 74x563 is an octal D-type transparent latch with inverting outputs and tri-state output control. When LE is HIGH, outputs follow inverted inputs; when LE goes LOW, data is held. OEn enables outputs. This is one of several 74x533/535/563 equivalent devices choice depends on package availability.',
+    tags: ['latch', 'octal', 'transparent', 'inverting', 'tri state'],
+    guideOverview: 'The 74x563 is an octal D type transparent latch with inverting outputs and tri state output control. When LE is HIGH, outputs follow inverted inputs; when LE goes LOW, data is held. OEn enables outputs. This is one of several 74x533/535/563 equivalent devices choice depends on package availability.',
     guidePinDescriptions: {
       'OEn': 'Output Enable (active LOW).',
       'D0':  'Data input 0.',
@@ -960,7 +1002,7 @@ export const CHIPS_BLOCK_30 = {
       {
         title: 'Inverting Octal Latch',
         paragraphs: [
-          'The 74x563 provides bus-hold latch functionality with inverted outputs. It is interchangeable with 74x533 and 74x535 in most designs.',
+          'The 74x563 provides bus hold latch functionality with inverted outputs. It is interchangeable with 74x533 and 74x535 in most designs.',
         ],
       },
     ],

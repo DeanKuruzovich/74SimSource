@@ -8,17 +8,17 @@ export const CHIPS_BLOCK_35 = {
   // ── 74658: Octal bus transceiver with parity, inverting, TRI ─────────────
   /* Primary source: Texas Instruments, 74658 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74als658.pdf
      https://en.wikipedia.org/wiki/Parity_bit */
-  '74658': {
+  '74x658': {
     name: '74x658',
     simpleName: 'Octal XCVR+Par Inv (TS)',
-    description: 'Octal bus transceiver with parity, inverting tri-state outputs (24-pin)',
+    description: 'Octal bus transceiver with parity, inverting tri state outputs (24-pin)',
     pins: 24, vcc: 24, gnd: 13,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74als658.pdf',
-    tags: ['transceiver', 'parity', 'octal', 'tri-state', 'inverting'],
+    tags: ['transceiver', 'parity', 'octal', 'tri state', 'inverting'],
     guideOverview: 'The 74x658 is an 8 bit inverting bus transceiver with integrated parity. It inverts data as it passes through and simultaneously generates/checks parity on the data word. OEABn/OEBAn control direction enables; DIR selects direction; PEn (active LOW) enables the parity function.',
     guidePinDescriptions: {
-      'OEABn': 'A-to-B Output Enable (active LOW).',
-      'OEBAn': 'B-to-A Output Enable (active LOW).',
+      'OEABn': 'A-to B Output Enable (active LOW).',
+      'OEBAn': 'B-to A Output Enable (active LOW).',
       'DIR':   'Direction. HIGH = A drives inverted B; LOW = B drives inverted A.',
       'PEn':   'Parity Enable (active LOW).',
       'A0':    'Port A bit 0.',
@@ -47,11 +47,11 @@ export const CHIPS_BLOCK_35 = {
         title: '74x658/659/664/665 Parity Transceiver Family',
         list: [
           '74x658: inverting, with parity',
-          '74x659: non-inverting, with parity',
+          '74x659: non inverting, with parity',
           '74x664: inverting, with parity (alternate version)',
-          '74x665: non-inverting, with parity (alternate version)',
+          '74x665: non inverting, with parity (alternate version)',
         ],
-        note: 'Parity logic is a stub in the simulator.',
+        note: 'Parity is now generated: PAR = even parity of A0-A7 when PEn=LOW. Note that 74Sim only models the A→B path (drive B when OEABn=LOW and DIR=HIGH); the reverse B→A direction stays HiZ.',
       },
     ],
     pinout: [
@@ -80,25 +80,25 @@ export const CHIPS_BLOCK_35 = {
       { pin: 23, name: 'NC',    type: 'nc'  },
       { pin: 24, name: 'VCC',   type: 'power'  },
     ],
-    gates: [{ type: 'PARITY_BUFFER_STUB',
+    gates: [{ type: 'XCVR_PARITY_INV',
       inputs:  ['OEABn','OEBAn','DIR','PEn','A0','A1','A2','A3','A4','A5','A6','A7'],
       outputs: ['B0','B1','B2','B3','B4','B5','B6','B7','PAR'] }],
   },
 
-  // ── 74659: Octal bus transceiver with parity, non-inverting, TRI ─────────
+  // ── 74659: Octal bus transceiver with parity, non inverting, TRI ─────────
   /* Primary source: Texas Instruments, 74659 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74als659.pdf
      https://en.wikipedia.org/wiki/Parity_bit */
-  '74659': {
+  '74x659': {
     name: '74x659',
     simpleName: 'Octal XCVR+Par (TS)',
-    description: 'Octal bus transceiver with parity, non-inverting tri-state outputs (24-pin)',
+    description: 'Octal bus transceiver with parity, non inverting tri state outputs (24-pin)',
     pins: 24, vcc: 24, gnd: 13,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74als659.pdf',
-    tags: ['transceiver', 'parity', 'octal', 'tri-state'],
-    guideOverview: 'The 74x659 is an 8 bit non-inverting bus transceiver with integrated parity generation and checking. Data passes through without inversion; PAR reports a parity error. Complement of the 74x658.',
+    tags: ['transceiver', 'parity', 'octal', 'tri state'],
+    guideOverview: 'The 74x659 is an 8 bit non inverting bus transceiver with integrated parity generation and checking. Data passes through without inversion; PAR reports a parity error. Complement of the 74x658.',
     guidePinDescriptions: {
-      'OEABn': 'A-to-B Output Enable (active LOW).',
-      'OEBAn': 'B-to-A Output Enable (active LOW).',
+      'OEABn': 'A-to B Output Enable (active LOW).',
+      'OEBAn': 'B-to A Output Enable (active LOW).',
       'DIR':   'Direction. HIGH = A drives B; LOW = B drives A.',
       'PEn':   'Parity Enable (active LOW).',
       'A0':    'Port A bit 0.',
@@ -124,11 +124,11 @@ export const CHIPS_BLOCK_35 = {
     },
     guideSections: [
       {
-        title: 'Non-Inverting Parity Transceiver',
+        title: 'Non Inverting Parity Transceiver',
         paragraphs: [
-          'Adding parity to a standard transceiver lets the receiving end detect single-bit transmission errors without extra logic. The PAR output can drive an interrupt line.',
+          'Adding parity to a standard transceiver lets the receiving end detect single bit transmission errors without extra logic. The PAR output can drive an interrupt line.',
         ],
-        note: 'Parity logic is a stub in the simulator.',
+        note: 'Parity is now generated: PAR = even parity of A0-A7 when PEn=LOW. Note that 74Sim only models the A→B path (drive B when OEABn=LOW and DIR=HIGH); the reverse B→A direction stays HiZ.',
       },
     ],
     pinout: [
@@ -157,7 +157,7 @@ export const CHIPS_BLOCK_35 = {
       { pin: 23, name: 'NC',    type: 'nc'  },
       { pin: 24, name: 'VCC',   type: 'power'  },
     ],
-    gates: [{ type: 'PARITY_BUFFER_STUB',
+    gates: [{ type: 'XCVR_PARITY',
       inputs:  ['OEABn','OEBAn','DIR','PEn','A0','A1','A2','A3','A4','A5','A6','A7'],
       outputs: ['B0','B1','B2','B3','B4','B5','B6','B7','PAR'] }],
   },
@@ -165,17 +165,17 @@ export const CHIPS_BLOCK_35 = {
   // ── 74664: Octal bus transceiver with parity, inverting, TRI ─────────────
   /* Primary source: Texas Instruments, 74664 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74als664.pdf
      https://en.wikipedia.org/wiki/Parity_bit */
-  '74664': {
+  '74x664': {
     name: '74x664',
     simpleName: 'Octal XCVR+Par Inv (TS)',
-    description: 'Octal bus transceiver with parity, inverting tri-state outputs (24-pin)',
+    description: 'Octal bus transceiver with parity, inverting tri state outputs (24-pin)',
     pins: 24, vcc: 24, gnd: 13,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74als664.pdf',
-    tags: ['transceiver', 'parity', 'octal', 'tri-state', 'inverting'],
-    guideOverview: 'The 74x664 is an 8 bit inverting parity transceiver, an alternate variant of the 74x658. Both are ALS-family inverting transceivers with parity generation/checking, differing in minor interface details or speed grades.',
+    tags: ['transceiver', 'parity', 'octal', 'tri state', 'inverting'],
+    guideOverview: 'The 74x664 is an 8 bit inverting parity transceiver, an alternate variant of the 74x658. Both are ALS family inverting transceivers with parity generation/checking, differing in minor interface details or speed grades.',
     guidePinDescriptions: {
-      'OEABn': 'A-to-B Output Enable (active LOW).',
-      'OEBAn': 'B-to-A Output Enable (active LOW).',
+      'OEABn': 'A-to B Output Enable (active LOW).',
+      'OEBAn': 'B-to A Output Enable (active LOW).',
       'DIR':   'Direction. HIGH = A drives inverted B; LOW = B drives inverted A.',
       'PEn':   'Parity Enable (active LOW).',
       'A0':    'Port A bit 0.',
@@ -203,9 +203,9 @@ export const CHIPS_BLOCK_35 = {
       {
         title: '74x658 vs 74x664',
         paragraphs: [
-          'Both 74x658 and 74x664 are ALS-family inverting parity transceivers. Verify the datasheet for the exact speed grade and family variant needed for your design.',
+          'Both 74x658 and 74x664 are ALS family inverting parity transceivers. Verify the datasheet for the exact speed grade and family variant needed for your design.',
         ],
-        note: 'Parity logic is a stub in the simulator.',
+        note: 'Parity is now generated: PAR = even parity of A0-A7 when PEn=LOW. Note that 74Sim only models the A→B path (drive B when OEABn=LOW and DIR=HIGH); the reverse B→A direction stays HiZ.',
       },
     ],
     pinout: [
@@ -234,25 +234,25 @@ export const CHIPS_BLOCK_35 = {
       { pin: 23, name: 'NC',    type: 'nc'  },
       { pin: 24, name: 'VCC',   type: 'power'  },
     ],
-    gates: [{ type: 'PARITY_BUFFER_STUB',
+    gates: [{ type: 'XCVR_PARITY_INV',
       inputs:  ['OEABn','OEBAn','DIR','PEn','A0','A1','A2','A3','A4','A5','A6','A7'],
       outputs: ['B0','B1','B2','B3','B4','B5','B6','B7','PAR'] }],
   },
 
-  // ── 74665: Octal bus transceiver with parity, non-inverting, TRI ─────────
+  // ── 74665: Octal bus transceiver with parity, non inverting, TRI ─────────
   /* Primary source: Texas Instruments, 74665 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74als665.pdf
      https://en.wikipedia.org/wiki/Parity_bit */
-  '74665': {
+  '74x665': {
     name: '74x665',
     simpleName: 'Octal XCVR+Par (TS)',
-    description: 'Octal bus transceiver with parity, non-inverting tri-state outputs (24-pin)',
+    description: 'Octal bus transceiver with parity, non inverting tri state outputs (24-pin)',
     pins: 24, vcc: 24, gnd: 13,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74als665.pdf',
-    tags: ['transceiver', 'parity', 'octal', 'tri-state'],
-    guideOverview: 'The 74x665 is an 8 bit non-inverting parity transceiver, an alternate variant of the 74x659. Both are ALS-family non-inverting transceivers with parity generation/checking.',
+    tags: ['transceiver', 'parity', 'octal', 'tri state'],
+    guideOverview: 'The 74x665 is an 8 bit non inverting parity transceiver, an alternate variant of the 74x659. Both are ALS family non inverting transceivers with parity generation/checking.',
     guidePinDescriptions: {
-      'OEABn': 'A-to-B Output Enable (active LOW).',
-      'OEBAn': 'B-to-A Output Enable (active LOW).',
+      'OEABn': 'A-to B Output Enable (active LOW).',
+      'OEBAn': 'B-to A Output Enable (active LOW).',
       'DIR':   'Direction. HIGH = A drives B; LOW = B drives A.',
       'PEn':   'Parity Enable (active LOW).',
       'A0':    'Port A bit 0.',
@@ -280,9 +280,9 @@ export const CHIPS_BLOCK_35 = {
       {
         title: '74x659 vs 74x665',
         paragraphs: [
-          'Both 74x659 and 74x665 are non-inverting parity transceivers in the ALS family. Check the specific datasheet for propagation delay and power differences.',
+          'Both 74x659 and 74x665 are non inverting parity transceivers in the ALS family. Check the specific datasheet for propagation delay and power differences.',
         ],
-        note: 'Parity logic is a stub in the simulator.',
+        note: 'Parity is now generated: PAR = even parity of A0-A7 when PEn=LOW. Note that 74Sim only models the A→B path (drive B when OEABn=LOW and DIR=HIGH); the reverse B→A direction stays HiZ.',
       },
     ],
     pinout: [
@@ -311,25 +311,25 @@ export const CHIPS_BLOCK_35 = {
       { pin: 23, name: 'NC',    type: 'nc'  },
       { pin: 24, name: 'VCC',   type: 'power'  },
     ],
-    gates: [{ type: 'PARITY_BUFFER_STUB',
+    gates: [{ type: 'XCVR_PARITY',
       inputs:  ['OEABn','OEBAn','DIR','PEn','A0','A1','A2','A3','A4','A5','A6','A7'],
       outputs: ['B0','B1','B2','B3','B4','B5','B6','B7','PAR'] }],
   },
 
-  // ── 74666: 8 bit D-type transparent read-back latch, non-inverting ────────
+  // ── 74666: 8 bit D type transparent read-back latch, non inverting ────────
   /* Primary source: Texas Instruments, 74666 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74als666.pdf
      https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
-  '74666': {
+  '74x666': {
     name: '74x666',
     simpleName: '8 bit Latch Readback',
-    description: '8 bit D-type transparent read-back latch, non-inverting, tri-state (24-pin)',
+    description: '8 bit D type transparent read-back latch, non inverting, tri state (24-pin)',
     pins: 24, vcc: 24, gnd: 12,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74als666.pdf',
-    tags: ['latch', '8 bit', 'transparent', 'tri-state', 'sequential'],
+    tags: ['latch', '8 bit', 'transparent', 'tri state', 'sequential'],
     sequential: true,
-    guideOverview: 'The 74x666 is an 8 bit transparent D-type latch with tri-state outputs, a CLR (active LOW) input, and a read-back capability. When LE is HIGH the outputs follow the data inputs; when LE goes LOW the data is held. OE (active LOW) enables the tri-state outputs. CLR asynchronously resets all bits to 0.',
+    guideOverview: 'The 74x666 is an 8 bit transparent D type latch with tri state outputs, a CLR (active LOW) input, and a read-back capability. When LE is HIGH the outputs follow the data inputs; when LE goes LOW the data is held. OE (active LOW) enables the tri state outputs. CLR asynchronously resets all bits to 0.',
     guidePinDescriptions: {
-      'OEn':  'Output Enable (active LOW). Pull HIGH to tri-state all outputs.',
+      'OEn':  'Output Enable (active LOW). Pull HIGH to tri state all outputs.',
       'CLR':  'Asynchronous clear (active LOW). Resets all latched data to 0.',
       'LE':   'Latch Enable. HIGH = transparent (Q follows D); LOW = holds data.',
       'D0':   'Data input bit 0.',
@@ -358,7 +358,7 @@ export const CHIPS_BLOCK_35 = {
       {
         title: '8 bit Transparent Latch with Clear',
         paragraphs: [
-          'The 74x666 is similar to the 74x573 but adds a CLR input. On a microprocessor bus, CLR can power-on reset the latch to a known state without requiring a separate write cycle.',
+          'The 74x666 is similar to the 74x573 but adds a CLR input. On a microprocessor bus, CLR can power on reset the latch to a known state without requiring a separate write cycle.',
         ],
       },
     ],
@@ -393,16 +393,16 @@ export const CHIPS_BLOCK_35 = {
       outputs: ['Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7'] }],
   },
 
-  // ── 74667: 8 bit D-type transparent read-back latch, inverting ────────────
+  // ── 74667: 8 bit D type transparent read-back latch, inverting ────────────
   /* Primary source: Texas Instruments, 74667 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74als667.pdf
      https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
-  '74667': {
+  '74x667': {
     name: '74x667',
     simpleName: '8 bit Latch Readback Inv',
-    description: '8 bit D-type transparent read-back latch, inverting, tri-state (24-pin)',
+    description: '8 bit D type transparent read-back latch, inverting, tri state (24-pin)',
     pins: 24, vcc: 24, gnd: 12,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74als667.pdf',
-    tags: ['latch', '8 bit', 'transparent', 'tri-state', 'inverting', 'sequential'],
+    tags: ['latch', '8 bit', 'transparent', 'tri state', 'inverting', 'sequential'],
     sequential: true,
     guideOverview: 'The 74x667 is the inverting version of the 74x666. Same 8 bit transparent latch with LE, OE (active LOW), and CLR (active LOW), but outputs are inverted copies of the stored data. Useful when driving active LOW devices from an active HIGH data bus.',
     guidePinDescriptions: {
@@ -473,7 +473,7 @@ export const CHIPS_BLOCK_35 = {
   // ── 74668: Synchronous 4 bit decade up/down counter ───────────────────────
   /* Primary source: Texas Instruments, 74668 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls668.pdf
      https://en.wikipedia.org/wiki/Counter_(digital) */
-  '74668': {
+  '74x668': {
     name: '74x668',
     simpleName: 'Sync BCD Up/Down Counter',
     description: 'Synchronous presettable 4 bit decade up/down counter (16-pin)',
@@ -481,7 +481,7 @@ export const CHIPS_BLOCK_35 = {
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls668.pdf',
     tags: ['counter', 'bcd', 'decade', 'up/down', 'synchronous', 'preset', 'sequential'],
     sequential: true,
-    guideOverview: 'The 74x668 is a synchronous presettable 4 bit BCD (decade) up/down counter. It counts 0 9 in BCD, rolling over at 9 (up) or 0 (down). UD selects direction; LOAD presets the count from A-D inputs on the next clock edge; ENP and ENT enable counting and drive the ripple-carry output RCO.',
+    guideOverview: 'The 74x668 is a synchronous presettable 4 bit BCD (decade) up/down counter. It counts 0-9 in BCD, rolling over at 9 (up) or 0 (down). UD selects direction; LOAD presets the count from A-D inputs on the next clock edge; ENP and ENT enable counting and drive the ripple carry output RCO.',
     guidePinDescriptions: {
       'CLK':  'Clock input. Counter advances on the rising edge.',
       'UD':   'Up/Down select. HIGH = count up; LOW = count down.',
@@ -504,13 +504,13 @@ export const CHIPS_BLOCK_35 = {
       {
         title: 'BCD Counting',
         paragraphs: [
-          'BCD counting uses 4 bits but only counts 0 through 9. This is ideal for driving 7-segment displays or decimal arithmetic without a binary-to-decimal conversion step.',
+          'BCD counting uses 4 bits but only counts 0 through 9. This is ideal for driving 7 segment displays or decimal arithmetic without a binary to decimal conversion step.',
         ],
       },
       {
         title: 'Cascading',
         paragraphs: [
-          'Connect RCO of a lower stage to ENT of the next stage to cascade decade counters into a multi-digit counter. ENP must be HIGH on all stages.',
+          'Connect RCO of a lower stage to ENT of the next stage to cascade decade counters into a multi digit counter. ENP must be HIGH on all stages.',
         ],
       },
     ],
@@ -540,7 +540,7 @@ export const CHIPS_BLOCK_35 = {
   // ── 74669: Synchronous 4 bit binary up/down counter ───────────────────────
   /* Primary source: Texas Instruments, 74669 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls669.pdf
      https://en.wikipedia.org/wiki/Counter_(digital) */
-  '74669': {
+  '74x669': {
     name: '74x669',
     simpleName: 'Sync Binary Up/Down Counter',
     description: 'Synchronous presettable 4 bit binary up/down counter (16-pin)',
@@ -598,18 +598,18 @@ export const CHIPS_BLOCK_35 = {
     ],
   },
 
-  // ── 74670: 4×4 Register File, tri-state outputs ───────────────────────────
+  // ── 74670: 4×4 Register File, tri state outputs ───────────────────────────
   /* Primary source: Texas Instruments, 74670 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls670.pdf
      https://en.wikipedia.org/wiki/Bus_transceiver */
-  '74670': {
+  '74x670': {
     name: '74x670',
     simpleName: '4x4 Register File (TS)',
-    description: '4-word x 4 bit register file with tri-state outputs (16-pin)',
+    description: '4 word x 4 bit register file with tri state outputs (16-pin)',
     pins: 16, vcc: 16, gnd: 8,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls670.pdf',
-    tags: ['register file', 'memory', 'storage', 'tri-state', 'sequential'],
+    tags: ['register file', 'memory', 'storage', 'tri state', 'sequential'],
     sequential: true,
-    guideOverview: 'The 74x670 is a 4-word × 4 bit register file with independent read and write ports and tri-state outputs. Write address (WA1/WA2) selects which of four registers to write; WE clocks the data in. Read address (RA1/RA2) and RE select and enable the output. Both ports are independent, allowing simultaneous read and write of different registers.',
+    guideOverview: 'The 74x670 is a 4 word × 4 bit register file with independent read and write ports and tri state outputs. Write address (WA1/WA2) selects which of four registers to write; WE clocks the data in. Read address (RA1/RA2) and RE select and enable the output. Both ports are independent, allowing simultaneous read and write of different registers.',
     guidePinDescriptions: {
       'D1':  'Data input bit 1.',
       'D2':  'Data input bit 2.',
@@ -632,7 +632,7 @@ export const CHIPS_BLOCK_35 = {
       {
         title: 'Register File Concept',
         paragraphs: [
-          'A register file is a small multi-port memory: you can write to one address while reading from a different address simultaneously. The 74x670 stores 4 words × 4 bits = 16 bits total.',
+          'A register file is a small multi port memory: you can write to one address while reading from a different address simultaneously. The 74x670 stores 4 words × 4 bits = 16 bits total.',
           'Cascade two 74x670s with shared address lines and separate data/output bits for 4 × 8 bit registers.',
         ],
       },
@@ -663,15 +663,15 @@ export const CHIPS_BLOCK_35 = {
   // ── 74671: 4 bit Bidirectional Shift Register / Latch / Mux (direct CLR) ──
   /* Primary source: Texas Instruments, 74671 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls671.pdf
      https://en.wikipedia.org/wiki/Shift_register */
-  '74671': {
+  '74x671': {
     name: '74x671',
     simpleName: '4 bit SR/Latch/Mux (CLR)',
-    description: '4 bit bidirectional shift register/latch/multiplexer with direct clear, tri-state (20-pin)',
+    description: '4-bit bidir shift register/latch/mux, direct clear, 3-state (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls671.pdf',
-    tags: ['shift register', 'latch', 'mux', '4 bit', 'tri-state', 'sequential'],
+    tags: ['shift register', 'latch', 'mux', '4 bit', 'tri state', 'sequential'],
     sequential: true,
-    guideOverview: 'The 74x671 is a 4 bit bidirectional shift register with parallel load, mode select (S0/S1), tri-state outputs, and asynchronous (direct) CLR. S0/S1 select among shift-left, shift-right, parallel load, and hold modes. SI is the serial input; SO is the serial output end. CLR asynchronously resets all bits.',
+    guideOverview: 'The 74x671 is a 4 bit bidirectional shift register with parallel load, mode select (S0/S1), tri state outputs, and asynchronous (direct) CLR. S0/S1 select among shift left, shift right, parallel load, and hold modes. SI is the serial input; SO is the serial output end. CLR asynchronously resets all bits.',
     guidePinDescriptions: {
       'S0':   'Mode select bit 0. With S1 selects shift/load/hold mode.',
       'S1':   'Mode select bit 1.',
@@ -741,15 +741,15 @@ export const CHIPS_BLOCK_35 = {
   // ── 74672: 4 bit Bidirectional Shift Register / Latch / Mux (sync CLR) ────
   /* Primary source: Texas Instruments, 74672 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls672.pdf
      https://en.wikipedia.org/wiki/Shift_register */
-  '74672': {
+  '74x672': {
     name: '74x672',
     simpleName: '4 bit SR/Latch/Mux (sCLR)',
-    description: '4 bit bidirectional shift register/latch/multiplexer with synchronous clear, tri-state (20-pin)',
+    description: '4-bit bidir shift register/latch/mux, sync clear, 3-state (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls672.pdf',
-    tags: ['shift register', 'latch', 'mux', '4 bit', 'tri-state', 'sequential'],
+    tags: ['shift register', 'latch', 'mux', '4 bit', 'tri state', 'sequential'],
     sequential: true,
-    guideOverview: 'The 74x672 is identical to the 74x671 except CLR is synchronous: it clears on the next rising clock edge rather than immediately. Synchronous clear improves noise immunity and ensures glitch-free reset in timing-critical circuits.',
+    guideOverview: 'The 74x672 is identical to the 74x671 except CLR is synchronous: it clears on the next rising clock edge rather than immediately. Synchronous clear improves noise immunity and ensures glitch free reset in timing critical circuits.',
     guidePinDescriptions: {
       'S0':   'Mode select bit 0.',
       'S1':   'Mode select bit 1.',
@@ -776,7 +776,7 @@ export const CHIPS_BLOCK_35 = {
       {
         title: 'Synchronous vs Asynchronous Clear',
         paragraphs: [
-          'Synchronous clear waits for the clock edge to take effect, preventing unwanted glitches when CLR and CLK transitions overlap. Use 74x672 in high-speed or noise-sensitive systems.',
+          'Synchronous clear waits for the clock edge to take effect, preventing unwanted glitches when CLR and CLK transitions overlap. Use 74x672 in high speed or noise sensitive systems.',
         ],
       },
     ],
@@ -807,78 +807,46 @@ export const CHIPS_BLOCK_35 = {
       outputs: ['QA','QB','QC','QD'] }],
   },
 
-  // ── 74673: 16 bit serial-in, serial/parallel-out shift register ───────────
+  // ── 74673: 16 bit serial in, serial/parallel out shift register ───────────
   /* Primary source: Texas Instruments, 74673 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls673.pdf
      https://en.wikipedia.org/wiki/Shift_register */
-  '74673': {
+  '74x673': {
     name: '74x673',
     simpleName: '16 bit SIPO Shift Reg',
-    description: '16 bit serial-in, serial/parallel-out shift register with output storage registers (24-pin)',
+    description: '16-bit serial-in, serial/parallel-out shift reg, storage regs (24-pin)',
     pins: 24, vcc: 24, gnd: 12,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls673.pdf',
-    tags: ['shift register', '16 bit', 'serial', 'parallel', 'tri-state', 'sequential'],
+    tags: ['shift register', '16 bit', 'serial', 'parallel', 'tri state', 'sequential'],
     sequential: true,
-    guideOverview: 'The 74x673 is a 16 bit serial-in, parallel-out (SIPO) shift register with a separate output storage register. SER clocks data in on CLK; RCK transfers the shift register contents to the output latch, which drives Q0-Q15. OEn enables the tri-state parallel outputs. SOUT provides daisy-chain serial output.',
+    guideOverview: 'The 74x673 is a 16 bit serial in, parallel out (SIPO) shift register with a separate output storage register. SER clocks data in on CLK; RCK transfers the shift register contents to the output latch, which drives Q0-Q15. OEn enables the tri state parallel outputs. SOUT provides daisy chain serial output.',
     guidePinDescriptions: {
-      'SER':  'Serial data input. Shifted in on each CLK rising edge.',
-      'CLK':  'Shift clock. Rising edge shifts SER into the register.',
-      'RCK':  'Register clock. Rising edge transfers shift register to output latch.',
-      'OEn':  'Output Enable (active LOW). Enables Q0-Q15 parallel outputs.',
-      'Q15':  'Parallel output bit 15 (most recently shifted bit).',
-      'Q14':  'Parallel output bit 14.',
-      'Q13':  'Parallel output bit 13.',
-      'Q12':  'Parallel output bit 12.',
-      'Q11':  'Parallel output bit 11.',
-    guideOverview: 'The 74x675 is a 16 bit SIPO shift register that directly drives Q0-Q15 outputs from the shift stages (no separate output latch). SER enters data on CLK; OEn enables all outputs. Unlike the 74x673, there is no RCK so outputs update live with each clock cycle.',
-    guidePinDescriptions: {
-      'SER':  'Serial data input.',
-      'CLK':  'Shift clock (rising edge).',
-      'OEn':  'Output Enable (active LOW).',
-      'Q15':  'Output bit 15.',
-      'Q14':  'Output bit 14.',
-      'Q13':  'Output bit 13.',
-      'Q12':  'Output bit 12.',
-      'Q11':  'Output bit 11.',
-      'Q10':  'Output bit 10.',
-      'Q9':   'Output bit 9.',
-      'Q8':   'Output bit 8.',
-      'GND':  'Ground reference (pin 12).',
-      'Q7':   'Output bit 7.',
-      'Q6':   'Output bit 6.',
-      'Q5':   'Output bit 5.',
-      'Q4':   'Output bit 4.',
-      'Q3':   'Output bit 3.',
-      'Q2':   'Output bit 2.',
-      'Q1':   'Output bit 1.',
-      'Q0':   'Output bit 0.',
-      'SOUT': 'Serial output for daisy-chaining.',
-      'NC1':  'No connect.',
-      'NC2':  'No connect.',
-      'VCC':  'Positive supply (+5 V, pin 24).',
-    },
-    guideSections: [
-      {
-        title: '74x673 vs 74x675',
-        paragraphs: [
-          '74x673 adds a separate RCK register clock for double-buffering (outputs only update on RCK, not CLK). 74x675 outputs update live on each CLK edge. Use 74x673 for glitch-free parallel output; use 74x675 for simpler designs.',
-        ],
-      },
-    ],
-      'Q10':  'Parallel output bit 10.',
-      'Q9':   'Parallel output bit 9.',
-      'GND':  'Ground reference (pin 12).',
-      'Q8':   'Parallel output bit 8.',
-      'Q7':   'Parallel output bit 7.',
-      'Q6':   'Parallel output bit 6.',
-      'Q5':   'Parallel output bit 5.',
-      'Q4':   'Parallel output bit 4.',
-      'Q3':   'Parallel output bit 3.',
-      'Q2':   'Parallel output bit 2.',
-      'Q1':   'Parallel output bit 1.',
-      'Q0':   'Parallel output bit 0 (first shifted bit).',
-      'SOUT': 'Serial output. Connects to SER of next chip for daisy-chaining.',
-      'NC':   'No connect.',
-      'VCC':  'Positive supply (+5 V, pin 24).',
+      'SER': 'Serial data input. Shifted in on each CLK rising edge.',
+      'CLK': 'Shift clock. Rising edge shifts SER into the register.',
+      'RCK': 'Register clock. Rising edge transfers shift register to output latch.',
+      'OEn': 'Output Enable (active LOW). Enables Q0-Q15 parallel outputs.',
+      'Q15': 'Parallel output bit 15 (most recently shifted bit).',
+      'Q14': 'Parallel output bit 14.',
+      'Q13': 'Parallel output bit 13.',
+      'Q12': 'Parallel output bit 12.',
+      'Q11': 'Parallel output bit 11.',
+      'guideOverview': 'The 74x675 is a 16 bit SIPO shift register that directly drives Q0-Q15 outputs from the shift stages (no separate output latch). SER enters data on CLK; OEn enables all outputs. Unlike the 74x673, there is no RCK so outputs update live with each clock cycle.',
+      'guidePinDescriptions': '{\'SER\': \'Serial data input.\', \'CLK\': \'Shift clock (rising edge).\', \'OEn\': \'Output Enable (active LOW).\', \'Q15\': \'Output bit 15.\', \'Q14\': \'Output bit 14.\', \'Q13\': \'Output bit 13.\', \'Q12\': \'Output bit 12.\', \'Q11\': \'Output bit 11.\', \'Q10\': \'Output bit 10.\', \'Q9\': \'Output bit 9.\', \'Q8\': \'Output bit 8.\', \'GND\': \'Ground reference (pin 12).\', \'Q7\': \'Output bit 7.\', \'Q6\': \'Output bit 6.\', \'Q5\': \'Output bit 5.\', \'Q4\': \'Output bit 4.\', \'Q3\': \'Output bit 3.\', \'Q2\': \'Output bit 2.\', \'Q1\': \'Output bit 1.\', \'Q0\': \'Output bit 0.\', \'SOUT\': \'Serial output for daisy chaining.\', \'NC1\': \'No connect.\', \'NC2\': \'No connect.\', \'VCC\': \'Positive supply (+5 V, pin 24).\'}',
+      'guideSections': '[{\'title\': \'74x673 vs 74x675\', \'paragraphs\': [\'74x673 adds a separate RCK register clock for double buffering (outputs only update on RCK, not CLK). 74x675 outputs update live on each CLK edge. Use 74x673 for glitch free parallel output; use 74x675 for simpler designs.\']}]',
+      'Q10': 'Parallel output bit 10.',
+      'Q9': 'Parallel output bit 9.',
+      'GND': 'Ground reference (pin 12).',
+      'Q8': 'Parallel output bit 8.',
+      'Q7': 'Parallel output bit 7.',
+      'Q6': 'Parallel output bit 6.',
+      'Q5': 'Parallel output bit 5.',
+      'Q4': 'Parallel output bit 4.',
+      'Q3': 'Parallel output bit 3.',
+      'Q2': 'Parallel output bit 2.',
+      'Q1': 'Parallel output bit 1.',
+      'Q0': 'Parallel output bit 0 (first shifted bit).',
+      'SOUT': 'Serial output. Connects to SER of next chip for daisy chaining.',
+      'NC': 'No connect.',
+      'VCC': 'Positive supply (+5 V, pin 24).',
     },
     guideSections: [
       {
@@ -886,7 +854,7 @@ export const CHIPS_BLOCK_35 = {
         paragraphs: [
           'A SIPO shift register converts a serial bit stream into a parallel word. Clock in 16 bits serially, then pulse RCK to update the parallel outputs atomically outputs do not glitch during shifting.',
         ],
-        note: '74x673 vs 74x675: 74x673 has a separate RCK for the output latch (double-buffered); 74x675 directly drives outputs from the shift stage.',
+        note: '74x673 vs 74x675: 74x673 has a separate RCK for the output latch (double buffered); 74x675 directly drives outputs from the shift stage.',
       },
     ],
     pinout: [
@@ -921,18 +889,18 @@ export const CHIPS_BLOCK_35 = {
                 'Q8','Q9','Q10','Q11','Q12','Q13','Q14','Q15','SOUT'] }],
   },
 
-  // ── 74674: 16 bit parallel-in, serial-out shift register ──────────────────
+  // ── 74674: 16 bit parallel in, serial out shift register ──────────────────
   /* Primary source: Texas Instruments, 74674 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls674.pdf
      https://en.wikipedia.org/wiki/Shift_register */
-  '74674': {
+  '74x674': {
     name: '74x674',
     simpleName: '16 bit PISO Shift Reg',
-    description: '16 bit parallel-in, serial-out shift register (24-pin)',
+    description: '16 bit parallel in, serial out shift register (24-pin)',
     pins: 24, vcc: 24, gnd: 12,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls674.pdf',
-    tags: ['shift register', '16 bit', 'parallel', 'serial', 'tri-state', 'sequential'],
+    tags: ['shift register', '16 bit', 'parallel', 'serial', 'tri state', 'sequential'],
     sequential: true,
-    guideOverview: 'The 74x674 is a 16 bit parallel-in, serial-out (PISO) shift register. Load all 16 bits in parallel using the S (LOAD) pin, then shift them out serially via SOUT. CLK steps the register; OEn enables the SOUT output. Used to serialize 16 bit parallel data for transmission over a single wire.',
+    guideOverview: 'The 74x674 is a 16 bit parallel in, serial out (PISO) shift register. Load all 16 bits in parallel using the S (LOAD) pin, then shift them out serially via SOUT. CLK steps the register; OEn enables the SOUT output. Used to serialize 16 bit parallel data for transmission over a single wire.',
     guidePinDescriptions: {
       'OEn':  'Output Enable for SOUT (active LOW).',
       'CLK':  'Shift clock. Rising edge shifts the register; captures parallel data when S=HIGH.',
@@ -999,13 +967,13 @@ export const CHIPS_BLOCK_35 = {
       outputs: ['SOUT'] }],
   },
 
-  // ── 74675: 16 bit serial-in, serial/parallel-out shift register ───────────
+  // ── 74675: 16 bit serial in, serial/parallel out shift register ───────────
   /* Primary source: Texas Instruments, 74675 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74f675a.pdf
      https://en.wikipedia.org/wiki/Shift_register */
-  '74675': {
+  '74x675': {
     name: '74x675',
     simpleName: '16 bit SIPO Shift Reg',
-    description: '16 bit serial-in, serial/parallel-out shift register (24-pin)',
+    description: '16 bit serial in, serial/parallel out shift register (24-pin)',
     pins: 24, vcc: 24, gnd: 12,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74f675a.pdf',
     tags: ['shift register', '16 bit', 'serial', 'parallel', 'sequential'],
@@ -1032,7 +1000,7 @@ export const CHIPS_BLOCK_35 = {
       'Q2':   'Output bit 2.',
       'Q1':   'Output bit 1.',
       'Q0':   'Output bit 0.',
-      'SOUT': 'Serial output for daisy-chaining.',
+      'SOUT': 'Serial output for daisy chaining.',
       'NC1':  'No connect.',
       'NC2':  'No connect.',
       'VCC':  'Positive supply (+5 V, pin 24).',
@@ -1041,7 +1009,7 @@ export const CHIPS_BLOCK_35 = {
       {
         title: '74x673 vs 74x675',
         paragraphs: [
-          '74x673 adds a separate RCK register clock for double-buffering (outputs only update on RCK, not CLK). 74x675 outputs update live on each CLK edge. Use 74x673 for glitch-free parallel output; use 74x675 for simpler designs.',
+          '74x673 adds a separate RCK register clock for double buffering (outputs only update on RCK, not CLK). 74x675 outputs update live on each CLK edge. Use 74x673 for glitch free parallel output; use 74x675 for simpler designs.',
         ],
       },
     ],
@@ -1077,13 +1045,13 @@ export const CHIPS_BLOCK_35 = {
                 'Q8','Q9','Q10','Q11','Q12','Q13','Q14','Q15','SOUT'] }],
   },
 
-  // ── 74676: 16 bit serial/parallel-in, serial-out shift register ───────────
+  // ── 74676: 16 bit serial/parallel in, serial out shift register ───────────
   /* Primary source: Texas Instruments, 74676 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74f676.pdf
      https://en.wikipedia.org/wiki/Shift_register */
-  '74676': {
+  '74x676': {
     name: '74x676',
     simpleName: '16 bit SP-SI Shift Reg',
-    description: '16 bit serial/parallel-in, serial-out shift register (24-pin)',
+    description: '16 bit serial/parallel in, serial out shift register (24-pin)',
     pins: 24, vcc: 24, gnd: 12,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74f676.pdf',
     tags: ['shift register', '16 bit', 'parallel', 'serial', 'sequential'],
@@ -1158,7 +1126,7 @@ export const CHIPS_BLOCK_35 = {
   // ── 74677: 16 bit Address Comparator with Enable ──────────────────────────
   /* Primary source: Texas Instruments, 74677 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74als677.pdf
      https://en.wikipedia.org/wiki/Digital_comparator */
-  '74677': {
+  '74x677': {
     name: '74x677',
     simpleName: '16 bit Addr Comparator',
     description: '16 bit address comparator with enable (24-pin)',
@@ -1166,7 +1134,7 @@ export const CHIPS_BLOCK_35 = {
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74als677.pdf',
     tags: ['comparator', 'address', '16 bit', 'sequential'],
     sequential: true,
-    guideOverview: 'The 74x677 is a 16 bit address comparator that compares two 8 bit words (A0-A7 vs B0-B7) and asserts outputs based on the comparison result. Three active LOW enable inputs (EGn, ELn, EQn) individually enable the greater-than, less-than, and equal-to comparison paths for cascading. Outputs GEn and EQout indicate the comparison result.',
+    guideOverview: 'The 74x677 is a 16 bit address comparator that compares two 8 bit words (A0-A7 vs B0-B7) and asserts outputs based on the comparison result. Three active LOW enable inputs (EGn, ELn, EQn) individually enable the greater than, less than, and equal to comparison paths for cascading. Outputs GEn and EQout indicate the comparison result.',
     guidePinDescriptions: {
       'A0':    'Address input bit 0.',
       'A1':    'Address input bit 1.',
@@ -1176,11 +1144,11 @@ export const CHIPS_BLOCK_35 = {
       'A5':    'Address input bit 5.',
       'A6':    'Address input bit 6.',
       'A7':    'Address input bit 7.',
-      'EGn':   'Enable Greater-than (active LOW).',
-      'ELn':   'Enable Less-than (active LOW).',
-      'EQn':   'Enable Equal-to (active LOW).',
+      'EGn':   'Enable Greater than (active LOW).',
+      'ELn':   'Enable Less than (active LOW).',
+      'EQn':   'Enable Equal to (active LOW).',
       'GND':   'Ground reference (pin 12).',
-      'GEn':   'Greater-or-Equal output (active LOW).',
+      'GEn':   'Greater or Equal output (active LOW).',
       'EQout': 'Equal output.',
       'B7':    'Reference input bit 7.',
       'B6':    'Reference input bit 6.',
@@ -1227,7 +1195,7 @@ export const CHIPS_BLOCK_35 = {
       { pin: 23, name: 'NC',   type: 'nc'  },
       { pin: 24, name: 'VCC',  type: 'power'  },
     ],
-    gates: [{ type: 'ADDR_COMP_16BIT_STUB',
+    gates: [{ type: 'ADDR_COMP_CASCADE',
       inputs:  ['A0','A1','A2','A3','A4','A5','A6','A7',
                 'B0','B1','B2','B3','B4','B5','B6','B7',
                 'EGn','ELn','EQn'],

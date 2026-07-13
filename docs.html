@@ -1,10 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-i18n-catalog="docs">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>74Sim Docs</title>
   <link rel="icon" type="image/png" href="assets/Logo74Sim.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/tokens.css">
   <link rel="stylesheet" href="/css/docs.css">
 </head>
@@ -28,29 +31,30 @@
     <!-- ── Left sidebar ── -->
     <aside class="docs-sidebar" id="docs-sidebar">
       <div class="sidebar-group">
-        <div class="sidebar-group-label">Getting Started</div>
-        <button class="sidebar-link active" data-article="overview">Overview</button>
-        <button class="sidebar-link" data-article="breadboard">How a Breadboard Works</button>
-        <button class="sidebar-link" data-article="chips">74 Series Logic Chips</button>
+        <div class="sidebar-group-label" data-i18n="docs.010b85ad56">Getting Started</div>
+        <button class="sidebar-link active" data-article="overview" data-i18n="docs.0efc2e6be4">Overview</button>
+        <button class="sidebar-link" data-article="breadboard" data-i18n="docs.589b6b4ebd">How a Breadboard Works</button>
+        <button class="sidebar-link" data-article="chips" data-i18n="docs.66deea0081">74 Series Logic Chips</button>
       </div>
 
       <div class="sidebar-group">
-        <div class="sidebar-group-label">Concepts</div>
-        <button class="sidebar-link" data-article="families">Chip Families</button>
-        <button class="sidebar-link" data-article="floating">Floating vs Grounded</button>
-        <button class="sidebar-link" data-article="spice-simulator">SPICE Simulator</button>
+        <div class="sidebar-group-label" data-i18n="docs.6f58d263f3">Concepts</div>
+        <button class="sidebar-link" data-article="families" data-i18n="docs.891d7a40e1">Chip Families</button>
+        <button class="sidebar-link" data-article="floating" data-i18n="docs.8a75f08496">Floating vs Grounded</button>
+        <button class="sidebar-link" data-article="spice-simulator" data-i18n="docs.7e94fb0112">SPICE Simulator</button>
       </div>
 
       <div class="sidebar-group">
-        <div class="sidebar-group-label">Resources</div>
-        <button class="sidebar-link" data-article="examples">Example Projects</button>
-        <button class="sidebar-link" data-article="keybinds">Keybinds</button>
-        <button class="sidebar-link" data-article="common-terms">Common Terms</button>
-        <button class="sidebar-link" data-article="unverified-chips">Unverified Chips</button>
+        <div class="sidebar-group-label" data-i18n="docs.87df60de33">Resources</div>
+        <button class="sidebar-link" data-article="examples" data-i18n="docs.ab858fbeca">Example Projects</button>
+        <button class="sidebar-link" data-article="keybinds" data-i18n="docs.880934ba65">Keybinds</button>
+        <button class="sidebar-link" data-article="common-terms" data-i18n="docs.902bb9a3d0">Common Terms</button>
+        <button class="sidebar-link" data-article="unverified-chips" data-i18n="docs.358e4c1512">Unverified Chips</button>
+        <a class="sidebar-link" href="/request-change" data-i18n="docs.1af31d3d2e">Request a Change</a>
       </div>
 
       <div class="sidebar-group" id="sidebar-chipref-group" style="display:none">
-        <div class="sidebar-group-label">Chip Reference</div>
+        <div class="sidebar-group-label" data-i18n="docs.2736f6d575">Chip Reference</div>
       </div>
     </aside>
 
@@ -64,49 +68,27 @@
           <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M3.5 2.5l3 2.5-3 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
           Overview
         </div>
-        <h1>74Sim Documentation</h1>
-        <p class="lead">74Sim is a browser-based <a href="https://en.wikipedia.org/wiki/Breadboard" target="_blank" rel="noopener">breadboard</a> simulator for 74-series and other digital <a href="https://en.wikipedia.org/wiki/Buffer" target="_blank" rel="noopener">logic</a> chips, designed for individuals with an intermediate to advanced knowledge of digital logic technology.</p>
+        <h1 data-i18n="docs.7b949af277">74Sim Documentation</h1>
+        <p class="lead" data-i18n="docs.248341c678">74Sim is an open source simulator for 74 series logic chips. You build circuits on a virtual breadboard, wire up switches and LEDs, and watch the logic run as you flip inputs.</p>
 
-        <h2 id="ov-what">What is 74Sim?</h2>
-        <p>74Sim lets you design, wire, and test digital logic circuits directly in your browser   no hardware, no soldering iron, and no proprietary software required. The interface models a real solderless breadboard: chips straddle the center channel, pins land in numbered columns, and wires connect column to column exactly as they would on a physical board.</p>
-        <p>The simulator is event-driven. Every time you toggle a switch or a chip output changes state, the signal propagates through connected wires in real time, updating LEDs, 7-segment displays, and downstream chip inputs automatically. What you see on screen matches what would appear on an <a href="https://en.wikipedia.org/wiki/Oscilloscope" target="_blank" rel="noopener">oscilloscope</a> or <a href="https://en.wikipedia.org/wiki/Logic_probe" target="_blank" rel="noopener">logic probe</a> in a lab.</p>
-
-        <h2 id="ov-chips">Supported chips</h2>
-        <p>74Sim includes a broad library of 74-series ICs spanning several logic families (74HC, 74LS, 74HCT, and others). The library covers:</p>
+        <h2 id="ov-what" data-i18n="docs.fb2dbad141">What you can do</h2>
         <ul>
-          <li><strong>Basic gates</strong>   AND, OR, NAND, NOR, XOR, XNOR, NOT, and buffers (7400, 7402, 7404, 7408, 7432, 7486...)</li>
-          <li><strong>Flip-flops and latches</strong>   SR, D, JK, and their clocked variants (7474, 7476, 74175...)</li>
-          <li><strong>Counters</strong>   <a href="https://en.wikipedia.org/wiki/Binary_number" target="_blank" rel="noopener">binary</a>, <a href="https://en.wikipedia.org/wiki/Binary-coded_decimal" target="_blank" rel="noopener">BCD</a>, up/down, with synchronous and asynchronous variants (7490, 74163, 74193...)</li>
-          <li><strong>Shift registers</strong>   serial-in/parallel-out, parallel-in/serial-out, bidirectional (74164, 74165, 74595...)</li>
-          <li><strong>Multiplexers and decoders</strong>   data selectors, address decoders, demultiplexers (74151, 74138, 74154...)</li>
-          <li><strong>Arithmetic</strong>   adders, comparators (7483, 7485...)</li>
-          <li><strong>Transceivers and buffers</strong>   tri-state, bidirectional bus drivers (74245, 74244...)</li>
-        </ul>
-        <p>Each chip in the Chip Reference includes a <a href="https://en.wikipedia.org/wiki/Pinout" target="_blank" rel="noopener">pinout</a> diagram, pin descriptions, and a guide section covering its operation, truth tables, and typical applications. Use the search bar in <a href="#" data-nav="chip-ref-search">Chip Reference → Search</a> to find any chip by number, function, or keyword.</p>
-
-        <h2 id="ov-components">Components and I/O</h2>
-        <p>Beyond chips, the simulator provides a set of input and output components:</p>
-        <ul>
-          <li><strong>Inputs</strong>   momentary pushbuttons and toggle switches for driving logic HIGH or LOW manually.</li>
-          <li><strong>Outputs</strong>   single LEDs (any color) for monitoring individual signals, and 7-segment displays for visualizing BCD or hex output from counters and decoders.</li>
-          <li><strong>Passives</strong>   pull up and pull down resistors for setting default <a href="https://en.wikipedia.org/wiki/Logic_level" target="_blank" rel="noopener">logic levels</a> on floating inputs.</li>
-          <li><strong>Power rails</strong>   VCC and GND bus connectors that tie the breadboard power rails to the simulation supply.</li>
+          <li data-i18n="docs.a7180934f4">Drop chips onto a breadboard and wire them up with switches, buttons, LEDs, and resistors.</li>
+          <li data-i18n="docs.2755357ab9">Pick from the 74HC, 74LS, 74HCT, and 74LVC families: gates, flip flops, counters, shift registers, multiplexers, arithmetic chips, and bus transceivers.</li>
+          <li data-i18n="docs.513ed0b03c">Open any chip to see its pinout and a short guide on how it works and where it gets used.</li>
+          <li data-i18n="docs.11eca4fa04">Save circuits to your computer, or load examples from the archive to see how the pieces fit together.</li>
         </ul>
 
-        <h2 id="ov-workflow">Typical workflow</h2>
-        <p>Most circuits follow this pattern:</p>
-        <ol>
-          <li>Add a chip from the toolbar and place it on the breadboard.</li>
-          <li>Connect VCC and GND to the chip's power pins   the simulation will not drive outputs correctly without power.</li>
-          <li>Wire inputs (switches, other chip outputs) to the chip's logic inputs.</li>
-          <li>Wire the chip's outputs to LEDs, 7-segment displays, or other chip inputs.</li>
-          <li>Toggle your input switches and observe the outputs update in real time.</li>
-        </ol>
-        <p>Circuits are saved automatically in your browser's local storage. You can also save, load, and share circuits as JSON files using the Save / Load buttons in the simulator toolbar.</p>
+        <h2 id="ov-start" data-i18n="docs.98aa05f1fd">Where to start</h2>
+        <p data-i18n="docs.22c015ad3c">Pick whichever fits where you are:</p>
+        <ul>
+          <li data-i18n-html="docs.a8e67c0b89">Want to just try it? <a href="simulator">Open the simulator</a> and start placing chips.</li>
+          <li data-i18n-html="docs.deb91b31d1">Want to see what's possible first? Browse the <a href="#" data-nav="examples">Example Projects</a> pre built circuits you can load and poke around in.</li>
+          <li data-i18n-html="docs.194c638400">New to breadboards? Read <a href="#" data-nav="breadboard">How a Breadboard Works</a>.</li>
+          <li data-i18n-html="docs.e51208ea12">New to 74 series chips? Read <a href="#" data-nav="chips">74 Series Logic Chips</a>, then <a href="#" data-nav="families">Chip Families</a>.</li>
+        </ul>
 
-        <h2 id="ov-start">Getting started</h2>
-        <p>Open the <a href="simulator">Simulator</a> to begin. The toolbar at the top lets you add chips, input components (switches, buttons), output components (LEDs, 7-segment displays), resistors, and wires.</p>
-        <p>If you are new to 74Sim, the <a href="onramp/intro.html">On-Ramp</a> is a short guided introduction to the interface. The <a href="#" data-nav="breadboard">How a Breadboard Works</a> article explains the physical layout the simulator is modeled on. Browse <a href="#" data-nav="examples">Example Projects</a> for pre-built circuits you can open directly in the simulator.</p>
+       
 
       </article>
 
@@ -117,23 +99,23 @@
           <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M3.5 2.5l3 2.5-3 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
           How a <a href="https://en.wikipedia.org/wiki/Breadboard" target="_blank" rel="noopener">Breadboard</a> Works
         </div>
-        <h1>How a Breadboard Works</h1>
-        <p class="lead">A <a href="https://en.wikipedia.org/wiki/Breadboard" target="_blank" rel="noopener">breadboard</a> is a reusable prototyping board made up of a grid of holes, with metal spring clips electronically connecting sections of the board, no soldering required.</p>
+        <h1 data-i18n="docs.589b6b4ebd">How a Breadboard Works</h1>
+        <p class="lead" data-i18n-html="docs.0e1d877c12">A <a href="https://en.wikipedia.org/wiki/Breadboard" target="_blank" rel="noopener">breadboard</a> is a reusable prototyping board made up of a grid of holes, with metal spring clips electronically connecting sections of the board, no soldering required.</p>
 
-        <h2 id="bb-layout">Physical layout</h2>
-        <p>The front of the breadboard shows labeled rows and columns of holes. The back reveals the metal clips that make the connections.</p>
+        <h2 id="bb-layout" data-i18n="docs.13fc393a13">Physical layout</h2>
+        <p data-i18n="docs.6a9c8bce07">The front of the breadboard shows labeled rows and columns of holes. The back reveals the metal clips that make the connections.</p>
         <div class="img-pair">
           <img src="assets/breadboardFront.png" alt="Front of a breadboard">
           <img src="assets/breadboardback.png" alt="Back of a breadboard">
         </div>
 
-        <h2 id="bb-connect">How holes connect</h2>
-        <p>There are two connection zones:</p>
+        <h2 id="bb-connect" data-i18n="docs.99131bae27">How holes connect</h2>
+        <p data-i18n="docs.e9536acb3b">There are two connection zones:</p>
         <ul>
-          <li>Main grid: columns of 5 holes (rows A to E on top, F to J on bottom). All holes in the same column and the same half are connected together. The center channel separates the two halves.</li>
-          <li>Power rails: long rows along each side, marked + and &#8722;. Each rail runs the full length of the board. Connect your power supply here and tap power from any hole along it.</li>
+          <li data-i18n="docs.09f82ff0aa">Main grid: columns of 5 holes (rows A to E on top, F to J on bottom). All holes in the same column and the same half are connected together. The center channel separates the two halves.</li>
+          <li data-i18n="docs.0da1d6cbaf">Power rails: long rows along each side, marked + and &#8722;. Each rail runs the full length of the board. Connect your power supply here and tap power from any hole along it.</li>
         </ul>
-        <p><a href="https://en.wikipedia.org/wiki/Dual_in-line_package" target="_blank" rel="noopener">DIP (Dual In-line Package)</a> chips straddle the center channel. Each pin connects to its own 5-hole column, so you can attach up to 4 other wires or components to a single chip pin.
+        <p data-i18n-html="docs.cb5d0a76d6"><a href="https://en.wikipedia.org/wiki/Dual_in-line_package" target="_blank" rel="noopener">DIP (Dual In line Package)</a> chips straddle the center channel. Each pin connects to its own 5-hole column, so you can attach up to 4 other wires or components to a single chip pin.
         </p>
 
 
@@ -147,36 +129,36 @@
           <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M3.5 2.5l3 2.5-3 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
           74 Series <a href="https://en.wikipedia.org/wiki/Buffer" target="_blank" rel="noopener">Logic</a> Chips
         </div>
-        <h1>74 Series Logic Chips</h1>
-        <p class="lead">74 series chips are logic chips designed to perform specific logical functions: AND, OR, NAND, flip-flops, counters, and more. The number in the chip name determines its logical function; the letters indicate the family.</p>
+        <h1 data-i18n="docs.66deea0081">74 Series Logic Chips</h1>
+        <p class="lead" data-i18n="docs.e04ceb4863">74 series chips are logic chips designed to perform specific logical functions: AND, OR, NAND, flip flops, counters, and more. The number in the chip name determines its logical function; the letters indicate the family.</p>
 
-        <h2 id="ch-about">About the series</h2>
-        <p><a href="https://en.wikipedia.org/wiki/7400-series_integrated_circuits" target="_blank" rel="noopener">Wikipedia: 7400-series integrated circuits</a></p>
+        <h2 id="ch-about" data-i18n="docs.a882abee2d">About the series</h2>
+        <p data-i18n-html="docs.a22ecec365"><a href="https://en.wikipedia.org/wiki/7400-series_integrated_circuits" target="_blank" rel="noopener">Wikipedia: 7400-series integrated circuits</a></p>
         <img src="assets/7400-chip-example.jpg" alt="74 series chip example" class="article-img">
-        <p class="img-caption">Image credit: Audrius Meskauskas, Creative Commons</p>
-        <p>A 74 series chip uses <a href="https://en.wikipedia.org/wiki/CMOS" target="_blank" rel="noopener">CMOS</a> or <a href="https://en.wikipedia.org/wiki/Transistor%E2%80%93transistor_logic" target="_blank" rel="noopener">TTL</a> transistors internally to implement its logic function. Pins are numbered around the package starting from pin 1.</p>
+        <p class="img-caption" data-i18n="docs.d0d2a79705">Image credit: Audrius Meskauskas, Creative Commons</p>
+        <p data-i18n-html="docs.b3234cb291">A 74 series chip uses <a href="https://en.wikipedia.org/wiki/CMOS" target="_blank" rel="noopener">CMOS</a> or <a href="https://en.wikipedia.org/wiki/Transistor%E2%80%93transistor_logic" target="_blank" rel="noopener">TTL</a> transistors internally to implement its logic function. Pins are numbered around the package starting from pin 1.</p>
 
-        <h2 id="ch-orient">Orientation</h2>
-        <p>A 74 series chip can be oriented by the notch on one of its short sides. With the notch on the left (as in 74Sim):</p>
+        <h2 id="ch-orient" data-i18n="docs.86e4e38754">Orientation</h2>
+        <p data-i18n="docs.d5844f6859">A 74 series chip can be oriented by the notch on one of its short sides. With the notch on the left (as in 74Sim):</p>
         <ul>
-          <li>VCC (power) is on the top-left pin</li>
-          <li>GND (ground) is on the bottom-right pin</li>
-          <li>Pins are numbered counter-clockwise starting from pin 1 at the bottom-left</li>
+          <li data-i18n="docs.2806a64d81">VCC (power) is on the top-left pin</li>
+          <li data-i18n="docs.049ca65375">GND (ground) is on the bottom-right pin</li>
+          <li data-i18n="docs.4b656c00bf">Pins are numbered counter clockwise starting from pin 1 at the bottom-left</li>
         </ul>
 
-        <h2 id="ch-naming">Naming convention</h2>
+        <h2 id="ch-naming" data-i18n="docs.efdb6f59d8">Naming convention</h2>
         <table>
           <thead><tr><th>Part</th><th>Meaning</th><th>Example</th></tr></thead>
           <tbody>
-            <tr><td><strong>74</strong></td><td>Series identifier</td><td>74</td></tr>
-            <tr><td><strong>LS / HC / HCT</strong></td><td>Family (technology)</td><td>LS</td></tr>
-            <tr><td><strong>Number</strong></td><td>Logical function</td><td>04</td></tr>
+            <tr><td><strong>74</strong></td><td data-i18n="docs.fde22ec039">Series identifier</td><td>74</td></tr>
+            <tr><td><strong>LS / HC / HCT</strong></td><td data-i18n="docs.ea0e81892c">Family (technology)</td><td>LS</td></tr>
+            <tr><td><strong>Number</strong></td><td data-i18n="docs.cf95fc941a">Logical function</td><td>04</td></tr>
           </tbody>
         </table>
-        <p>So 74LS04 is a 74 series Low power <a href="https://en.wikipedia.org/wiki/Schottky_diode" target="_blank" rel="noopener">Schottky</a> <a href="https://en.wikipedia.org/wiki/Inverter_(logic_gate)" target="_blank" rel="noopener">hex inverter</a>. See <a href="#" data-nav="families">Chip Families</a> for a full breakdown of family differences.</p>
+        <p data-i18n-html="docs.d580edce08">So 74LS04 is a 74 series Low power <a href="https://en.wikipedia.org/wiki/Schottky_diode" target="_blank" rel="noopener">Schottky</a> <a href="https://en.wikipedia.org/wiki/Inverter_(logic_gate)" target="_blank" rel="noopener">hex inverter</a>. See <a href="#" data-nav="families">Chip Families</a> for a full breakdown of family differences.</p>
 
-        <h2 id="ch-list">Full chip reference</h2>
-        <p>A full list of 74 series chips can be found at <a href="https://www.build-electronic-circuits.com/7400-series-integrated-circuits/" target="_blank" rel="noopener">build-electronic-circuits.com</a>. 74Sim supports the chips shown in the chip picker in the toolbar.</p>
+        <h2 id="ch-list" data-i18n="docs.ffbffd792a">Full chip reference</h2>
+        <p data-i18n-html="docs.048603fea2">A full list of 74 series chips can be found at <a href="https://www.build-electronic-circuits.com/7400-series-integrated-circuits/" target="_blank" rel="noopener">build electronic-circuits.com</a>. 74Sim supports the chips shown in the chip picker in the toolbar.</p>
 
 
       </article>
@@ -188,63 +170,79 @@
           <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M3.5 2.5l3 2.5-3 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
           Chip Families
         </div>
-        <h1>74 Series Chip Families</h1>
-        <p class="lead">The letters between "74" and the function number indicate which family a chip belongs to. Families differ in transistor technology, <a href="https://en.wikipedia.org/wiki/Power_supply" target="_blank" rel="noopener">supply voltage</a>, speed, power consumption, and input/output behavior.</p>
+        <h1 data-i18n="docs.e83e77afb5">74 Series Chip Families</h1>
+        <p class="lead" data-i18n-html="docs.41fe119b4c">The letters between "74" and the function number indicate which family a chip belongs to. Families differ in transistor technology, <a href="https://en.wikipedia.org/wiki/Power_supply" target="_blank" rel="noopener">supply voltage</a>, speed, power consumption, and input/output behavior.</p>
 
-        <h2 id="fam-ls">74LS, Low power Schottky (TTL)</h2>
-        <p>The 74LS family uses <a href="https://en.wikipedia.org/wiki/Transistor%E2%80%93transistor_logic" target="_blank" rel="noopener">Transistor to Transistor Logic (TTL)</a> circuitry. It is fast but consumes more power than the <a href="https://en.wikipedia.org/wiki/CMOS" target="_blank" rel="noopener">CMOS</a> families that followed it.</p>
+        <h2 id="fam-ls" data-i18n="docs.8a10f16154">74LS, Low power Schottky (TTL)</h2>
+        <p data-i18n-html="docs.de0a3d9f0c">The 74LS family uses <a href="https://en.wikipedia.org/wiki/Transistor%E2%80%93transistor_logic" target="_blank" rel="noopener">Transistor to Transistor Logic (TTL)</a> circuitry. It is fast but consumes more power than the <a href="https://en.wikipedia.org/wiki/CMOS" target="_blank" rel="noopener">CMOS</a> families that followed it.</p>
         <ul>
-          <li>Supply: 5V &#177;0.25V (&#177;5%), a regulated supply is best. Add a 0.1 &#956;F <a href="https://en.wikipedia.org/wiki/Decoupling_capacitor" target="_blank" rel="noopener">decoupling capacitor</a> near each IC.</li>
-          <li>Inputs float high to <a href="https://en.wikipedia.org/wiki/Buffer" target="_blank" rel="noopener">logic</a> 1 when unconnected. Connect unused inputs to +Vs in real circuits.</li>
-          <li>Outputs can sink up to 8 mA but source only ~0.4 mA.</li>
-          <li><a href="https://en.wikipedia.org/wiki/Fan-out" target="_blank" rel="noopener">Fan-out</a>: one output drives up to 10 74LS inputs.</li>
-          <li><a href="https://en.wikipedia.org/wiki/Propagation_delay" target="_blank" rel="noopener">Propagation delay</a>: ~10 ns per gate. Max frequency: ~35 MHz.</li>
+          <li data-i18n-html="docs.01fb87976d">Supply: 5V &#177;0.25V (&#177;5%), a regulated supply is best. Add a 0.1 &#956;F <a href="https://en.wikipedia.org/wiki/Decoupling_capacitor" target="_blank" rel="noopener">decoupling capacitor</a> near each IC.</li>
+          <li data-i18n-html="docs.6f37c71b80">Inputs float high to <a href="https://en.wikipedia.org/wiki/Buffer" target="_blank" rel="noopener">logic</a> 1 when unconnected. Connect unused inputs to +Vs in real circuits.</li>
+          <li data-i18n="docs.cb27ec6c67">Outputs can sink up to 8 mA but source only ~0.4 mA.</li>
+          <li data-i18n-html="docs.fabf220698"><a href="https://en.wikipedia.org/wiki/Fan-out" target="_blank" rel="noopener">Fan out</a>: one output drives up to 10 74LS inputs.</li>
+          <li data-i18n-html="docs.801a108081"><a href="https://en.wikipedia.org/wiki/Propagation_delay" target="_blank" rel="noopener">Propagation delay</a>: ~10 ns per gate. Max frequency: ~35 MHz.</li>
         </ul>
 
-        <h2 id="fam-hc">74HC, High speed CMOS</h2>
-        <p>74HC combines the speed of <a href="https://en.wikipedia.org/wiki/Transistor%E2%80%93transistor_logic" target="_blank" rel="noopener">TTL</a> with the very low power consumption of <a href="https://en.wikipedia.org/wiki/CMOS" target="_blank" rel="noopener">CMOS</a>. Pin arrangements are identical to 74LS but input thresholds differ, so a 74LS output cannot reliably drive a 74HC input.</p>
+        <h2 id="fam-hc" data-i18n="docs.b6833087b0">74HC, High speed CMOS</h2>
+        <p data-i18n-html="docs.d271dbb25b">74HC combines the speed of <a href="https://en.wikipedia.org/wiki/Transistor%E2%80%93transistor_logic" target="_blank" rel="noopener">TTL</a> with the very low power consumption of <a href="https://en.wikipedia.org/wiki/CMOS" target="_blank" rel="noopener">CMOS</a>. Pin arrangements are identical to 74LS but input thresholds differ, so a 74LS output cannot reliably drive a 74HC input.</p>
         <ul>
-          <li>Supply: 2 to 6V, suitable for battery powered designs.</li>
-          <li>Inputs have very <a href="https://en.wikipedia.org/wiki/High_impedance" target="_blank" rel="noopener">high impedance</a>. All unused inputs must be tied to +Vs or GND.</li>
-          <li>Outputs can sink and source ~4 mA (logic) or up to ~20 mA (max).</li>
-          <li>Fan-out: 50+ 74HC inputs, but only 10 74LS inputs.</li>
-          <li>Propagation delay: ~10 ns. Max frequency: ~25 MHz.</li>
-          <li>Static sensitivity: CMOS inputs are sensitive to <a href="https://en.wikipedia.org/wiki/Electrostatic_discharge" target="_blank" rel="noopener">ESD</a>. Earth yourself before handling.</li>
+          <li data-i18n="docs.b71054533d">Supply: 2 to 6V, suitable for battery powered designs.</li>
+          <li data-i18n-html="docs.a378b982fd">Inputs have very <a href="https://en.wikipedia.org/wiki/High_impedance" target="_blank" rel="noopener">high impedance</a>. All unused inputs must be tied to +Vs or GND.</li>
+          <li data-i18n="docs.97b9ee1e77">Outputs can sink and source ~4 mA (logic) or up to ~20 mA (max).</li>
+          <li data-i18n="docs.facf6efba2">Fan out: 50+ 74HC inputs, but only 10 74LS inputs.</li>
+          <li data-i18n="docs.ba96cc973b">Propagation delay: ~10 ns. Max frequency: ~25 MHz.</li>
+          <li data-i18n-html="docs.be8eab6319">Static sensitivity: CMOS inputs are sensitive to <a href="https://en.wikipedia.org/wiki/Electrostatic_discharge" target="_blank" rel="noopener">ESD</a>. Earth yourself before handling.</li>
         </ul>
 
-        <h2 id="fam-hct">74HCT, CMOS with TTL compatible inputs</h2>
-        <p>74HCT is a variant of 74HC whose input thresholds accept the voltage levels produced by 74LS TTL outputs. Use it when mixing 74LS and 74HC logic in the same circuit.</p>
+        <h2 id="fam-hct" data-i18n="docs.bc871d3ab9">74HCT, CMOS with TTL compatible inputs</h2>
+        <p data-i18n="docs.03c0435627">74HCT is a variant of 74HC whose input thresholds accept the voltage levels produced by 74LS TTL outputs. Use it when mixing 74LS and 74HC logic in the same circuit.</p>
         <ul>
-          <li>Supply: 5V &#177;0.5V, a regulated supply is recommended.</li>
-          <li>All other characteristics are the same as 74HC.</li>
+          <li data-i18n="docs.13ce3ea41a">Supply: 5V &#177;0.5V, a regulated supply is recommended.</li>
+          <li data-i18n="docs.a51c197b2a">All other characteristics are the same as 74HC.</li>
         </ul>
 
-        <div class="callout tip">
-          <strong>Recommendation:</strong> For most new projects, choose 74HC. It works from 2 to 6V (battery friendly), has excellent <a href="https://en.wikipedia.org/wiki/Noise_immunity" target="_blank" rel="noopener">noise immunity</a>, and very low idle power. Only switch to 74HCT when you need TTL compatible inputs, or to 74LS for existing 5V TTL systems.
+        <h2 id="fam-lvc" data-i18n="docs.2cd66a5bd5">74LVC, Low Voltage CMOS</h2>
+        <p data-i18n-html="docs.7ba2df4c8b">74LVC is a low voltage <a href="https://en.wikipedia.org/wiki/CMOS" target="_blank" rel="noopener">CMOS</a> family intended for 3.3V (and lower) digital systems. Most LVC parts have 5V tolerant inputs, which lets them act as level translators between modern 3.3V logic and legacy 5V 74HC / 74LS systems. Compared to 74HC, LVC is much faster and has stronger output drive.</p>
+        <ul>
+          <li data-i18n="docs.e42d6dbd2a">Supply: 1.65 to 3.6V. Many parts have 5V tolerant inputs but cannot be powered from 5V.</li>
+          <li data-i18n-html="docs.6d410816db">Inputs are TTL compatible (V<sub>IH</sub> &#8805; 2.0V, V<sub>IL</sub> &#8804; 0.8V) so they accept 74LS, 74HC, and 74HCT outputs directly.</li>
+          <li data-i18n="docs.6ed68ac820">Outputs can sink and source ~24 mA, much stronger than 74HC.</li>
+          <li data-i18n="docs.788a5760ee">Propagation delay: ~3 ns. Max frequency: ~100 MHz.</li>
+          <li data-i18n="docs.9a1f52ccd4">Idle power is very low, comparable to 74HC.</li>
+          <li data-i18n-html="docs.1f8290bf46">Static sensitivity: like all CMOS, LVC inputs are <a href="https://en.wikipedia.org/wiki/Electrostatic_discharge" target="_blank" rel="noopener">ESD</a> sensitive. Tie unused inputs to V<sub>CC</sub> or GND.</li>
+        </ul>
+        <div class="callout warn" data-i18n-html="docs.5cf3fb706d">
+          <strong>74Sim note:</strong> the simulator's V<sub>CC</sub> rail is fixed at 5V. A real 74LVC part powered at 5V would be destroyed. In 74Sim, the LVC family selection models LVC's <em>logic level behavior</em> (TTL compatible thresholds, low output impedance, high speed, no floating bias) running on the simulator's 5V supply rather than a literal 3.3V system.
         </div>
 
-        <h2 id="fam-compare">Comparison</h2>
+        <div class="callout tip" data-i18n-html="docs.67f71d3ede">
+          <strong>Recommendation:</strong> For most new projects, choose 74HC. It works from 2 to 6V (battery friendly), has excellent <a href="https://en.wikipedia.org/wiki/Noise_immunity" target="_blank" rel="noopener">noise immunity</a>, and very low idle power. Switch to 74HCT when you need TTL compatible inputs, to 74LS for existing 5V TTL systems, or to 74LVC for 3.3V designs and high speed level translation.
+        </div>
+
+        <h2 id="fam-compare" data-i18n="docs.2dfcf898a3">Comparison</h2>
         <table>
-          <thead><tr><th>Property</th><th>74LS</th><th>74HC</th><th>74HCT</th></tr></thead>
+          <thead><tr><th>Property</th><th>74LS</th><th>74HC</th><th>74HCT</th><th>74LVC</th></tr></thead>
           <tbody>
-            <tr><td>Technology</td><td>Bipolar TTL</td><td>CMOS</td><td>CMOS</td></tr>
-            <tr><td>Supply voltage</td><td>5V &#177;0.25V</td><td>2 to 6V</td><td>5V &#177;0.5V</td></tr>
-            <tr><td>Output sink current</td><td>16 mA</td><td>~4 mA / 20 mA max</td><td>~4 mA / 20 mA max</td></tr>
-            <tr><td>Output source current</td><td>~2 mA</td><td>~4 mA / 20 mA max</td><td>~4 mA / 20 mA max</td></tr>
-            <tr><td>Fan-out (same family)</td><td>10 inputs</td><td>50+ inputs</td><td>50+ inputs</td></tr>
-            <tr><td>Propagation delay</td><td>~10 ns</td><td>~10 ns</td><td>~10 ns</td></tr>
-            <tr><td>Max frequency</td><td>~35 MHz</td><td>~25 MHz</td><td>~25 MHz</td></tr>
-            <tr><td>Idle power</td><td>A few mW</td><td>A few &#956;W</td><td>A few &#956;W</td></tr>
-            <tr><td>Unused inputs</td><td>Float HIGH, tie to +Vs recommended</td><td>Must tie to +Vs or GND</td><td>Must tie to +Vs or GND</td></tr>
-            <tr><td>Accepts 74LS output?</td><td>Yes</td><td>No (use pull up or 74HCT)</td><td>Yes</td></tr>
-            <tr><td>Battery-friendly?</td><td>No</td><td>Yes</td><td>No</td></tr>
-            <tr><td>Static sensitive?</td><td>No</td><td>Yes</td><td>Yes</td></tr>
+            <tr><td>Technology</td><td data-i18n="docs.bbb92cf3bb">Bipolar TTL</td><td>CMOS</td><td>CMOS</td><td>CMOS</td></tr>
+            <tr><td data-i18n="docs.776e1fe1c8">Supply voltage</td><td>5V &#177;0.25V</td><td>2 to 6V</td><td>5V &#177;0.5V</td><td data-i18n="docs.adc6c3205a">1.65 to 3.6V (5V tolerant inputs)</td></tr>
+            <tr><td data-i18n="docs.4e906c7787">Output sink current</td><td>16 mA</td><td>~4 mA / 20 mA max</td><td>~4 mA / 20 mA max</td><td>~24 mA</td></tr>
+            <tr><td data-i18n="docs.9079e5734d">Output source current</td><td>~2 mA</td><td>~4 mA / 20 mA max</td><td>~4 mA / 20 mA max</td><td>~24 mA</td></tr>
+            <tr><td data-i18n="docs.d415f4fe9b">Fan out (same family)</td><td data-i18n="docs.92781ee262">10 inputs</td><td data-i18n="docs.be8b728677">50+ inputs</td><td data-i18n="docs.be8b728677">50+ inputs</td><td data-i18n="docs.be8b728677">50+ inputs</td></tr>
+            <tr><td data-i18n="docs.79cccca126">Propagation delay</td><td>~10 ns</td><td>~10 ns</td><td>~10 ns</td><td>~3 ns</td></tr>
+            <tr><td data-i18n="docs.41574631bc">Max frequency</td><td>~35 MHz</td><td>~25 MHz</td><td>~25 MHz</td><td>~100 MHz</td></tr>
+            <tr><td data-i18n="docs.922e905950">Idle power</td><td>A few mW</td><td>A few &#956;W</td><td>A few &#956;W</td><td>A few &#956;W</td></tr>
+            <tr><td data-i18n="docs.7033e4c315">Unused inputs</td><td data-i18n="docs.b6a68b6d63">Float HIGH, tie to +Vs recommended</td><td data-i18n="docs.cc7b1544f3">Must tie to +Vs or GND</td><td data-i18n="docs.cc7b1544f3">Must tie to +Vs or GND</td><td data-i18n-html="docs.a26aa8971b">Must tie to V<sub>CC</sub> or GND</td></tr>
+            <tr><td data-i18n="docs.a9d9d9bcde">Recommended pull-up resistor</td><td>1.4&thinsp;k&#937;</td><td>140&thinsp;k&#937;</td><td>140&thinsp;k&#937;</td><td>140&thinsp;k&#937;</td></tr>
+            <tr><td data-i18n="docs.3d152eaec6">Accepts 74LS output?</td><td>Yes</td><td data-i18n="docs.4768d056a4">No (use pull up or 74HCT)</td><td>Yes</td><td data-i18n="docs.500b51eb35">Yes (5V tolerant inputs)</td></tr>
+            <tr><td data-i18n="docs.6301323325">Battery friendly?</td><td>No</td><td>Yes</td><td>No</td><td>Yes</td></tr>
+            <tr><td data-i18n="docs.0812bf426c">Static sensitive?</td><td>No</td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
           </tbody>
         </table>
 
-        <h2 id="fam-mixing">Mixing families</h2>
-        <p>It is best to build a circuit using a single logic family. If mixing is unavoidable, the power supply must be within the valid range of every family used.</p>
-        <p>When a 74LS output needs to drive a 74HC input, connect a 2.2 k&#937; pull up resistor between the +5V supply and the input pin.</p>
+        <h2 id="fam-mixing" data-i18n="docs.ff08f597a9">Mixing families</h2>
+        <p data-i18n="docs.c13c4572b3">It is best to build a circuit using a single logic family. If mixing is unavoidable, the power supply must be within the valid range of every family used.</p>
+        <p data-i18n="docs.e4bc6dc6bd">When a 74LS output needs to drive a 74HC input, connect a 2.2 k&#937; pull up resistor between the +5V supply and the input pin.</p>
+        <p data-i18n-html="docs.9f6d1e61b6">74LVC is commonly used as a one way <a href="https://en.wikipedia.org/wiki/Level_shifter" target="_blank" rel="noopener">level translator</a> from 5V TTL/CMOS down to 3.3V logic: the 5V tolerant LVC input accepts the 5V signal and the LVC output drives the 3.3V side. Going the other way (3.3V LVC output into 5V 74HC input) requires a dedicated level shifter, since 3.3V is below V<sub>IH</sub> for 74HC.</p>
 
 
       </article>
@@ -256,29 +254,33 @@
           <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M3.5 2.5l3 2.5-3 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
           Floating vs Grounded
         </div>
-        <h1>Floating vs Grounded</h1>
-        <p class="lead">Leaving a <a href="https://en.wikipedia.org/wiki/Buffer" target="_blank" rel="noopener">logic</a> input unconnected is <em>not</em> the same as tying it to GND. A pin with nothing driving it is <em>floating</em>: its voltage is set by whatever stray currents and capacitive coupling happen to reach it, not by your circuit. The result is an input that reads HIGH, LOW, or oscillates between the two depending on the time of day, the length of the wire, and whether your hand is nearby.</p>
+        <h1 data-i18n="docs.8a75f08496">Floating vs Grounded</h1>
+        <p class="lead" data-i18n-html="docs.5dd9451cf7">Leaving a <a href="https://en.wikipedia.org/wiki/Buffer" target="_blank" rel="noopener">logic</a> input unconnected is <em>not</em> the same as tying it to GND. A pin with nothing driving it is <em>floating</em>: its voltage is set by whatever stray currents and capacitive coupling happen to reach it, not by your circuit. The result is an input that reads HIGH, LOW, or oscillates between the two depending on the time of day, the length of the wire, and whether your hand is nearby.</p>
 
-        <h2 id="fl-what">What is a floating input?</h2>
-        <p>Logic gate inputs are very <a href="https://en.wikipedia.org/wiki/High_impedance" target="_blank" rel="noopener">high impedance</a>   typically megohms for <a href="https://en.wikipedia.org/wiki/Transistor%E2%80%93transistor_logic" target="_blank" rel="noopener">TTL</a>, gigohms for <a href="https://en.wikipedia.org/wiki/CMOS" target="_blank" rel="noopener">CMOS</a>. That high <a href="https://en.wikipedia.org/wiki/Electrical_impedance" target="_blank" rel="noopener">impedance</a> is what makes them cheap to drive, but it also means the pin has no preferred voltage of its own. A few nanoamps of leakage, a millivolt of induced noise from the 60 Hz mains, or the capacitance between the wire and your finger is enough to swing the pin across the logic threshold.</p>
-        <p>The image below shows a 2-input <a href="https://en.wikipedia.org/wiki/OR_gate" target="_blank" rel="noopener">OR gate</a> with one input left dangling. You might expect the dangling pin to read LOW   it isn't connected to anything, after all   but in practice it can sit anywhere, and the gate's output is whatever the noise on that pin decides moment to moment.</p>
+        <h2 id="fl-what" data-i18n="docs.7b64b2ef8c">What is a floating input?</h2>
+        <p data-i18n-html="docs.10f202be99">Logic gate inputs are very <a href="https://en.wikipedia.org/wiki/High_impedance" target="_blank" rel="noopener">high impedance</a>   typically megohms for <a href="https://en.wikipedia.org/wiki/Transistor%E2%80%93transistor_logic" target="_blank" rel="noopener">TTL</a>, gigohms for <a href="https://en.wikipedia.org/wiki/CMOS" target="_blank" rel="noopener">CMOS</a>. That high <a href="https://en.wikipedia.org/wiki/Electrical_impedance" target="_blank" rel="noopener">impedance</a> is what makes them cheap to drive, but it also means the pin has no preferred voltage of its own. A few nanoamps of leakage, a millivolt of induced noise from the 60 Hz mains, or the capacitance between the wire and your finger is enough to swing the pin across the logic threshold.</p>
+        <p data-i18n-html="docs.b14c0aed14">The image below shows a 2-input <a href="https://en.wikipedia.org/wiki/OR_gate" target="_blank" rel="noopener">OR gate</a> with one input left dangling. You might expect the dangling pin to read LOW   it isn't connected to anything, after all   but in practice it can sit anywhere, and the gate's output is whatever the noise on that pin decides moment to moment.</p>
         <img src="assets/floating input OR.png" alt="Floating input on OR gate example" class="article-img">
-        <p>This is the kind of bug that survives every bench test and then fails the moment the board is mounted next to a motor or a fluorescent light. The gate isn't broken; an undriven input is just an antenna.</p>
+        <p data-i18n="docs.c45c34f20c">This is the kind of bug that survives every bench test and then fails the moment the board is mounted next to a motor or a fluorescent light. The gate isn't broken; an undriven input is just an antenna.</p>
 
-        <h2 id="fl-pulldown">Pull down and pull up resistors</h2>
-        <p>The fix is to give the pin a defined idle level using a weak resistor to a rail. A <strong>pull down</strong> resistor to GND holds the input LOW until something actively drives it HIGH; a <strong>pull up</strong> to VCC does the opposite. The resistor is weak enough (typically 1 k&#937; to 100 k&#937;) that any real driver wins easily, but strong enough to swamp the stray currents that cause floating.</p>
-        <p>Choosing the value is a tradeoff. A smaller resistor (1 10 k&#937;) gives stronger <a href="https://en.wikipedia.org/wiki/Noise_immunity" target="_blank" rel="noopener">noise immunity</a> but draws more current when the input is driven the other way; a larger one (47 100 k&#937;) saves power but leaves the pin more susceptible to interference on long wires. For most <a href="https://en.wikipedia.org/wiki/Breadboard" target="_blank" rel="noopener">breadboard</a> work, 10 k&#937; is a safe default.</p>
-        <p>The images below show an <a href="https://en.wikipedia.org/wiki/AND_gate" target="_blank" rel="noopener">AND gate</a> with floating inputs on the left, and the same gate with pull down resistors on the right:</p>
+        <h2 id="fl-pulldown" data-i18n="docs.173fa7b2f7">Pull down and pull up resistors</h2>
+        <p data-i18n-html="docs.96a73fd153">The fix is to give the pin a defined idle level using a weak resistor to a rail. A <strong>pull down</strong> resistor to GND holds the input LOW until something actively drives it HIGH; a <strong>pull up</strong> to VCC does the opposite. The resistor is weak enough (typically 1 k&#937; to 100 k&#937;) that any real driver wins easily, but strong enough to swamp the stray currents that cause floating.</p>
+        <p data-i18n-html="docs.1f2e75c5ae">Choosing the value is a tradeoff. A smaller resistor (1 10 k&#937;) gives stronger <a href="https://en.wikipedia.org/wiki/Noise_immunity" target="_blank" rel="noopener">noise immunity</a> but draws more current when the input is driven the other way; a larger one (47 100 k&#937;) saves power but leaves the pin more susceptible to interference on long wires. The right value depends on which family you are using:</p>
+        <ul>
+          <li data-i18n-html="docs.4350dd05e6"><strong>74HC / 74HCT (CMOS):</strong> Use <strong>140&thinsp;k&#937;</strong>. CMOS inputs draw almost no current, so a large resistor holds the pin reliably without wasting power.</li>
+          <li data-i18n-html="docs.1c494a444a"><strong>74LS (TTL):</strong> Use <strong>1.4&thinsp;k&#937;</strong>. LS inputs source a small current when held LOW; a lower-value resistor is needed to overcome it and keep the pin below V<sub>IL</sub>.</li>
+        </ul>
+        <p data-i18n-html="docs.0da8b7f158">The images below show an <a href="https://en.wikipedia.org/wiki/AND_gate" target="_blank" rel="noopener">AND gate</a> with floating inputs on the left, and the same gate with pull down resistors on the right:</p>
         <div class="img-pair">
           <img src="assets/and gate without pull downs.png" alt="AND gate without pull down resistors">
           <img src="assets/with pull downs.png" alt="AND gate with pull down resistors">
         </div>
 
-        <h2 id="fl-74series">Behavior in 74-series chips</h2>
-        <p>The two families behave very differently when a pin is left floating, and the difference matters.</p>
-        <p><strong>74LS (TTL)</strong> inputs tend to float HIGH. The bipolar input stage has a built-in path to VCC through the input transistor, so an undriven pin pulls itself up to roughly 1.4 V   above the LOW threshold, and usually read as a logic HIGH. This is the source of the classic bug: a forgotten wire silently enables a gate that should be disabled, the circuit "almost works", and you spend an afternoon chasing it.</p>
-        <p><strong>74HC and 74HCT (CMOS)</strong> inputs have no such bias. Their input impedance is essentially infinite, so a floating pin can sit at any voltage at all. Worse, if the voltage lingers near the threshold, both the n-channel and p-channel transistors in the input <a href="https://en.wikipedia.org/wiki/Buffer" target="_blank" rel="noopener">buffer</a> conduct simultaneously, drawing tens of milliamps and heating the chip. CMOS datasheets are explicit on this point: every unused input must be tied to VCC or GND.</p>
-        <p>The rule for both families is the same, only the consequence of breaking it differs: <strong>drive every input to a defined level.</strong> Tie unused gate inputs to GND or VCC directly (no resistor needed for permanently unused inputs), and use pull ups or pull downs on inputs that are sometimes driven and sometimes not   buttons, jumpers, tri-state buses.</p>
+        <h2 id="fl-74series" data-i18n="docs.9d17f15f5e">Behavior in 74 series chips</h2>
+        <p data-i18n="docs.126615bc78">The two families behave very differently when a pin is left floating, and the difference matters.</p>
+        <p data-i18n-html="docs.ebf8ed7d53"><strong>74LS (TTL)</strong> inputs tend to float HIGH. The bipolar input stage has a built in path to VCC through the input transistor, so an undriven pin pulls itself up to roughly 1.4 V   above the LOW threshold, and usually read as a logic HIGH. This is the source of the classic bug: a forgotten wire silently enables a gate that should be disabled, the circuit "almost works", and you spend an afternoon chasing it.</p>
+        <p data-i18n-html="docs.dab787fe78"><strong>74HC and 74HCT (CMOS)</strong> inputs have no such bias. Their input impedance is essentially infinite, so a floating pin can sit at any voltage at all. Worse, if the voltage lingers near the threshold, both the n-channel and p-channel transistors in the input <a href="https://en.wikipedia.org/wiki/Buffer" target="_blank" rel="noopener">buffer</a> conduct simultaneously, drawing tens of milliamps and heating the chip. CMOS datasheets are explicit on this point: every unused input must be tied to VCC or GND.</p>
+        <p data-i18n-html="docs.145dd252e9">The rule for both families is the same, only the consequence of breaking it differs: <strong>drive every input to a defined level.</strong> Tie unused gate inputs to GND or VCC directly (no resistor needed for permanently unused inputs), and use pull ups or pull downs on inputs that are sometimes driven and sometimes not   buttons, jumpers, tri state buses.</p>
       </article>
 
       <!-- ══ EXAMPLES ══ -->
@@ -288,11 +290,11 @@
           <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M3.5 2.5l3 2.5-3 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
           Example Projects
         </div>
-        <h1>Example Projects</h1>
-        <p class="lead">Click any example below to open it directly in the simulator.</p>
+        <h1 data-i18n="docs.ab858fbeca">Example Projects</h1>
+        <p class="lead" data-i18n-html="docs.9d49fbb259">Click any example below to open it directly in the simulator. Made something cool? <a href="/submit-example">Submit your project</a> to the archive.</p>
 
         <ul class="example-list" id="examples-doc-list">
-          <li class="example-list-loading">Loading examples&hellip;</li>
+          <li class="example-list-loading" data-i18n="docs.14856f18e8">Loading examples&hellip;</li>
         </ul>
 
       </article>
@@ -304,27 +306,27 @@
           <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M3.5 2.5l3 2.5-3 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
           Keybinds
         </div>
-        <h1>Keybinds</h1>
-        <p class="lead">Keyboard shortcuts available while the simulator is open.</p>
+        <h1 data-i18n="docs.880934ba65">Keybinds</h1>
+        <p class="lead" data-i18n="docs.6756555dc5">Keyboard shortcuts available while the simulator is open.</p>
 
-        <h2 id="kb-editing">Editing</h2>
+        <h2 id="kb-editing" data-i18n="docs.3b9ba1a251">Editing</h2>
         <table>
           <thead><tr><th>Shortcut</th><th>Action</th></tr></thead>
           <tbody>
-            <tr><td><kbd>Ctrl</kbd> + <kbd>C</kbd></td><td>Copy selected components</td></tr>
-            <tr><td><kbd>Ctrl</kbd> + <kbd>X</kbd></td><td>Cut selected components</td></tr>
-            <tr><td><kbd>Ctrl</kbd> + <kbd>V</kbd></td><td>Paste</td></tr>
-            <tr><td><kbd>Ctrl</kbd> + <kbd>A</kbd></td><td>Select all</td></tr>
-            <tr><td><kbd>Ctrl</kbd> + <kbd>Z</kbd></td><td>Undo</td></tr>
+            <tr><td data-i18n-html="docs.e6ae52c175"><kbd>Ctrl</kbd> + <kbd>C</kbd></td><td data-i18n="docs.65350a2f6a">Copy selected components</td></tr>
+            <tr><td data-i18n-html="docs.425e267c46"><kbd>Ctrl</kbd> + <kbd>X</kbd></td><td data-i18n="docs.3363614186">Cut selected components</td></tr>
+            <tr><td data-i18n-html="docs.8ffc16414a"><kbd>Ctrl</kbd> + <kbd>V</kbd></td><td>Paste</td></tr>
+            <tr><td data-i18n-html="docs.aa5b3a654f"><kbd>Ctrl</kbd> + <kbd>A</kbd></td><td data-i18n="docs.913afff1fa">Select all</td></tr>
+            <tr><td data-i18n-html="docs.8da28c20e2"><kbd>Ctrl</kbd> + <kbd>Z</kbd></td><td>Undo</td></tr>
           </tbody>
         </table>
 
-        <h2 id="kb-files">Files</h2>
+        <h2 id="kb-files" data-i18n="docs.6ce6c512ea">Files</h2>
         <table>
           <thead><tr><th>Shortcut</th><th>Action</th></tr></thead>
           <tbody>
-            <tr><td><kbd>Ctrl</kbd> + <kbd>S</kbd></td><td>Save circuit to local file</td></tr>
-            <tr><td><kbd>Ctrl</kbd> + <kbd>L</kbd></td><td>Load circuit from computer</td></tr>
+            <tr><td data-i18n-html="docs.36ab7f2fb4"><kbd>Ctrl</kbd> + <kbd>S</kbd></td><td data-i18n="docs.6d602a134a">Save circuit to local file</td></tr>
+            <tr><td data-i18n-html="docs.74132ce6a2"><kbd>Ctrl</kbd> + <kbd>L</kbd></td><td data-i18n="docs.e87c98c938">Load circuit from computer</td></tr>
           </tbody>
         </table>
       </article>
@@ -336,29 +338,29 @@
           <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M3.5 2.5l3 2.5-3 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
           SPICE Simulator
         </div>
-        <h1>SPICE Simulator</h1>
-        <p class="lead">Under the hood, 74Sim ships a custom SPICE class analog engine. This page explains how a circuit on the <a href="https://en.wikipedia.org/wiki/Breadboard" target="_blank" rel="noopener">breadboard</a> becomes math, and how that math becomes the voltages, currents, and LED brightness you see on the screen. The top of the page is conceptual; later sections drill into the equations and constants used by the real code.</p>
+        <h1 data-i18n="docs.7e94fb0112">SPICE Simulator</h1>
+        <p class="lead" data-i18n-html="docs.48a28709df">Under the hood, 74Sim ships a custom SPICE class analog engine. This page explains how a circuit on the <a href="https://en.wikipedia.org/wiki/Breadboard" target="_blank" rel="noopener">breadboard</a> becomes math, and how that math becomes the voltages, currents, and LED brightness you see on the screen. The top of the page is conceptual; later sections drill into the equations and constants used by the real code.</p>
 
-        <h2 id="sp-bigpicture">How a SPICE simulator thinks</h2>
-        <p>Every SPICE style simulator does the same three things in a loop:</p>
+        <h2 id="sp-bigpicture" data-i18n="docs.1371ab7784">How a SPICE simulator thinks</h2>
+        <p data-i18n="docs.9368f354a5">Every SPICE style simulator does the same three things in a loop:</p>
         <ol>
-          <li>Turn the circuit into a graph: identify every electrically connected group of holes (a net) and every component that bridges two nets.</li>
-          <li>Have each component contribute a small pattern of numbers, called a stamp, into a single global linear system Ax&thinsp;=&thinsp;z. Resistors stamp a conductance; voltage sources stamp a current; capacitors stamp a time discretised approximation; chip outputs stamp a <a href="https://en.wikipedia.org/wiki/Norton%27s_theorem" target="_blank" rel="noopener">Norton equivalent</a> driver.</li>
-          <li>Solve the linear system for every node voltage at this instant, then use those voltages to update gate <a href="https://en.wikipedia.org/wiki/Buffer" target="_blank" rel="noopener">logic</a> and (for transient effects) to advance time, then repeat until nothing changes or the user stops.</li>
+          <li data-i18n="docs.9675e03c4b">Turn the circuit into a graph: identify every electrically connected group of holes (a net) and every component that bridges two nets.</li>
+          <li data-i18n-html="docs.a4eb476d7e">Have each component contribute a small pattern of numbers, called a stamp, into a single global linear system Ax&thinsp;=&thinsp;z. Resistors stamp a conductance; voltage sources stamp a current; capacitors stamp a time discretised approximation; chip outputs stamp a <a href="https://en.wikipedia.org/wiki/Norton%27s_theorem" target="_blank" rel="noopener">Norton equivalent</a> driver.</li>
+          <li data-i18n-html="docs.1e02a55def">Solve the linear system for every node voltage at this instant, then use those voltages to update gate <a href="https://en.wikipedia.org/wiki/Buffer" target="_blank" rel="noopener">logic</a> and (for transient effects) to advance time, then repeat until nothing changes or the user stops.</li>
         </ol>
-        <p>Concretely, when any component is placed, moved, wired, or toggled, 74Sim runs the following pipeline synchronously before the next frame is rendered:</p>
+        <p data-i18n="docs.54686a250e">Concretely, when any component is placed, moved, wired, or toggled, 74Sim runs the following pipeline synchronously before the next frame is rendered:</p>
         <ol>
-          <li>Build the <a href="https://en.wikipedia.org/wiki/Netlist" target="_blank" rel="noopener">netlist</a>: flood-fill the breadboard to identify nets.</li>
-          <li>Tag power nodes: mark VCC (5&thinsp;V) and GND (0&thinsp;V); detect VCC&#8209;GND shorts.</li>
-          <li>Iterative gate&#8200;+&#8200;MNA loop: evaluate chip logic, record output drive states, solve the MNA system, and repeat until the circuit settles (up to 30 passes).</li>
-          <li>Compute derived quantities: per branch resistor, capacitor, and <a href="https://en.wikipedia.org/wiki/Diode" target="_blank" rel="noopener">diode</a> currents; per net current sums.</li>
-          <li>Evaluate outputs: light LEDs, update 7 segment segments.</li>
+          <li data-i18n-html="docs.7f4fb48d41">Build the <a href="https://en.wikipedia.org/wiki/Netlist" target="_blank" rel="noopener">netlist</a>: flood fill the breadboard to identify nets.</li>
+          <li data-i18n="docs.bb1ebd57e6">Tag power nodes: mark VCC (5&thinsp;V) and GND (0&thinsp;V); detect VCC&#8209;GND shorts.</li>
+          <li data-i18n="docs.53d5ae44f6">Iterative gate&#8200;+&#8200;MNA loop: evaluate chip logic, record output drive states, solve the MNA system, and repeat until the circuit settles (up to 30 passes).</li>
+          <li data-i18n-html="docs.326eef33b3">Compute derived quantities: per branch resistor, capacitor, and <a href="https://en.wikipedia.org/wiki/Diode" target="_blank" rel="noopener">diode</a> currents; per net current sums.</li>
+          <li data-i18n="docs.7d257e3535">Evaluate outputs: light LEDs, update 7 segment segments.</li>
         </ol>
 
-        <h2 id="sp-chips">How chips are represented</h2>
-        <p>A chip in 74Sim has two completely separate representations: a structural description (pure data) and a behavioural evaluator (a function). The simulator does not know what a NAND is from the data alone; it only knows that a particular chip type has an evaluator that, when called, reads its input pin voltages and writes drive states to its output pins.</p>
-        <p>The structural side is a plain JavaScript object. Here is the real definition of the 7400 (Quad 2 input NAND):</p>
-        <pre>'7400': {
+        <h2 id="sp-chips" data-i18n="docs.066b5c2b30">How chips are represented</h2>
+        <p data-i18n="docs.6c8bfc4a14">A chip in 74Sim has two completely separate representations: a structural description (pure data) and a behavioural evaluator (a function). The simulator does not know what a NAND is from the data alone; it only knows that a particular chip type has an evaluator that, when called, reads its input pin voltages and writes drive states to its output pins.</p>
+        <p data-i18n="docs.35c75d14f3">The structural side is a plain JavaScript object. Here is the real definition of the 7400 (Quad 2 input NAND):</p>
+        <pre>'74x00': {
   name: '74x00',
   pins: 14,
   vcc: 14,
@@ -377,132 +379,132 @@
     { type: 'NAND', inputs: ['4A','4B'], output: '4Y' },
   ],
 }</pre>
-        <p>The behavioural side lives in a per chip evaluator function. For a combinational chip like the 7400, the evaluator simply iterates the gates array, reads each input pin as a bit (HIGH if the solved voltage is above the family threshold V<sub>TH</sub>, otherwise LOW), computes the boolean, and writes the result to the output pin's drive state.</p>
-        <p>Sequential chips (flip-flops, counters, shift registers) do the same but additionally carry per instance state in a ffState map. Edge detection is performed by comparing the current clock input bit against a stored prevClk; a rising or <a href="https://en.wikipedia.org/wiki/Signal_edge" target="_blank" rel="noopener">falling edge</a> is recognised exactly once per transition, even though the gate evaluator may be called many times per simulation step.</p>
-        <p>Every output pin is tagged with one of three drive states after each gate evaluation:</p>
+        <p data-i18n-html="docs.62e2140263">The behavioural side lives in a per chip evaluator function. For a combinational chip like the 7400, the evaluator simply iterates the gates array, reads each input pin as a bit (HIGH if the solved voltage is above the family threshold V<sub>TH</sub>, otherwise LOW), computes the boolean, and writes the result to the output pin's drive state.</p>
+        <p data-i18n-html="docs.b60a961c43">Sequential chips (flip flops, counters, shift registers) do the same but additionally carry per instance state in a ffState map. Edge detection is performed by comparing the current clock input bit against a stored prevClk; a rising or <a href="https://en.wikipedia.org/wiki/Signal_edge" target="_blank" rel="noopener">falling edge</a> is recognised exactly once per transition, even though the gate evaluator may be called many times per simulation step.</p>
+        <p data-i18n="docs.e8c79d6c2f">Every output pin is tagged with one of three drive states after each gate evaluation:</p>
         <table>
-          <thead><tr><th>Drive state</th><th>What it means electrically</th><th>Used for</th></tr></thead>
+          <thead><tr><th data-i18n="docs.50f9e7cbdb">Drive state</th><th data-i18n="docs.86a89d4927">What it means electrically</th><th data-i18n="docs.d678e1d1c6">Used for</th></tr></thead>
           <tbody>
             <tr>
               <td><strong>PUSH_PULL</strong></td>
-              <td>Norton source pulling the pin's net toward V<sub>drive</sub> (0&thinsp;V or 5&thinsp;V) through R<sub>OUT</sub>.</td>
-              <td>Normal totem-pole output driving HIGH or LOW.</td>
+              <td data-i18n-html="docs.f3d529de39">Norton source pulling the pin's net toward V<sub>drive</sub> (0&thinsp;V or 5&thinsp;V) through R<sub>OUT</sub>.</td>
+              <td data-i18n="docs.e2a2d72db7">Normal totem pole output driving HIGH or LOW.</td>
             </tr>
             <tr>
               <td><strong>SINK_ONLY</strong></td>
-              <td>Conductance G&thinsp;=&thinsp;1/R<sub>OUT</sub> from the pin's net to GND. The pin can only pull the net low.</td>
-              <td>Open collector output actively sinking current.</td>
+              <td data-i18n-html="docs.c3ae24b390">Conductance G&thinsp;=&thinsp;1/R<sub>OUT</sub> from the pin's net to GND. The pin can only pull the net low.</td>
+              <td data-i18n="docs.be4d674582">Open collector output actively sinking current.</td>
             </tr>
             <tr>
               <td><strong>HIGH_Z</strong></td>
-              <td>No stamp at all; the pin is electrically absent. Open collector pins in this state receive an implicit 4.7&thinsp;k&#937; pull up to VCC.</td>
-              <td>Tristate output disabled; open collector output off.</td>
+              <td data-i18n="docs.2601e93a50">No stamp at all; the pin is electrically absent. Open collector pins in this state receive an implicit 4.7&thinsp;k&#937; pull up to VCC.</td>
+              <td data-i18n="docs.102068b3fd">Tristate output disabled; open collector output off.</td>
             </tr>
           </tbody>
         </table>
-        <p>Drive states are kept across calls to the simulator's main evaluate() function, so the next pass starts with the previous step's drives already in place. This is essential for feedback paths like a <a href="https://en.wikipedia.org/wiki/Counter_(digital)#Ripple_counter" target="_blank" rel="noopener">ripple counter</a>, where a chip's own output feeds back to its clock or enable pin.</p>
+        <p data-i18n-html="docs.d9db03355f">Drive states are kept across calls to the simulator's main evaluate() function, so the next pass starts with the previous step's drives already in place. This is essential for feedback paths like a <a href="https://en.wikipedia.org/wiki/Counter_(digital)#Ripple_counter" target="_blank" rel="noopener">ripple counter</a>, where a chip's own output feeds back to its clock or enable pin.</p>
 
-        <h2 id="sp-netlist">From breadboard to nets</h2>
-        <p>Before any math runs, the netlist builder converts the spatial layout into a graph of electrical nets using a BFS flood-fill over connected holes:</p>
+        <h2 id="sp-netlist" data-i18n="docs.9c25237438">From breadboard to nets</h2>
+        <p data-i18n="docs.cfaaf22197">Before any math runs, the netlist builder converts the spatial layout into a graph of electrical nets using a BFS flood fill over connected holes:</p>
         <ul>
-          <li>Every wire segment merges the two holes it spans into the same net.</li>
-          <li>Breadboard internal connections (the 5 hole columns and power rail rows) are implicit edges traversed by the BFS.</li>
-          <li>Component boundary pairs: 2 pin passives (resistors, LEDs, capacitors, diodes) act as net boundaries. Their two pins are never merged. The component sits between two distinct nets and carries current across them during the solve.</li>
-          <li>Closed switches and pressed buttons are recorded as conducting pairs. Their endpoints stay on separate nets (so VCC/GND identity does not propagate through a switch), but the simulator stamps a near-zero resistance (0.01&thinsp;&#937;) between them so voltage conducts freely.</li>
-          <li>Each net is annotated with isVCC / isGND when any of its holes belongs to a power rail.</li>
+          <li data-i18n="docs.628dec962b">Every wire segment merges the two holes it spans into the same net.</li>
+          <li data-i18n="docs.5d2a04ac2e">Breadboard internal connections (the 5 hole columns and power rail rows) are implicit edges traversed by the BFS.</li>
+          <li data-i18n="docs.a38da223e7">Component boundary pairs: 2-pin passives (resistors, LEDs, capacitors, diodes) act as net boundaries. Their two pins are never merged. The component sits between two distinct nets and carries current across them during the solve.</li>
+          <li data-i18n="docs.e79ddfa629">Closed switches and pressed buttons are recorded as conducting pairs. Their endpoints stay on separate nets (so VCC/GND identity does not propagate through a switch), but the simulator stamps a near zero resistance (0.01&thinsp;&#937;) between them so voltage conducts freely.</li>
+          <li data-i18n="docs.a1b9c1013f">Each net is annotated with isVCC / isGND when any of its holes belongs to a power rail.</li>
         </ul>
 
-        <h2 id="sp-mna">Modified Nodal Analysis: the math</h2>
-        <p>74Sim's analog core is a <a href="https://en.wikipedia.org/wiki/Modified_nodal_analysis" target="_blank" rel="noopener">Modified Nodal Analysis (MNA)</a> engine, the same mathematical foundation used by SPICE. The circuit is modelled as a single linear system:</p>
-        <p style="text-align:center;"><strong>A&thinsp;x&thinsp;=&thinsp;z</strong></p>
-        <p>where x is the unknown vector of node voltages, A is the <a href="https://en.wikipedia.org/wiki/Admittance_matrix" target="_blank" rel="noopener">conductance matrix</a>, and z is the injected current vector. GND is the reference node (index 0, excluded from the matrix), so for a circuit with N+1 nets the matrix is N&#215;N.</p>
-        <p>Why this works: applying <a href="https://en.wikipedia.org/wiki/Kirchhoff%27s_circuit_laws" target="_blank" rel="noopener">Kirchhoff's Current Law</a> at every non-reference node says "the sum of currents leaving the node equals zero." Each branch contributes a current that, by <a href="https://en.wikipedia.org/wiki/Ohm%27s_law" target="_blank" rel="noopener">Ohm's law</a>, is a linear function of node voltages (I&thinsp;=&thinsp;G&thinsp;&#215;&thinsp;&#916;V for a resistor, plus an offset for any current source). Collecting the equations for all N nodes gives exactly the matrix form above.</p>
+        <h2 id="sp-mna" data-i18n="docs.4afdf5814f">Modified Nodal Analysis: the math</h2>
+        <p data-i18n-html="docs.ecfcc024cc">74Sim's analog core is a <a href="https://en.wikipedia.org/wiki/Modified_nodal_analysis" target="_blank" rel="noopener">Modified Nodal Analysis (MNA)</a> engine, the same mathematical foundation used by SPICE. The circuit is modelled as a single linear system:</p>
+        <p style="text-align:center;" data-i18n-html="docs.78c14a1dc7"><strong>A&thinsp;x&thinsp;=&thinsp;z</strong></p>
+        <p data-i18n-html="docs.f59d696f46">where x is the unknown vector of node voltages, A is the <a href="https://en.wikipedia.org/wiki/Admittance_matrix" target="_blank" rel="noopener">conductance matrix</a>, and z is the injected current vector. GND is the reference node (index 0, excluded from the matrix), so for a circuit with N+1 nets the matrix is N&#215;N.</p>
+        <p data-i18n-html="docs.a888d31db7">Why this works: applying <a href="https://en.wikipedia.org/wiki/Kirchhoff%27s_circuit_laws" target="_blank" rel="noopener">Kirchhoff's Current Law</a> at every non reference node says "the sum of currents leaving the node equals zero." Each branch contributes a current that, by <a href="https://en.wikipedia.org/wiki/Ohm%27s_law" target="_blank" rel="noopener">Ohm's law</a>, is a linear function of node voltages (I&thinsp;=&thinsp;G&thinsp;&#215;&thinsp;&#916;V for a resistor, plus an offset for any current source). Collecting the equations for all N nodes gives exactly the matrix form above.</p>
 
-        <h3 id="sp-mna-stamp">Component stamps</h3>
-        <p>Each component contributes to A and z by a standard stamp, a small fixed pattern of additions:</p>
+        <h3 id="sp-mna-stamp" data-i18n="docs.ad79a04fec">Component stamps</h3>
+        <p data-i18n="docs.93a2682f91">Each component contributes to A and z by a standard stamp, a small fixed pattern of additions:</p>
         <table>
           <thead><tr><th>Component</th><th>Stamp</th></tr></thead>
           <tbody>
             <tr>
               <td><strong>Resistor</strong></td>
-              <td>Conductance G&thinsp;=&thinsp;1/R between the two end-nodes i, j: A<sub>ii</sub>&thinsp;+=&thinsp;G, A<sub>jj</sub>&thinsp;+=&thinsp;G, A<sub>ij</sub>&thinsp;&#8722;=&thinsp;G, A<sub>ji</sub>&thinsp;&#8722;=&thinsp;G.</td>
+              <td data-i18n-html="docs.cc23a44787">Conductance G&thinsp;=&thinsp;1/R between the two end nodes i, j: A<sub>ii</sub>&thinsp;+=&thinsp;G, A<sub>jj</sub>&thinsp;+=&thinsp;G, A<sub>ij</sub>&thinsp;&#8722;=&thinsp;G, A<sub>ji</sub>&thinsp;&#8722;=&thinsp;G.</td>
             </tr>
             <tr>
-              <td><strong>VCC rail</strong></td>
-              <td>Norton equivalent: G&thinsp;=&thinsp;1/2.5&thinsp;&#937; (0.4&thinsp;S), I&thinsp;=&thinsp;5&thinsp;V&thinsp;&#215;&thinsp;G = 2&thinsp;A. Equivalent to a perfect 5&thinsp;V source with 2.5&thinsp;&#937; series resistance, giving a 2&thinsp;A short-circuit limit.</td>
+              <td data-i18n-html="docs.4b633f9674"><strong>VCC rail</strong></td>
+              <td data-i18n="docs.9889dcd5a2">Norton equivalent: G&thinsp;=&thinsp;1/2.5&thinsp;&#937; (0.4&thinsp;S), I&thinsp;=&thinsp;5&thinsp;V&thinsp;&#215;&thinsp;G = 2&thinsp;A. Equivalent to a perfect 5&thinsp;V source with 2.5&thinsp;&#937; series resistance, giving a 2&thinsp;A short circuit limit.</td>
             </tr>
             <tr>
               <td><strong>Capacitor</strong></td>
-              <td>Backward Euler companion model: G<sub>eq</sub>&thinsp;=&thinsp;C/dt as a conductance, plus a Norton current source I<sub>eq</sub>&thinsp;=&thinsp;G<sub>eq</sub>&thinsp;&#215;&thinsp;V<sub>prev</sub> injected into z. See <a data-nav href="#sp-capacitor">How capacitance is modelled</a>.</td>
+              <td data-i18n-html="docs.9cc8d8a49e">Backward Euler companion model: G<sub>eq</sub>&thinsp;=&thinsp;C/dt as a conductance, plus a Norton current source I<sub>eq</sub>&thinsp;=&thinsp;G<sub>eq</sub>&thinsp;&#215;&thinsp;V<sub>prev</sub> injected into z. See <a data-nav href="#sp-capacitor">How capacitance is modelled</a>.</td>
             </tr>
             <tr>
-              <td><strong>LED / Diode</strong></td>
-              <td>Piecewise linear two pass model. See <a data-nav href="#sp-diode">Nonlinear elements</a>.</td>
+              <td data-i18n-html="docs.2cd36ed8d0"><strong>LED / Diode</strong></td>
+              <td data-i18n-html="docs.56b5475969">Piecewise linear two pass model. See <a data-nav href="#sp-diode">Nonlinear elements</a>.</td>
             </tr>
             <tr>
-              <td><strong>Chip output (PUSH_PULL)</strong></td>
-              <td>Norton equivalent: G&thinsp;=&thinsp;1/R<sub>OUT</sub> stamped on the pin's net, plus a current I&thinsp;=&thinsp;V<sub>drive</sub>/R<sub>OUT</sub> injected into z. R<sub>OUT</sub> depends on the chip family (714&thinsp;&#937; for 74LS, 150&thinsp;&#937; for 74HC/HCT), limiting max drive current to ~7&thinsp;mA or ~33&thinsp;mA respectively.</td>
+              <td data-i18n-html="docs.bf5ec3406a"><strong>Chip output (PUSH_PULL)</strong></td>
+              <td data-i18n-html="docs.eabbb96a40">Norton equivalent: G&thinsp;=&thinsp;1/R<sub>OUT</sub> stamped on the pin's net, plus a current I&thinsp;=&thinsp;V<sub>drive</sub>/R<sub>OUT</sub> injected into z. R<sub>OUT</sub> depends on the chip family (714&thinsp;&#937; for 74LS, 150&thinsp;&#937; for 74HC/HCT, 50&thinsp;&#937; for 74LVC), limiting max drive current to ~7&thinsp;mA, ~33&thinsp;mA, or ~100&thinsp;mA respectively.</td>
             </tr>
             <tr>
-              <td><strong>Chip output (SINK_ONLY)</strong></td>
-              <td>Conductance G&thinsp;=&thinsp;1/R<sub>OUT</sub> from the pin's net to GND, pulling it low. No current source. The pin can only sink, not source.</td>
+              <td data-i18n-html="docs.09fd0581d7"><strong>Chip output (SINK_ONLY)</strong></td>
+              <td data-i18n-html="docs.91f25c631e">Conductance G&thinsp;=&thinsp;1/R<sub>OUT</sub> from the pin's net to GND, pulling it low. No current source. The pin can only sink, not source.</td>
             </tr>
             <tr>
-              <td><strong>Chip output (HIGH_Z)</strong></td>
-              <td>No stamp; the pin is electrically disconnected. Open collector outputs in this state receive an implicit 4.7&thinsp;k&#937; pull up to VCC.</td>
+              <td data-i18n-html="docs.d3ef5e85be"><strong>Chip output (HIGH_Z)</strong></td>
+              <td data-i18n="docs.dafcb451c9">No stamp; the pin is electrically disconnected. Open collector outputs in this state receive an implicit 4.7&thinsp;k&#937; pull up to VCC.</td>
             </tr>
             <tr>
-              <td><strong>TTL floating input</strong></td>
-              <td>For 74LS only: an undriven chip input pin receives a 100&thinsp;k&#937; pull up to VCC, causing it to read HIGH, matching real 74LS behaviour. 74HC/HCT inputs receive no pull up and stay truly floating.</td>
+              <td data-i18n-html="docs.d29fbc1c9c"><strong>TTL floating input</strong></td>
+              <td data-i18n="docs.1aaf4666fe">For 74LS only: an undriven chip input pin receives a 100&thinsp;k&#937; pull up to VCC, causing it to read HIGH, matching real 74LS behaviour. 74HC, 74HCT, and 74LVC inputs receive no pull up and stay truly floating.</td>
             </tr>
             <tr>
-              <td><strong>Closed switch</strong></td>
-              <td>G&thinsp;=&thinsp;100&thinsp;S (0.01&thinsp;&#937;) between the two end-nodes, effectively an ideal conductor.</td>
+              <td data-i18n-html="docs.c8294ef6c4"><strong>Closed switch</strong></td>
+              <td data-i18n="docs.7c7488e109">G&thinsp;=&thinsp;100&thinsp;S (0.01&thinsp;&#937;) between the two end nodes, effectively an ideal conductor.</td>
             </tr>
           </tbody>
         </table>
-        <p>A small leak conductance of 10<sup>&#8722;9</sup>&thinsp;S is added to every diagonal entry of A. This prevents the matrix from going singular when a node has no real conductance path (for example, a wire segment connected to nothing) and costs nothing physically. 10<sup>&#8722;9</sup>&thinsp;S corresponds to 1&thinsp;G&#937;.</p>
+        <p data-i18n-html="docs.cbb9a6a342">A small leak conductance of 10<sup>&#8722;9</sup>&thinsp;S is added to every diagonal entry of A. This prevents the matrix from going singular when a node has no real conductance path (for example, a wire segment connected to nothing) and costs nothing physically. 10<sup>&#8722;9</sup>&thinsp;S corresponds to 1&thinsp;G&#937;.</p>
 
-        <h2 id="sp-voltage">How voltages are computed</h2>
-        <p>Once A and z are assembled, the unknown node voltages x are obtained by solving the linear system. 74Sim uses <a href="https://en.wikipedia.org/wiki/Gaussian_elimination" target="_blank" rel="noopener">Gaussian elimination</a> with partial column pivoting on a fresh Float64Array backed N&#215;N matrix per pass:</p>
+        <h2 id="sp-voltage" data-i18n="docs.cd43990685">How voltages are computed</h2>
+        <p data-i18n-html="docs.5be9ea5677">Once A and z are assembled, the unknown node voltages x are obtained by solving the linear system. 74Sim uses <a href="https://en.wikipedia.org/wiki/Gaussian_elimination" target="_blank" rel="noopener">Gaussian elimination</a> with partial column pivoting on a fresh Float64Array backed N&#215;N matrix per pass:</p>
         <ol>
-          <li>For each column k, find the row with the largest absolute value in column k at or below the diagonal. This is the pivot row.</li>
-          <li>Swap that row into row k.</li>
-          <li>Eliminate column k from all rows below k by subtracting an appropriate multiple of row k.</li>
-          <li>After the matrix is upper triangular, back-substitute from the bottom row up to recover x.</li>
+          <li data-i18n="docs.2c9fa04ef9">For each column k, find the row with the largest absolute value in column k at or below the diagonal. This is the pivot row.</li>
+          <li data-i18n="docs.00cee4c400">Swap that row into row k.</li>
+          <li data-i18n="docs.9a046ec59b">Eliminate column k from all rows below k by subtracting an appropriate multiple of row k.</li>
+          <li data-i18n="docs.6c70bd224f">After the matrix is upper triangular, back substitute from the bottom row up to recover x.</li>
         </ol>
-        <p>Pivoting matters here because real 74 series circuits mix wildly different impedances on the same matrix: a 100&thinsp;k&#937; pull up sits next to a 33&thinsp;&#937; LED bulk resistor, a 2.5&thinsp;&#937; VCC rail next to a 1&thinsp;G&#937; leak. Pivoting picks the largest available coefficient at each elimination step, which keeps floating point cancellation under control. (<a href="https://en.wikipedia.org/wiki/Gaussian_elimination" target="_blank" rel="noopener">Gaussian elimination with partial pivoting</a>)</p>
-        <p>The result x is one voltage for every non-GND net. Downstream code reads these voltages and classifies each chip input pin as logic HIGH (V&thinsp;&#8805;&thinsp;V<sub>TH</sub>) or LOW (V&thinsp;&lt;&thinsp;V<sub>TH</sub>) using the family dependent threshold.</p>
+        <p data-i18n-html="docs.ba497cc81e">Pivoting matters here because real 74 series circuits mix wildly different impedances on the same matrix: a 100&thinsp;k&#937; pull up sits next to a 33&thinsp;&#937; LED bulk resistor, a 2.5&thinsp;&#937; VCC rail next to a 1&thinsp;G&#937; leak. Pivoting picks the largest available coefficient at each elimination step, which keeps floating point cancellation under control. (<a href="https://en.wikipedia.org/wiki/Gaussian_elimination" target="_blank" rel="noopener">Gaussian elimination with partial pivoting</a>)</p>
+        <p data-i18n-html="docs.3cc9d4b16c">The result x is one voltage for every non GND net. Downstream code reads these voltages and classifies each chip input pin as logic HIGH (V&thinsp;&#8805;&thinsp;V<sub>TH</sub>) or LOW (V&thinsp;&lt;&thinsp;V<sub>TH</sub>) using the family dependent threshold.</p>
 
-        <h2 id="sp-current">How currents are computed</h2>
-        <p>Current is not solved for directly. It is derived from the now-known node voltages on a per branch basis after the linear solve completes:</p>
+        <h2 id="sp-current" data-i18n="docs.ddc8d87313">How currents are computed</h2>
+        <p data-i18n="docs.61a1e93ad8">Current is not solved for directly. It is derived from the now known node voltages on a per branch basis after the linear solve completes:</p>
         <ul>
-          <li>Resistors and chip outputs: I&thinsp;=&thinsp;(V<sub>a</sub>&thinsp;&#8722;&thinsp;V<sub>b</sub>)&thinsp;&#215;&thinsp;G, where G is the branch conductance from the stamp. For a Norton stamped chip output, the effective branch current is I&thinsp;=&thinsp;(V<sub>drive</sub>&thinsp;&#8722;&thinsp;V<sub>pin</sub>)&thinsp;/&thinsp;R<sub>OUT</sub>.</li>
-          <li>Capacitors: I&thinsp;=&thinsp;G<sub>eq</sub>&thinsp;&#215;&thinsp;(V<sub>now</sub>&thinsp;&#8722;&thinsp;V<sub>prev</sub>), a discrete approximation of I&thinsp;=&thinsp;C&thinsp;&#215;&thinsp;dV/dt over one time step.</li>
-          <li>LEDs and diodes: if forward biased, I&thinsp;=&thinsp;(V<sub>anode</sub>&thinsp;&#8722;&thinsp;V<sub>cathode</sub>&thinsp;&#8722;&thinsp;V<sub>F</sub>)&thinsp;/&thinsp;R<sub>internal</sub>; otherwise the leakage current through the off state conductance (~1&thinsp;&#956;A).</li>
+          <li data-i18n-html="docs.f6f6344894">Resistors and chip outputs: I&thinsp;=&thinsp;(V<sub>a</sub>&thinsp;&#8722;&thinsp;V<sub>b</sub>)&thinsp;&#215;&thinsp;G, where G is the branch conductance from the stamp. For a Norton stamped chip output, the effective branch current is I&thinsp;=&thinsp;(V<sub>drive</sub>&thinsp;&#8722;&thinsp;V<sub>pin</sub>)&thinsp;/&thinsp;R<sub>OUT</sub>.</li>
+          <li data-i18n-html="docs.999bb10a7e">Capacitors: I&thinsp;=&thinsp;G<sub>eq</sub>&thinsp;&#215;&thinsp;(V<sub>now</sub>&thinsp;&#8722;&thinsp;V<sub>prev</sub>), a discrete approximation of I&thinsp;=&thinsp;C&thinsp;&#215;&thinsp;dV/dt over one time step.</li>
+          <li data-i18n-html="docs.a73530d515">LEDs and diodes: if forward biased, I&thinsp;=&thinsp;(V<sub>anode</sub>&thinsp;&#8722;&thinsp;V<sub>cathode</sub>&thinsp;&#8722;&thinsp;V<sub>F</sub>)&thinsp;/&thinsp;R<sub>internal</sub>; otherwise the leakage current through the off state conductance (~1&thinsp;&#956;A).</li>
         </ul>
-        <p>Per net current totals are aggregated by summing the absolute branch currents touching each net. These totals drive the current flow visualisation, set LED brightness (proportional to forward current), and trigger overcurrent warnings when a single net carries more than its rail's share.</p>
+        <p data-i18n="docs.595e28161e">Per net current totals are aggregated by summing the absolute branch currents touching each net. These totals drive the current flow visualisation, set LED brightness (proportional to forward current), and trigger overcurrent warnings when a single net carries more than its rail's share.</p>
 
-        <h2 id="sp-capacitor">How capacitance is modelled</h2>
-        <p>Capacitors are time derivative elements: their current depends on dV/dt, but MNA is a static linear system at one instant in time. SPICE's classic answer is the companion model: replace the capacitor with an equivalent resistor and current source that approximates its behaviour over a finite time step dt.</p>
-        <p>74Sim uses the <a href="https://en.wikipedia.org/wiki/Backward_Euler_method" target="_blank" rel="noopener">backward Euler</a> companion:</p>
-        <p style="text-align:center;">G<sub>eq</sub>&thinsp;=&thinsp;C&thinsp;/&thinsp;dt&nbsp;&nbsp;&nbsp;&nbsp;I<sub>eq</sub>&thinsp;=&thinsp;G<sub>eq</sub>&thinsp;&#215;&thinsp;V<sub>prev</sub></p>
-        <p>G<sub>eq</sub> is stamped exactly like a resistor between the capacitor's two pins; I<sub>eq</sub> is injected into z as a current source from one pin to the other. After the solve, V<sub>prev</sub> is updated with the new pin to pin voltage and the cycle repeats next step.</p>
-        <p>Two important properties fall out of this:</p>
+        <h2 id="sp-capacitor" data-i18n="docs.1e9b0f5681">How capacitance is modelled</h2>
+        <p data-i18n="docs.dd9d41a50f">Capacitors are time derivative elements: their current depends on dV/dt, but MNA is a static linear system at one instant in time. SPICE's classic answer is the companion model: replace the capacitor with an equivalent resistor and current source that approximates its behaviour over a finite time step dt.</p>
+        <p data-i18n-html="docs.7e794c7565">74Sim uses the <a href="https://en.wikipedia.org/wiki/Backward_Euler_method" target="_blank" rel="noopener">backward Euler</a> companion:</p>
+        <p style="text-align:center;" data-i18n-html="docs.41491ebe06">G<sub>eq</sub>&thinsp;=&thinsp;C&thinsp;/&thinsp;dt&nbsp;&nbsp;&nbsp;&nbsp;I<sub>eq</sub>&thinsp;=&thinsp;G<sub>eq</sub>&thinsp;&#215;&thinsp;V<sub>prev</sub></p>
+        <p data-i18n-html="docs.1ac11093c4">G<sub>eq</sub> is stamped exactly like a resistor between the capacitor's two pins; I<sub>eq</sub> is injected into z as a current source from one pin to the other. After the solve, V<sub>prev</sub> is updated with the new pin to pin voltage and the cycle repeats next step.</p>
+        <p data-i18n="docs.4d22eec599">Two important properties fall out of this:</p>
         <ul>
-          <li>DC <a href="https://en.wikipedia.org/wiki/Steady_state" target="_blank" rel="noopener">steady state</a> is correct. When V<sub>now</sub>&thinsp;=&thinsp;V<sub>prev</sub>, the I<sub>eq</sub> current source exactly cancels the current that G<sub>eq</sub> would otherwise draw. Net DC current through the capacitor is zero, so it correctly blocks DC.</li>
-          <li>Backward Euler is unconditionally stable. The capacitor cannot oscillate or blow up regardless of how large dt is. This is a key reason it's the default choice for circuit simulators.</li>
+          <li data-i18n-html="docs.3e5ef24abd">DC <a href="https://en.wikipedia.org/wiki/Steady_state" target="_blank" rel="noopener">steady state</a> is correct. When V<sub>now</sub>&thinsp;=&thinsp;V<sub>prev</sub>, the I<sub>eq</sub> current source exactly cancels the current that G<sub>eq</sub> would otherwise draw. Net DC current through the capacitor is zero, so it correctly blocks DC.</li>
+          <li data-i18n="docs.1790277503">Backward Euler is unconditionally stable. The capacitor cannot oscillate or blow up regardless of how large dt is. This is a key reason it's the default choice for circuit simulators.</li>
         </ul>
-        <p>One detail specific to 74Sim: _updateCapacitorState clamps the voltage change per step to MAX_CAP_DV&thinsp;=&thinsp;0.25&thinsp;V. This is purely cosmetic. It stretches the visible RC charge curve onto many frames so users can see a capacitor charging instead of snapping to its final voltage in one tick. The math underneath is still backward Euler.</p>
-        <div class="callout">
-          <strong>Note:</strong> Because backward Euler is unconditionally stable, the simulator can use a fairly coarse time step (up to 50&thinsp;ms) without numerical blow-up. The adaptive policy in the time stepping section keeps the curve smooth without wasting CPU at steady state.
+        <p data-i18n="docs.455da04af8">One detail specific to 74Sim: _updateCapacitorState clamps the voltage change per step to MAX_CAP_DV&thinsp;=&thinsp;0.25&thinsp;V. This is purely cosmetic. It stretches the visible RC charge curve onto many frames so users can see a capacitor charging instead of snapping to its final voltage in one tick. The math underneath is still backward Euler.</p>
+        <div class="callout" data-i18n-html="docs.629252c0c3">
+          <strong>Note:</strong> Because backward Euler is unconditionally stable, the simulator can use a fairly coarse time step (up to 50&thinsp;ms) without numerical blow up. The adaptive policy in the time stepping section keeps the curve smooth without wasting CPU at steady state.
         </div>
 
-        <h2 id="sp-diode">Nonlinear elements: the two pass diode/LED model</h2>
-        <p>Real diodes are exponential (the <a href="https://en.wikipedia.org/wiki/Shockley_diode_equation" target="_blank" rel="noopener">Shockley equation</a>), but MNA needs a linear system. SPICE solves this with <a href="https://en.wikipedia.org/wiki/Newton%27s_method" target="_blank" rel="noopener">Newton Raphson iteration</a>, which repeatedly linearises the diode around the current voltage estimate. 74Sim uses a simplified equivalent: two successive solves per evaluate() pass, switching the diode/LED stamps between an off form and an on form based on the first solve's result.</p>
+        <h2 id="sp-diode" data-i18n="docs.8045ffcb49">Nonlinear elements: the two pass diode/LED model</h2>
+        <p data-i18n-html="docs.8fb8f0f201">Real diodes are exponential (the <a href="https://en.wikipedia.org/wiki/Shockley_diode_equation" target="_blank" rel="noopener">Shockley equation</a>), but MNA needs a linear system. SPICE solves this with <a href="https://en.wikipedia.org/wiki/Newton%27s_method" target="_blank" rel="noopener">Newton Raphson iteration</a>, which repeatedly linearises the diode around the current voltage estimate. 74Sim uses a simplified equivalent: two successive solves per evaluate() pass, switching the diode/LED stamps between an off form and an on form based on the first solve's result.</p>
         <ol>
-          <li>Pass 0, assume all off. Every LED and diode is stamped as a near-open circuit with conductance G<sub>off</sub>&thinsp;&#8776;&thinsp;1&thinsp;&#956;S (1&thinsp;M&#937;). Solve. Inspect each device's anode minus cathode voltage; any device with a positive value greater than its V<sub>F</sub> is forward biased.</li>
-          <li>Pass 1, re-stamp the conducting ones. Each forward biased device is re-stamped as a bulk resistance plus a Norton current source that subtracts its <a href="https://en.wikipedia.org/wiki/Forward_voltage" target="_blank" rel="noopener">forward voltage</a> drop:
+          <li data-i18n-html="docs.ce4117615e">Pass 0, assume all off. Every LED and diode is stamped as a near open circuit with conductance G<sub>off</sub>&thinsp;&#8776;&thinsp;1&thinsp;&#956;S (1&thinsp;M&#937;). Solve. Inspect each device's anode minus cathode voltage; any device with a positive value greater than its V<sub>F</sub> is forward biased.</li>
+          <li data-i18n-html="docs.846385ed96">Pass 1, re stamp the conducting ones. Each forward biased device is re stamped as a bulk resistance plus a Norton current source that subtracts its <a href="https://en.wikipedia.org/wiki/Forward_voltage" target="_blank" rel="noopener">forward voltage</a> drop:
             <ul>
               <li>LEDs: R&thinsp;=&thinsp;33&thinsp;&#937;, V<sub>F</sub>&thinsp;=&thinsp;2.0&thinsp;V.</li>
               <li>Silicon diodes: R&thinsp;=&thinsp;10&thinsp;&#937;, V<sub>F</sub>&thinsp;=&thinsp;0.7&thinsp;V.</li>
@@ -510,73 +512,61 @@
             Solve again. The result is the final node voltages with each diode contributing its drop.
           </li>
         </ol>
-        <p>This two pass scheme is mathematically equivalent to a single Newton Raphson iteration of the standard SPICE diode model started from a good initial guess (everything off), and is accurate enough for the 0 to 5&thinsp;V range these chips operate at. The constants are taken from js/simulator.js: LED_VF, LED_R_INTERNAL, DIODE_VF, DIODE_R_INTERNAL, and LED_G_OFF&thinsp;/&thinsp;DIODE_G_OFF.</p>
+        <p data-i18n="docs.2270c9a69d">This two pass scheme is mathematically equivalent to a single Newton Raphson iteration of the standard SPICE diode model started from a good initial guess (everything off), and is accurate enough for the 0 to 5&thinsp;V range these chips operate at. The constants are taken from js/simulator.js: LED_VF, LED_R_INTERNAL, DIODE_VF, DIODE_R_INTERNAL, and LED_G_OFF&thinsp;/&thinsp;DIODE_G_OFF.</p>
 
-        <h2 id="sp-fixedpoint">Iterative gate + MNA loop</h2>
-        <p>Chip logic and the MNA solver are mutually dependent: gate outputs change A and z, and the solved voltages in turn determine the next round of gate inputs. To resolve this without infinite recursion, the simulator runs an iterative fixed-point loop:</p>
+        <h2 id="sp-fixedpoint" data-i18n="docs.ab3739d2b2">Iterative gate + MNA loop</h2>
+        <p data-i18n="docs.3d97bcba72">Chip logic and the MNA solver are mutually dependent: gate outputs change A and z, and the solved voltages in turn determine the next round of gate inputs. To resolve this without infinite recursion, the simulator runs an iterative fixed point loop:</p>
         <ol>
-          <li>An initial MNA pass is run before any chip evaluates, so feedback wires (e.g. Q&#8594;CK on a ripple counter) already carry correct voltages from the previous simulation step.</li>
-          <li>All chips are evaluated in placement order. Each chip reads its input pin voltages, computes its logic function, and writes output drive states to pinDriveStates.</li>
-          <li>If any drive state changed, another MNA pass is run and the chip loop repeats. The loop runs for at most 30 iterations.</li>
-          <li>The loop exits early (after at least 2 passes) when no chip changes any output, meaning the circuit has reached a stable <a href="https://en.wikipedia.org/wiki/Operating_point" target="_blank" rel="noopener">DC operating point</a>.</li>
+          <li data-i18n="docs.612c6ef1a4">An initial MNA pass is run before any chip evaluates, so feedback wires (e.g. Q&#8594;CK on a ripple counter) already carry correct voltages from the previous simulation step.</li>
+          <li data-i18n="docs.15aabbbcc9">All chips are evaluated in placement order. Each chip reads its input pin voltages, computes its logic function, and writes output drive states to pinDriveStates.</li>
+          <li data-i18n="docs.6f2f793bf5">If any drive state changed, another MNA pass is run and the chip loop repeats. The loop runs for at most 30 iterations.</li>
+          <li data-i18n-html="docs.1ac4507f8f">The loop exits early (after at least 2 passes) when no chip changes any output, meaning the circuit has reached a stable <a href="https://en.wikipedia.org/wiki/Operating_point" target="_blank" rel="noopener">DC operating point</a>.</li>
         </ol>
-        <p>Most circuits converge in 2 to 3 iterations. The 30 iteration cap exists to bound pathological cases like a free-running NAND-gate <a href="https://en.wikipedia.org/wiki/Ring_oscillator" target="_blank" rel="noopener">ring oscillator</a>, where the simulator picks one consistent state for the snapshot rather than oscillating in place.</p>
+        <p data-i18n-html="docs.d545f7fa71">Most circuits converge in 2 to 3 iterations. The 30 iteration cap exists to bound pathological cases like a free running NAND gate <a href="https://en.wikipedia.org/wiki/Ring_oscillator" target="_blank" rel="noopener">ring oscillator</a>, where the simulator picks one consistent state for the snapshot rather than oscillating in place.</p>
 
-        <h2 id="sp-time">Time-domain stepping</h2>
-        <p>When a circuit contains capacitors or clock components, the simulator starts a real-time loop that advances simulation time in 20&thinsp;ms wall-clock intervals (targeting 50&thinsp;FPS):</p>
+        <h2 id="sp-time" data-i18n="docs.fdc0d50235">Time domain stepping</h2>
+        <p data-i18n="docs.5683b38781">When a circuit contains capacitors or clock components, the simulator starts a real time loop that advances simulation time in 20&thinsp;ms wall clock intervals (targeting 50&thinsp;FPS):</p>
         <ul>
-          <li>Each tick increments simTime by the current adaptive time step dt and calls evaluate().</li>
-          <li>After each pass, the maximum voltage change across any capacitor is measured. If it exceeds 0.1&thinsp;V, dt is halved (minimum 1&thinsp;ms). If it is below 0.02&thinsp;V, dt grows by 20% (maximum 50&thinsp;ms). This adaptive scheme keeps the RC charging curve smooth without wasting CPU at steady state.</li>
-          <li>Capacitor pin-to-pin voltage is clamped to a maximum change of 0.25&thinsp;V per step in _updateCapacitorState, producing a visually gradual exponential charge curve over many steps even when dt is large.</li>
-          <li>Clock components read the wall-clock time (performance.now()) to toggle their output at the user-specified frequency, independent of the simulation time step.</li>
+          <li data-i18n="docs.607dd735bb">Each tick increments simTime by the current adaptive time step dt and calls evaluate().</li>
+          <li data-i18n="docs.e40d019e97">After each pass, the maximum voltage change across any capacitor is measured. If it exceeds 0.1&thinsp;V, dt is halved (minimum 1&thinsp;ms). If it is below 0.02&thinsp;V, dt grows by 20% (maximum 50&thinsp;ms). This adaptive scheme keeps the RC charging curve smooth without wasting CPU at steady state.</li>
+          <li data-i18n="docs.33d0158bf0">Capacitor pin to pin voltage is clamped to a maximum change of 0.25&thinsp;V per step in _updateCapacitorState, producing a visually gradual exponential charge curve over many steps even when dt is large.</li>
+          <li data-i18n="docs.f211437868">Clock components read the wall clock time (performance.now()) to toggle their output at the user-specified frequency, independent of the simulation time step.</li>
         </ul>
 
-        <h2 id="sp-puredigital">Pure Digital mode</h2>
-        <p>Not every circuit needs a full analog solve. Pure Digital mode exists for two practical reasons: first, as a quick way to test purely gate level circuits where voltage levels are always rail-to-rail and analog behavior is irrelevant; second, as a debugging sanity check   if a circuit behaves strangely in full MNA mode, switching to Pure Digital can isolate whether the problem is a wiring or logic error versus an analog effect. Because it bypasses all resistor and current math, it also runs significantly faster on large netlists.</p>
-        <p>As a fast alternative to the full MNA solve, Pure Digital mode resolves all nets to exactly 0&thinsp;V or 5&thinsp;V using a <a href="https://en.wikipedia.org/wiki/Disjoint-set_data_structure" target="_blank" rel="noopener">union-find algorithm</a>:</p>
-        <ol>
-          <li>Union-find merge  resistors and closed switches are treated as ideal wires; their endpoints are unioned into the same equivalence class.</li>
-          <li>Class tagging  each class is tagged with its strongest driver: GND rail &gt; SINK_ONLY &gt; PUSH_PULL LOW/MIX &gt; PUSH_PULL HIGH &gt; VCC rail &gt; <a href="https://en.wikipedia.org/wiki/Transistor%E2%80%93transistor_logic" target="_blank" rel="noopener">TTL</a> <a href="https://learn.sparkfun.com/tutorials/pull-up-resistors/all" target="_blank" rel="noopener">floating input</a> pull up &gt; floating.</li>
-          <li>Backward LED/diode flood-fill  starting from GND-tagged classes, the flood-fill propagates backwards through forward-biased LEDs and diodes (cathode&#8594;anode) to build a reaches GND set.</li>
-          <li>Forward flood-fill  VCC-tagged classes propagate forward through LED/diode chains, painting intermediate nets HIGH only when the downstream terminus can reach GND. This lets a chain VCC&#8594;LED&#8594;&#8943;&#8594;LED&#8594;GND light all LEDs correctly.</li>
-        </ol>
-        <p>Pure Digital mode ignores resistance values, LED forward voltages, and all current calculations. It is faster and simpler but cannot model voltage dividers, RC timing, or analog mixing.</p>
-        <p>Circuits that rely on analog-in-digital techniques will not work correctly in Pure Digital mode. A common example is a pull down resistor used to hold an input LOW when no driver is active: in Pure Digital mode all resistors are treated as ideal wires, so the pull down merges that net directly to GND and forces it LOW even when a chip is actively driving it HIGH, producing incorrect logic. Similarly, <a href="https://en.wikipedia.org/wiki/Wired_AND" target="_blank" rel="noopener">wired AND</a> / <a href="https://en.wikipedia.org/wiki/Wired_OR" target="_blank" rel="noopener">wired OR</a> configurations (open-collector or open-drain outputs tied together with a pull up) collapse to a single union-find class and lose the intent of the topology. Any circuit that depends on resistor ratios, current-sink behavior, threshold biasing, or passive level setting should be simulated with the full MNA solver to get meaningful results.</p>
-
-        <h2 id="sp-family">Family dependent constants</h2>
-        <p>All threshold comparisons, output impedances, and pull up values are driven by the selected chip family.</p>
+        <h2 id="sp-family" data-i18n="docs.0d75da6ea8">Family dependent constants</h2>
+        <p data-i18n="docs.cd3f3aa650">All threshold comparisons, output impedances, and pull up values are driven by the selected chip family.</p>
         <table>
-          <thead><tr><th>Parameter</th><th>74LS</th><th>74HC</th><th>74HCT</th></tr></thead>
+          <thead><tr><th>Parameter</th><th>74LS</th><th>74HC</th><th>74HCT</th><th>74LVC</th></tr></thead>
           <tbody>
-            <tr><td>Switching threshold V<sub>TH</sub></td><td>1.4&thinsp;V</td><td>2.5&thinsp;V</td><td>1.4&thinsp;V</td></tr>
-            <tr><td>Output impedance R<sub>OUT</sub></td><td>714&thinsp;&#937;</td><td>150&thinsp;&#937;</td><td>150&thinsp;&#937;</td></tr>
-            <tr><td>TTL floating input pull up</td><td>100&thinsp;k&#937; to VCC</td><td>None (truly floating)</td><td>None (truly floating)</td></tr>
-            <tr><td>Valid HIGH input V<sub>IH</sub></td><td>&#8805;&thinsp;2.0&thinsp;V</td><td>&#8805;&thinsp;3.5&thinsp;V</td><td>&#8805;&thinsp;2.0&thinsp;V</td></tr>
-            <tr><td>Valid LOW input V<sub>IL</sub></td><td>&#8804;&thinsp;0.8&thinsp;V</td><td>&#8804;&thinsp;1.5&thinsp;V</td><td>&#8804;&thinsp;0.8&thinsp;V</td></tr>
-            <tr><td>Max clock frequency</td><td>35&thinsp;MHz</td><td>25&thinsp;MHz</td><td>25&thinsp;MHz</td></tr>
+            <tr><td data-i18n-html="docs.1b28c30900">Switching threshold V<sub>TH</sub></td><td>1.4&thinsp;V</td><td>2.5&thinsp;V</td><td>1.4&thinsp;V</td><td>1.4&thinsp;V</td></tr>
+            <tr><td data-i18n-html="docs.c5781d4d98">Output impedance R<sub>OUT</sub></td><td>714&thinsp;&#937;</td><td>150&thinsp;&#937;</td><td>150&thinsp;&#937;</td><td>50&thinsp;&#937;</td></tr>
+            <tr><td data-i18n="docs.a93aba9c81">TTL floating input pull up</td><td>100&thinsp;k&#937; to VCC</td><td data-i18n="docs.6164fa0ac3">None (truly floating)</td><td data-i18n="docs.6164fa0ac3">None (truly floating)</td><td data-i18n="docs.6164fa0ac3">None (truly floating)</td></tr>
+            <tr><td data-i18n-html="docs.85cfb4875c">Valid HIGH input V<sub>IH</sub></td><td>&#8805;&thinsp;2.0&thinsp;V</td><td>&#8805;&thinsp;3.5&thinsp;V</td><td>&#8805;&thinsp;2.0&thinsp;V</td><td>&#8805;&thinsp;2.0&thinsp;V</td></tr>
+            <tr><td data-i18n-html="docs.75dd04d0af">Valid LOW input V<sub>IL</sub></td><td>&#8804;&thinsp;0.8&thinsp;V</td><td>&#8804;&thinsp;1.5&thinsp;V</td><td>&#8804;&thinsp;0.8&thinsp;V</td><td>&#8804;&thinsp;0.8&thinsp;V</td></tr>
+            <tr><td data-i18n="docs.96a75c84bf">Max clock frequency</td><td>35&thinsp;MHz</td><td>25&thinsp;MHz</td><td>25&thinsp;MHz</td><td>100&thinsp;MHz</td></tr>
           </tbody>
         </table>
-        <p>V<sub>TH</sub> is the internal compare value used by the simulator when classifying a solved node voltage as logic HIGH (&#8805;&thinsp;V<sub>TH</sub>) or logic LOW (&lt;&thinsp;V<sub>TH</sub>). In real hardware the actual switching point varies device-to-device; V<sub>TH</sub> is the typical midpoint.</p>
+        <p data-i18n-html="docs.764398bcca">V<sub>TH</sub> is the internal compare value used by the simulator when classifying a solved node voltage as logic HIGH (&#8805;&thinsp;V<sub>TH</sub>) or logic LOW (&lt;&thinsp;V<sub>TH</sub>). In real hardware the actual switching point varies device to device; V<sub>TH</sub> is the typical midpoint.</p>
 
-        <h2 id="sp-walkthrough">Worked example: VCC &#8594; 330&thinsp;&#937; &#8594; LED &#8594; GND</h2>
-        <p>To make all of this concrete, here is a hand-solve of the simplest non-trivial circuit: a 5&thinsp;V supply through a 330&thinsp;&#937; resistor to a red LED to ground.</p>
-        <p>The netlist has three nets:</p>
+        <h2 id="sp-walkthrough" data-i18n="docs.d51a20ad22">Worked example: VCC &#8594; 330&thinsp;&#937; &#8594; LED &#8594; GND</h2>
+        <p data-i18n="docs.658d4e0783">To make all of this concrete, here is a hand solve of the simplest non trivial circuit: a 5&thinsp;V supply through a 330&thinsp;&#937; resistor to a red LED to ground.</p>
+        <p data-i18n="docs.26fac1f9ef">The netlist has three nets:</p>
         <ul>
-          <li><strong>Net 0:</strong> GND (reference, excluded from the matrix).</li>
-          <li><strong>Net 1:</strong> the VCC node  one side of the 330&thinsp;&#937; resistor and the VCC rail's Norton source.</li>
-          <li><strong>Net 2:</strong> the node between the resistor and the LED's anode.</li>
+          <li data-i18n-html="docs.e7e9a2b720"><strong>Net 0:</strong> GND (reference, excluded from the matrix).</li>
+          <li data-i18n-html="docs.70b7eb1f09"><strong>Net 1:</strong> the VCC node  one side of the 330&thinsp;&#937; resistor and the VCC rail's Norton source.</li>
+          <li data-i18n-html="docs.0c482b1e5c"><strong>Net 2:</strong> the node between the resistor and the LED's anode.</li>
         </ul>
-        <p>So A is 2&#215;2 and z is length 2.</p>
-        <p><strong>Pass 0 (LED off, stamp G<sub>off</sub>):</strong> The VCC rail stamps G&thinsp;=&thinsp;0.4&thinsp;S to net 1 with current I&thinsp;=&thinsp;2&thinsp;A into z<sub>1</sub>. The 330&thinsp;&#937; resistor stamps G&thinsp;=&thinsp;1/330&thinsp;&#8776;&thinsp;0.00303&thinsp;S between nets 1 and 2. The LED stamps G<sub>off</sub>&thinsp;=&thinsp;10<sup>&#8722;6</sup>&thinsp;S between net 2 and GND. Adding the leak conductance:</p>
+        <p data-i18n="docs.72b65aa218">So A is 2&#215;2 and z is length 2.</p>
+        <p data-i18n-html="docs.efeaa43b22"><strong>Pass 0 (LED off, stamp G<sub>off</sub>):</strong> The VCC rail stamps G&thinsp;=&thinsp;0.4&thinsp;S to net 1 with current I&thinsp;=&thinsp;2&thinsp;A into z<sub>1</sub>. The 330&thinsp;&#937; resistor stamps G&thinsp;=&thinsp;1/330&thinsp;&#8776;&thinsp;0.00303&thinsp;S between nets 1 and 2. The LED stamps G<sub>off</sub>&thinsp;=&thinsp;10<sup>&#8722;6</sup>&thinsp;S between net 2 and GND. Adding the leak conductance:</p>
         <pre>A = [ 0.40303    -0.00303 ]      z = [ 2.0 ]
     [ -0.00303   0.00303 ]          [ 0.0 ]</pre>
-        <p>Solving gives V<sub>1</sub>&thinsp;&#8776;&thinsp;5.00&thinsp;V and V<sub>2</sub>&thinsp;&#8776;&thinsp;5.00&thinsp;V. The LED's anode (V<sub>2</sub>) minus cathode (0&thinsp;V) is 5&thinsp;V  greater than V<sub>F</sub>&thinsp;=&thinsp;2.0&thinsp;V, so the LED is forward-biased.</p>
-        <p><strong>Pass 1 (LED on, stamp R&thinsp;=&thinsp;33&thinsp;&#937; + V<sub>F</sub> Norton):</strong> The LED's bulk conductance is now G<sub>LED</sub>&thinsp;=&thinsp;1/33&thinsp;&#8776;&thinsp;0.0303&thinsp;S between net 2 and GND, and a current source I<sub>LED</sub>&thinsp;=&thinsp;V<sub>F</sub>&thinsp;&#215;&thinsp;G<sub>LED</sub>&thinsp;&#8776;&thinsp;0.0606&thinsp;A is injected to subtract the forward drop:</p>
+        <p data-i18n-html="docs.a55082e9aa">Solving gives V<sub>1</sub>&thinsp;&#8776;&thinsp;5.00&thinsp;V and V<sub>2</sub>&thinsp;&#8776;&thinsp;5.00&thinsp;V. The LED's anode (V<sub>2</sub>) minus cathode (0&thinsp;V) is 5&thinsp;V  greater than V<sub>F</sub>&thinsp;=&thinsp;2.0&thinsp;V, so the LED is forward biased.</p>
+        <p data-i18n-html="docs.07fbe77449"><strong>Pass 1 (LED on, stamp R&thinsp;=&thinsp;33&thinsp;&#937; + V<sub>F</sub> Norton):</strong> The LED's bulk conductance is now G<sub>LED</sub>&thinsp;=&thinsp;1/33&thinsp;&#8776;&thinsp;0.0303&thinsp;S between net 2 and GND, and a current source I<sub>LED</sub>&thinsp;=&thinsp;V<sub>F</sub>&thinsp;&#215;&thinsp;G<sub>LED</sub>&thinsp;&#8776;&thinsp;0.0606&thinsp;A is injected to subtract the forward drop:</p>
         <pre>A = [ 0.40303    -0.00303 ]      z = [ 2.0      ]
     [ -0.00303   0.03333 ]          [ -0.0606  ]</pre>
-        <p>Solving (and ignoring the 10<sup>&#8722;9</sup>&thinsp;S leak) gives V<sub>1</sub>&thinsp;&#8776;&thinsp;4.93&thinsp;V and V<sub>2</sub>&thinsp;&#8776;&thinsp;2.30&thinsp;V. The LED current is then computed in the post-solve current pass:</p>
-        <p style="text-align:center;font-size:1.05em;">I<sub>LED</sub>&thinsp;=&thinsp;(V<sub>2</sub>&thinsp;&#8722;&thinsp;0&thinsp;&#8722;&thinsp;V<sub>F</sub>)&thinsp;/&thinsp;33&thinsp;&#937;&thinsp;&#8776;&thinsp;(2.30&thinsp;&#8722;&thinsp;2.00)&thinsp;/&thinsp;33&thinsp;&#8776;&thinsp;9&thinsp;mA</p>
-        <p>which is the realistic forward current you would expect from a 5&thinsp;V supply, a 330&thinsp;&#937; series resistor, and a 2&thinsp;V red LED. Every quantity on the screen for this circuit  the voltage at each net, the current through each branch, the LED's brightness  is computed by exactly this two-pass procedure.</p>
+        <p data-i18n-html="docs.66ec274ac0">Solving (and ignoring the 10<sup>&#8722;9</sup>&thinsp;S leak) gives V<sub>1</sub>&thinsp;&#8776;&thinsp;4.93&thinsp;V and V<sub>2</sub>&thinsp;&#8776;&thinsp;2.30&thinsp;V. The LED current is then computed in the post solve current pass:</p>
+        <p style="text-align:center;font-size:1.05em;" data-i18n-html="docs.762e746f4f">I<sub>LED</sub>&thinsp;=&thinsp;(V<sub>2</sub>&thinsp;&#8722;&thinsp;0&thinsp;&#8722;&thinsp;V<sub>F</sub>)&thinsp;/&thinsp;33&thinsp;&#937;&thinsp;&#8776;&thinsp;(2.30&thinsp;&#8722;&thinsp;2.00)&thinsp;/&thinsp;33&thinsp;&#8776;&thinsp;9&thinsp;mA</p>
+        <p data-i18n="docs.69ee1d4475">which is the realistic forward current you would expect from a 5&thinsp;V supply, a 330&thinsp;&#937; series resistor, and a 2&thinsp;V red LED. Every quantity on the screen for this circuit  the voltage at each net, the current through each branch, the LED's brightness  is computed by exactly this two pass procedure.</p>
       </article>
 
       <!-- ══ COMMON TERMS ══ -->
@@ -586,14 +576,14 @@
           <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M3.5 2.5l3 2.5-3 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
           Common Terms
         </div>
-        <h1>Common Terms</h1>
+        <h1 data-i18n="docs.902bb9a3d0">Common Terms</h1>
         
         <!-- ── Logic gates ── -->
-        <h2 id="ct-gates">Logic Gates</h2>
-        <p>A <a href="https://en.wikipedia.org/wiki/Buffer" target="_blank" rel="noopener">logic</a> gate is a circuit that performs a Boolean operation on one or more <a href="https://en.wikipedia.org/wiki/Binary_number" target="_blank" rel="noopener">binary</a> inputs and produces a single binary output. All 74 series logic is built from combinations of these primitive gates.</p>
+        <h2 id="ct-gates" data-i18n="docs.e5f99ed5bb">Logic Gates</h2>
+        <p data-i18n-html="docs.356fec07c9">A <a href="https://en.wikipedia.org/wiki/Buffer" target="_blank" rel="noopener">logic</a> gate is a circuit that performs a Boolean operation on one or more <a href="https://en.wikipedia.org/wiki/Binary_number" target="_blank" rel="noopener">binary</a> inputs and produces a single binary output. All 74 series logic is built from combinations of these primitive gates.</p>
 
-        <h3 id="ct-gate-table">Gate truth table</h3>
-        <p>The table below shows every common two-input gate. A = first input, B = second input, 0 = LOW, 1 = HIGH.</p>
+        <h3 id="ct-gate-table" data-i18n="docs.17c3bd6f98">Gate truth table</h3>
+        <p data-i18n="docs.0c0fbb9218">The table below shows every common two input gate. A = first input, B = second input, 0 = LOW, 1 = HIGH.</p>
         <table>
           <thead>
             <tr><th>A</th><th>B</th><th>AND</th><th>OR</th><th>NAND</th><th>NOR</th><th>XOR</th><th>XNOR</th></tr>
@@ -606,72 +596,91 @@
           </tbody>
         </table>
         <ul>
-          <li>AND: output is HIGH only when all inputs are HIGH.</li>
-          <li>OR: output is HIGH when any input is HIGH.</li>
-          <li>NAND: NOT/AND; output is LOW only when all inputs are HIGH. <a href="https://en.wikipedia.org/wiki/Functional_completeness" target="_blank" rel="noopener">Universal gate</a>: any logic function can be built from NANDs alone.</li>
-          <li>NOR: NOT/OR; output is HIGH only when all inputs are LOW. Also a <a href="https://en.wikipedia.org/wiki/Functional_completeness" target="_blank" rel="noopener">universal gate</a>.</li>
-          <li>XOR (<a href="https://en.wikipedia.org/wiki/XOR_gate" target="_blank" rel="noopener">exclusive-OR</a>): output is HIGH when inputs differ. Used in adders and parity checkers.</li>
-          <li>XNOR (<a href="https://en.wikipedia.org/wiki/XNOR_gate" target="_blank" rel="noopener">exclusive-NOR</a>): output is HIGH when inputs are equal. The inverse of XOR; used in comparators.</li>
+          <li data-i18n="docs.3f9fe975ce">AND: output is HIGH only when all inputs are HIGH.</li>
+          <li data-i18n="docs.d050803b7f">OR: output is HIGH when any input is HIGH.</li>
+          <li data-i18n-html="docs.7db090246f">NAND: NOT/AND; output is LOW only when all inputs are HIGH. <a href="https://en.wikipedia.org/wiki/Functional_completeness" target="_blank" rel="noopener">Universal gate</a>: any logic function can be built from NANDs alone.</li>
+          <li data-i18n-html="docs.a47d04e34b">NOR: NOT/OR; output is HIGH only when all inputs are LOW. Also a <a href="https://en.wikipedia.org/wiki/Functional_completeness" target="_blank" rel="noopener">universal gate</a>.</li>
+          <li data-i18n-html="docs.f73b0a437d">XOR (<a href="https://en.wikipedia.org/wiki/XOR_gate" target="_blank" rel="noopener">exclusive OR</a>): output is HIGH when inputs differ. Used in adders and parity checkers.</li>
+          <li data-i18n-html="docs.41c3ca9af9">XNOR (<a href="https://en.wikipedia.org/wiki/XNOR_gate" target="_blank" rel="noopener">exclusive NOR</a>): output is HIGH when inputs are equal. The inverse of XOR; used in comparators.</li>
         </ul>
 
-        <h2 id="ct-buffer">Buffer</h2>
-        <p>A bufferis a gate with a single input whose output equals its input  logically it does nothing. Its purpose is electrical: it provides a clean, high-current copy of a signal to drive many downstream loads without the source being overloaded. Buffers also isolate sections of a circuit so a disturbance on one side cannot propagate back to the other.</p>
+        <h2 id="ct-buffer" data-i18n="docs.2be5f64b36">Buffer</h2>
+        <p data-i18n="docs.ad6660615a">A bufferis a gate with a single input whose output equals its input  logically it does nothing. Its purpose is electrical: it provides a clean, high current copy of a signal to drive many downstream loads without the source being overloaded. Buffers also isolate sections of a circuit so a disturbance on one side cannot propagate back to the other.</p>
 
-        <h2 id="ct-hex-inverter">Hex Inverter (NOT Gate)</h2>
-        <p>An inverter (<a href="https://en.wikipedia.org/wiki/NOT_gate" target="_blank" rel="noopener">NOT gate</a>) flips a single bit: a HIGH input produces a LOW output and vice versa. A <a href="https://en.wikipedia.org/wiki/Inverter_(logic_gate)" target="_blank" rel="noopener">hex inverter</a> is a single chip package containing six independent inverters, hence the prefix &#8220;hex.&#8221; The 74LS04 and 74HC04 are the classic examples. Each gate is completely independent; unused gates should have their inputs tied to GND.</p>
+        <h2 id="ct-hex-inverter" data-i18n="docs.84df246805">Hex Inverter (NOT Gate)</h2>
+        <p data-i18n-html="docs.580558fbcf">An inverter (<a href="https://en.wikipedia.org/wiki/NOT_gate" target="_blank" rel="noopener">NOT gate</a>) flips a single bit: a HIGH input produces a LOW output and vice versa. A <a href="https://en.wikipedia.org/wiki/Inverter_(logic_gate)" target="_blank" rel="noopener">hex inverter</a> is a single chip package containing six independent inverters, hence the prefix &#8220;hex.&#8221; The 74LS04 and 74HC04 are the classic examples. Each gate is completely independent; unused gates should have their inputs tied to GND.</p>
 
-        <h2 id="ct-open-collector">Open Collector Output</h2>
-        <p>A standard push-pull output actively drives its pin both HIGH and LOW. An <a href="https://en.wikipedia.org/wiki/Open_collector" target="_blank" rel="noopener">open collector</a> output is different: it can only pull the pin LOW (by connecting the collector of an internal transistor to the output pin). When the output is &#8220;HIGH,&#8221; the transistor is simply off and the pin floats.</p>
-        <p>To get a usable HIGH level you must add an external pull up resistor between the output pin and VCC. The key advantage is <a href="https://en.wikipedia.org/wiki/Wired_AND" target="_blank" rel="noopener">wired AND</a>: multiple open collector outputs can share the same wire, and the line is pulled LOW whenever any one of them is active. This makes open collector outputs ideal for bus lines and for driving loads (LEDs, relays) at a voltage higher than the chip&#8217;s own supply.</p>
-        <div class="callout tip">
+        <h2 id="ct-totem-pole" data-i18n="docs.9e474f9aeb">Totem Pole Output</h2>
+        <p data-i18n-html="docs.2362873293">A <a href="https://en.wikipedia.org/wiki/Push%E2%80%93pull_output" target="_blank" rel="noopener">totem pole output</a> is the standard output structure used in most TTL and CMOS logic gates. It gets its name from the physical arrangement of two transistors stacked vertically on the output pin: one transistor pulls the pin HIGH (sources current to the load) while the other pulls it LOW (sinks current from the load). Only one transistor is on at a time, so the output actively drives to a definite HIGH or LOW level in both directions.</p>
+        <p data-i18n-html="docs.615d37adad">The totem pole structure gives logic gates low output impedance in both states, which means they can source and sink current quickly and drive long traces or many inputs without significant voltage sag. The tradeoff is that totem pole outputs <em>cannot</em> be tied directly together: if one output is driving HIGH and another is driving LOW on the same wire, the two transistors fight each other and cause a short circuit current spike. Use <a href="#ct-open collector">open collector</a> or <a href="#ct-tristate">tristate</a> outputs when multiple drivers must share a bus.</p>
+        <div class="callout tip" data-i18n-html="docs.ef01a3c631">
+          <strong>In 74Sim:</strong> Chips with totem pole outputs (the majority of 74 series parts) are shown with a PUSH_PULL drive state in the simulator. Wiring two PUSH_PULL outputs together to the same node is flagged as a conflict, matching real world bus contention.
+        </div>
+
+        <h2 id="ct-open collector" data-i18n="docs.2452f302e9">Open Collector Output</h2>
+        <p data-i18n-html="docs.13ced64be9">A standard push pull output actively drives its pin both HIGH and LOW. An <a href="https://en.wikipedia.org/wiki/Open_collector" target="_blank" rel="noopener">open collector</a> output is different: it can only pull the pin LOW (by connecting the collector of an internal transistor to the output pin). When the output is &#8220;HIGH,&#8221; the transistor is simply off and the pin floats.</p>
+        <p data-i18n-html="docs.c9a0a1040a">To get a usable HIGH level you must add an external pull up resistor between the output pin and VCC. The key advantage is <a href="https://en.wikipedia.org/wiki/Wired_AND" target="_blank" rel="noopener">wired AND</a>: multiple open collector outputs can share the same wire, and the line is pulled LOW whenever any one of them is active. This makes open collector outputs ideal for bus lines and for driving loads (LEDs, relays) at a voltage higher than the chip&#8217;s own supply.</p>
+        <div class="callout tip" data-i18n-html="docs.ae68068a38">
           <strong>In 74Sim:</strong> Open collector chips (e.g. 74LS05) are modelled with a SINK_ONLY drive state. The pin pulls toward GND when active and floats HIGH otherwise  add a pull up resistor in the simulator exactly as you would in hardware.
         </div>
 
-        <h2 id="ct-wired and">Wired AND</h2>
-        <p>Wired AND is a technique where two or more open-collector (or open-drain) outputs are connected directly together on a shared wire with a single pull up resistor to VCC. Because any active output can sink the line to GND, the shared wire is LOW whenever <em>any</em> driver is active   identical to the behavior of an <a href="https://en.wikipedia.org/wiki/AND_gate" target="_blank" rel="noopener">AND gate</a> applied to the <a href="https://en.wikipedia.org/wiki/Logic_level" target="_blank" rel="noopener">active LOW</a> sense of each driver.</p>
-        <p>No extra gate IC is required: the wiring itself performs the logic. Wired AND is widely used on I&#178;C buses (SDA and SCL lines) and on interrupt request lines where multiple sources must share a single signal without <a href="https://en.wikipedia.org/wiki/Bus_contention" target="_blank" rel="noopener">bus contention</a>. Only open-collector or open-drain outputs are safe to wire together this way   connecting push-pull outputs directly causes a short circuit between the HIGH driver and the LOW driver.</p>
-        <div class="callout tip">
-          <strong>In 74Sim:</strong> Wire several open-collector outputs (e.g. 74LS05 inverters) to a common node and add a pull up resistor to VCC. The node will read LOW whenever any output is active, implementing Wired AND in the simulator exactly as in hardware.
+        <h2 id="ct-darlington" data-i18n="docs.d0dade1431">Darlington Sink</h2>
+        <p data-i18n-html="docs.c0a1bc2978">A <a href="https://en.wikipedia.org/wiki/Darlington_transistor" target="_blank" rel="noopener">Darlington pair</a> is two <a href="https://en.wikipedia.org/wiki/Bipolar_junction_transistor" target="_blank" rel="noopener">bipolar transistors</a> wired so the first transistor's emitter current feeds directly into the second transistor's base. The result behaves like a single transistor with a current gain (&#946;) equal to the product of the two individual gains often in the thousands. A few milliamps into the base can therefore switch hundreds of milliamps at the combined collector.</p>
+        <p data-i18n-html="docs.fe044603a6">A <strong>Darlington sink</strong> is an <a href="#ct-open collector">open collector</a> output built from a Darlington pair instead of a single transistor. Like any open collector stage it can only pull its output toward GND (sink current); it never sources current or drives the pin HIGH. The load current path - and the diode reverse voltage flyback diodes must withstand on inductive loads - flows from the external supply, through the load, into the OUT pin, and to ground through the Darlington pair.</p>
+        <p data-i18n-html="docs.aea540b63f">Darlington sink arrays are the standard interface between low current logic outputs and higher current loads such as relays, solenoids, stepper motor coils, and incandescent lamps. The <a href="https://www.ti.com/lit/ds/symlink/uln2003a.pdf" target="_blank" rel="noopener">ULN2003</a> (seven channels) and ULN2803 (eight channels) are the classic 16/18 pin Darlington driver arrays; each channel includes a built in flyback diode (brought out to a common COM pin) to clamp the inductive kickback when a relay or motor coil turns off.</p>
+        <div class="callout tip" data-i18n-html="docs.34339cb3b6">
+          <strong>In 74Sim:</strong> The ULN2003 has no VCC pin only GND needs to be connected. Each channel is INVERTING in the open collector sense: drive an input HIGH and the matching output sinks hard to GND (modeled as a strong few tens of ohms pull down); drive it LOW and the output floats. Wire the load between VCC and the output pin, exactly as you would with real hardware.
         </div>
 
-        <h2 id="ct-wired or">Wired OR</h2>
-        <p><a href="https://en.wikipedia.org/wiki/Wired_OR" target="_blank" rel="noopener">Wired OR</a> is the complementary technique: two or more open-emitter (open-source) outputs share a wire with a pull down resistor to GND. The line is pulled HIGH whenever <em>any</em> driver is active, which is equivalent to an <a href="https://en.wikipedia.org/wiki/OR_gate" target="_blank" rel="noopener">OR gate</a> applied to the <a href="https://en.wikipedia.org/wiki/Logic_level" target="_blank" rel="noopener">active HIGH</a> sense of each driver.</p>
-        <p>Wired OR is less common in <a href="https://en.wikipedia.org/wiki/Transistor%E2%80%93transistor_logic" target="_blank" rel="noopener">TTL</a>/<a href="https://en.wikipedia.org/wiki/CMOS" target="_blank" rel="noopener">CMOS</a> logic than Wired AND because most bus standards use active LOW signalling, but the concept is important in emitter-coupled logic (ECL) and in some mixed-signal systems. The term is also used informally to describe any situation where multiple signals are tied together through diodes so that any HIGH input forces the bus HIGH.</p>
+        <h2 id="ct-wired and" data-i18n="docs.2dee7631ac">Wired AND</h2>
+        <p data-i18n-html="docs.8a5846bb63">Wired AND is a technique where two or more open collector (or open drain) outputs are connected directly together on a shared wire with a single pull up resistor to VCC. Because any active output can sink the line to GND, the shared wire is LOW whenever <em>any</em> driver is active   identical to the behavior of an <a href="https://en.wikipedia.org/wiki/AND_gate" target="_blank" rel="noopener">AND gate</a> applied to the <a href="https://en.wikipedia.org/wiki/Logic_level" target="_blank" rel="noopener">active LOW</a> sense of each driver.</p>
+        <p data-i18n-html="docs.31dc77256f">No extra gate IC is required: the wiring itself performs the logic. Wired AND is widely used on I&#178;C buses (SDA and SCL lines) and on interrupt request lines where multiple sources must share a single signal without <a href="https://en.wikipedia.org/wiki/Bus_contention" target="_blank" rel="noopener">bus contention</a>. Only open collector or open drain outputs are safe to wire together this way   connecting push pull outputs directly causes a short circuit between the HIGH driver and the LOW driver.</p>
+        <div class="callout tip" data-i18n-html="docs.1fb3829bef">
+          <strong>In 74Sim:</strong> Wire several open collector outputs (e.g. 74LS05 inverters) to a common node and add a pull up resistor to VCC. The node will read LOW whenever any output is active, implementing Wired AND in the simulator exactly as in hardware.
+        </div>
 
-        <h2 id="ct-tristate">Tristate Output</h2>
-        <p>A tristate output has three possible states instead of two: HIGH, LOW, and <a href="https://en.wikipedia.org/wiki/High_impedance" target="_blank" rel="noopener">high impedance</a> (<a href="https://en.wikipedia.org/wiki/High_impedance" target="_blank" rel="noopener">Hi-Z</a>). In the Hi-Z state the output is electrically disconnected from the bus and neither sources nor sinks current. This allows many chips to share a single <a href="https://en.wikipedia.org/wiki/Bus_(computing)#Data_bus" target="_blank" rel="noopener">data bus</a>: only one chip is enabled at a time, while all others are in Hi-Z so they do not interfere. Most bus-driver and <a href="https://en.wikipedia.org/wiki/Buffer" target="_blank" rel="noopener">buffer</a> chips (e.g. 74HC244, 74HC245) use tristate outputs controlled by an active LOW Output Enable (/OE) pin.</p>
+        <h2 id="ct-wired or" data-i18n="docs.a98dd40e40">Wired OR</h2>
+        <p data-i18n-html="docs.526c8967e4"><a href="https://en.wikipedia.org/wiki/Wired_OR" target="_blank" rel="noopener">Wired OR</a> is the complementary technique: two or more open emitter (open source) outputs share a wire with a pull down resistor to GND. The line is pulled HIGH whenever <em>any</em> driver is active, which is equivalent to an <a href="https://en.wikipedia.org/wiki/OR_gate" target="_blank" rel="noopener">OR gate</a> applied to the <a href="https://en.wikipedia.org/wiki/Logic_level" target="_blank" rel="noopener">active HIGH</a> sense of each driver.</p>
+        <p data-i18n-html="docs.3f387efa31">Wired OR is less common in <a href="https://en.wikipedia.org/wiki/Transistor%E2%80%93transistor_logic" target="_blank" rel="noopener">TTL</a>/<a href="https://en.wikipedia.org/wiki/CMOS" target="_blank" rel="noopener">CMOS</a> logic than Wired AND because most bus standards use active LOW signalling, but the concept is important in emitter coupled logic (ECL) and in some mixed signal systems. The term is also used informally to describe any situation where multiple signals are tied together through diodes so that any HIGH input forces the bus HIGH.</p>
 
-        <h2 id="ct-schmitt">Schmitt Trigger</h2>
-        <p>A <a href="https://en.wikipedia.org/wiki/Schmitt_trigger" target="_blank" rel="noopener">Schmitt trigger</a> is an input circuit with <a href="https://en.wikipedia.org/wiki/Hysteresis" target="_blank" rel="noopener">hysteresis</a>: it switches HIGH at one voltage threshold (V<sub>T+</sub>) but does not switch back LOW until the input falls to a lower threshold (V<sub>T&#8722;</sub>). The gap between the two thresholds gives the <a href="https://en.wikipedia.org/wiki/Schmitt_trigger" target="_blank" rel="noopener">Schmitt trigger</a> its <a href="https://en.wikipedia.org/wiki/Noise_immunity" target="_blank" rel="noopener">noise immunity</a>   a slowly rising or noisy signal will not cause multiple rapid toggles.</p>
-        <p>Schmitt trigger inverters (e.g. 74HC14) are commonly used to clean up slow or bouncy signals  such as the output of an <a href="https://en.wikipedia.org/wiki/RC_oscillator" target="_blank" rel="noopener">RC oscillator</a> or a mechanical button  before feeding them into clocked logic. In the capabilities page the 74HC14 is noted as a way to <a href="https://en.wikipedia.org/wiki/Debouncing" target="_blank" rel="noopener">debounce</a> button presses.</p>
+        <h2 id="ct-tristate" data-i18n="docs.c39cbaa712">Tristate Output</h2>
+        <p data-i18n-html="docs.6159f60a22">A tristate output has three possible states instead of two: HIGH, LOW, and <a href="https://en.wikipedia.org/wiki/High_impedance" target="_blank" rel="noopener">high impedance</a> (<a href="https://en.wikipedia.org/wiki/High_impedance" target="_blank" rel="noopener">Hi Z</a>). In the Hi Z state the output is electrically disconnected from the bus and neither sources nor sinks current. This allows many chips to share a single <a href="https://en.wikipedia.org/wiki/Bus_(computing)#Data_bus" target="_blank" rel="noopener">data bus</a>: only one chip is enabled at a time, while all others are in Hi Z so they do not interfere. Most bus driver and <a href="https://en.wikipedia.org/wiki/Buffer" target="_blank" rel="noopener">buffer</a> chips (e.g. 74HC244, 74HC245) use tristate outputs controlled by an active LOW Output Enable (/OE) pin.</p>
+
+        <h2 id="ct-hysteresis" data-i18n="docs.b69d97def5">Hysteresis</h2>
+        <p data-i18n-html="docs.70faf337f2"><a href="https://en.wikipedia.org/wiki/Hysteresis" target="_blank" rel="noopener">Hysteresis</a> is the property of a system whose output depends on the history of the input, not just its instantaneous value. In digital logic the term almost always refers to input switching thresholds: the voltage at which the input switches from LOW to HIGH (V<sub>T+</sub>) is intentionally set higher than the voltage at which it switches back from HIGH to LOW (V<sub>T&#8722;</sub>). The gap between the two thresholds&#8202;&#8212;&#8202;the <em>hysteresis band</em>&#8202;&#8212;&#8202;must be crossed in the opposite direction before the output changes state again.</p>
+        <p data-i18n-html="docs.b2731456ee">The practical effect is noise immunity. If the input sits near the switching point and a noise spike pushes it past the threshold, the output changes. Without hysteresis, the slightest additional noise could immediately toggle it back, causing rapid oscillation (chatter). With hysteresis the output stays put: to reverse, the input must travel all the way to the opposite threshold. The <a href="#ct-schmitt">Schmitt trigger</a> is the standard circuit that adds hysteresis to a logic input.</p>
+
+        <h2 id="ct-schmitt" data-i18n="docs.888b6017d7">Schmitt Trigger</h2>
+        <p data-i18n-html="docs.218e2c534d">A <a href="https://en.wikipedia.org/wiki/Schmitt_trigger" target="_blank" rel="noopener">Schmitt trigger</a> is an input circuit with <a href="#ct-hysteresis">hysteresis</a>: it switches HIGH at one voltage threshold (V<sub>T+</sub>) but does not switch back LOW until the input falls to a lower threshold (V<sub>T&#8722;</sub>). The gap between the two thresholds gives the <a href="https://en.wikipedia.org/wiki/Schmitt_trigger" target="_blank" rel="noopener">Schmitt trigger</a> its <a href="https://en.wikipedia.org/wiki/Noise_immunity" target="_blank" rel="noopener">noise immunity</a>   a slowly rising or noisy signal will not cause multiple rapid toggles.</p>
+        <p data-i18n-html="docs.2bf94a02df">Schmitt trigger inverters (e.g. 74HC14) are commonly used to clean up slow or bouncy signals  such as the output of an <a href="https://en.wikipedia.org/wiki/RC_oscillator" target="_blank" rel="noopener">RC oscillator</a> or a mechanical button  before feeding them into clocked logic. In the capabilities page the 74HC14 is noted as a way to <a href="https://en.wikipedia.org/wiki/Debouncing" target="_blank" rel="noopener">debounce</a> button presses.</p>
 
         <!-- ── Memory elements: Latches ── -->
-        <h2 id="ct-latch">Latch (Level-Sensitive Memory)</h2>
-        <p>A <a href="https://en.wikipedia.org/wiki/Flip-flop_(electronics)#Latch" target="_blank" rel="noopener">latch</a> is a one-bit memory element whose behavior depends on the <em>level</em> of its enable input rather than on a clock edge. While the enable is asserted, the output follows the data input continuously   the <a href="https://en.wikipedia.org/wiki/Latch" target="_blank" rel="noopener">latch</a> is &#8220;open.&#8221; When the enable is de-asserted the latch &#8220;closes&#8221; and freezes the last value it saw. Because latches are level sensitive they are <em>asynchronous</em>: the output can change at any moment while enabled, not only at a single instant per clock cycle. For this reason synchronous designs almost always use flip-flops in place of latches.</p>
-        <p>All latches share the same internal structure: two cross-coupled inverting gates (NOR or NAND) form a positive-feedback loop that holds either Q&thinsp;=&thinsp;1, /Q&thinsp;=&thinsp;0 or Q&thinsp;=&thinsp;0, /Q&thinsp;=&thinsp;1. The four common variants (SR, gated SR, D, gated D) differ only in how external inputs steer that loop.</p>
+        <h2 id="ct-latch" data-i18n="docs.02999c43f7">Latch (Level Sensitive Memory)</h2>
+        <p data-i18n-html="docs.2963ef9b39">A <a href="https://en.wikipedia.org/wiki/Flip-flop_(electronics)#Latch" target="_blank" rel="noopener">latch</a> is a one bit memory element whose behavior depends on the <em>level</em> of its enable input rather than on a clock edge. While the enable is asserted, the output follows the data input continuously   the <a href="https://en.wikipedia.org/wiki/Latch" target="_blank" rel="noopener">latch</a> is &#8220;open.&#8221; When the enable is de asserted the latch &#8220;closes&#8221; and freezes the last value it saw. Because latches are level sensitive they are <em>asynchronous</em>: the output can change at any moment while enabled, not only at a single instant per clock cycle. For this reason synchronous designs almost always use flip flops in place of latches.</p>
+        <p data-i18n="docs.f7e6b5dde8">All latches share the same internal structure: two cross coupled inverting gates (NOR or NAND) form a positive feedback loop that holds either Q&thinsp;=&thinsp;1, /Q&thinsp;=&thinsp;0 or Q&thinsp;=&thinsp;0, /Q&thinsp;=&thinsp;1. The four common variants (SR, gated SR, D, gated D) differ only in how external inputs steer that loop.</p>
 
-        <h2 id="ct-sr-latch">SR Latch</h2>
-        <p>The Set-Reset (SR) latch is the simplest memory element. It has two inputs   S (Set) and R (Reset)   and two <a href="https://en.wikipedia.org/wiki/Push%E2%80%93pull_output" target="_blank" rel="noopener">complementary outputs</a> Q and /Q. Asserting S forces Q&thinsp;=&thinsp;1; asserting R forces Q&thinsp;=&thinsp;0; with both LOW the latch holds its previous value:</p>
+        <h2 id="ct-sr-latch" data-i18n="docs.8b5f3cb1ab">SR Latch</h2>
+        <p data-i18n-html="docs.c11f16dab0">The Set Reset (SR) latch is the simplest memory element. It has two inputs   S (Set) and R (Reset)   and two <a href="https://en.wikipedia.org/wiki/Push%E2%80%93pull_output" target="_blank" rel="noopener">complementary outputs</a> Q and /Q. Asserting S forces Q&thinsp;=&thinsp;1; asserting R forces Q&thinsp;=&thinsp;0; with both LOW the latch holds its previous value:</p>
         <table>
           <thead><tr><th>S</th><th>R</th><th>Q<sub>next</sub></th><th>State</th></tr></thead>
           <tbody>
-            <tr><td>0</td><td>0</td><td>Q</td><td>Hold (memory)</td></tr>
+            <tr><td>0</td><td>0</td><td>Q</td><td data-i18n="docs.aad7c53485">Hold (memory)</td></tr>
             <tr><td>1</td><td>0</td><td>1</td><td>Set</td></tr>
             <tr><td>0</td><td>1</td><td>0</td><td>Reset</td></tr>
-            <tr><td>1</td><td>1</td><td>&#8212;</td><td>Forbidden (undefined / race)</td></tr>
+            <tr><td>1</td><td>1</td><td>&#8212;</td><td data-i18n="docs.9fc6bb0394">Forbidden (undefined / race)</td></tr>
           </tbody>
         </table>
         <img src="assets/Sr-latch.png" alt="SR latch circuit diagram" class="article-img">
-        <p class="img-caption"><a href="https://en.wikipedia.org/wiki/SR_latch" target="_blank" rel="noopener">SR latch</a>, Ninja~commonswiki (talk | contribs), drawn by Heron 20:28, 5 Jul 2004 (UTC), via <a href="https://commons.wikimedia.org/wiki/File:SR_latch.svg" target="_blank" rel="noopener">Wikimedia Commons</a>. GFDL.</p>
-        <p>An SR latch can be built from two cross-coupled NOR gates (active-HIGH inputs, as in the <a href="https://en.wikipedia.org/wiki/Truth_table" target="_blank" rel="noopener">truth table</a> above) or two cross-coupled NAND gates (active-LOW inputs, often labelled /S and /R). The Example Projects section includes an SR latch built from 74LS02 NOR gates.</p>
-        <p>The S&thinsp;=&thinsp;R&thinsp;=&thinsp;1 case is &#8220;forbidden&#8221; because both outputs are momentarily forced to the same level, breaking the Q, /Q complementarity. When the inputs return to 0&thinsp;0 the next state depends on a race between the two gates and is not predictable. The <a href="https://en.wikipedia.org/wiki/Flip-flop_(electronics)#D_latch" target="_blank" rel="noopener">D latch</a> below was invented to make this state physically impossible.</p>
+        <p class="img-caption" data-i18n-html="docs.d32fd9bf75"><a href="https://en.wikipedia.org/wiki/SR_latch" target="_blank" rel="noopener">SR latch</a>, Ninja~commonswiki (talk | contribs), drawn by Heron 20:28, 5 Jul 2004 (UTC), via <a href="https://commons.wikimedia.org/wiki/File:SR_latch.svg" target="_blank" rel="noopener">Wikimedia Commons</a>. GFDL.</p>
+        <p data-i18n-html="docs.a717534bea">An SR latch can be built from two cross coupled NOR gates (active HIGH inputs, as in the <a href="https://en.wikipedia.org/wiki/Truth_table" target="_blank" rel="noopener">truth table</a> above) or two cross coupled NAND gates (active LOW inputs, often labelled /S and /R). The Example Projects section includes an SR latch built from 74LS02 NOR gates.</p>
+        <p data-i18n-html="docs.7a200dd07e">The S&thinsp;=&thinsp;R&thinsp;=&thinsp;1 case is &#8220;forbidden&#8221; because both outputs are momentarily forced to the same level, breaking the Q, /Q complementarity. When the inputs return to 0&thinsp;0 the next state depends on a race between the two gates and is not predictable. The <a href="https://en.wikipedia.org/wiki/Flip-flop_(electronics)#D_latch" target="_blank" rel="noopener">D latch</a> below was invented to make this state physically impossible.</p>
 
-        <h2 id="ct-gated-sr">Gated SR Latch</h2>
-        <p>A <a href="https://en.wikipedia.org/wiki/SR_latch#Gated_SR_latch" target="_blank" rel="noopener">gated SR latch</a> adds an enable (or clock) input EN. The S and R inputs are AND-ed with EN before reaching the cross-coupled core, so the latch responds to S and R only while EN&thinsp;=&thinsp;1 and holds its state while EN&thinsp;=&thinsp;0. Gating turns the bare SR latch into something usable in a clocked system: changes propagate only during the active phase of EN.</p>
+        <h2 id="ct-gated-sr" data-i18n="docs.59101cc60c">Gated SR Latch</h2>
+        <p data-i18n-html="docs.f7752efb8f">A <a href="https://en.wikipedia.org/wiki/SR_latch#Gated_SR_latch" target="_blank" rel="noopener">gated SR latch</a> adds an enable (or clock) input EN. The S and R inputs are AND ed with EN before reaching the cross coupled core, so the latch responds to S and R only while EN&thinsp;=&thinsp;1 and holds its state while EN&thinsp;=&thinsp;0. Gating turns the bare SR latch into something usable in a clocked system: changes propagate only during the active phase of EN.</p>
         <table>
           <thead><tr><th>EN</th><th>S</th><th>R</th><th>Q<sub>next</sub></th><th>State</th></tr></thead>
           <tbody>
-            <tr><td>0</td><td>X</td><td>X</td><td>Q</td><td>Hold (latch closed)</td></tr>
+            <tr><td>0</td><td>X</td><td>X</td><td>Q</td><td data-i18n="docs.c018de2b83">Hold (latch closed)</td></tr>
             <tr><td>1</td><td>0</td><td>0</td><td>Q</td><td>Hold</td></tr>
             <tr><td>1</td><td>1</td><td>0</td><td>1</td><td>Set</td></tr>
             <tr><td>1</td><td>0</td><td>1</td><td>0</td><td>Reset</td></tr>
@@ -679,54 +688,54 @@
           </tbody>
         </table>
 
-        <h2 id="ct-transparent-latch">D Latch (Transparent Latch)</h2>
-        <p>The <strong>D latch</strong>   also called a <strong><a href="https://en.wikipedia.org/wiki/Flip-flop_(electronics)#D_latch" target="_blank" rel="noopener">transparent latch</a></strong>   eliminates the SR latch&#8217;s forbidden state by deriving R from S inside the chip: a single data input D drives S directly, and an inverter generates R&thinsp;=&thinsp;/D. Because S and R are now always opposites, the illegal S&thinsp;=&thinsp;R&thinsp;=&thinsp;1 condition cannot occur. The latch has just two inputs: D (data) and EN (enable, sometimes labelled LE for &#8220;latch enable&#8221; or G for &#8220;gate&#8221;).</p>
-        <p>The name &#8220;transparent&#8221; describes its behavior from the outside: while EN&thinsp;=&thinsp;1 the latch is <em>transparent</em>   any change at D propagates straight through to Q after only the gate delay. When EN falls to 0 the latch &#8220;closes&#8221; and Q is frozen at whatever value D had at that moment. This is the standard meaning of &#8220;transparent latch&#8221; in digital logic textbooks; the two terms describe the same circuit.</p>
+        <h2 id="ct-transparent-latch" data-i18n="docs.20789de258">D Latch (Transparent Latch)</h2>
+        <p data-i18n-html="docs.edd35473ce">The <strong>D latch</strong>   also called a <strong><a href="https://en.wikipedia.org/wiki/Flip-flop_(electronics)#D_latch" target="_blank" rel="noopener">transparent latch</a></strong>   eliminates the SR latch&#8217;s forbidden state by deriving R from S inside the chip: a single data input D drives S directly, and an inverter generates R&thinsp;=&thinsp;/D. Because S and R are now always opposites, the illegal S&thinsp;=&thinsp;R&thinsp;=&thinsp;1 condition cannot occur. The latch has just two inputs: D (data) and EN (enable, sometimes labelled LE for &#8220;latch enable&#8221; or G for &#8220;gate&#8221;).</p>
+        <p data-i18n-html="docs.c099602ec2">The name &#8220;transparent&#8221; describes its behavior from the outside: while EN&thinsp;=&thinsp;1 the latch is <em>transparent</em>   any change at D propagates straight through to Q after only the gate delay. When EN falls to 0 the latch &#8220;closes&#8221; and Q is frozen at whatever value D had at that moment. This is the standard meaning of &#8220;transparent latch&#8221; in digital logic textbooks; the two terms describe the same circuit.</p>
         <table>
           <thead><tr><th>EN</th><th>D</th><th>Q<sub>next</sub></th><th>State</th></tr></thead>
           <tbody>
-            <tr><td>0</td><td>X</td><td>Q</td><td>Hold (opaque)</td></tr>
-            <tr><td>1</td><td>0</td><td>0</td><td>Reset (transparent)</td></tr>
-            <tr><td>1</td><td>1</td><td>1</td><td>Set (transparent)</td></tr>
+            <tr><td>0</td><td>X</td><td>Q</td><td data-i18n="docs.1d8b935440">Hold (opaque)</td></tr>
+            <tr><td>1</td><td>0</td><td>0</td><td data-i18n="docs.c2a67df089">Reset (transparent)</td></tr>
+            <tr><td>1</td><td>1</td><td>1</td><td data-i18n="docs.c6ede72e60">Set (transparent)</td></tr>
           </tbody>
         </table>
-        <p>The 74HC373 <a href="https://en.wikipedia.org/wiki/Octal" target="_blank" rel="noopener">octal</a> D latch (8 transparent latches with a shared LE and tristate /OE) is the classic example. The 74HC75 contains four D latches in two pairs. Don&#8217;t confuse the 74HC373 with the 74HC374, which is the <a href="https://en.wikipedia.org/wiki/Flip-flop_(electronics)#Edge-triggered" target="_blank" rel="noopener">edge-triggered</a> <a href="https://en.wikipedia.org/wiki/Flip-flop_(electronics)#D_flip-flop" target="_blank" rel="noopener">D flip-flop</a> equivalent in the same package style; the &#8217;373 is <a href="https://en.wikipedia.org/wiki/Latch" target="_blank" rel="noopener">level-sensitive</a>, the &#8217;374 is edge-triggered.</p>
-        <div class="callout tip">
-          <strong>Why this matters in <a href="https://en.wikipedia.org/wiki/Synchronous_circuit" target="_blank" rel="noopener">synchronous design</a>:</strong> because the latch is transparent during the entire HIGH phase of EN, any <a href="https://en.wikipedia.org/wiki/Glitch" target="_blank" rel="noopener">glitch</a> on D between the rising and <a href="https://en.wikipedia.org/wiki/Signal_edge" target="_blank" rel="noopener">falling edge</a> of EN can ripple through to Q. Replacing the latch with an edge-triggered D <a href="https://en.wikipedia.org/wiki/Flip-flop_(electronics)" target="_blank" rel="noopener">flip-flop</a> confines D &#8594; Q transfer to a single instant per clock cycle, which is what synchronous timing analysis assumes.
+        <p data-i18n-html="docs.1d3face005">The 74HC373 <a href="https://en.wikipedia.org/wiki/Octal" target="_blank" rel="noopener">octal</a> D latch (8 transparent latches with a shared LE and tristate /OE) is the classic example. The 74HC75 contains four D latches in two pairs. Don&#8217;t confuse the 74HC373 with the 74HC374, which is the <a href="https://en.wikipedia.org/wiki/Flip-flop_(electronics)#Edge triggered" target="_blank" rel="noopener">edge triggered</a> <a href="https://en.wikipedia.org/wiki/Flip-flop_(electronics)#D_flip flop" target="_blank" rel="noopener">D flip flop</a> equivalent in the same package style; the &#8217;373 is <a href="https://en.wikipedia.org/wiki/Latch" target="_blank" rel="noopener">level sensitive</a>, the &#8217;374 is edge triggered.</p>
+        <div class="callout tip" data-i18n-html="docs.3c71e89f80">
+          <strong>Why this matters in <a href="https://en.wikipedia.org/wiki/Synchronous_circuit" target="_blank" rel="noopener">synchronous design</a>:</strong> because the latch is transparent during the entire HIGH phase of EN, any <a href="https://en.wikipedia.org/wiki/Glitch" target="_blank" rel="noopener">glitch</a> on D between the rising and <a href="https://en.wikipedia.org/wiki/Signal_edge" target="_blank" rel="noopener">falling edge</a> of EN can ripple through to Q. Replacing the latch with an edge triggered D <a href="https://en.wikipedia.org/wiki/Flip-flop_(electronics)" target="_blank" rel="noopener">flip flop</a> confines D &#8594; Q transfer to a single instant per clock cycle, which is what synchronous timing analysis assumes.
         </div>
 
-        <h2 id="ct-latch-summary">Latch Comparison</h2>
+        <h2 id="ct-latch-summary" data-i18n="docs.c3c38ad1c4">Latch Comparison</h2>
         <table>
-          <thead><tr><th>Latch</th><th>Inputs</th><th>Forbidden state?</th><th>Typical 74-series chip</th><th>Use</th></tr></thead>
+          <thead><tr><th>Latch</th><th>Inputs</th><th data-i18n="docs.472423d8d9">Forbidden state?</th><th data-i18n="docs.562debfb5e">Typical 74 series chip</th><th>Use</th></tr></thead>
           <tbody>
-            <tr><td>SR (NOR)</td><td>S, R (active HIGH)</td><td>Yes (S&thinsp;=&thinsp;R&thinsp;=&thinsp;1)</td><td>Built from 74LS02</td><td>Debouncing, simple set/reset memory</td></tr>
-            <tr><td>SR (NAND)</td><td>/S, /R (active LOW)</td><td>Yes (/S&thinsp;=&thinsp;/R&thinsp;=&thinsp;0)</td><td>Built from 74LS00</td><td>Same, with active-LOW signals (e.g. push-button bounce)</td></tr>
-            <tr><td>Gated SR</td><td>EN, S, R</td><td>Yes (when EN&thinsp;=&thinsp;1)</td><td>Rare as standalone IC</td><td>Pedagogical bridge from SR to D</td></tr>
-            <tr><td>D / Transparent</td><td>EN, D</td><td>No</td><td>74HC75, 74HC373</td><td>Bus-side data capture, address latching (e.g. 8085 multiplexed bus)</td></tr>
+            <tr><td>SR (NOR)</td><td data-i18n="docs.d2e88e1f9a">S, R (active HIGH)</td><td>Yes (S&thinsp;=&thinsp;R&thinsp;=&thinsp;1)</td><td data-i18n="docs.9ab5e37b67">Built from 74LS02</td><td data-i18n="docs.f4bae17829">Debouncing, simple set/reset memory</td></tr>
+            <tr><td data-i18n="docs.bebf028d10">SR (NAND)</td><td data-i18n="docs.619c2d1e09">/S, /R (active LOW)</td><td>Yes (/S&thinsp;=&thinsp;/R&thinsp;=&thinsp;0)</td><td data-i18n="docs.b2343dea53">Built from 74LS00</td><td data-i18n="docs.335bed46dd">Same, with active LOW signals (e.g. push button bounce)</td></tr>
+            <tr><td data-i18n="docs.b7c23c4889">Gated SR</td><td>EN, S, R</td><td data-i18n="docs.ede670af43">Yes (when EN&thinsp;=&thinsp;1)</td><td data-i18n="docs.d43e428ef8">Rare as standalone IC</td><td data-i18n="docs.b52c2f9edc">Pedagogical bridge from SR to D</td></tr>
+            <tr><td data-i18n="docs.f8109cd1de">D / Transparent</td><td>EN, D</td><td>No</td><td>74HC75, 74HC373</td><td data-i18n="docs.819963be14">Bus side data capture, address latching (e.g. 8085 multiplexed bus)</td></tr>
           </tbody>
         </table>
 
-        <!-- ── Flip-Flops ── -->
-        <h2 id="ct-flip-flops">Flip-Flops (Edge-Triggered Memory)</h2>
-        <p>A <a href="https://en.wikipedia.org/wiki/Flip-flop_(electronics)" target="_blank" rel="noopener">flip-flop</a> is a one-bit memory element that samples its inputs only at the active <em>edge</em> of a clock signal   either the <a href="https://en.wikipedia.org/wiki/Signal_edge" target="_blank" rel="noopener">rising edge</a> (LOW &#8594; HIGH) or the falling edge (HIGH &#8594; LOW). For the rest of the clock period the inputs are ignored and Q is held constant. This is the defining difference between a flip-flop and a latch: a latch is &#8220;open&#8221; for an entire half-cycle, a flip-flop captures at one instant per cycle.</p>
-        <p>On a schematic the active clock edge is drawn as a small triangle (&#9657;) at the clock input. A bubble in front of the triangle (&#9657; with &#9675;) means the flip-flop is falling-edge triggered. In datasheet timing diagrams the active edge is the moment at which D, J, K, or T are sampled and against which setup and hold times are measured.</p>
-        <p>Edge triggering is what makes synchronous digital design possible. Every storage element in a synchronous system updates at the same instant, so the result of one clock cycle becomes the input to the next without the &#8220;<a href="https://en.wikipedia.org/wiki/SR_latch#Race_condition" target="_blank" rel="noopener">ones catching</a>&#8221; or transparency problems that plague level-sensitive designs.</p>
+        <!-- ── Flip Flops ── -->
+        <h2 id="ct-flip flops" data-i18n="docs.ed7e1bc52a">Flip Flops (Edge Triggered Memory)</h2>
+        <p data-i18n-html="docs.443ce21ba0">A <a href="https://en.wikipedia.org/wiki/Flip-flop_(electronics)" target="_blank" rel="noopener">flip flop</a> is a one bit memory element that samples its inputs only at the active <em>edge</em> of a clock signal   either the <a href="https://en.wikipedia.org/wiki/Signal_edge" target="_blank" rel="noopener">rising edge</a> (LOW &#8594; HIGH) or the falling edge (HIGH &#8594; LOW). For the rest of the clock period the inputs are ignored and Q is held constant. This is the defining difference between a flip flop and a latch: a latch is &#8220;open&#8221; for an entire half cycle, a flip flop captures at one instant per cycle.</p>
+        <p data-i18n="docs.22cdec5d04">On a schematic the active clock edge is drawn as a small triangle (&#9657;) at the clock input. A bubble in front of the triangle (&#9657; with &#9675;) means the flip flop is falling edge triggered. In datasheet timing diagrams the active edge is the moment at which D, J, K, or T are sampled and against which setup and hold times are measured.</p>
+        <p data-i18n-html="docs.7b0655e448">Edge triggering is what makes synchronous digital design possible. Every storage element in a synchronous system updates at the same instant, so the result of one clock cycle becomes the input to the next without the &#8220;<a href="https://en.wikipedia.org/wiki/SR_latch#Race_condition" target="_blank" rel="noopener">ones catching</a>&#8221; or transparency problems that plague level sensitive designs.</p>
 
-        <h2 id="ct-d-ff">D Flip-Flop</h2>
-        <p>The D flip-flop is the workhorse of modern digital logic. It has a single data input D and one clock input. On each active clock edge it samples D and copies it to Q; for the rest of the clock period Q is held. Conceptually it is just a D latch sampled at the clock edge instead of held open across the clock HIGH phase.</p>
+        <h2 id="ct-d-ff" data-i18n="docs.6437c5b78f">D Flip Flop</h2>
+        <p data-i18n="docs.49f289828c">The D flip flop is the workhorse of modern digital logic. It has a single data input D and one clock input. On each active clock edge it samples D and copies it to Q; for the rest of the clock period Q is held. Conceptually it is just a D latch sampled at the clock edge instead of held open across the clock HIGH phase.</p>
         <table>
           <thead><tr><th>CLK</th><th>D</th><th>Q<sub>next</sub></th><th>Operation</th></tr></thead>
           <tbody>
-            <tr><td>&#8593; (rising edge)</td><td>0</td><td>0</td><td>Reset</td></tr>
-            <tr><td>&#8593; (rising edge)</td><td>1</td><td>1</td><td>Set</td></tr>
-            <tr><td>0, 1, &#8595; (any non-rising)</td><td>X</td><td>Q</td><td>Hold</td></tr>
+            <tr><td data-i18n="docs.3cee500fa9">&#8593; (rising edge)</td><td>0</td><td>0</td><td>Reset</td></tr>
+            <tr><td data-i18n="docs.3cee500fa9">&#8593; (rising edge)</td><td>1</td><td>1</td><td>Set</td></tr>
+            <tr><td data-i18n="docs.82609279ca">0, 1, &#8595; (any non rising)</td><td>X</td><td>Q</td><td>Hold</td></tr>
           </tbody>
         </table>
-        <p>Common 74-series D flip-flops include the <strong>74HC74</strong> (dual D with async preset and clear), the <strong>74HC175</strong> (quad D with shared clock and clear), the <strong>74HC273</strong> (octal D with shared clock and clear), and the <strong>74HC374</strong> (octal D with shared clock and tristate /OE). Inside CPUs and FPGAs, almost every <a href="https://en.wikipedia.org/wiki/Processor_register" target="_blank" rel="noopener">register</a> bit is a D flip-flop.</p>
-        <p>A D flip-flop is also the simplest way to build a <a href="https://en.wikipedia.org/wiki/Frequency_divider#Divide-by-2_divider" target="_blank" rel="noopener">divide-by-2</a>: tie D to /Q and Q toggles on every clock edge, producing an output at half the input frequency.</p>
+        <p data-i18n-html="docs.fd334d9d00">Common 74 series D flip flops include the <strong>74HC74</strong> (dual D with async preset and clear), the <strong>74HC175</strong> (quad D with shared clock and clear), the <strong>74HC273</strong> (octal D with shared clock and clear), and the <strong>74HC374</strong> (octal D with shared clock and tristate /OE). Inside CPUs and FPGAs, almost every <a href="https://en.wikipedia.org/wiki/Processor_register" target="_blank" rel="noopener">register</a> bit is a D flip flop.</p>
+        <p data-i18n-html="docs.1dc26d5f76">A D flip flop is also the simplest way to build a <a href="https://en.wikipedia.org/wiki/Frequency_divider#Divide-by-2_divider" target="_blank" rel="noopener">divide by-2</a>: tie D to /Q and Q toggles on every clock edge, producing an output at half the input frequency.</p>
 
-        <h2 id="ct-jk-ff">JK Flip-Flop</h2>
-        <p>The <a href="https://en.wikipedia.org/wiki/Flip-flop_(electronics)#JK_flip-flop" target="_blank" rel="noopener">JK flip-flop</a> is the edge-triggered descendant of the SR latch. It eliminates the forbidden S&thinsp;=&thinsp;R&thinsp;=&thinsp;1 state by redefining J&thinsp;=&thinsp;K&thinsp;=&thinsp;1 as <em>toggle</em>: Q flips to its complement on each active clock edge. With the four input combinations it can perform every primitive operation a one-bit element can do   hold, set, reset, and toggle   making it the most flexible flip-flop type.</p>
+        <h2 id="ct-jk-ff" data-i18n="docs.dd69892b2b">JK Flip Flop</h2>
+        <p data-i18n-html="docs.557748a32c">The <a href="https://en.wikipedia.org/wiki/Flip-flop_(electronics)#JK_flip flop" target="_blank" rel="noopener">JK flip flop</a> is the edge triggered descendant of the SR latch. It eliminates the forbidden S&thinsp;=&thinsp;R&thinsp;=&thinsp;1 state by redefining J&thinsp;=&thinsp;K&thinsp;=&thinsp;1 as <em>toggle</em>: Q flips to its complement on each active clock edge. With the four input combinations it can perform every primitive operation a one bit element can do   hold, set, reset, and toggle   making it the most flexible flip flop type.</p>
         <table>
           <thead><tr><th>CLK</th><th>J</th><th>K</th><th>Q<sub>next</sub></th><th>Operation</th></tr></thead>
           <tbody>
@@ -737,12 +746,12 @@
             <tr><td>0, 1, &#8595;</td><td>X</td><td>X</td><td>Q</td><td>Hold</td></tr>
           </tbody>
         </table>
-        <a href="https://commons.wikimedia.org/wiki/File:JK-FlipFlop_(4-NAND).PNG" target="_blank" rel="noopener"><img src="assets/JK-FlipFlop_(4-NAND).png" alt="JK flip-flop built from 4 NAND gates" class="article-img"></a>
-        <p class="img-caption"><a href="https://commons.wikimedia.org/wiki/File:JK-FlipFlop_(4-NAND).PNG" target="_blank" rel="noopener">Tosaka</a>, CC BY 3.0, via Wikimedia Commons.</p>
-        <p>JK flip-flops are the foundation of ripple counters and shift registers. Common chips include the 74HC73 (dual JK with clear), the 74HC76 (dual JK with preset and clear), and the 74HC112 (dual JK, falling-edge triggered).</p>
+        <a href="https://commons.wikimedia.org/wiki/File:JK-FlipFlop_(4-NAND).PNG" target="_blank" rel="noopener"><img src="assets/JK-FlipFlop_(4-NAND).png" alt="JK flip flop built from 4 NAND gates" class="article-img"></a>
+        <p class="img-caption" data-i18n-html="docs.dde112f7a8"><a href="https://commons.wikimedia.org/wiki/File:JK-FlipFlop_(4-NAND).PNG" target="_blank" rel="noopener">Tosaka</a>, CC BY 3.0, via Wikimedia Commons.</p>
+        <p data-i18n="docs.4e1dbf5349">JK flip flops are the foundation of ripple counters and shift registers. Common chips include the 74HC73 (dual JK with clear), the 74HC76 (dual JK with preset and clear), and the 74HC112 (dual JK, falling edge triggered).</p>
 
-        <h2 id="ct-t-ff">T Flip-Flop (Toggle)</h2>
-        <p>The T (Toggle) flip-flop has a single input T. When T&thinsp;=&thinsp;0 the flip-flop holds; when T&thinsp;=&thinsp;1 it toggles Q on every active clock edge. It is functionally a <a href="https://en.wikipedia.org/wiki/JK_flip-flop" target="_blank" rel="noopener">JK flip-flop</a> with J and K tied together (J&thinsp;=&thinsp;K&thinsp;=&thinsp;T), or equivalently a D flip-flop with D&thinsp;=&thinsp;T XOR Q.</p>
+        <h2 id="ct-t-ff" data-i18n="docs.2175e89421">T Flip Flop (Toggle)</h2>
+        <p data-i18n-html="docs.fb84392a60">The T (Toggle) flip flop has a single input T. When T&thinsp;=&thinsp;0 the flip flop holds; when T&thinsp;=&thinsp;1 it toggles Q on every active clock edge. It is functionally a <a href="https://en.wikipedia.org/wiki/JK_flip-flop" target="_blank" rel="noopener">JK flip flop</a> with J and K tied together (J&thinsp;=&thinsp;K&thinsp;=&thinsp;T), or equivalently a D flip flop with D&thinsp;=&thinsp;T XOR Q.</p>
         <table>
           <thead><tr><th>CLK</th><th>T</th><th>Q<sub>next</sub></th><th>Operation</th></tr></thead>
           <tbody>
@@ -751,39 +760,39 @@
             <tr><td>0, 1, &#8595;</td><td>X</td><td>Q</td><td>Hold</td></tr>
           </tbody>
         </table>
-        <p>There is no widely used standalone <a href="https://en.wikipedia.org/wiki/Flip-flop_(electronics)#T_flip-flop" target="_blank" rel="noopener">T flip-flop</a> in the 74 series   designers build one from a JK or D when needed. T flip-flops appear inside ripple counters such as the 74HC93 and 74HC393, where each stage toggles on the falling edge of the previous stage&#8217;s Q to perform binary division.</p>
+        <p data-i18n-html="docs.3d7c235b9d">There is no widely used standalone <a href="https://en.wikipedia.org/wiki/Flip-flop_(electronics)#T_flip flop" target="_blank" rel="noopener">T flip flop</a> in the 74 series   designers build one from a JK or D when needed. T flip flops appear inside ripple counters such as the 74HC93 and 74HC393, where each stage toggles on the falling edge of the previous stage&#8217;s Q to perform binary division.</p>
 
-        <h2 id="ct-sr-ff">SR Flip-Flop</h2>
-        <p>An edge-triggered <a href="https://en.wikipedia.org/wiki/SR_flip-flop" target="_blank" rel="noopener">SR flip-flop</a> exists conceptually   it is a clocked SR latch whose response is restricted to the active clock edge   but it inherits the forbidden S&thinsp;=&thinsp;R&thinsp;=&thinsp;1 state and so is rarely manufactured as a discrete chip. Most designs that conceptually want an SR flip-flop are built from a JK flip-flop with the J&thinsp;=&thinsp;K&thinsp;=&thinsp;1 input simply not used.</p>
+        <h2 id="ct-sr-ff" data-i18n="docs.4cb8f1e481">SR Flip Flop</h2>
+        <p data-i18n-html="docs.c4a24526b1">An edge triggered <a href="https://en.wikipedia.org/wiki/SR_flip-flop" target="_blank" rel="noopener">SR flip flop</a> exists conceptually   it is a clocked SR latch whose response is restricted to the active clock edge   but it inherits the forbidden S&thinsp;=&thinsp;R&thinsp;=&thinsp;1 state and so is rarely manufactured as a discrete chip. Most designs that conceptually want an SR flip flop are built from a JK flip flop with the J&thinsp;=&thinsp;K&thinsp;=&thinsp;1 input simply not used.</p>
 
-        <h2 id="ct-flip-flop-summary">Flip-Flop Comparison</h2>
+        <h2 id="ct-flip flop-summary" data-i18n="docs.6f22638134">Flip Flop Comparison</h2>
         <table>
-          <thead><tr><th>Type</th><th>Inputs</th><th>Operations</th><th>Forbidden?</th><th>Typical 74-series chip</th></tr></thead>
+          <thead><tr><th>Type</th><th>Inputs</th><th>Operations</th><th>Forbidden?</th><th data-i18n="docs.562debfb5e">Typical 74 series chip</th></tr></thead>
           <tbody>
-            <tr><td>SR FF</td><td>CLK, S, R</td><td>Hold, Set, Reset</td><td>Yes (S&thinsp;=&thinsp;R&thinsp;=&thinsp;1)</td><td>(rare)</td></tr>
-            <tr><td>D FF</td><td>CLK, D</td><td>Set, Reset</td><td>No</td><td>74HC74, 74HC175, 74HC273, 74HC374</td></tr>
-            <tr><td>JK FF</td><td>CLK, J, K</td><td>Hold, Set, Reset, Toggle</td><td>No (J&thinsp;=&thinsp;K&thinsp;=&thinsp;1 = toggle)</td><td>74HC73, 74HC76, 74HC112</td></tr>
-            <tr><td>T FF</td><td>CLK, T</td><td>Hold, Toggle</td><td>No</td><td>(built from JK or D)</td></tr>
+            <tr><td>SR FF</td><td>CLK, S, R</td><td data-i18n="docs.87d3237c0e">Hold, Set, Reset</td><td>Yes (S&thinsp;=&thinsp;R&thinsp;=&thinsp;1)</td><td>(rare)</td></tr>
+            <tr><td>D FF</td><td>CLK, D</td><td data-i18n="docs.81cc006383">Set, Reset</td><td>No</td><td>74HC74, 74HC175, 74HC273, 74HC374</td></tr>
+            <tr><td>JK FF</td><td>CLK, J, K</td><td data-i18n="docs.a84c5a58a9">Hold, Set, Reset, Toggle</td><td data-i18n="docs.29c8bd9040">No (J&thinsp;=&thinsp;K&thinsp;=&thinsp;1 = toggle)</td><td>74HC73, 74HC76, 74HC112</td></tr>
+            <tr><td>T FF</td><td>CLK, T</td><td data-i18n="docs.ec82c7bd7f">Hold, Toggle</td><td>No</td><td data-i18n="docs.04ea2b2aad">(built from JK or D)</td></tr>
           </tbody>
         </table>
 
-        <h2 id="ct-char-eq">Characteristic Equations</h2>
-        <p>The <strong><a href="https://en.wikipedia.org/wiki/Flip-flop_(electronics)" target="_blank" rel="noopener">characteristic equation</a></strong> of a flip-flop expresses the next state Q(t+1)   abbreviated Q<sup>+</sup>   as a Boolean function of the inputs and the current state Q. It is the equation you derive from the truth table by writing out each row that produces Q<sup>+</sup>&thinsp;=&thinsp;1, OR-ing them together, and minimising. These equations are the starting point for synthesising a <a href="https://en.wikipedia.org/wiki/Sequential_logic" target="_blank" rel="noopener">sequential circuit</a> from a <a href="https://en.wikipedia.org/wiki/State_diagram" target="_blank" rel="noopener">state diagram</a>.</p>
-        <p>In the table below, &#183; denotes AND, + denotes OR, &#8853; denotes XOR, and an apostrophe denotes NOT (so K&#8242; is /K).</p>
+        <h2 id="ct-char-eq" data-i18n="docs.132e7899b0">Characteristic Equations</h2>
+        <p data-i18n-html="docs.e4a5f9ece2">The <strong><a href="https://en.wikipedia.org/wiki/Flip-flop_(electronics)" target="_blank" rel="noopener">characteristic equation</a></strong> of a flip flop expresses the next state Q(t+1)   abbreviated Q<sup>+</sup>   as a Boolean function of the inputs and the current state Q. It is the equation you derive from the truth table by writing out each row that produces Q<sup>+</sup>&thinsp;=&thinsp;1, OR ing them together, and minimising. These equations are the starting point for synthesising a <a href="https://en.wikipedia.org/wiki/Sequential_logic" target="_blank" rel="noopener">sequential circuit</a> from a <a href="https://en.wikipedia.org/wiki/State_diagram" target="_blank" rel="noopener">state diagram</a>.</p>
+        <p data-i18n="docs.eb08186210">In the table below, &#183; denotes AND, + denotes OR, &#8853; denotes XOR, and an apostrophe denotes NOT (so K&#8242; is /K).</p>
         <table>
-          <thead><tr><th>Type</th><th>Characteristic equation</th><th>Read it as</th></tr></thead>
+          <thead><tr><th>Type</th><th data-i18n="docs.e7d7aae5f5">Characteristic equation</th><th data-i18n="docs.d30a36e8e3">Read it as</th></tr></thead>
           <tbody>
-            <tr><td>SR FF</td><td>Q<sup>+</sup> = S + R&#8242;&#183;Q&nbsp;&nbsp;(with S&#183;R = 0)</td><td>Set if S; otherwise hold unless R clears it</td></tr>
-            <tr><td>D FF</td><td>Q<sup>+</sup> = D</td><td>Next state simply equals D</td></tr>
-            <tr><td>JK FF</td><td>Q<sup>+</sup> = J&#183;Q&#8242; + K&#8242;&#183;Q</td><td>Set when J&thinsp;=&thinsp;1 and Q&thinsp;=&thinsp;0; hold when K&thinsp;=&thinsp;0 and Q&thinsp;=&thinsp;1</td></tr>
-            <tr><td>T FF</td><td>Q<sup>+</sup> = T &#8853; Q</td><td>Toggle when T&thinsp;=&thinsp;1; hold when T&thinsp;=&thinsp;0</td></tr>
+            <tr><td>SR FF</td><td data-i18n-html="docs.06afa55af9">Q<sup>+</sup> = S + R&#8242;&#183;Q&nbsp;&nbsp;(with S&#183;R = 0)</td><td data-i18n="docs.ad94093655">Set if S; otherwise hold unless R clears it</td></tr>
+            <tr><td>D FF</td><td>Q<sup>+</sup> = D</td><td data-i18n="docs.e2a8a4d380">Next state simply equals D</td></tr>
+            <tr><td>JK FF</td><td>Q<sup>+</sup> = J&#183;Q&#8242; + K&#8242;&#183;Q</td><td data-i18n="docs.5ad2075dd3">Set when J&thinsp;=&thinsp;1 and Q&thinsp;=&thinsp;0; hold when K&thinsp;=&thinsp;0 and Q&thinsp;=&thinsp;1</td></tr>
+            <tr><td>T FF</td><td>Q<sup>+</sup> = T &#8853; Q</td><td data-i18n="docs.6241d4a622">Toggle when T&thinsp;=&thinsp;1; hold when T&thinsp;=&thinsp;0</td></tr>
           </tbody>
         </table>
-        <p>The JK characteristic equation is worth memorising: it captures all four operations (00 hold, 01 reset, 10 set, 11 toggle) in a single Boolean expression and is the canonical example used in nearly every digital-logic textbook.</p>
+        <p data-i18n="docs.8d3ad7134e">The JK characteristic equation is worth memorising: it captures all four operations (00 hold, 01 reset, 10 set, 11 toggle) in a single Boolean expression and is the canonical example used in nearly every digital logic textbook.</p>
 
-        <h2 id="ct-excit-tables">Excitation Tables</h2>
-        <p>An <strong><a href="https://en.wikipedia.org/wiki/Excitation_table" target="_blank" rel="noopener">excitation table</a></strong> is the inverse of the characteristic table: given a desired transition from Q to Q<sup>+</sup>, it lists the input values that produce it. Excitation tables are the bridge from a state diagram (which specifies the desired transitions) to the gate-level inputs needed to drive a flip-flop. They are the second step in synthesis, immediately after writing down the state table.</p>
-        <p>Below, &#8220;X&#8221; means &#8220;don&#8217;t care&#8221;   either input value produces the required transition.</p>
+        <h2 id="ct-excit-tables" data-i18n="docs.36bfc213ab">Excitation Tables</h2>
+        <p data-i18n-html="docs.2a6b5eaa26">An <strong><a href="https://en.wikipedia.org/wiki/Excitation_table" target="_blank" rel="noopener">excitation table</a></strong> is the inverse of the characteristic table: given a desired transition from Q to Q<sup>+</sup>, it lists the input values that produce it. Excitation tables are the bridge from a state diagram (which specifies the desired transitions) to the gate level inputs needed to drive a flip flop. They are the second step in synthesis, immediately after writing down the state table.</p>
+        <p data-i18n="docs.00cb7f1a05">Below, &#8220;X&#8221; means &#8220;don&#8217;t care&#8221;   either input value produces the required transition.</p>
         <table>
           <thead>
             <tr><th>Q</th><th>Q<sup>+</sup></th><th>SR (S, R)</th><th>D</th><th>JK (J, K)</th><th>T</th></tr>
@@ -795,47 +804,55 @@
             <tr><td>1</td><td>1</td><td>X, 0</td><td>1</td><td>X, 0</td><td>0</td></tr>
           </tbody>
         </table>
-        <p>The don&#8217;t cares are why the JK is so attractive for counter and state-machine design: every transition has at least one don&#8217;t-care input, which collapses to simpler <a href="https://en.wikipedia.org/wiki/Combinational_logic" target="_blank" rel="noopener">combinational logic</a> when minimised with a <a href="https://en.wikipedia.org/wiki/Karnaugh_map" target="_blank" rel="noopener">Karnaugh map</a>. The D excitation table has no don&#8217;t cares (D = Q<sup>+</sup> always), which is why D flip-flops dominate FPGA and ASIC design where the next-state logic is generated automatically by a synthesis tool.</p>
+        <p data-i18n-html="docs.a6bc5e48d0">The don&#8217;t cares are why the JK is so attractive for counter and state machine design: every transition has at least one don&#8217;t-care input, which collapses to simpler <a href="https://en.wikipedia.org/wiki/Combinational_logic" target="_blank" rel="noopener">combinational logic</a> when minimised with a <a href="https://en.wikipedia.org/wiki/Karnaugh_map" target="_blank" rel="noopener">Karnaugh map</a>. The D excitation table has no don&#8217;t cares (D = Q<sup>+</sup> always), which is why D flip flops dominate FPGA and ASIC design where the next state logic is generated automatically by a synthesis tool.</p>
 
-        <h2 id="ct-leader-follower">Leader-Follower (Master-Slave) Flip-Flop</h2>
-        <p>A <a href="https://en.wikipedia.org/wiki/Flip-flop_(electronics)#Master%E2%80%93slave_edge-triggered_D_flip-flop" target="_blank" rel="noopener">leader-follower (master-slave) flip-flop</a> chains two latches back to back driven by opposite phases of the clock. On the rising clock edge the leader latch captures the input; on the falling edge the follower latch copies the leader&#8217;s output to Q. The result is a fully edge-triggered element with no transparency during the clock cycle. This architecture prevents the &#8220;ones catching&#8221; problem of single-stage JK designs (where a brief HIGH on J during the clock&#8217;s active phase would erroneously set Q) and is the internal structure of most 74-series flip-flop ICs.</p>
+        <h2 id="ct-controller device" data-i18n="docs.08957d8e4b">controller device (Master Slave) Flip Flop</h2>
+        <p data-i18n-html="docs.3b790ffd89">A <a href="https://en.wikipedia.org/wiki/Flip-flop_(electronics)#Master%E2%80%93slave_edge triggered_D_flip flop" target="_blank" rel="noopener">controller device (master slave) flip flop</a> chains two latches back to back driven by opposite phases of the clock. On the rising clock edge the leader latch captures the input; on the falling edge the follower latch copies the leader&#8217;s output to Q. The result is a fully edge triggered element with no transparency during the clock cycle. This architecture prevents the &#8220;ones catching&#8221; problem of single stage JK designs (where a brief HIGH on J during the clock&#8217;s active phase would erroneously set Q) and is the internal structure of most 74 series flip flop ICs.</p>
 
-        <h2 id="ct-timing">Setup, Hold, and Propagation Delay</h2>
-        <p>Edge-triggered flip-flops have three timing parameters, all measured against the active clock edge, that bound the maximum reliable clock frequency of a synchronous system:</p>
+        <h2 id="ct-timing" data-i18n="docs.1df8c32b18">Setup, Hold, and Propagation Delay</h2>
+        <p data-i18n="docs.136f79b625">Edge triggered flip flops have three timing parameters, all measured against the active clock edge, that bound the maximum reliable clock frequency of a synchronous system:</p>
         <ul>
-          <li><strong><a href="https://en.wikipedia.org/wiki/Flip-flop_(electronics)" target="_blank" rel="noopener">Setup time</a> (t<sub>su</sub>):</strong> the minimum time <em>before</em> the active clock edge during which the data input (D, J, K, or T) must be stable.</li>
-          <li><strong><a href="https://en.wikipedia.org/wiki/Flip-flop_(electronics)" target="_blank" rel="noopener">Hold time</a> (t<sub>h</sub>):</strong> the minimum time <em>after</em> the active clock edge during which the data input must remain stable.</li>
-          <li><strong>Clock-to-Q <a href="https://en.wikipedia.org/wiki/Propagation_delay" target="_blank" rel="noopener">propagation delay</a> (t<sub>CO</sub> or t<sub>pd</sub>):</strong> the time from the active clock edge until Q updates to its new value.</li>
+          <li data-i18n-html="docs.0e9ab9bd75"><strong><a href="https://en.wikipedia.org/wiki/Flip-flop_(electronics)" target="_blank" rel="noopener">Setup time</a> (t<sub>su</sub>):</strong> the minimum time <em>before</em> the active clock edge during which the data input (D, J, K, or T) must be stable.</li>
+          <li data-i18n-html="docs.3e591c6e04"><strong><a href="https://en.wikipedia.org/wiki/Flip-flop_(electronics)" target="_blank" rel="noopener">Hold time</a> (t<sub>h</sub>):</strong> the minimum time <em>after</em> the active clock edge during which the data input must remain stable.</li>
+          <li data-i18n-html="docs.399f6f77f7"><strong>Clock to-Q <a href="https://en.wikipedia.org/wiki/Propagation_delay" target="_blank" rel="noopener">propagation delay</a> (t<sub>CO</sub> or t<sub>pd</sub>):</strong> the time from the active clock edge until Q updates to its new value.</li>
         </ul>
-        <p>If setup or hold are violated   for example because the upstream combinational logic was too slow   the flip-flop may enter <em><a href="https://en.wikipedia.org/wiki/Metastability_(electronics)" target="_blank" rel="noopener">metastability</a></em>: Q sits at an indeterminate voltage between the valid HIGH and LOW levels for an unbounded time before resolving randomly to 0 or 1. Every synchronous design has a maximum clock period given by t<sub>CO</sub> + t<sub>logic</sub> + t<sub>su</sub>; exceeding it is the most common source of intermittent failures in digital systems.</p>
+        <p data-i18n-html="docs.297725b300">If setup or hold are violated   for example because the upstream combinational logic was too slow   the flip flop may enter <em><a href="https://en.wikipedia.org/wiki/Metastability_(electronics)" target="_blank" rel="noopener">metastability</a></em>: Q sits at an indeterminate voltage between the valid HIGH and LOW levels for an unbounded time before resolving randomly to 0 or 1. Every synchronous design has a maximum clock period given by t<sub>CO</sub> + t<sub>logic</sub> + t<sub>su</sub>; exceeding it is the most common source of intermittent failures in digital systems.</p>
 
-        <h2 id="ct-async">Asynchronous Preset and Clear</h2>
-        <p>Most 74-series flip-flops include <a href="https://en.wikipedia.org/wiki/Flip-flop_(electronics)#Asynchronous_inputs" target="_blank" rel="noopener">asynchronous Preset</a> (PRE, PR, or SD for &#8220;set direct&#8221;) and Clear (CLR, MR for &#8220;master reset,&#8221; or RD for &#8220;reset direct&#8221;) inputs that override the clock entirely. These inputs are usually active LOW (signified by an overbar in the datasheet) and force Q to a known state regardless of D, J, K, T, or CLK. Asserting both at once produces an indeterminate state and is forbidden, just like S&thinsp;=&thinsp;R&thinsp;=&thinsp;1 on the SR latch.</p>
-        <p><a href="https://en.wikipedia.org/wiki/Flip-flop_(electronics)#Asynchronous_inputs" target="_blank" rel="noopener">Asynchronous clear</a> is used at power-up to put every flip-flop in a known state before the first clock edge. Asynchronous preset is rarer in practice but appears in counter chips that need to load a non-zero value as part of a parallel-load operation. Because these inputs bypass the clock, signals connected to them must be debounced and free of glitches   a single nanosecond pulse on /CLR will reset the flip-flop.</p>
+        <h2 id="ct-async" data-i18n="docs.8102ac86b5">Asynchronous Preset and Clear</h2>
+        <p data-i18n-html="docs.6be3b6f2e8">Most 74 series flip flops include <a href="https://en.wikipedia.org/wiki/Flip-flop_(electronics)#Asynchronous_inputs" target="_blank" rel="noopener">asynchronous Preset</a> (PRE, PR, or SD for &#8220;set direct&#8221;) and Clear (CLR, MR for &#8220;master reset,&#8221; or RD for &#8220;reset direct&#8221;) inputs that override the clock entirely. These inputs are usually active LOW (signified by an overbar in the datasheet) and force Q to a known state regardless of D, J, K, T, or CLK. Asserting both at once produces an indeterminate state and is forbidden, just like S&thinsp;=&thinsp;R&thinsp;=&thinsp;1 on the SR latch.</p>
+        <p data-i18n-html="docs.cfe02d7e68"><a href="https://en.wikipedia.org/wiki/Flip-flop_(electronics)#Asynchronous_inputs" target="_blank" rel="noopener">Asynchronous clear</a> is used at power up to put every flip flop in a known state before the first clock edge. Asynchronous preset is rarer in practice but appears in counter chips that need to load a non zero value as part of a parallel load operation. Because these inputs bypass the clock, signals connected to them must be debounced and free of glitches   a single nanosecond pulse on /CLR will reset the flip flop.</p>
 
-        <h2 id="ct-register">Register</h2>
-        <p>A register is a group of flip-flops that store multiple bits simultaneously, all clocked together. A typical 8 bit register holds one byte of data and latches it on each rising clock edge. Registers appear in CPUs to hold operands and results, and in digital circuits wherever parallel data needs to be captured and held. <a href="https://en.wikipedia.org/wiki/Shift_register" target="_blank" rel="noopener">Shift register</a> chips such as the 74HC595 (serial in, parallel out) and 74HC165 (parallel in, serial out) are common 74 series examples.</p>
+        <h2 id="ct-register" data-i18n="docs.d672995a14">Register</h2>
+        <p data-i18n-html="docs.64f4cc1f7f">A register is a group of flip flops that store multiple bits simultaneously, all clocked together. A typical 8 bit register holds one byte of data and latches it on each rising clock edge. Registers appear in CPUs to hold operands and results, and in digital circuits wherever parallel data needs to be captured and held. <a href="https://en.wikipedia.org/wiki/Shift_register" target="_blank" rel="noopener">Shift register</a> chips such as the 74HC595 (serial in, parallel out) and 74HC165 (parallel in, serial out) are common 74 series examples.</p>
 
-        <h2 id="ct-freq-divider">Frequency Divider</h2>
-        <p>A <a href="https://en.wikipedia.org/wiki/Frequency_divider" target="_blank" rel="noopener">frequency divider</a> produces an output whose frequency is a fraction of its input clock frequency. The simplest divider is a single <a href="https://en.wikipedia.org/wiki/Flip-flop_(electronics)#T_flip-flop" target="_blank" rel="noopener">toggle flip-flop</a>: with J=K=1 (JK) or D=/<wbr>Q (D-type), Q toggles on every clock edge, producing an output at exactly half the input frequency  a divide-by-2.</p>
-        <p>Chaining N flip-flops divides by 2<sup>N</sup>. A four bit <a href="https://en.wikipedia.org/wiki/Counter_(digital)#Binary_counter" target="_blank" rel="noopener">binary counter</a> (e.g. 74HC93) provides &#247;2, &#247;4, &#247;8, and &#247;16 outputs simultaneously from its Q0&#8211;Q3 outputs. Dedicated frequency divider chips like the 74HC92 (&#247;12) and the CD4060 (14 stage binary divider with built in <a href="https://en.wikipedia.org/wiki/Oscillator" target="_blank" rel="noopener">oscillator</a>) provide specific division ratios in a single package.</p>
+        <h2 id="ct-freq-divider" data-i18n="docs.1eee7c4613">Frequency Divider</h2>
+        <p data-i18n-html="docs.d8af75a01e">A <a href="https://en.wikipedia.org/wiki/Frequency_divider" target="_blank" rel="noopener">frequency divider</a> produces an output whose frequency is a fraction of its input clock frequency. The simplest divider is a single <a href="https://en.wikipedia.org/wiki/Flip-flop_(electronics)#T_flip flop" target="_blank" rel="noopener">toggle flip flop</a>: with J=K=1 (JK) or D=/<wbr>Q (D type), Q toggles on every clock edge, producing an output at exactly half the input frequency  a divide by-2.</p>
+        <p data-i18n-html="docs.cb67d3dd4a">Chaining N flip flops divides by 2<sup>N</sup>. A four bit <a href="https://en.wikipedia.org/wiki/Counter_(digital)#Binary_counter" target="_blank" rel="noopener">binary counter</a> (e.g. 74HC93) provides &#247;2, &#247;4, &#247;8, and &#247;16 outputs simultaneously from its Q0&#8211;Q3 outputs. Dedicated frequency divider chips like the 74HC92 (&#247;12) and the CD4060 (14 stage binary divider with built in <a href="https://en.wikipedia.org/wiki/Oscillator" target="_blank" rel="noopener">oscillator</a>) provide specific division ratios in a single package.</p>
 
-        <h2 id="ct-bin-rate-mult">Binary Rate Multiplier</h2>
-        <p>A <a href="https://en.wikipedia.org/wiki/Binary_multiplier" target="_blank" rel="noopener">binary rate multiplier</a> (BRM) generates an output pulse train whose average frequency is proportional to a binary input word. If the input word is N and the clock is f, the output rate is approximately N/2<sup>n</sup> &times; f, where n is the word width. The 74LS97 is the classic 6 bit BRM chip.</p>
-        <p>BRMs are used wherever a programmable fraction of a clock is needed  stepper motor speed control, programmable clock dividers, and early digital-to-analog conversion schemes. Unlike a simple divider, the output pulses are not evenly spaced; they are distributed as uniformly as possible across the clock period.</p>
+        <h2 id="ct-bin-rate-mult" data-i18n="docs.31fb7de8ad">Binary Rate Multiplier</h2>
+        <p data-i18n-html="docs.f1d988a5e0">A <a href="https://en.wikipedia.org/wiki/Binary_multiplier" target="_blank" rel="noopener">binary rate multiplier</a> (BRM) generates an output pulse train whose average frequency is proportional to a binary input word. If the input word is N and the clock is f, the output rate is approximately N/2<sup>n</sup> &times; f, where n is the word width. The 74LS97 is the classic 6 bit BRM chip.</p>
+        <p data-i18n="docs.dfd57f543a">BRMs are used wherever a programmable fraction of a clock is needed  stepper motor speed control, programmable clock dividers, and early digital to analog conversion schemes. Unlike a simple divider, the output pulses are not evenly spaced; they are distributed as uniformly as possible across the clock period.</p>
+
+        <h2 id="ct-bi quinary" data-i18n="docs.c3b0307c8c">Bi Quinary Counter</h2>
+        <p data-i18n-html="docs.7ea9559fc0">A <a href="https://en.wikipedia.org/wiki/Bi-quinary_coded_decimal" target="_blank" rel="noopener">bi quinary</a> counter counts to ten by cascading two independent stages: a <strong>divide by-2</strong> stage (&#8220;bi&#8221;) and a <strong>divide by-5</strong> stage (&#8220;quinary&#8221;). Each stage is a straightforward binary counter, and together they produce a BCD (Binary Coded Decimal) count from 0 to 9 before resetting. The name simply reflects the factoring: 2 &times; 5 = 10.</p>
+        <p data-i18n-html="docs.8a7449bf53">In the 74 series the two stages share a chip but are driven by <em>separate clock inputs</em>, giving you flexibility in how you wire them. The classic configuration ties the divide by-2 output (QA) into the clock of the divide by-5 stage; the combined Q output is then standard 8-4-2-1 BCD. Alternatively you can drive the divide by-5 stage first and feed its output into the divide by-2, which swaps the bit weighting to 2-1-8-4 (sometimes called &#8220;biquinary&#8221; or &#8220;5-2&#8221; mode). Both output orders count the same 0&#8211;9 sequence; only the pin weights differ.</p>
+        <p data-i18n="docs.ab7ed941c2">The 74176 is the classic presettable bi quinary decade counter. Its QA pin is the divide by-2 output and QB&#8211;QD form the divide by-5 group. Feeding QA into CLK2 gives a standard BCD count on QA&#8211;QD. The architecture appears in many frequency division and decimal counting applications: BCD adders, digital clocks, event counters, and frequency meters all rely on decade counters built this way.</p>
+        <div class="callout tip" data-i18n-html="docs.01d3584bd1">
+          <strong>In 74Sim:</strong> Wire QA to CLK2 on the 74176 to get a straightforward 0&#8211;9 BCD count. Drive CLK1 with your input clock. The four outputs QA&#8211;QD represent the BCD digit with weights 1&#8211;2&#8211;4&#8211;8 respectively.
+        </div>
 
         <section class="doc-references">
-          <h2>References</h2>
+          <h2 data-i18n="docs.5d20d0fee3">References</h2>
           <ol start="12">
-            <li id="ct-ref-12">M. M. Mano and C. R. Kime, <em>Logic and Computer Design Fundamentals</em>, 3rd ed. Upper Saddle River, NJ: Prentice Hall, 2004, p. 73. Also: Wikipedia contributors, &#8220;<a href="https://en.wikipedia.org/wiki/NAND_gate" target="_blank" rel="noopener">NAND gate</a>.&#8221; Available: <a href="https://en.wikipedia.org/wiki/NAND_gate" target="_blank" rel="noopener">https://en.wikipedia.org/wiki/NAND_gate</a>.</li>
-            <li id="ct-ref-13">M. M. Mano and C. R. Kime, <em>Logic and Computer Design Fundamentals</em>, 3rd ed. Upper Saddle River, NJ: Prentice Hall, 2004, p. 73. Also: Wikipedia contributors, &#8220;<a href="https://en.wikipedia.org/wiki/NOR_gate" target="_blank" rel="noopener">NOR gate</a>.&#8221; Available: <a href="https://en.wikipedia.org/wiki/NOR_gate" target="_blank" rel="noopener">https://en.wikipedia.org/wiki/NOR_gate</a>.</li>
-            <li id="ct-ref-14">Wikipedia contributors, &#8220;Schmitt trigger,&#8221; <em>Wikipedia, The Free Encyclopedia</em>. [Online]. Available: <a href="https://en.wikipedia.org/wiki/Schmitt_trigger" target="_blank" rel="noopener">https://en.wikipedia.org/wiki/Schmitt_trigger</a>. (Accessed: May 4, 2026).</li>
-            <li id="ct-ref-15">Wikipedia contributors, &#8220;Flip-flop (electronics),&#8221; <em>Wikipedia, The Free Encyclopedia</em>. [Online]. Available: <a href="https://en.wikipedia.org/wiki/Flip-flop_(electronics)" target="_blank" rel="noopener">https://en.wikipedia.org/wiki/Flip-flop_(electronics)</a>. (Accessed: May 4, 2026).</li>
-            <li id="ct-ref-16">Wikipedia contributors, &#8220;Flip-flop (electronics) &#167; JK flip-flop,&#8221; <em>Wikipedia, The Free Encyclopedia</em>. [Online]. Available: <a href="https://en.wikipedia.org/wiki/Flip-flop_(electronics)#JK_flip-flop" target="_blank" rel="noopener">https://en.wikipedia.org/wiki/Flip-flop_(electronics)#JK_flip-flop</a>. (Accessed: May 4, 2026).</li>
-            <li id="ct-ref-17">Wikipedia contributors, &#8220;Flip-flop (electronics) &#167; Master&#8211;slave edge-triggered D flip-flop,&#8221; <em>Wikipedia, The Free Encyclopedia</em>. [Online]. Available: <a href="https://en.wikipedia.org/wiki/Flip-flop_(electronics)#Master%E2%80%93slave_edge-triggered_D_flip-flop" target="_blank" rel="noopener">https://en.wikipedia.org/wiki/Flip-flop_(electronics)#Master%E2%80%93slave_edge-triggered_D_flip-flop</a>. (Accessed: May 4, 2026).</li>
-            <li id="ct-ref-18">Wikipedia contributors, &#8220;Binary multiplier,&#8221; <em>Wikipedia, The Free Encyclopedia</em>. [Online]. Available: <a href="https://en.wikipedia.org/wiki/Binary_multiplier" target="_blank" rel="noopener">https://en.wikipedia.org/wiki/Binary_multiplier</a>. (Accessed: May 4, 2026).</li>
-            <li id="ct-ref-19">Wikipedia contributors, &#8220;Wired logic connection,&#8221; <em>Wikipedia, The Free Encyclopedia</em>. [Online]. Available: <a href="https://en.wikipedia.org/wiki/Wired_logic_connection" target="_blank" rel="noopener">https://en.wikipedia.org/wiki/Wired_logic_connection</a>. (Accessed: May 10, 2026).</li>
-            <li id="ct-ref-20">Wikipedia contributors, &#8220;Wired logic connection &#167; Wired OR,&#8221; <em>Wikipedia, The Free Encyclopedia</em>. [Online]. Available: <a href="https://en.wikipedia.org/wiki/Wired_logic_connection" target="_blank" rel="noopener">https://en.wikipedia.org/wiki/Wired_logic_connection</a>. (Accessed: May 10, 2026).</li>
+            <li id="ct-ref-12" data-i18n-html="docs.14b6797dfd">M. M. Mano and C. R. Kime, <em>Logic and Computer Design Fundamentals</em>, 3rd ed. Upper Saddle River, NJ: Prentice Hall, 2004, p. 73. Also: Wikipedia contributors, &#8220;<a href="https://en.wikipedia.org/wiki/NAND_gate" target="_blank" rel="noopener">NAND gate</a>.&#8221; Available: <a href="https://en.wikipedia.org/wiki/NAND_gate" target="_blank" rel="noopener">https://en.wikipedia.org/wiki/NAND_gate</a>.</li>
+            <li id="ct-ref-13" data-i18n-html="docs.606b4f56a8">M. M. Mano and C. R. Kime, <em>Logic and Computer Design Fundamentals</em>, 3rd ed. Upper Saddle River, NJ: Prentice Hall, 2004, p. 73. Also: Wikipedia contributors, &#8220;<a href="https://en.wikipedia.org/wiki/NOR_gate" target="_blank" rel="noopener">NOR gate</a>.&#8221; Available: <a href="https://en.wikipedia.org/wiki/NOR_gate" target="_blank" rel="noopener">https://en.wikipedia.org/wiki/NOR_gate</a>.</li>
+            <li id="ct-ref-14" data-i18n-html="docs.48c37aaa5c">Wikipedia contributors, &#8220;Schmitt trigger,&#8221; <em>Wikipedia, The Free Encyclopedia</em>. [Online]. Available: <a href="https://en.wikipedia.org/wiki/Schmitt_trigger" target="_blank" rel="noopener">https://en.wikipedia.org/wiki/Schmitt_trigger</a>. (Accessed: May 4, 2026).</li>
+            <li id="ct-ref-15" data-i18n-html="docs.dad6008cba">Wikipedia contributors, &#8220;Flip flop (electronics),&#8221; <em>Wikipedia, The Free Encyclopedia</em>. [Online]. Available: <a href="https://en.wikipedia.org/wiki/Flip-flop_(electronics)" target="_blank" rel="noopener">https://en.wikipedia.org/wiki/Flip-flop_(electronics)</a>. (Accessed: May 4, 2026).</li>
+            <li id="ct-ref-16" data-i18n-html="docs.a39decb70d">Wikipedia contributors, &#8220;Flip flop (electronics) &#167; JK flip flop,&#8221; <em>Wikipedia, The Free Encyclopedia</em>. [Online]. Available: <a href="https://en.wikipedia.org/wiki/Flip-flop_(electronics)#JK_flip flop" target="_blank" rel="noopener">https://en.wikipedia.org/wiki/Flip-flop_(electronics)#JK_flip flop</a>. (Accessed: May 4, 2026).</li>
+            <li id="ct-ref-17" data-i18n-html="docs.8429d19836">Wikipedia contributors, &#8220;Flip flop (electronics) &#167; Master&#8211;slave edge triggered D flip flop,&#8221; <em>Wikipedia, The Free Encyclopedia</em>. [Online]. Available: <a href="https://en.wikipedia.org/wiki/Flip-flop_(electronics)#Master%E2%80%93slave_edge triggered_D_flip flop" target="_blank" rel="noopener">https://en.wikipedia.org/wiki/Flip-flop_(electronics)#Master%E2%80%93slave_edge triggered_D_flip flop</a>. (Accessed: May 4, 2026).</li>
+            <li id="ct-ref-18" data-i18n-html="docs.f4175d63ff">Wikipedia contributors, &#8220;Binary multiplier,&#8221; <em>Wikipedia, The Free Encyclopedia</em>. [Online]. Available: <a href="https://en.wikipedia.org/wiki/Binary_multiplier" target="_blank" rel="noopener">https://en.wikipedia.org/wiki/Binary_multiplier</a>. (Accessed: May 4, 2026).</li>
+            <li id="ct-ref-19" data-i18n-html="docs.63c323f262">Wikipedia contributors, &#8220;Wired logic connection,&#8221; <em>Wikipedia, The Free Encyclopedia</em>. [Online]. Available: <a href="https://en.wikipedia.org/wiki/Wired_logic_connection" target="_blank" rel="noopener">https://en.wikipedia.org/wiki/Wired_logic_connection</a>. (Accessed: May 10, 2026).</li>
+            <li id="ct-ref-20" data-i18n-html="docs.a67be1e155">Wikipedia contributors, &#8220;Wired logic connection &#167; Wired OR,&#8221; <em>Wikipedia, The Free Encyclopedia</em>. [Online]. Available: <a href="https://en.wikipedia.org/wiki/Wired_logic_connection" target="_blank" rel="noopener">https://en.wikipedia.org/wiki/Wired_logic_connection</a>. (Accessed: May 10, 2026).</li>
           </ol>
         </section>
       </article>
@@ -847,23 +864,24 @@
           <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M3.5 2.5l3 2.5-3 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
           Unverified Chips
         </div>
-        <h1>Unverified Chips</h1>
-        <p class="lead">Some chips in 74Sim have not been verified against an official manufacturer datasheet. Their pinouts and simulation behavior are based on best-effort community definitions and may not match real hardware.</p>
+        <h1 data-i18n="docs.358e4c1512">Unverified Chips</h1>
+        <p class="lead" data-i18n="docs.a415b18965">Some chips in 74Sim have not been verified against an official manufacturer datasheet. Their pinouts and simulation behavior are based on best effort community definitions and may not match real hardware.</p>
 
-        <h2 id="uc-what">What does "unverified" mean?</h2>
-        <p>A chip is marked unverified when no confirmed datasheet URL was available at the time the chip definition was written. This can happen when:</p>
+        <h2 id="uc-what" data-i18n="docs.616a356aa4">What does "unverified" mean?</h2>
+        <p data-i18n="docs.d9689f0bf2">A chip is marked unverified when no confirmed datasheet URL was available at the time the chip definition was written. This can happen when:</p>
         <ul style="color:var(--text-dim);font-size:13px;padding-left:22px;line-height:1.8;margin-bottom:16px;">
-          <li>The part is obscure or discontinued and no public datasheet PDF exists.</li>
-          <li>Search results only turn up distributor pages or application notes, not a pin level datasheet.</li>
-          <li>The chip exists in the 74 series number space but was never widely produced.</li>
+          <li data-i18n="docs.9a5a5a6e35">The part is obscure or discontinued and no public datasheet PDF exists.</li>
+          <li data-i18n="docs.cb80f1ecea">Search results only turn up distributor pages or application notes, not a pin level datasheet.</li>
+          <li data-i18n="docs.736d1c2863">The chip exists in the 74 series number space but was never widely produced.</li>
         </ul>
-        <p>When a chip is unverified, its pin names, pin count, and <a href="https://en.wikipedia.org/wiki/Buffer" target="_blank" rel="noopener">logic</a> function in the simulator are an educated guess. Simulation results for these chips may be inaccurate.</p>
+        <p data-i18n-html="docs.d8291d0c9c">When a chip is unverified, its pin names, pin count, and <a href="https://en.wikipedia.org/wiki/Buffer" target="_blank" rel="noopener">logic</a> function in the simulator are an educated guess. Simulation results for these chips may be inaccurate.</p>
 
-        <p>Unverified chips display a yellow warning banner at the top of their chip reference page (here in the docs) and in the chip info panel inside the simulator. There is no "View Datasheet" link for these chips.</p>
-        <h2 id="uc-spot">How to spot an unverified chip</h2>
+        <p data-i18n="docs.3e55a3fa57">Unverified chips display a yellow warning banner at the top of their chip reference page (here in the docs) and in the chip info panel inside the simulator. There is no "View Datasheet" link for these chips.</p>
+        <h2 id="uc-spot" data-i18n="docs.fa3bbb9e9f">How to spot an unverified chip</h2>
 
-        <h2 id="uc-help">How to help</h2>
-        <p>If you have access to an official datasheet for an unverified chip, or if you notice that a chip's simulation behavior does not match real hardware, please <a href="simulator.html#bugreport">submit a bug report</a>. Include the chip part number, a link to the datasheet (or the PDF itself), and a description of what is wrong. Your report will help improve accuracy for everyone.</p>
+        <h2 id="uc-help" data-i18n="docs.ac40e1aefa">How to help</h2>
+        <p data-i18n-html="docs.63d04f4eb6">If you have access to an official datasheet for an unverified chip, or if you notice that a chip's simulation behavior does not match real hardware, please <a href="/bug-report">submit a bug report</a>. Include the chip part number, a link to the datasheet (or the PDF itself), and a description of what is wrong. Your report will help improve accuracy for everyone.</p>
+        <p data-i18n-html="docs.a795500281">If nothing is broken but you would like a chip added, a pinout corrected, or something in the docs or simulator done differently, use the <a href="/request-change">Request a Change</a> form instead.</p>
       </article>
 
       </article>
@@ -883,6 +901,7 @@
 
   <script src="/js/docs-tabs.js" defer></script>
 
+  <script type="module" src="/js/i18n.js"></script>
   <script type="module" src="/js/docs-page.js"></script>
 <!-- 100% privacy-first analytics -->
 <script async src="https://scripts.simpleanalyticscdn.com/latest.js"></script>

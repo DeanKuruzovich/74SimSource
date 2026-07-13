@@ -43,14 +43,21 @@ function assertPinLow(sim, chip, pinName, label) {
   const v = getPinVoltage(sim, pin);
   assert(v !== undefined && v !== null && v < 2.5, `${label}: expected LOW, got ${v}`);
 }
+// Find the supply pin. Most parts name it 'VCC'/'GND'; dual-supply parts (e.g.
+// 74x8153 with VCC1/VCC2 + GND/GND2) do not, so fall back to the pin number the
+// chip def declares in its `vcc`/`gnd` field.
+function findPowerPin(chip, name, defPinNo) {
+  return findPin(chip, name) ||
+    chip.pins.find(p => p.pin === defPinNo || p.name === `${name}2`);
+}
 function setupChipWithPower(chipId) {
   const world = new BreadboardWorld(1, 1);
   const chip = new ChipComponent(chipId);
   chip.place(0, 0, 10, 4);
   const wm = new WireManager();
   resetWireCounter();
-  connectPinToVcc(wm, findPin(chip, 'VCC'));
-  connectPinToGnd(wm, findPin(chip, 'GND'));
+  connectPinToVcc(wm, findPowerPin(chip, 'VCC', chip.chipDef?.vcc));
+  connectPinToGnd(wm, findPowerPin(chip, 'GND', chip.chipDef?.gnd));
   return { world, chip, wm };
 }
 function connectHigh(wm, chip, name) { return connectPinToVcc(wm, findPin(chip, name)); }
@@ -132,11 +139,13 @@ for (const key of Object.keys(CHIPS_BLOCK_63)) {
   assert(Array.isArray(def.pinout) && def.pinout.length === def.pins,
     `S6: key=${key} pinout length=${def.pinout?.length} expected ${def.pins}`);
 }
-// S7 - VCC and GND pins have type 'power'
+// S7 - the declared supply pins (def.vcc / def.gnd) have type 'power'.
+// Keyed off the pin numbers rather than the literal name 'VCC'/'GND' so that
+// dual-supply parts (e.g. 74x8153: VCC1/VCC2, GND/GND2) are accepted.
 for (const key of Object.keys(CHIPS_BLOCK_63)) {
   const def = CHIPS_BLOCK_63[key];
-  const vcc = def.pinout.find(p => p.name === 'VCC');
-  const gnd = def.pinout.find(p => p.name === 'GND');
+  const vcc = def.pinout.find(p => p.pin === def.vcc);
+  const gnd = def.pinout.find(p => p.pin === def.gnd);
   assert(vcc && vcc.type === 'power', `S7: key=${key} VCC power`);
   assert(gnd && gnd.type === 'power', `S7: key=${key} GND power`);
 }

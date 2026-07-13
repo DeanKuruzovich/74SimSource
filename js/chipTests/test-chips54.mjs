@@ -1,21 +1,21 @@
 // test-chips54.mjs - Tests for all chips defined in js/chips/chips54.js
-// Chips under test (all GENERIC_STUB, all 24-pin):
+// Chips under test (all GENERIC_STUB, all 24 pin):
 //   74x2825  : 8 bit D-FF with clear and clock enable TRI+25Ω
-//   74x2827  : 10 bit buffer, non-inverting TRI+25Ω
+//   74x2827  : 10 bit buffer, non inverting TRI+25Ω
 //   74x2828  : 10 bit buffer, inverting TRI+25Ω
 //   74x2833  : 8 bit bus transceiver with parity error FF (bidir) TRI+25Ω
 //   74x2841  : 10 bit transparent latch TRI+25Ω
 //   74x2843  : 9 bit transparent latch with async reset TRI+25Ω
 //   74x2845  : 8 bit transparent latch with async reset and multi-OE TRI+25Ω
 //   74x2853  : 8 bit bus transceiver with parity error latch (bidir) TRI+25Ω
-//   74x2861  : 10 bit non-inverting bus transceiver (bidir) TRI+25Ω
+//   74x2861  : 10 bit non inverting bus transceiver (bidir) TRI+25Ω
 //   74x2862  : 10 bit inverting bus transceiver (bidir) TRI+25Ω
-//   74x2863  : 9 bit non-inverting bus transceiver with dual OE (bidir) TRI+25Ω
+//   74x2863  : 9 bit non inverting bus transceiver with dual OE (bidir) TRI+25Ω
 //   74x2864  : 9 bit inverting bus transceiver with dual OE (bidir) TRI+25Ω
-//   74x2952  : Octal bus transceiver and register, non-inverting (bidir) TRI
+//   74x2952  : Octal bus transceiver and register, non inverting (bidir) TRI
 //   74x2953  : Octal bus transceiver and register, inverting (bidir) TRI
 //   74x2961  : 4 bit EDAC bus buffer, inverting TRI
-//   74x2962  : 4 bit EDAC bus buffer, non-inverting TRI
+//   74x2962  : 4 bit EDAC bus buffer, non inverting TRI
 
 import { CHIPS_BLOCK_54 } from '../chips/chips54.js';
 import { BreadboardWorld, holeId } from '../breadboard.js';

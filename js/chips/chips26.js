@@ -7,26 +7,26 @@ export const CHIPS_BLOCK_26 = {
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic
      Wikipedia: https://en.wikipedia.org/wiki/Bus_transceiver */
-  '74446': {
+  '74x446': {
     name: '74x446',
     simpleName: 'Quad Inv Bus Xcvr (3-state)',
-    description: 'Quad bus transceivers with direction controls and inverting tri-state outputs (16-pin)',
+    description: 'Quad bus transceiver, DIR control, inverting 3-state outputs (16-pin)',
     pins: 16, vcc: 16, gnd: 8,
-    tags: ['transceiver', 'quad', 'inverting', 'tri-state'],
-    guideOverview: 'The 74x446 is a quad inverting bidirectional bus transceiver with tri-state outputs. Two enable inputs (OE1n, OE2n active LOW) plus DIR control data direction. Data is inverted as it passes through a HIGH on the A side becomes a LOW on the B side. A compact 16-pin alternative to the 20-pin 74x443.',
+    tags: ['transceiver', 'quad', 'inverting', 'tri state'],
+    guideOverview: 'The 74x446 is a quad inverting bidirectional bus transceiver with tri state outputs. Two enable inputs (OE1n, OE2n active LOW) plus DIR control data direction. Data is inverted as it passes through a HIGH on the A side becomes a LOW on the B side. A compact 16-pin alternative to the 20-pin 74x443.',
     guidePinDescriptions: {
       'OE1n': 'Output Enable 1 (active LOW). Both OE1n and OE2n must be LOW to enable.',
       'OE2n': 'Output Enable 2 (active LOW).',
       'DIR':  'Direction. HIGH = A to B (inverted); LOW = B to A (inverted).',
-      'A1':   'Side-A pin 1.',
-      'B1':   'Side-B pin 1 (inverted).',
-      'A2':   'Side-A pin 2.',
-      'B2':   'Side-B pin 2.',
+      'A1':   'Side A pin 1.',
+      'B1':   'Side B pin 1 (inverted).',
+      'A2':   'Side A pin 2.',
+      'B2':   'Side B pin 2.',
       'GND':  'Ground reference (pin 8).',
-      'B3':   'Side-B pin 3.',
-      'A3':   'Side-A pin 3.',
-      'B4':   'Side-B pin 4.',
-      'A4':   'Side-A pin 4.',
+      'B3':   'Side B pin 3.',
+      'A3':   'Side A pin 3.',
+      'B4':   'Side B pin 4.',
+      'A4':   'Side A pin 4.',
       'NC1':  'No connect.',
       'NC2':  'No connect.',
       'NC3':  'No connect.',
@@ -65,18 +65,18 @@ export const CHIPS_BLOCK_26 = {
     ],
   },
 
-  // ── 74447: BCD to 7-segment decoders/drivers (low voltage version of 74247)
+  // ── 74447: BCD to 7 segment decoders/drivers (low voltage version of 74247)
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Multiplexer
      Wikipedia: https://en.wikipedia.org/wiki/Open_collector */
-  '74447': {
+  '74x447': {
     name: '74x447',
-    simpleName: 'BCD to 7-Seg (OC, low-V)',
-    description: 'BCD to 7-segment decoder/driver, open-collector outputs (low voltage version of 74247) (16-pin)',
+    simpleName: 'BCD to 7-Seg (OC, low V)',
+    description: 'BCD to 7-seg decoder/driver, open-collector, low-voltage 74247 (16-pin)',
     pins: 16, vcc: 16, gnd: 8,
     openCollector: true,
-    tags: ['7-segment', '7 seg', 'decoder', 'bcd', 'display', 'open-collector'],
-    guideOverview: 'The 74x447 is a BCD to 7-segment decoder/driver with open-collector outputs and a low-voltage output swing suited for direct LED or LCD interfacing. It is functionally identical to the 74247 but specified for lower output voltage. LT (lamp test) forces all segments on; RBI blanks leading zeros; BI/RBO blanks and ripple-chains multiple digits.',
+    tags: ['7 segment', '7 seg', 'decoder', 'bcd', 'display', 'open collector'],
+    guideOverview: 'The 74x447 is a BCD to 7 segment decoder/driver with open collector outputs and a low voltage output swing suited for direct LED or LCD interfacing. It is functionally identical to the 74x247 but specified for lower output voltage. LT (lamp test) forces all segments on; RBI blanks leading zeros; BI/RBO blanks and ripple chains multiple digits.',
     guidePinDescriptions: {
       'B':      'BCD input bit B (weight 2).',
       'C':      'BCD input bit C (weight 4).',
@@ -97,9 +97,9 @@ export const CHIPS_BLOCK_26 = {
     },
     guideSections: [
       {
-        title: '7-Segment Display Layout',
+        title: '7 Segment Display Layout',
         paragraphs: [
-          'Segments a-g correspond to: a=top, b=upper-right, c=lower-right, d=bottom, e=lower-left, f=upper-left, g=middle bar. Each active LOW OC output needs a pull up resistor matched to the LED forward voltage and desired current.',
+          'Segments a-g correspond to: a=top, b=upper right, c=lower right, d=bottom, e=lower left, f=upper left, g=middle bar. Each active LOW OC output needs a pull up resistor matched to the LED forward voltage and desired current.',
         ],
       },
     ],
@@ -126,30 +126,31 @@ export const CHIPS_BLOCK_26 = {
     ],
   },
 
-  // ── 74448: Quad tridirectional transceiver, inv+non-inv, OC ─────────────
+  // ── 74448: Quad tridirectional transceiver, inv+non inv, OC ─────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Open_collector
      Wikipedia: https://en.wikipedia.org/wiki/Bus_transceiver */
-  '74448': {
+  '74x448': {
     name: '74x448',
-    simpleName: 'Quad Inv+Non-Inv Tridirnl Xcvr (OC)',
-    description: 'Quad tridirectional bus transceiver, inverting and non-inverting, open-collector (20-pin)',
+    simpleName: 'Quad Inv+Non Inv Tridirnl Xcvr (OC)',
+    description: 'Quad tridirectional transceiver, mixed polarity, open-collector (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
-    tags: ['transceiver', 'quad', 'bidirectional', 'inverting', 'open-collector'],
-    guideOverview: 'The 74x448 is a quad mixed polarity tridirectional bus transceiver with open-collector outputs. Some channels pass data non-inverted and some are inverted, making it suitable for buses that mix active HIGH and active LOW lines. OC outputs require external pull ups.',
+    openCollector: true,
+    tags: ['transceiver', 'quad', 'bidirectional', 'inverting', 'open collector'],
+    guideOverview: 'The 74x448 is a quad mixed polarity tridirectional bus transceiver with open collector outputs. Some channels pass data non inverted and some are inverted, making it suitable for buses that mix active HIGH and active LOW lines. OC outputs require external pull ups.',
     guidePinDescriptions: {
       'OE1n': 'Output Enable 1 (active LOW).',
       'OE2n': 'Output Enable 2 (active LOW).',
       'DIR':  'Direction. HIGH = A to B; LOW = B to A.',
-      'A1':   'Side-A pin 1.',
-      'B1':   'Side-B pin 1.',
-      'A2':   'Side-A pin 2.',
-      'B2':   'Side-B pin 2.',
-      'A3':   'Side-A pin 3.',
-      'B3':   'Side-B pin 3.',
+      'A1':   'Side A pin 1.',
+      'B1':   'Side B pin 1.',
+      'A2':   'Side A pin 2.',
+      'B2':   'Side B pin 2.',
+      'A3':   'Side A pin 3.',
+      'B3':   'Side B pin 3.',
       'GND':  'Ground reference (pin 10).',
-      'B4':   'Side-B pin 4.',
-      'A4':   'Side-A pin 4.',
+      'B4':   'Side B pin 4.',
+      'A4':   'Side A pin 4.',
       'NC1':  'No connect.',
       'NC2':  'No connect.',
       'NC3':  'No connect.',
@@ -167,7 +168,20 @@ export const CHIPS_BLOCK_26 = {
         ],
       },
     ],
+    // Pins 1-10 reconstructed: the def shipped with only the pin 11-20 tail.
+    // Signal order follows the 74x446/74x449 family interleave; GND at pin 10
+    // and VCC at pin 20 match this chip's own guidePinDescriptions.
     pinout: [
+      { pin:  1, name: 'OE1n', type: 'input' },
+      { pin:  2, name: 'OE2n', type: 'input' },
+      { pin:  3, name: 'DIR',  type: 'input' },
+      { pin:  4, name: 'A1',   type: 'input' },
+      { pin:  5, name: 'B1',   type: 'output' },
+      { pin:  6, name: 'A2',   type: 'input' },
+      { pin:  7, name: 'B2',   type: 'output' },
+      { pin:  8, name: 'A3',   type: 'input' },
+      { pin:  9, name: 'B3',   type: 'output' },
+      { pin: 10, name: 'GND',  type: 'power' },
       { pin: 11, name: 'B4',   type: 'output' },
       { pin: 12, name: 'A4',   type: 'input' },
       { pin: 13, name: 'NC1',  type: 'nc' },
@@ -186,30 +200,30 @@ export const CHIPS_BLOCK_26 = {
     ],
   },
 
-  // ── 74449: Quad bus transceivers, direction controls, non-inverting ──────
+  // ── 74449: Quad bus transceivers, direction controls, non inverting ──────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic
      Wikipedia: https://en.wikipedia.org/wiki/Bus_transceiver */
-  '74449': {
+  '74x449': {
     name: '74x449',
-    simpleName: 'Quad Non-Inv Bus Xcvr (3-state)',
-    description: 'Quad bus transceivers with direction controls and non-inverting tri-state outputs (16-pin)',
+    simpleName: 'Quad Non Inv Bus Xcvr (3-state)',
+    description: 'Quad bus transceiver, DIR control, non-inverting 3-state outputs (16-pin)',
     pins: 16, vcc: 16, gnd: 8,
-    tags: ['transceiver', 'quad', 'tri-state'],
-    guideOverview: 'The 74x449 is a quad non-inverting bidirectional bus transceiver with tri-state outputs in a 16-pin package. DIR controls data direction; OE1n and OE2n (both active LOW) must be asserted together. It is the compact version of the 74x442 with fewer NC pins.',
+    tags: ['transceiver', 'quad', 'tri state'],
+    guideOverview: 'The 74x449 is a quad non inverting bidirectional bus transceiver with tri state outputs in a 16-pin package. DIR controls data direction; OE1n and OE2n (both active LOW) must be asserted together. It is the compact version of the 74x442 with fewer NC pins.',
     guidePinDescriptions: {
       'OE1n': 'Output Enable 1 (active LOW).',
       'OE2n': 'Output Enable 2 (active LOW).',
       'DIR':  'Direction. HIGH = A to B; LOW = B to A.',
-      'A1':   'Side-A pin 1.',
-      'B1':   'Side-B pin 1.',
-      'A2':   'Side-A pin 2.',
-      'B2':   'Side-B pin 2.',
+      'A1':   'Side A pin 1.',
+      'B1':   'Side B pin 1.',
+      'A2':   'Side A pin 2.',
+      'B2':   'Side B pin 2.',
       'GND':  'Ground reference (pin 8).',
-      'B3':   'Side-B pin 3.',
-      'A3':   'Side-A pin 3.',
-      'B4':   'Side-B pin 4.',
-      'A4':   'Side-A pin 4.',
+      'B3':   'Side B pin 3.',
+      'A3':   'Side A pin 3.',
+      'B4':   'Side B pin 4.',
+      'A4':   'Side A pin 4.',
       'NC1':  'No connect.',
       'NC2':  'No connect.',
       'NC3':  'No connect.',
@@ -217,7 +231,7 @@ export const CHIPS_BLOCK_26 = {
     },
     guideSections: [
       {
-        title: 'Compact Non-Inverting Transceiver',
+        title: 'Compact Non Inverting Transceiver',
         paragraphs: [
           'The 74x449 provides the same function as 74x442 in a smaller 16-pin package by eliminating the NC pins. Functionally identical; choose based on board size and routing constraints.',
         ],
@@ -256,7 +270,7 @@ export const CHIPS_BLOCK_26 = {
     description: '16-to-1 multiplexer with complementary (true and inverted) outputs (24-pin)',
     pins: 24, vcc: 24, gnd: 12,
     tags: ['multiplexer', '16-to-1', 'complementary'],
-    guideOverview: 'The 74x450 is a 16-to-1 multiplexer with a 4 bit select (A-D), 16 data inputs (E0-E15), an active LOW global enable (Gn), and a true output (W). With 4 select lines it can address any of 16 inputs (2^4 = 16). This is the largest single-package MUX in the 74xx family.',
+    guideOverview: 'The 74x450 is a 16-to-1 multiplexer with a 4 bit select (A-D), 16 data inputs (E0-E15), an active LOW global enable (Gn), and a true output (W). With 4 select lines it can address any of 16 inputs (2^4 = 16). This is the largest single package MUX in the 74xx family.',
     guidePinDescriptions: {
       'E0':  'Data input 0.',
       'E1':  'Data input 1.',
@@ -332,7 +346,7 @@ export const CHIPS_BLOCK_26 = {
   '74x451': {
     name: '74x451',
     simpleName: 'Dual 8-to-1 Mux',
-    description: 'Dual 8-to-1 multiplexer with complementary outputs, shared lower 4 data inputs (24-pin)',
+    description: 'Dual 8-to-1 mux, complementary outputs, shared lower-4 inputs (24-pin)',
     pins: 24, vcc: 24, gnd: 12,
     tags: ['multiplexer', '8-to-1', 'dual'],
     guideOverview: 'The 74x451 contains two 8-to-1 multiplexers in a 24-pin package. Both sections share the lower 4 data inputs (D0-D3) and all three select lines (S0-S2), but each section has its own upper 4 data inputs (1D4-1D7, 2D4-2D7), enable (1Gn/2Gn), and complementary outputs (1W/1Wn, 2W/2Wn).',
@@ -366,7 +380,7 @@ export const CHIPS_BLOCK_26 = {
       {
         title: 'Shared vs Private Inputs',
         paragraphs: [
-          'D0-D3 are common to both sections, reducing pin count for the lower half of the address space. D4-D7 are separate per section for the upper half. This architecture is useful for dual-channel signal routing where both channels share a common input pool.',
+          'D0-D3 are common to both sections, reducing pin count for the lower half of the address space. D4-D7 are separate per section for the upper half. This architecture is useful for dual channel signal routing where both channels share a common input pool.',
         ],
       },
     ],
@@ -410,14 +424,14 @@ export const CHIPS_BLOCK_26 = {
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Counter_(digital)
      Wikipedia: https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
-  '74452': {
+  '74x452': {
     name: '74x452',
     simpleName: 'Dual Decade Counter (sync)',
     description: 'Dual synchronous decade counter with reset (16-pin)',
     pins: 16, vcc: 16, gnd: 8,
     sequential: true,
     tags: ['counter', 'decade', 'synchronous', 'dual'],
-    guideOverview: 'The 74x452 contains two independent synchronous BCD decade counters (0-9), each with its own clock, active LOW clear, and terminal count (TC) output for cascading. Unlike the asynchronous 74x390, both flip-flops in each counter are clocked simultaneously, eliminating ripple delay between bits.',
+    guideOverview: 'The 74x452 contains two independent synchronous BCD decade counters (0-9), each with its own clock, active LOW clear, and terminal count (TC) output for cascading. Unlike the asynchronous 74x390, both flip flops in each counter are clocked simultaneously, eliminating ripple delay between bits.',
     guidePinDescriptions: {
       'CLK1':  'Clock for counter 1 (rising edge counts).',
       'CLRn1': 'Clear for counter 1 (active LOW). Synchronous or asynchronous depending on variant.',
@@ -440,8 +454,8 @@ export const CHIPS_BLOCK_26 = {
       {
         title: 'Synchronous vs Asynchronous Decade Counter',
         paragraphs: [
-          'In a synchronous counter all flip-flops share the clock, so all outputs change simultaneously. In an asynchronous (ripple) counter each stage clocks from the previous output, causing small delays that can produce glitches on combinational decode logic.',
-          'The TC output (HIGH at count 9) can clock the next counter for multi-digit cascading.',
+          'In a synchronous counter all flip flops share the clock, so all outputs change simultaneously. In an asynchronous (ripple) counter each stage clocks from the previous output, causing small delays that can produce glitches on combinational decode logic.',
+          'The TC output (HIGH at count 9) can clock the next counter for multi digit cascading.',
         ],
       },
     ],
@@ -509,7 +523,7 @@ export const CHIPS_BLOCK_26 = {
       {
         title: '4-Wide Bus Selection',
         paragraphs: [
-          'By treating the four sections as a nibble-wide MUX, you can route one of four 4 bit buses to the output with a single 2 bit address. Connect S0/S1 to address bits; the four Y outputs give the selected nibble.',
+          'By treating the four sections as a nibble wide MUX, you can route one of four 4 bit buses to the output with a single 2 bit address. Connect S0/S1 to address bits; the four Y outputs give the selected nibble.',
         ],
       },
     ],
@@ -550,7 +564,7 @@ export const CHIPS_BLOCK_26 = {
   // ── 74454: Dual decade up/down counter, synchronous, preset input ────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Counter_(digital) */
-  '74454': {
+  '74x454': {
     name: '74x454',
     simpleName: 'Dual Decade Up/Down Counter (sync)',
     description: 'Dual synchronous decade up/down counter with preset inputs (24-pin)',
@@ -588,7 +602,7 @@ export const CHIPS_BLOCK_26 = {
       {
         title: 'Up/Down Counter Cascading',
         paragraphs: [
-          'Connect TCU of the lower counter to ENT of the next for up-counting cascade; connect TCD similarly for down-counting. ENP should be tied HIGH for cascaded sections since they should always count when the upstream counter reaches its terminal.',
+          'Connect TCU of the lower counter to ENT of the next for up counting cascade; connect TCD similarly for down counting. ENP should be tied HIGH for cascaded sections since they should always count when the upstream counter reaches its terminal.',
         ],
       },
     ],
@@ -630,12 +644,12 @@ export const CHIPS_BLOCK_26 = {
   '74x455': {
     name: '74x455',
     simpleName: 'Octal Buffer w/ Parity (inv)',
-    description: 'Octal buffer/line driver with parity generator, inverting outputs, tri-state (24-pin)',
+    description: 'Octal buffer/line driver, parity gen, inverting, 3-state (24-pin)',
     pins: 24, vcc: 24, gnd: 12,
-    tags: ['buffer', 'octal', 'parity', 'inverting', 'tri-state'],
-    guideOverview: 'The 74x455 is an octal inverting buffer/line driver with integrated even/odd parity generation. Each of the eight inputs passes through an inverter to the Y output; simultaneously the XOR tree accumulates a parity bit. EP (Even Parity) selects whether the PERR output flags even or odd parity. OEn tri-states all Y outputs.',
+    tags: ['buffer', 'octal', 'parity', 'inverting', 'tri state'],
+    guideOverview: 'The 74x455 is an octal inverting buffer/line driver with integrated even/odd parity generation. Each of the eight inputs passes through an inverter to the Y output; simultaneously the XOR tree accumulates a parity bit. EP (Even Parity) selects whether the PERR output flags even or odd parity. OEn tri states all Y outputs.',
     guidePinDescriptions: {
-      'OEn':  'Output Enable (active LOW). When HIGH, Y0-Y7 are high-impedance.',
+      'OEn':  'Output Enable (active LOW). When HIGH, Y0-Y7 are high impedance.',
       'A0':   'Data input 0.',
       'A1':   'Data input 1.',
       'A2':   'Data input 2.',
@@ -664,7 +678,7 @@ export const CHIPS_BLOCK_26 = {
       {
         title: 'Parity Generation',
         paragraphs: [
-          'Parity is a simple error-detection scheme: an extra bit is added to a data word so the total number of 1 bits is always even (even parity) or always odd (odd parity). The receiver recounts and flags a PERR if the parity is wrong.',
+          'Parity is a simple error detection scheme: an extra bit is added to a data word so the total number of 1 bits is always even (even parity) or always odd (odd parity). The receiver recounts and flags a PERR if the parity is wrong.',
           'The 74x455 generates parity on the fly as data is buffered, adding error detection without extra logic.',
         ],
       },
@@ -702,15 +716,15 @@ export const CHIPS_BLOCK_26 = {
     ],
   },
 
-  // ── 74x456: Octal buffer/line driver with parity, non-inverting ──────────
+  // ── 74x456: Octal buffer/line driver with parity, non inverting ──────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits */
   '74x456': {
     name: '74x456',
-    simpleName: 'Octal Buffer w/ Parity (non-inv)',
-    description: 'Octal buffer/line driver with parity generator, non-inverting outputs, tri-state (24-pin)',
+    simpleName: 'Octal Buffer w/ Parity (non inv)',
+    description: 'Octal buffer/line driver, parity gen, non-inverting, 3-state (24-pin)',
     pins: 24, vcc: 24, gnd: 12,
-    tags: ['buffer', 'octal', 'parity', 'non-inverting', 'tri-state'],
-    guideOverview: 'The 74x456 is identical to the 74x455 but with non-inverting outputs. Eight inputs pass through buffers unchanged to Y0-Y7 while the parity tree checks or generates even/odd parity. OEn tri-states all Y outputs.',
+    tags: ['buffer', 'octal', 'parity', 'non inverting', 'tri state'],
+    guideOverview: 'The 74x456 is identical to the 74x455 but with non inverting outputs. Eight inputs pass through buffers unchanged to Y0-Y7 while the parity tree checks or generates even/odd parity. OEn tri states all Y outputs.',
     guidePinDescriptions: {
       'OEn':  'Output Enable (active LOW).',
       'A0':   'Data input 0.',
@@ -724,7 +738,7 @@ export const CHIPS_BLOCK_26 = {
       'EP':   'Even Parity select.',
       'PERR': 'Parity Error output.',
       'GND':  'Ground reference (pin 12).',
-      'Y7':   'Buffered output 7 (non-inverted).',
+      'Y7':   'Buffered output 7 (non inverted).',
       'Y6':   'Buffered output 6.',
       'Y5':   'Buffered output 5.',
       'Y4':   'Buffered output 4.',
@@ -741,7 +755,7 @@ export const CHIPS_BLOCK_26 = {
       {
         title: '74x455 vs 74x456',
         paragraphs: [
-          'The 74x455 inverts each data bit at the output; the 74x456 does not. Both calculate parity on the same input data. Use 74x456 when you need the original data on the bus with in-line parity checking.',
+          'The 74x455 inverts each data bit at the output; the 74x456 does not. Both calculate parity on the same input data. Use 74x456 when you need the original data on the bus with in line parity checking.',
         ],
       },
     ],
@@ -780,24 +794,24 @@ export const CHIPS_BLOCK_26 = {
 
   // ── 74458: Nines complement / zero element ────────────────────────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits */
-  '74458': {
+  '74x458': {
     name: '74x458',
     simpleName: "Nines Complement / Zero Elem",
     description: "Nines complement and zero element logic (stub) (14-pin)",
     pins: 14, vcc: 14, gnd: 7,
     tags: ['arithmetic', 'bcd', 'complement'],
-    guideOverview: 'The 74x458 computes the nines complement of a BCD digit. Given a BCD input A (0-9), it outputs 9-A. When the ZEn (Zero Element) input is asserted, the output is forced to zero. Used in BCD subtraction circuits where complement-and-add is used instead of direct subtraction.',
+    guideOverview: 'The 74x458 computes the nines complement of a BCD digit. Given a BCD input A (0-9), it outputs 9-A. When the ZEn (Zero Element) input is asserted, the output is forced to zero. Used in BCD subtraction circuits where complement and add is used instead of direct subtraction.',
     guidePinDescriptions: {
       'A0':  'BCD input bit 0 (LSB).',
       'A1':  'BCD input bit 1.',
       'A2':  'BCD input bit 2.',
       'A3':  'BCD input bit 3 (MSB).',
       'ZEn': 'Zero Element enable. When asserted, forces output to 0.',
-      'Y0':  'Nines-complement output bit 0.',
+      'Y0':  'Nines complement output bit 0.',
       'GND': 'Ground reference (pin 7).',
-      'Y1':  'Nines-complement output bit 1.',
-      'Y2':  'Nines-complement output bit 2.',
-      'Y3':  'Nines-complement output bit 3.',
+      'Y1':  'Nines complement output bit 1.',
+      'Y2':  'Nines complement output bit 2.',
+      'Y3':  'Nines complement output bit 3.',
       'NC1': 'No connect.',
       'NC2': 'No connect.',
       'NC3': 'No connect.',
@@ -843,7 +857,7 @@ export const CHIPS_BLOCK_26 = {
     description: '10 bit identity comparator (24-pin)',
     pins: 24, vcc: 24, gnd: 12,
     tags: ['comparator', '10 bit', 'identity'],
-    guideOverview: 'The 74x460 is a 10 bit identity comparator. It compares two 10 bit words (A0-A9 vs B0-B9) bit by bit and asserts the single AEQB output when all ten pairs match. An output enable (OEn) tri-states the AEQB output. Wider than the 4 bit 74x85, it is useful for address match detection in 10 bit address spaces.',
+    guideOverview: 'The 74x460 is a 10 bit identity comparator. It compares two 10 bit words (A0-A9 vs B0-B9) bit by bit and asserts the single AEQB output when all ten pairs match. An output enable (OEn) tri states the AEQB output. Wider than the 4 bit 74x85, it is useful for address match detection in 10 bit address spaces.',
     guidePinDescriptions: {
       'A0':   'Comparator A bit 0.',
       'A1':   'Comparator A bit 1.',
@@ -855,7 +869,7 @@ export const CHIPS_BLOCK_26 = {
       'A7':   'Comparator A bit 7.',
       'A8':   'Comparator A bit 8.',
       'A9':   'Comparator A bit 9 (MSB).',
-      'OEn':  'Output Enable (active LOW). When HIGH, AEQB is tri-stated.',
+      'OEn':  'Output Enable (active LOW). When HIGH, AEQB is tri stated.',
       'GND':  'Ground reference (pin 12).',
       'AEQB': 'A equals B output. HIGH when A[9:0] = B[9:0].',
       'B0':   'Comparator B bit 0.',
@@ -875,7 +889,7 @@ export const CHIPS_BLOCK_26 = {
         title: '10 bit Address Match Detector',
         paragraphs: [
           'The AEQB output is a single flag this chip does not provide magnitude comparison (A>B, A<B). For magnitude comparison, use 74x85 or cascade multiple 74x85s.',
-          'Typical use: connect A0-A9 to the CPU address bus and B0-B9 to switch-selectable address constants. AEQB goes HIGH to select a memory region.',
+          'Typical use: connect A0-A9 to the CPU address bus and B0-B9 to switch selectable address constants. AEQB goes HIGH to select a memory region.',
         ],
       },
     ],
@@ -917,16 +931,16 @@ export const CHIPS_BLOCK_26 = {
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Counter_(digital)
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic */
-  '74461': {
+  '74x461': {
     name: '74x461',
     simpleName: '8 bit Presettable Binary Counter',
-    description: '8 bit presettable cascadable binary counter with tri-state outputs (24-pin)',
+    description: '8 bit presettable cascadable binary counter with tri state outputs (24-pin)',
     pins: 24, vcc: 24, gnd: 12,
     sequential: true,
-    tags: ['counter', '8 bit', 'presettable', 'binary', 'tri-state'],
-    guideOverview: 'The 74x461 is an 8 bit presettable synchronous binary counter with tri-state outputs and ripple carry output (RCO). LOADn (active LOW) parallel-loads P0-P7; CLRn resets asynchronously; ENP and ENT enable counting; RCO goes HIGH when the counter overflows from 255 to 0, allowing cascading.',
+    tags: ['counter', '8 bit', 'presettable', 'binary', 'tri state'],
+    guideOverview: 'The 74x461 is an 8 bit presettable synchronous binary counter with tri state outputs and ripple carry output (RCO). LOADn (active LOW) parallel loads P0-P7; CLRn resets asynchronously; ENP and ENT enable counting; RCO goes HIGH when the counter overflows from 255 to 0, allowing cascading.',
     guidePinDescriptions: {
-      'OEn':   'Output Enable (active LOW). When HIGH, Q1-Q7 are tri-stated.',
+      'OEn':   'Output Enable (active LOW). When HIGH, Q1-Q7 are tri stated.',
       'P0':    'Preset data bit 0.',
       'P1':    'Preset data bit 1.',
       'P2':    'Preset data bit 2.',

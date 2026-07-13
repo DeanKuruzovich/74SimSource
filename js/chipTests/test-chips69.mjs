@@ -1,10 +1,10 @@
 // test-chips69.mjs - Tests for all chips defined in js/chips/chips69.js
 // Chips under test:
-//   CD4011 : Quad 2-Input NAND (14-pin)
-//   CD4012 : Dual 4-Input NAND (14-pin)
-//   CD4069 : Hex Inverter (14-pin)
-//   CD4082 : Dual 4-Input AND (14-pin)
-//   CD4543 : BCD to 7-Segment Latch/Decoder/Driver (16-pin, BCD_7SEG_4543)
+//   CD4011 : Quad 2-Input NAND (14 pin)
+//   CD4012 : Dual 4-Input NAND (14 pin)
+//   CD4069 : Hex Inverter (14 pin)
+//   CD4082 : Dual 4-Input AND (14 pin)
+//   CD4543 : BCD to 7 Segment Latch/Decoder/Driver (16 pin, BCD_7SEG_4543)
 
 import { CHIPS_BLOCK_69 } from '../chips/chips69.js';
 import { BreadboardWorld, holeId } from '../breadboard.js';
@@ -97,17 +97,18 @@ function makeSim(world, chips, wm) {
 // ─────────────────────────────────────────────────────────────────────────────
 console.log('\n=== SECTION S: Structure ===');
 
-const EXPECTED_IDS = ['CD4011', 'CD4012', 'CD4069', 'CD4082', 'CD4543'];
+const EXPECTED_IDS = ['CD4011', 'CD4012', 'CD4069', 'CD4082', 'CD4543', 'CD4027'];
 const EXPECTED_SPECS = {
-  'CD4011': { pins: 14, gnd: 7,  vcc: 14 },
-  'CD4012': { pins: 14, gnd: 7,  vcc: 14 },
-  'CD4069': { pins: 14, gnd: 7,  vcc: 14 },
-  'CD4082': { pins: 14, gnd: 7,  vcc: 14 },
-  'CD4543': { pins: 16, gnd: 8,  vcc: 16 },
+  'CD4011':  { pins: 14, gnd: 7,  vcc: 14 },
+  'CD4012':  { pins: 14, gnd: 7,  vcc: 14 },
+  'CD4069':  { pins: 14, gnd: 7,  vcc: 14 },
+  'CD4082':  { pins: 14, gnd: 7,  vcc: 14 },
+  'CD4543':  { pins: 16, gnd: 8,  vcc: 16 },
+  'CD4027': { pins: 16, gnd: 8,  vcc: 16 },
 };
 
 assert(typeof CHIPS_BLOCK_69 === 'object', 'CHIPS_BLOCK_69 is an exported object');
-assert(Object.keys(CHIPS_BLOCK_69).length === 5, 'CHIPS_BLOCK_69 has 5 chips');
+assert(Object.keys(CHIPS_BLOCK_69).length === 6, 'CHIPS_BLOCK_69 has 6 chips');
 
 for (const id of EXPECTED_IDS) {
   const def = CHIPS_BLOCK_69[id];
@@ -310,9 +311,9 @@ for (const inputPin of ['1A','1B','1C','1D']) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SECTION E   CD4543: BCD to 7-Segment Decoder/Driver
+// SECTION E   CD4543: BCD to 7 Segment Decoder/Driver
 // ─────────────────────────────────────────────────────────────────────────────
-console.log('\n=== SECTION E: CD4543 BCD to 7-Segment Decoder ===');
+console.log('\n=== SECTION E: CD4543 BCD to 7 Segment Decoder ===');
 
 // Expected segment patterns (a,b,c,d,e,f,g)   active HIGH (Ph=LOW, common cathode):
 const SEG_TABLE = [
@@ -416,6 +417,122 @@ for (const phState of [0, 1]) {
   connectLow(wm, chip, 'C'); connectHigh(wm, chip, 'D');
   const sim = makeSim(world, [chip], wm);
   for (const s of SEG_PINS) assertPinLow(sim, chip, s, `CD4543 BCD=10 (invalid): ${s}=L`);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SECTION CD4027: Dual JK Master-Slave Flip-Flop
+// ─────────────────────────────────────────────────────────────────────────────
+console.log('\n=== CD4027: Dual JK Master-Slave FF ===');
+
+function setupCD4027() {
+  const world = new BreadboardWorld(1, 1);
+  const chip = new ChipComponent('CD4027');
+  chip.place(0, 0, 10, 4);
+  const wm = new WireManager();
+  resetWireCounter();
+  const vddPin = findPin(chip, 'VDD');
+  const gndPin = findPin(chip, 'GND');
+  connectPinToVcc(wm, vddPin);
+  connectPinToGnd(wm, gndPin);
+  // Hold S and R LOW (inactive) by default
+  connectLow(wm, chip, '1S');
+  connectLow(wm, chip, '1R');
+  connectLow(wm, chip, '2S');
+  connectLow(wm, chip, '2R');
+  // Hold J and K LOW by default
+  connectLow(wm, chip, '1J');
+  connectLow(wm, chip, '1K');
+  connectLow(wm, chip, '2J');
+  connectLow(wm, chip, '2K');
+  // Clock starts LOW
+  connectLow(wm, chip, '1C');
+  connectLow(wm, chip, '2C');
+  return { world, chip, wm };
+}
+
+function pulseClockCMOS(world, chip, wm, clkPin) {
+  const sim = new CircuitSimulator();
+  // Rising edge
+  disconnectPin(wm, chip, clkPin);
+  connectHigh(wm, chip, clkPin);
+  sim.evaluate(world, [chip], wm);
+  // Falling edge
+  disconnectPin(wm, chip, clkPin);
+  connectLow(wm, chip, clkPin);
+  sim.evaluate(world, [chip], wm);
+  return sim;
+}
+
+// a: active-HIGH reset holds Q=0
+{
+  const { world, chip, wm } = setupCD4027();
+  reconnectHigh(wm, chip, '1R');  // Assert reset
+  const sim = makeSim(world, [chip], wm);
+  assertPinLow(sim,  chip, '1Q',  'CD4027 reset active: 1Q=LOW');
+  assertPinHigh(sim, chip, '1Qn', 'CD4027 reset active: 1Qn=HIGH');
+}
+
+// b: active-HIGH set holds Q=1
+{
+  const { world, chip, wm } = setupCD4027();
+  reconnectHigh(wm, chip, '1S');  // Assert set
+  const sim = makeSim(world, [chip], wm);
+  assertPinHigh(sim, chip, '1Q',  'CD4027 set active: 1Q=HIGH');
+  assertPinLow(sim,  chip, '1Qn', 'CD4027 set active: 1Qn=LOW');
+}
+
+// c: reset overrides set (R takes priority)
+{
+  const { world, chip, wm } = setupCD4027();
+  reconnectHigh(wm, chip, '1S');
+  reconnectHigh(wm, chip, '1R');
+  const sim = makeSim(world, [chip], wm);
+  assertPinLow(sim, chip, '1Q', 'CD4027 R overrides S: 1Q=LOW');
+}
+
+// d: J=1,K=0 on rising edge sets Q
+{
+  const { world, chip, wm } = setupCD4027();
+  reconnectHigh(wm, chip, '1J');
+  const sim = pulseClockCMOS(world, chip, wm, '1C');
+  assertPinHigh(sim, chip, '1Q',  'CD4027 J=1,K=0 rising edge: 1Q=HIGH');
+  assertPinLow(sim,  chip, '1Qn', 'CD4027 J=1,K=0 rising edge: 1Qn=LOW');
+}
+
+// e: J=0,K=1 on rising edge resets Q
+{
+  const { world, chip, wm } = setupCD4027();
+  // First set Q=1 via S, then release S and pulse with K=1
+  reconnectHigh(wm, chip, '1S');
+  makeSim(world, [chip], wm);
+  reconnectLow(wm, chip, '1S');
+  reconnectHigh(wm, chip, '1K');
+  const sim = pulseClockCMOS(world, chip, wm, '1C');
+  assertPinLow(sim,  chip, '1Q',  'CD4027 J=0,K=1 rising edge: 1Q=LOW');
+  assertPinHigh(sim, chip, '1Qn', 'CD4027 J=0,K=1 rising edge: 1Qn=HIGH');
+}
+
+// f: J=1,K=1 on rising edge toggles Q
+{
+  const { world, chip, wm } = setupCD4027();
+  reconnectHigh(wm, chip, '1J');
+  reconnectHigh(wm, chip, '1K');
+  // Start Q=0, toggle → Q=1
+  pulseClockCMOS(world, chip, wm, '1C');
+  const sim1 = makeSim(world, [chip], wm);
+  assertPinHigh(sim1, chip, '1Q', 'CD4027 J=1,K=1 first toggle: 1Q=HIGH');
+  // Toggle again → Q=0
+  const sim2 = pulseClockCMOS(world, chip, wm, '1C');
+  assertPinLow(sim2, chip, '1Q', 'CD4027 J=1,K=1 second toggle: 1Q=LOW');
+}
+
+// g: FF2 operates independently
+{
+  const { world, chip, wm } = setupCD4027();
+  reconnectHigh(wm, chip, '2J');
+  const sim = pulseClockCMOS(world, chip, wm, '2C');
+  assertPinHigh(sim, chip, '2Q',  'CD4027 FF2 set on rising edge: 2Q=HIGH');
+  assertPinLow(sim,  chip, '1Q',  'CD4027 FF2 independent: 1Q unchanged=LOW');
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

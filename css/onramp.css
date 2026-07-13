@@ -5,7 +5,7 @@
 body {
   background: #111;
   color: #ffffff;
-  font-family: 'Menlo', 'Consolas', 'Courier New', monospace;
+  font-family: var(--font-body);
   overflow: hidden;
   height: 100vh;
 }
@@ -36,27 +36,14 @@ body {
   text-decoration: none;
 }
 
-#onramp-toolbar .toolbar-back {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 26px;
-  height: 26px;
-  color: #888;
-  border: 1px solid #2e2e2e;
-  border-radius: 3px;
-  text-decoration: none;
-  transition: color 0.12s, border-color 0.12s;
-}
-
-#onramp-toolbar .toolbar-back:hover {
-  color: #ddd;
-  border-color: #555;
+#onramp-toolbar .toolbar-sep {
+  font-size: 13px;
+  color: #555;
 }
 
 #onramp-lesson-title {
   font-size: 12px;
-  color: #888;
+  color: #aaa;
 }
 
 .toolbar-spacer { flex: 1; }
@@ -139,27 +126,27 @@ body {
 }
 
 #onramp-step-content h2 {
-  font-size: 16px;
-  color: #eee;
-  margin-bottom: 16px;
+  font-size: 14px;
+  color: #f0f0f0;
+  margin-bottom: 12px;
   font-weight: 600;
 }
 
 #onramp-step-content h3 {
-  font-size: 14px;
-  color: #ddd;
-  margin: 16px 0 8px 0;
+  font-size: 13px;
+  color: #e0e0e0;
+  margin: 14px 0 6px 0;
   font-weight: 600;
 }
 
 #onramp-step-content p {
   margin-bottom: 12px;
-  color: #bbb;
+  color: #d6d6d6;
 }
 
 #onramp-step-content ul, #onramp-step-content ol {
   margin: 8px 0 12px 20px;
-  color: #bbb;
+  color: #d6d6d6;
 }
 
 #onramp-step-content li {
@@ -167,64 +154,64 @@ body {
 }
 
 #onramp-step-content strong {
-  color: #eee;
+  color: #ffffff;
   font-weight: 600;
 }
 
 #onramp-step-content em {
-  color: #aaa;
+  color: #cfcfcf;
   font-style: italic;
 }
 
 #onramp-step-content code {
-  background: #252525;
+  background: #2a2a2a;
   padding: 2px 5px;
   border-radius: 3px;
   font-size: 12px;
-  color: #e0e0e0;
+  color: #e8e8e8;
 }
 
 .onramp-hint {
-  background: #1e2a1e;
-  border: 1px solid #2a4a2a;
+  background: #1c1c1c;
+  border: 1px solid #2e2e2e;
   border-radius: 4px;
   padding: 10px 14px;
   margin: 12px 0;
   font-size: 12px;
-  color: #8dca8d;
+  color: #b8b8b8;
   line-height: 1.6;
 }
 
 .onramp-warning {
-  background: #2a2a1e;
-  border: 1px solid #4a4a2a;
+  background: #1c1c1c;
+  border: 1px solid #2e2e2e;
   border-radius: 4px;
   padding: 10px 14px;
   margin: 12px 0;
   font-size: 12px;
-  color: #caca8d;
+  color: #b8b8b8;
   line-height: 1.6;
 }
 
 .onramp-success {
-  background: #1a2a1a;
-  border: 1px solid #2a5a2a;
+  background: #18241a;
+  border: 1px solid #2c4a30;
   border-radius: 4px;
   padding: 10px 14px;
   margin: 12px 0;
   font-size: 12px;
-  color: #6dda6d;
+  color: #a8d6ab;
   line-height: 1.6;
 }
 
 .onramp-error-callout {
-  background: #2a1a1a;
-  border: 1px solid #5a2a2a;
+  background: #1c1c1c;
+  border: 1px solid #2e2e2e;
   border-radius: 4px;
   padding: 10px 14px;
   margin: 12px 0;
   font-size: 12px;
-  color: #da6d6d;
+  color: #b8b8b8;
   line-height: 1.6;
 }
 
@@ -255,20 +242,52 @@ body {
 .onramp-nav-btn:disabled { opacity: 0.3; cursor: default; }
 
 .onramp-nav-btn.primary {
-  background: #2a5a2a;
-  border-color: #3a7a3a;
-  color: #8dda8d;
+  background: #e6e6e6;
+  border-color: #e6e6e6;
+  color: #111;
+  font-weight: 600;
 }
 
-.onramp-nav-btn.primary:hover:not(:disabled) { background: #3a6a3a; }
+.onramp-nav-btn.primary:hover:not(:disabled) { background: #ffffff; border-color: #ffffff; }
+.onramp-nav-btn.primary:disabled { background: #3a3a3a; border-color: #3a3a3a; color: #888; }
 
-.onramp-nav-btn.check {
-  background: #2a3a5a;
-  border-color: #3a5a8a;
-  color: #8daadd;
+/* ── Visual hint ("Show me") ─────────────────────────────────────────────────
+   The amber button in the nav bar toggles the board highlight overlay; the
+   matching .hint-pulse class rings the toolbar button a step wants clicked. */
+
+.onramp-hint-show-btn {
+  flex: 0 0 auto;
+  padding: 8px 14px;
+  border: 1px solid #6b5416;
+  border-radius: 4px;
+  background: #241d06;
+  color: #ffc857;
+  font-family: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
 }
 
-.onramp-nav-btn.check:hover:not(:disabled) { background: #3a4a6a; }
+.onramp-hint-show-btn:hover { background: #35290a; border-color: #8a6d1d; }
+
+.onramp-hint-show-btn.active {
+  background: #ffb020;
+  border-color: #ffb020;
+  color: #1a1a1a;
+  font-weight: 600;
+}
+
+@keyframes onramp-hint-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(255, 176, 32, 0.75); }
+  70%  { box-shadow: 0 0 0 10px rgba(255, 176, 32, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 176, 32, 0); }
+}
+
+.onramp-toolbar-btn.hint-pulse {
+  animation: onramp-hint-pulse 1.4s ease-out infinite;
+  border-color: #ffb020;
+  color: #ffc857;
+}
 
 /* ── Canvas Area ─────────────────────────────────────────────────────────────── */
 
@@ -285,34 +304,38 @@ body {
   display: block;
 }
 
+/* ── Full-screen text mode (steps with no board) ─────────────────────────────── */
+/* When a step has no circuit, hide the canvas and let the instruction panel take
+   the whole width, with the text centered in a comfortable reading column. */
+
+#onramp-body.no-board #onramp-canvas-area {
+  display: none;
+}
+
+#onramp-body.no-board #onramp-panel {
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+  border-right: none;
+  align-items: center;
+}
+
+#onramp-body.no-board #onramp-step-content {
+  width: 100%;
+  max-width: 760px;
+  padding: 36px 28px;
+  font-size: 14px;
+}
+
+#onramp-body.no-board #onramp-step-nav {
+  width: 100%;
+  max-width: 760px;
+}
+
 /* ── Progress Bar ────────────────────────────────────────────────────────────── */
 
 #onramp-progress {
-  height: 28px;
-  min-height: 28px;
-  background: #141414;
-  border-top: 1px solid #252525;
-  display: flex;
-  align-items: center;
-  padding: 0 16px;
-  position: relative;
-}
-
-#onramp-progress-bar {
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 100%;
-  background: #2a5a2a;
-  transition: width 0.4s ease;
-  opacity: 0.3;
-}
-
-#onramp-progress-text {
-  position: relative;
-  font-size: 11px;
-  color: #666;
-  z-index: 1;
+  display: none;
 }
 
 /* ── Lesson Select ───────────────────────────────────────────────────────────── */
@@ -416,6 +439,123 @@ body {
 }
 
 .onramp-btn.secondary:hover { background: #333; }
+
+/* ── Lesson SVG Diagrams ─────────────────────────────────────────────────────── */
+
+.lesson-diagram {
+  display: block;
+  width: 100%;
+  margin: 14px 0;
+  background: #161616;
+  border: 1px solid #252525;
+  border-radius: 4px;
+}
+
+/* ── Lesson CTA button (e.g. "Open the full CPU in the simulator") ──────────── */
+
+.onramp-cta {
+  display: inline-block;
+  margin: 6px 0;
+  padding: 9px 16px;
+  background: #e8e8e8;
+  border: 1px solid #e8e8e8;
+  border-radius: 4px;
+  color: #111;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.12s, border-color 0.12s;
+}
+
+.onramp-cta:hover { background: #fff; border-color: #fff; color: #111; }
+
+/* ── Lesson Tables (instruction set, microcode steps) ───────────────────────── */
+
+.onramp-table {
+  width: 100%;
+  margin: 14px 0;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.onramp-table th {
+  text-align: left;
+  color: #888;
+  font-weight: 600;
+  padding: 5px 10px;
+  border-bottom: 1px solid #333;
+}
+
+.onramp-table td {
+  color: #bbb;
+  padding: 5px 10px;
+  border-bottom: 1px solid #222;
+}
+
+.onramp-table code {
+  white-space: nowrap;
+}
+
+/* ── Quiz Options ────────────────────────────────────────────────────────────── */
+
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin: 14px 0;
+}
+
+.quiz-option {
+  background: #222;
+  border: 1px solid #333;
+  border-radius: 4px;
+  padding: 9px 13px;
+  color: #bbb;
+  font-family: inherit;
+  font-size: 12px;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s;
+}
+
+.quiz-option:hover { background: #2a2a2a; border-color: #444; }
+
+.quiz-option.correct {
+  background: #1a2a1a;
+  border-color: #3a7a3a;
+  color: #6dda6d;
+}
+
+.quiz-option.incorrect {
+  background: #2a1a1a;
+  border-color: #7a3a3a;
+  color: #da6d6d;
+}
+
+/* ── SPDT Lever Animation ────────────────────────────────────────────────────── */
+
+@keyframes onramp-spdt-swing {
+  0%, 20%  { transform: rotate(-45deg); }
+  50%, 70% { transform: rotate(45deg); }
+  100%     { transform: rotate(-45deg); }
+}
+
+@keyframes onramp-tristate-swing {
+  0%, 15%  { transform: rotate(-45deg); }
+  30%, 40% { transform: rotate(0deg); }
+  55%, 70% { transform: rotate(45deg); }
+  85%, 100%{ transform: rotate(-45deg); }
+}
+
+.onramp-spdt-lever {
+  transform-origin: 140px 92px;
+  animation: onramp-spdt-swing 3s ease-in-out infinite;
+}
+
+.onramp-tristate-lever {
+  transform-origin: 140px 92px;
+  animation: onramp-tristate-swing 4.5s ease-in-out infinite;
+}
 
 /* ── Step complete animation ─────────────────────────────────────────────────── */
 

@@ -74,9 +74,9 @@ function makeWm(chip, inputs) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const EXPECTED_CHIP_IDS = [
-  '74242', '74243', '74246', '74247', '74248', '74249',
-  '74250', '74251', '74253', '74255', '74256', '74258',
-  '74260', '74261', '74264',
+  '74x242', '74x243', '74x246', '74x247', '74x248', '74x249',
+  '74x250', '74x251', '74x253', '74x255', '74x256', '74x258',
+  '74x260', '74x261', '74x264',
 ];
 
 console.log('\nS1: All chip IDs present in CHIPS_BLOCK_17');
@@ -109,7 +109,7 @@ for (const [id, def] of Object.entries(CHIPS_BLOCK_17)) {
 console.log('\nG1: 74242 - 4 bit Inverting Bus Transceiver');
 {
   // GABn=0, GBAn=1: A→B (inverting), A1=HIGH → B1=LOW
-  const { world, chip } = setupWorld('74242');
+  const { world, chip } = setupWorld('74x242');
   const wm = makeWm(chip, { A1:1, A2:0, A3:1, A4:0, GABn:0, GBAn:1 });
   const sim = simulate(world, chip, wm);
   assert(isLow(getPinVoltage(sim, findPin(chip, 'B1'))),  '74242: A→B, A1=HIGH → B1=LOW (inv)');
@@ -119,7 +119,7 @@ console.log('\nG1: 74242 - 4 bit Inverting Bus Transceiver');
 }
 {
   // GABn=1, GBAn=0: B→A (inverting), B1=HIGH → A1=LOW
-  const { world, chip } = setupWorld('74242');
+  const { world, chip } = setupWorld('74x242');
   const wm = makeWm(chip, { B1:1, B2:0, B3:1, B4:0, GABn:1, GBAn:0 });
   const sim = simulate(world, chip, wm);
   assert(isLow(getPinVoltage(sim, findPin(chip, 'A1'))),  '74242: B→A, B1=HIGH → A1=LOW (inv)');
@@ -127,7 +127,7 @@ console.log('\nG1: 74242 - 4 bit Inverting Bus Transceiver');
 }
 {
   // Both GABn=1, GBAn=1: HiZ all
-  const { world, chip } = setupWorld('74242');
+  const { world, chip } = setupWorld('74x242');
   const wm = makeWm(chip, { A1:1, B1:1, GABn:1, GBAn:1 });
   const sim = simulate(world, chip, wm);
   const vA1 = getPinVoltage(sim, findPin(chip, 'A1'));
@@ -137,13 +137,13 @@ console.log('\nG1: 74242 - 4 bit Inverting Bus Transceiver');
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// G2: 74243 - 4 bit Non-Inverting Bus Transceiver
+// G2: 74243 - 4 bit Non Inverting Bus Transceiver
 // ─────────────────────────────────────────────────────────────────────────────
-console.log('\nG2: 74243 - 4 bit Non-Inverting Bus Transceiver');
+console.log('\nG2: 74243 - 4 bit Non Inverting Bus Transceiver');
 {
-  // GABn=0, GBAn=1: A→B (non-inverting)
+  // GABn=0, GBAn=1: A→B (non inverting)
   // Do NOT wire B pins - chip drives them as outputs
-  const { world, chip } = setupWorld('74243');
+  const { world, chip } = setupWorld('74x243');
   const wm = makeWm(chip, { A1:1, A2:0, A3:1, A4:0, GABn:0, GBAn:1 });
   const sim = simulate(world, chip, wm);
   assert(isHigh(getPinVoltage(sim, findPin(chip, 'B1'))), '74243: A→B, A1=HIGH → B1=HIGH');
@@ -152,9 +152,9 @@ console.log('\nG2: 74243 - 4 bit Non-Inverting Bus Transceiver');
   assert(isLow(getPinVoltage(sim, findPin(chip, 'B4'))),  '74243: A→B, A4=LOW → B4=LOW');
 }
 {
-  // GABn=1, GBAn=0: B→A (non-inverting)
+  // GABn=1, GBAn=0: B→A (non inverting)
   // Do NOT wire A pins - chip drives them as outputs
-  const { world, chip } = setupWorld('74243');
+  const { world, chip } = setupWorld('74x243');
   const wm = makeWm(chip, { B1:1, B2:0, B3:1, B4:0, GABn:1, GBAn:0 });
   const sim = simulate(world, chip, wm);
   assert(isHigh(getPinVoltage(sim, findPin(chip, 'A1'))), '74243: B→A, B1=HIGH → A1=HIGH');
@@ -162,13 +162,13 @@ console.log('\nG2: 74243 - 4 bit Non-Inverting Bus Transceiver');
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// G3: 74246 - BCD to 7-Segment (OC, blanking, ripple)
+// G3: 74246 - BCD to 7 Segment (OC, blanking, ripple)
 // ─────────────────────────────────────────────────────────────────────────────
-console.log('\nG3: 74246 - BCD-to-7-Segment OC (active LOW outputs, 30V)');
+console.log('\nG3: 74246 - BCD to-7 Segment OC (active LOW outputs, 30V)');
 {
   // Digit 0: A=0,B=0,C=0,D=0, LT=1, RBI=1, BI/RBO=1
   // Expected: a,b,c,d,e,f=LOW (active LOW: segment ON), g=HIGH (segment OFF)
-  const { world, chip } = setupWorld('74246');
+  const { world, chip } = setupWorld('74x246');
   const wm = makeWm(chip, { A:0, B:0, C:0, D:0, LT:1, RBI:1 });
   wirePinToVcc(wm, findPin(chip, 'BI/RBO'));
   const sim = simulate(world, chip, wm);
@@ -184,7 +184,7 @@ console.log('\nG3: 74246 - BCD-to-7-Segment OC (active LOW outputs, 30V)');
   // Lamp test (LT=0): BCD_7SEG evaluator uses only A,B,C,D inputs;
   // LT pin is not modelled by this gate type - so test digit 9 instead.
   // digit 9: A=1,B=0,C=0,D=1 → a,b,c,d,f,g LOW (ON), e HIGH (OFF)
-  const { world, chip } = setupWorld('74246');
+  const { world, chip } = setupWorld('74x246');
   const wm = makeWm(chip, { A:1, B:0, C:0, D:1, LT:1, RBI:1 });
   wirePinToVcc(wm, findPin(chip, 'BI/RBO'));
   const sim = simulate(world, chip, wm);
@@ -193,13 +193,13 @@ console.log('\nG3: 74246 - BCD-to-7-Segment OC (active LOW outputs, 30V)');
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// G4: 74247 - BCD to 7-Segment (OC, active LOW outputs)
+// G4: 74247 - BCD to 7 Segment (OC, active LOW outputs)
 // ─────────────────────────────────────────────────────────────────────────────
-console.log('\nG4: 74247 - BCD-to-7-Segment OC');
+console.log('\nG4: 74247 - BCD to-7 Segment OC');
 {
   // Same as 74246 - digit 1: A=1,B=0,C=0,D=0
   // Segments b,c ON (LOW), rest OFF (HIGH)
-  const { world, chip } = setupWorld('74247');
+  const { world, chip } = setupWorld('74x247');
   const wm = makeWm(chip, { A:1, B:0, C:0, D:0, LT:1, RBI:1 });
   wirePinToVcc(wm, findPin(chip, 'BI/RBO'));
   const sim = simulate(world, chip, wm);
@@ -210,12 +210,12 @@ console.log('\nG4: 74247 - BCD-to-7-Segment OC');
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// G5: 74248 - BCD to 7-Segment (active HIGH, internal pull ups)
+// G5: 74248 - BCD to 7 Segment (active HIGH, internal pull ups)
 // ─────────────────────────────────────────────────────────────────────────────
-console.log('\nG5: 74248 - BCD-to-7-Segment (active HIGH outputs)');
+console.log('\nG5: 74248 - BCD to-7 Segment (active HIGH outputs)');
 {
   // Digit 0: segments a-f HIGH (ON), g LOW (OFF)
-  const { world, chip } = setupWorld('74248');
+  const { world, chip } = setupWorld('74x248');
   const wm = makeWm(chip, { A:0, B:0, C:0, D:0 });
   wirePinToVcc(wm, findPin(chip, 'LAMP_TEST'));
   wirePinToVcc(wm, findPin(chip, 'BI/RBO'));
@@ -228,7 +228,7 @@ console.log('\nG5: 74248 - BCD-to-7-Segment (active HIGH outputs)');
 }
 {
   // Digit 7: a,b,c HIGH; d,e,f,g LOW
-  const { world, chip } = setupWorld('74248');
+  const { world, chip } = setupWorld('74x248');
   const wm = makeWm(chip, { A:1, B:1, C:1, D:0 });
   wirePinToVcc(wm, findPin(chip, 'LAMP_TEST'));
   wirePinToVcc(wm, findPin(chip, 'BI/RBO'));
@@ -241,12 +241,12 @@ console.log('\nG5: 74248 - BCD-to-7-Segment (active HIGH outputs)');
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// G6: 74249 - BCD to 7-Segment (active HIGH, OC)
+// G6: 74249 - BCD to 7 Segment (active HIGH, OC)
 // ─────────────────────────────────────────────────────────────────────────────
-console.log('\nG6: 74249 - BCD-to-7-Segment OC (active HIGH)');
+console.log('\nG6: 74249 - BCD to-7 Segment OC (active HIGH)');
 {
   // Digit 3: a,b,c,d,g HIGH (ON), e,f LOW (OFF)
-  const { world, chip } = setupWorld('74249');
+  const { world, chip } = setupWorld('74x249');
   const wm = makeWm(chip, { A:1, B:1, C:0, D:0, LT:1, RBI:1 });
   wirePinToVcc(wm, findPin(chip, 'BI/RBO'));
   const sim = simulate(world, chip, wm);
@@ -257,12 +257,12 @@ console.log('\nG6: 74249 - BCD-to-7-Segment OC (active HIGH)');
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// G7: 74250 - 16-to-1 Multiplexer (tri-state, complemented output)
+// G7: 74250 - 16-to-1 Multiplexer (tri state, complemented output)
 // ─────────────────────────────────────────────────────────────────────────────
-console.log('\nG7: 74250 - 16-to-1 MUX (tri-state, complemented)');
+console.log('\nG7: 74250 - 16-to-1 MUX (tri state, complemented)');
 {
   // OE=0, select E1 (A=0,B=0,C=0,D=0), E1=HIGH → W=LOW (complemented)
-  const { world, chip } = setupWorld('74250');
+  const { world, chip } = setupWorld('74x250');
   const wm = makeWm(chip, { E1:1, E2:0,E3:0,E4:0,E5:0,E6:0,E7:0,E8:0,
                              E9:0,E10:0,E11:0,E12:0,E13:0,E14:0,E15:0,E16:0,
                              A:0, B:0, C:0, D:0, OE:0 });
@@ -271,7 +271,7 @@ console.log('\nG7: 74250 - 16-to-1 MUX (tri-state, complemented)');
 }
 {
   // OE=0, select E3 (A=1,B=1,C=0,D=0 = index 3), E3=LOW → W=HIGH
-  const { world, chip } = setupWorld('74250');
+  const { world, chip } = setupWorld('74x250');
   const wm = makeWm(chip, { E1:0, E2:0, E3:0, E4:0,E5:0,E6:0,E7:0,E8:0,
                              E9:0,E10:0,E11:0,E12:0,E13:0,E14:0,E15:0,E16:0,
                              A:1, B:1, C:0, D:0, OE:0 });
@@ -280,7 +280,7 @@ console.log('\nG7: 74250 - 16-to-1 MUX (tri-state, complemented)');
 }
 {
   // OE=1: W HiZ (not driven, should float)
-  const { world, chip } = setupWorld('74250');
+  const { world, chip } = setupWorld('74x250');
   const wm = makeWm(chip, { E1:1, E2:0,E3:0,E4:0,E5:0,E6:0,E7:0,E8:0,
                              E9:0,E10:0,E11:0,E12:0,E13:0,E14:0,E15:0,E16:0,
                              A:0, B:0, C:0, D:0, OE:1 });
@@ -290,12 +290,12 @@ console.log('\nG7: 74250 - 16-to-1 MUX (tri-state, complemented)');
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// G8: 74251 - 8-to-1 Multiplexer (tri-state, Y and W outputs)
+// G8: 74251 - 8-to-1 Multiplexer (tri state, Y and W outputs)
 // ─────────────────────────────────────────────────────────────────────────────
-console.log('\nG8: 74251 - 8-to-1 MUX (tri-state, true+complemented)');
+console.log('\nG8: 74251 - 8-to-1 MUX (tri state, true+complemented)');
 {
   // Gn=0, select D2 (A=0,B=1,C=0 = index 2), D2=HIGH → Y=HIGH, W=LOW
-  const { world, chip } = setupWorld('74251');
+  const { world, chip } = setupWorld('74x251');
   const wm = makeWm(chip, { D0:0, D1:0, D2:1, D3:0, D4:0, D5:0, D6:0, D7:0,
                              A:0, B:1, C:0, Gn:0 });
   const sim = simulate(world, chip, wm);
@@ -304,7 +304,7 @@ console.log('\nG8: 74251 - 8-to-1 MUX (tri-state, true+complemented)');
 }
 {
   // Gn=0, select D5 (A=1,B=0,C=1 = index 5), D5=LOW → Y=LOW, W=HIGH
-  const { world, chip } = setupWorld('74251');
+  const { world, chip } = setupWorld('74x251');
   const wm = makeWm(chip, { D0:0, D1:0, D2:0, D3:0, D4:0, D5:0, D6:0, D7:0,
                              A:1, B:0, C:1, Gn:0 });
   const sim = simulate(world, chip, wm);
@@ -313,7 +313,7 @@ console.log('\nG8: 74251 - 8-to-1 MUX (tri-state, true+complemented)');
 }
 {
   // Gn=1: both Y and W HiZ
-  const { world, chip } = setupWorld('74251');
+  const { world, chip } = setupWorld('74x251');
   const wm = makeWm(chip, { D0:1, D1:0, D2:0, D3:0, D4:0, D5:0, D6:0, D7:0,
                              A:0, B:0, C:0, Gn:1 });
   const sim = simulate(world, chip, wm);
@@ -324,12 +324,12 @@ console.log('\nG8: 74251 - 8-to-1 MUX (tri-state, true+complemented)');
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// G9: 74253 - Dual 4-to-1 Multiplexer (tri-state)
+// G9: 74253 - Dual 4-to-1 Multiplexer (tri state)
 // ─────────────────────────────────────────────────────────────────────────────
-console.log('\nG9: 74253 - Dual 4-to-1 MUX (tri-state)');
+console.log('\nG9: 74253 - Dual 4-to-1 MUX (tri state)');
 {
   // Section 1: 1Gn=0, S0=1,S1=0 (sel=1), 1C1=HIGH → 1Y=HIGH
-  const { world, chip } = setupWorld('74253');
+  const { world, chip } = setupWorld('74x253');
   const wm = makeWm(chip, { '1C0':0, '1C1':1, '1C2':0, '1C3':0,
                              '2C0':0, '2C1':0, '2C2':0, '2C3':0,
                              S0:1, S1:0, '1Gn':0, '2Gn':1 });
@@ -338,7 +338,7 @@ console.log('\nG9: 74253 - Dual 4-to-1 MUX (tri-state)');
 }
 {
   // Section 2: 2Gn=0, S0=0,S1=1 (sel=2), 2C2=HIGH → 2Y=HIGH
-  const { world, chip } = setupWorld('74253');
+  const { world, chip } = setupWorld('74x253');
   const wm = makeWm(chip, { '1C0':0, '1C1':0, '1C2':0, '1C3':0,
                              '2C0':0, '2C1':0, '2C2':1, '2C3':0,
                              S0:0, S1:1, '1Gn':1, '2Gn':0 });
@@ -347,7 +347,7 @@ console.log('\nG9: 74253 - Dual 4-to-1 MUX (tri-state)');
 }
 {
   // 1Gn=1: 1Y HiZ
-  const { world, chip } = setupWorld('74253');
+  const { world, chip } = setupWorld('74x253');
   const wm = makeWm(chip, { '1C0':1, '1C1':0, '1C2':0, '1C3':0,
                              '2C0':0, '2C1':0, '2C2':0, '2C3':0,
                              S0:0, S1:0, '1Gn':1, '2Gn':0 });
@@ -357,12 +357,12 @@ console.log('\nG9: 74253 - Dual 4-to-1 MUX (tri-state)');
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// G10: 74255 - Dual 1-of-4 Demultiplexer (tri-state inverting)
+// G10: 74255 - Dual 1-of-4 Demultiplexer (tri state inverting)
 // ─────────────────────────────────────────────────────────────────────────────
-console.log('\nG10: 74255 - Dual 1-of-4 DEMUX (tri-state, inverting outputs)');
+console.log('\nG10: 74255 - Dual 1-of-4 DEMUX (tri state, inverting outputs)');
 {
   // Section 1: 1Gn=0, C=0, S0=0,S1=0 (sel=0) → 1Y0n=LOW (active), 1Y1n-3n=HIGH (inactive)
-  const { world, chip } = setupWorld('74255');
+  const { world, chip } = setupWorld('74x255');
   const wm = makeWm(chip, { S0:0, S1:0, '1Gn':0, '1C':0,
                              '2Gn':1, '2C':0 });
   const sim = simulate(world, chip, wm);
@@ -373,7 +373,7 @@ console.log('\nG10: 74255 - Dual 1-of-4 DEMUX (tri-state, inverting outputs)');
 }
 {
   // Section 1: sel=3 (S0=1,S1=1), Gn=0, C=0 → 1Y3n=LOW, others HIGH
-  const { world, chip } = setupWorld('74255');
+  const { world, chip } = setupWorld('74x255');
   const wm = makeWm(chip, { S0:1, S1:1, '1Gn':0, '1C':0, '2Gn':1, '2C':0 });
   const sim = simulate(world, chip, wm);
   assert(isHigh(getPinVoltage(sim, findPin(chip, '1Y0n'))), '74255: S=3 → 1Y0n=HIGH');
@@ -381,7 +381,7 @@ console.log('\nG10: 74255 - Dual 1-of-4 DEMUX (tri-state, inverting outputs)');
 }
 {
   // 1Gn=1 → all HiZ
-  const { world, chip } = setupWorld('74255');
+  const { world, chip } = setupWorld('74x255');
   const wm = makeWm(chip, { S0:0, S1:0, '1Gn':1, '1C':0, '2Gn':1, '2C':0 });
   const sim = simulate(world, chip, wm);
   const v = getPinVoltage(sim, findPin(chip, '1Y0n'));
@@ -389,7 +389,7 @@ console.log('\nG10: 74255 - Dual 1-of-4 DEMUX (tri-state, inverting outputs)');
 }
 {
   // C=1 → all HiZ (data input HIGH blocks demux)
-  const { world, chip } = setupWorld('74255');
+  const { world, chip } = setupWorld('74x255');
   const wm = makeWm(chip, { S0:0, S1:0, '1Gn':0, '1C':1, '2Gn':1, '2C':0 });
   const sim = simulate(world, chip, wm);
   const v = getPinVoltage(sim, findPin(chip, '1Y0n'));
@@ -402,7 +402,7 @@ console.log('\nG10: 74255 - Dual 1-of-4 DEMUX (tri-state, inverting outputs)');
 console.log('\nG11: 74256 - Dual 4 bit Addressable Latch');
 {
   // GS=0, A=0 (addr=0), D=1, CLR1=1, CLR2=1 → 1Q0=HIGH
-  const { world, chip } = setupWorld('74256');
+  const { world, chip } = setupWorld('74x256');
   const wm = makeWm(chip, { A0:0, A1:0, D:1, GS:0, CLR1:1, CLR2:1 });
   const sim = simulate(world, chip, wm);
   assert(isHigh(getPinVoltage(sim, findPin(chip, '1Q0'))), '74256: GS=0,addr=0,D=1 → 1Q0=HIGH');
@@ -410,7 +410,7 @@ console.log('\nG11: 74256 - Dual 4 bit Addressable Latch');
 }
 {
   // GS=0, A=2 (A0=0,A1=1), D=1, CLR1=1, CLR2=1 → 1Q2=HIGH, others=LOW
-  const { world, chip } = setupWorld('74256');
+  const { world, chip } = setupWorld('74x256');
   const wm = makeWm(chip, { A0:0, A1:1, D:1, GS:0, CLR1:1, CLR2:1 });
   const sim = simulate(world, chip, wm);
   assert(isHigh(getPinVoltage(sim, findPin(chip, '1Q2'))), '74256: GS=0,addr=2,D=1 → 1Q2=HIGH');
@@ -418,7 +418,7 @@ console.log('\nG11: 74256 - Dual 4 bit Addressable Latch');
 }
 {
   // CLR1=0 → section 1 all cleared
-  const { world, chip } = setupWorld('74256');
+  const { world, chip } = setupWorld('74x256');
   // First set addr=0 D=1
   const wm1 = makeWm(chip, { A0:0, A1:0, D:1, GS:0, CLR1:1, CLR2:1 });
   simulate(world, chip, wm1);
@@ -429,19 +429,19 @@ console.log('\nG11: 74256 - Dual 4 bit Addressable Latch');
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// G12: 74258 - Quad 2-to-1 MUX (inverting, tri-state)
+// G12: 74258 - Quad 2-to-1 MUX (inverting, tri state)
 // ─────────────────────────────────────────────────────────────────────────────
-console.log('\nG12: 74258 - Quad 2-to-1 MUX (inverting, tri-state)');
+console.log('\nG12: 74258 - Quad 2-to-1 MUX (inverting, tri state)');
 {
   // OEn=0, S=0: select A side, invert. 1A=HIGH → 1Y=LOW
-  const { world, chip } = setupWorld('74258');
+  const { world, chip } = setupWorld('74x258');
   const wm = makeWm(chip, { S:0, '1A':1, '1B':0, '2A':0, '2B':0, '3A':0, '3B':0, '4A':0, '4B':0, OEn:0 });
   const sim = simulate(world, chip, wm);
   assert(isLow(getPinVoltage(sim, findPin(chip, '1Y'))),  '74258: S=0,1A=H → 1Y=LOW (inv)');
 }
 {
   // OEn=0, S=1: select B side, invert. 2B=LOW → 2Y=HIGH
-  const { world, chip } = setupWorld('74258');
+  const { world, chip } = setupWorld('74x258');
   const wm = makeWm(chip, { S:1, '1A':0, '1B':0, '2A':0, '2B':0, '3A':0, '3B':0, '4A':0, '4B':0, OEn:0 });
   const sim = simulate(world, chip, wm);
   assert(isHigh(getPinVoltage(sim, findPin(chip, '2Y'))), '74258: S=1,2B=L → 2Y=HIGH (inv)');
@@ -449,9 +449,9 @@ console.log('\nG12: 74258 - Quad 2-to-1 MUX (inverting, tri-state)');
 
 
 // ─────────────────────────────────────────────────────────────────────────────
-// G16: 74264 - Look-Ahead Carry Generator
+// G16: 74264 - Look Ahead Carry Generator
 // ─────────────────────────────────────────────────────────────────────────────
-console.log('\nG16: 74264 - Look-Ahead Carry Generator');
+console.log('\nG16: 74264 - Look Ahead Carry Generator');
 {
   // All P=0, all G=0, Cn=0: no carry propagates
   // Cn_x = G0 + P0*Cn = 0
@@ -459,7 +459,7 @@ console.log('\nG16: 74264 - Look-Ahead Carry Generator');
   // Cn_z = G3 + P3*(G2+P2*Cn_y) = 0
   // G = G3 + P3*G2 + P3*P2*G1 + P3*P2*P1*G0 = 0
   // P = P0&P1&P2&P3 = 0
-  const { world, chip } = setupWorld('74264');
+  const { world, chip } = setupWorld('74x264');
   const wm = makeWm(chip, { P0:0,G0:0,P1:0,G1:0,P2:0,G2:0,P3:0,G3:0,Cn:0 });
   const sim = simulate(world, chip, wm);
   assert(isLow(getPinVoltage(sim, findPin(chip, 'Cn_x'))), '74264: all 0 → Cn_x=LOW');
@@ -472,7 +472,7 @@ console.log('\nG16: 74264 - Look-Ahead Carry Generator');
   // G0=1, Cn=0: generates carry from bit 0
   // Cn_x = G0 = 1, Cn_y = G1 + P1*Cn_x = P1
   // When P1=0: Cn_y= 0
-  const { world, chip } = setupWorld('74264');
+  const { world, chip } = setupWorld('74x264');
   const wm = makeWm(chip, { P0:0,G0:1,P1:0,G1:0,P2:0,G2:0,P3:0,G3:0,Cn:0 });
   const sim = simulate(world, chip, wm);
   assert(isHigh(getPinVoltage(sim, findPin(chip, 'Cn_x'))), '74264: G0=1 → Cn_x=HIGH');
@@ -480,14 +480,14 @@ console.log('\nG16: 74264 - Look-Ahead Carry Generator');
 }
 {
   // P0=1, Cn=1: propagate carry: Cn_x = G0 + P0*Cn = 0+1*1=1
-  const { world, chip } = setupWorld('74264');
+  const { world, chip } = setupWorld('74x264');
   const wm = makeWm(chip, { P0:1,G0:0,P1:0,G1:0,P2:0,G2:0,P3:0,G3:0,Cn:1 });
   const sim = simulate(world, chip, wm);
   assert(isHigh(getPinVoltage(sim, findPin(chip, 'Cn_x'))), '74264: P0=1,Cn=1 → Cn_x=HIGH');
 }
 {
   // All P=1, Cn=1: P_out=1 (all bits propagate)
-  const { world, chip } = setupWorld('74264');
+  const { world, chip } = setupWorld('74x264');
   const wm = makeWm(chip, { P0:1,G0:0,P1:1,G1:0,P2:1,G2:0,P3:1,G3:0,Cn:1 });
   const sim = simulate(world, chip, wm);
   assert(isHigh(getPinVoltage(sim, findPin(chip, 'P'))), '74264: all P=1 → P=HIGH');
@@ -497,7 +497,7 @@ console.log('\nG16: 74264 - Look-Ahead Carry Generator');
 }
 {
   // G3=1: generates group carry
-  const { world, chip } = setupWorld('74264');
+  const { world, chip } = setupWorld('74x264');
   const wm = makeWm(chip, { P0:0,G0:0,P1:0,G1:0,P2:0,G2:0,P3:0,G3:1,Cn:0 });
   const sim = simulate(world, chip, wm);
   assert(isHigh(getPinVoltage(sim, findPin(chip, 'G'))), '74264: G3=1 → G=HIGH');

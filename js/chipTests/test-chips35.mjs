@@ -86,17 +86,17 @@ function connectPinsLow(wm, chip, names) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const EXPECTED_IDS = [
-  '74658','74659','74664','74665',
-  '74666','74667',
-  '74668','74669','74670',
-  '74671','74672',
-  '74673','74674','74675','74676',
-  '74677',
+  '74x658','74x659','74x664','74x665',
+  '74x666','74x667',
+  '74x668','74x669','74x670',
+  '74x671','74x672',
+  '74x673','74x674','74x675','74x676',
+  '74x677',
 ];
 
 const SEQUENTIAL_IDS = [
-  '74666','74667','74668','74669','74670',
-  '74671','74672','74673','74674','74675','74676','74677',
+  '74x666','74x667','74x668','74x669','74x670',
+  '74x671','74x672','74x673','74x674','74x675','74x676','74x677',
 ];
 
 console.log('\nS1: All 16 chip IDs present in CHIPS_BLOCK_35');
@@ -158,7 +158,7 @@ console.log('\nS4: Sequential chips are flagged sequential');
 // ── G1: 74658 - XCVR+parity stub → all outputs HiZ ──────────────────────────
 console.log('\nG1: 74658 - parity stub outputs HiZ');
 {
-  const { world, chip, wm } = setupChipWithPower('74658');
+  const { world, chip, wm } = setupChipWithPower('74x658');
   const sim = new CircuitSimulator();
   sim.evaluate(world, [chip], wm);
   for (const p of ['B0','B1','B2','B3','B4','B5','B6','B7','PAR'])
@@ -168,7 +168,7 @@ console.log('\nG1: 74658 - parity stub outputs HiZ');
 // ── G2: 74659 - same stub ─────────────────────────────────────────────────────
 console.log('\nG2: 74659 - parity stub outputs HiZ');
 {
-  const { world, chip, wm } = setupChipWithPower('74659');
+  const { world, chip, wm } = setupChipWithPower('74x659');
   const sim = new CircuitSimulator();
   sim.evaluate(world, [chip], wm);
   assertPinHighZ(sim, chip, 'PAR', '74659: PAR HiZ');
@@ -177,7 +177,7 @@ console.log('\nG2: 74659 - parity stub outputs HiZ');
 // ── G3: 74664 / 74665 - same stub ────────────────────────────────────────────
 console.log('\nG3: 74664/665 - parity stub outputs HiZ');
 {
-  for (const id of ['74664','74665']) {
+  for (const id of ['74x664','74x665']) {
     const { world, chip, wm } = setupChipWithPower(id);
     const sim = new CircuitSimulator();
     sim.evaluate(world, [chip], wm);
@@ -186,12 +186,12 @@ console.log('\nG3: 74664/665 - parity stub outputs HiZ');
   }
 }
 
-// ── G4: 74666 - 8 bit transparent latch (non-inverting) ─────────────────────
+// ── G4: 74666 - 8 bit transparent latch (non inverting) ─────────────────────
 console.log('\nG4: 74666 - 8 bit transparent latch (non-inv)');
 
 console.log('  G4a: OEn=H → outputs HiZ');
 {
-  const { world, chip, wm } = setupChipWithPower('74666');
+  const { world, chip, wm } = setupChipWithPower('74x666');
   connectPinsHigh(wm, chip, ['OEn','LE','CLR']);
   connectPinsHigh(wm, chip, ['D0','D1','D2','D3','D4','D5','D6','D7']);
   const sim = new CircuitSimulator();
@@ -202,7 +202,7 @@ console.log('  G4a: OEn=H → outputs HiZ');
 
 console.log('  G4b: CLR=L → Q all LOW (async clear), OEn=L');
 {
-  const { world, chip, wm } = setupChipWithPower('74666');
+  const { world, chip, wm } = setupChipWithPower('74x666');
   connectPinsLow(wm, chip, ['OEn','CLR']);
   connectPinsHigh(wm, chip, ['LE','D0','D1','D2','D3','D4','D5','D6','D7']);
   const sim = new CircuitSimulator();
@@ -213,7 +213,7 @@ console.log('  G4b: CLR=L → Q all LOW (async clear), OEn=L');
 
 console.log('  G4c: LE=H transparent → Q follows D');
 {
-  const { world, chip, wm } = setupChipWithPower('74666');
+  const { world, chip, wm } = setupChipWithPower('74x666');
   connectPinsLow(wm, chip, ['OEn']);
   connectPinsHigh(wm, chip, ['CLR','LE']);
   // D0,D2,D4,D6 = HIGH; D1,D3,D5,D7 = LOW
@@ -232,7 +232,7 @@ console.log('\nG5: 74667 - 8 bit transparent latch (inv)');
 
 console.log('  G5a: LE=H transparent → Q = NOT D');
 {
-  const { world, chip, wm } = setupChipWithPower('74667');
+  const { world, chip, wm } = setupChipWithPower('74x667');
   connectPinsLow(wm, chip, ['OEn']);
   connectPinsHigh(wm, chip, ['CLR','LE']);
   connectPinsHigh(wm, chip, ['D0','D1','D2','D3','D4','D5','D6','D7']);
@@ -244,7 +244,7 @@ console.log('  G5a: LE=H transparent → Q = NOT D');
 
 console.log('  G5b: CLR=L → Q all HIGH (inverting clear)');
 {
-  const { world, chip, wm } = setupChipWithPower('74667');
+  const { world, chip, wm } = setupChipWithPower('74x667');
   connectPinsLow(wm, chip, ['OEn','CLR']);
   connectPinsHigh(wm, chip, ['LE']);
   connectPinsLow(wm, chip,  ['D0','D1','D2','D3','D4','D5','D6','D7']);
@@ -258,7 +258,7 @@ console.log('  G5b: CLR=L → Q all HIGH (inverting clear)');
 console.log('\nG6: 74668 - Sync BCD up/down counter');
 console.log('  G6a: Count up from 0: CLK rising edges advance QA..QD');
 {
-  const { world, chip, wm } = setupChipWithPower('74668');
+  const { world, chip, wm } = setupChipWithPower('74x668');
   connectPinsHigh(wm, chip, ['UD','LOAD','ENP','ENT']); // UP=1, LOAD=1(no load), ENP=1, ENT=1
   connectPinsLow(wm, chip,  ['A','B','C','D']);
   const clkLo = connectPinToGnd(wm, findPin(chip, 'CLK'));
@@ -282,7 +282,7 @@ console.log('  G6a: Count up from 0: CLK rising edges advance QA..QD');
 console.log('\nG7: 74669 - Sync binary up/down counter');
 console.log('  G7a: Load 0b1010 (=10), read outputs');
 {
-  const { world, chip, wm } = setupChipWithPower('74669');
+  const { world, chip, wm } = setupChipWithPower('74x669');
   connectPinsHigh(wm, chip, ['UD','ENP','ENT']); // keep UP
   connectPinsLow(wm, chip,  ['LOAD']); // LOAD=L → load preset on CLK
   connectPinsHigh(wm, chip, ['B','D']); // B=1,D=1 → 0b1010 = 10
@@ -305,7 +305,7 @@ console.log('  G7a: Load 0b1010 (=10), read outputs');
 console.log('\nG8: 74670 - 4x4 Register File (TRI)');
 console.log('  G8a: Write then read word 0 = 0b1010');
 {
-  const { world, chip, wm } = setupChipWithPower('74670');
+  const { world, chip, wm } = setupChipWithPower('74x670');
   // Write addr 0 (WA1=0, WA2=0), data: D1=0(Q1),D2=1(Q2),D3=0(Q3),D4=1(Q4), WE=L
   connectPinsLow(wm,  chip, ['WE','WA1','WA2','D1','D3']);
   connectPinsHigh(wm, chip, ['D2','D4']);
@@ -321,7 +321,7 @@ console.log('  G8a: Write then read word 0 = 0b1010');
 
 console.log('  G8b: RE=H → outputs HiZ');
 {
-  const { world, chip, wm } = setupChipWithPower('74670');
+  const { world, chip, wm } = setupChipWithPower('74x670');
   connectPinsLow(wm, chip, ['WE','WA1','WA2','RA1','RA2']);
   connectPinsHigh(wm, chip, ['RE','D1','D2','D3','D4']);
   const sim = new CircuitSimulator();
@@ -333,7 +333,7 @@ console.log('  G8b: RE=H → outputs HiZ');
 // ── G9: 74671 / 74672 - 4 bit bidirectional SR stub ──────────────────────────
 console.log('\nG9: 74671/672 - 4 bit SR/latch stubs');
 {
-  for (const id of ['74671','74672']) {
+  for (const id of ['74x671','74x672']) {
     const { world, chip, wm } = setupChipWithPower(id);
     // OEn=L to enable outputs, CLK=L, CLR=H
     connectPinsLow(wm, chip, ['OEn']);
@@ -349,14 +349,14 @@ console.log('\nG9: 74671/672 - 4 bit SR/latch stubs');
 // ── G10: 74673/674/675/676 - 16 bit shift register stubs ─────────────────────
 console.log('\nG10: 74673/674/675/676 - 16 bit shift reg stubs (HiZ outputs)');
 {
-  for (const id of ['74673','74675']) {
+  for (const id of ['74x673','74x675']) {
     const { world, chip, wm } = setupChipWithPower(id);
     const sim = new CircuitSimulator();
     sim.evaluate(world, [chip], wm);
     assertPinHighZ(sim, chip, 'SOUT', `${id}: SOUT HiZ`);
     assertPinHighZ(sim, chip, 'Q0',   `${id}: Q0 HiZ`);
   }
-  for (const id of ['74674','74676']) {
+  for (const id of ['74x674','74x676']) {
     const { world, chip, wm } = setupChipWithPower(id);
     const sim = new CircuitSimulator();
     sim.evaluate(world, [chip], wm);
@@ -364,14 +364,28 @@ console.log('\nG10: 74673/674/675/676 - 16 bit shift reg stubs (HiZ outputs)');
   }
 }
 
-// ── G11: 74677 - 16 bit address comparator stub ───────────────────────────────
-console.log('\nG11: 74677 - 16 bit address comparator stub (HiZ outputs)');
+// ── G11: 74677 - 16 bit address comparator (behavioral) ──────────────────────
+// The 74677 has a real evaluator (ADDR_COMP_CASCADE). With every input
+// floating (TTL pull-ups), A = B = 0xFF and all three enables read HIGH
+// (inactive), so it actively drives the inactive levels: GEn HIGH, EQout LOW.
+// Pulling EQn LOW with A = B then asserts EQout HIGH.
+console.log('\nG11: 74677 - 16 bit address comparator (behavioral)');
 {
-  const { world, chip, wm } = setupChipWithPower('74677');
+  const { world, chip, wm } = setupChipWithPower('74x677');
   const sim = new CircuitSimulator();
   sim.evaluate(world, [chip], wm);
-  assertPinHighZ(sim, chip, 'GEn',   '74677: GEn HiZ');
-  assertPinHighZ(sim, chip, 'EQout', '74677: EQout HiZ');
+  const vGen = getPinVoltage(sim, findPin(chip, 'GEn'));
+  const vEq  = getPinVoltage(sim, findPin(chip, 'EQout'));
+  assert(vGen !== undefined && vGen > 2.5, `74677 idle: GEn driven HIGH (got ${vGen})`);
+  assert(vEq === undefined || vEq < 2.5,   `74677 idle: EQout LOW (got ${vEq})`);
+}
+{
+  const { world, chip, wm } = setupChipWithPower('74x677');
+  connectPinToGnd(wm, findPin(chip, 'EQn'));
+  const sim = new CircuitSimulator();
+  sim.evaluate(world, [chip], wm);
+  const vEq = getPinVoltage(sim, findPin(chip, 'EQout'));
+  assert(vEq !== undefined && vEq > 2.5, `74677 EQn=0, A=B: EQout HIGH (got ${vEq})`);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

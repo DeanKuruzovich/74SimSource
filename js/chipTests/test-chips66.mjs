@@ -73,21 +73,21 @@ function simulate(world, wm, chips) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const EXPECTED_IDS = [
-  '74406', '74408', '74418', '74419', '74450',
-  '74453', '74455', '74456', '74460', '74934',
+  '74x406', '74x408', '74x418', '74x419', '74x450',
+  '74x453', '74x455', '74x456', '74x460', '74x934',
 ];
 
 const EXPECTED_SPECS = {
-  '74406': { pins: 14, gnd:  7, vcc: 14 },
-  '74408': { pins: 14, gnd:  7, vcc: 14 },
-  '74418': { pins: 16, gnd:  8, vcc: 16 },
-  '74419': { pins: 16, gnd:  8, vcc: 16 },
-  '74450': { pins: 16, gnd:  8, vcc: 16 },
-  '74453': { pins: 16, gnd:  8, vcc: 16 },
-  '74455': { pins: 24, gnd: 12, vcc: 24 },
-  '74456': { pins: 16, gnd:  8, vcc: 16 },
-  '74460': { pins: 16, gnd:  8, vcc: 16 },
-  '74934': { pins: 28, gnd: 14, vcc: 28 },
+  '74x406': { pins: 14, gnd:  7, vcc: 14 },
+  '74x408': { pins: 14, gnd:  7, vcc: 14 },
+  '74x418': { pins: 16, gnd:  8, vcc: 16 },
+  '74x419': { pins: 16, gnd:  8, vcc: 16 },
+  '74x450': { pins: 16, gnd:  8, vcc: 16 },
+  '74x453': { pins: 16, gnd:  8, vcc: 16 },
+  '74x455': { pins: 24, gnd: 12, vcc: 24 },
+  '74x456': { pins: 16, gnd:  8, vcc: 16 },
+  '74x460': { pins: 16, gnd:  8, vcc: 16 },
+  '74x934': { pins: 28, gnd: 14, vcc: 28 },
 };
 
 console.log('── S: Structure ─────────────');
@@ -106,7 +106,7 @@ console.log('── S: Structure ─────────────');
     assert(Array.isArray(c.tags) && c.tags.length >= 1, `S.tags: ${id}`);
   }
   // Verify skipped chips are NOT present
-  for (const skipped of ['74131', '74416', '74424']) {
+  for (const skipped of ['74x131', '74x416', '74x424']) {
     assert(CHIPS_BLOCK_66[skipped] === undefined, `S.skip: ${skipped} should NOT be present`);
   }
 }
@@ -238,8 +238,8 @@ console.log('── T: Tags ─────────────────'
 // ─────────────────────────────────────────────────────────────────────────────
 console.log('── SEQ: Sequential flags ───');
 {
-  const SEQUENTIAL_IDS = ['74418', '74419', '74450', '74453', '74455'];
-  const COMBINATIONAL_IDS = ['74406', '74408', '74456', '74460', '74934'];
+  const SEQUENTIAL_IDS = ['74x418', '74x419', '74x450', '74x453', '74x455'];
+  const COMBINATIONAL_IDS = ['74x406', '74x408', '74x456', '74x460', '74x934'];
 
   for (const id of SEQUENTIAL_IDS) {
     const c = CHIPS_BLOCK_66[id];
@@ -253,13 +253,13 @@ console.log('── SEQ: Sequential flags ───');
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SECTION OC - Open-collector flag
+// SECTION OC - Open collector flag
 // ─────────────────────────────────────────────────────────────────────────────
-console.log('── OC: Open-collector flags ');
+console.log('── OC: Open collector flags ');
 {
   // Only 74450 has openCollector
-  assert(CHIPS_BLOCK_66['74450'].openCollector === true, 'OC.74450: should have openCollector=true');
-  for (const id of EXPECTED_IDS.filter(i => i !== '74450')) {
+  assert(CHIPS_BLOCK_66['74x450'].openCollector === true, 'OC.74450: should have openCollector=true');
+  for (const id of EXPECTED_IDS.filter(i => i !== '74x450')) {
     const c = CHIPS_BLOCK_66[id];
     assert(!c.openCollector, `OC.${id}: should NOT have openCollector`);
   }
@@ -348,9 +348,9 @@ console.log('── MC: Multi-chip sim ──────');
 // ─────────────────────────────────────────────────────────────────────────────
 console.log('── PI: Pinout integrity ────');
 {
-  // 74406: 3-to-8 decoder
+  // 74406: 3 to 8 decoder
   {
-    const c = CHIPS_BLOCK_66['74406'];
+    const c = CHIPS_BLOCK_66['74x406'];
     const inPins = c.pinout.filter(p => p.type === 'input');
     const outPins = c.pinout.filter(p => p.type === 'output');
     assert(inPins.length === 4, 'PI.74406: 4 inputs (A0,A1,A2,EN)');
@@ -359,7 +359,7 @@ console.log('── PI: Pinout integrity ────');
 
   // 74408: 8 bit parity tree
   {
-    const c = CHIPS_BLOCK_66['74408'];
+    const c = CHIPS_BLOCK_66['74x408'];
     const inPins = c.pinout.filter(p => p.type === 'input');
     const outPins = c.pinout.filter(p => p.type === 'output');
     assert(inPins.length === 8, 'PI.74408: 8 inputs (D0-D7)');
@@ -368,7 +368,7 @@ console.log('── PI: Pinout integrity ────');
 
   // 74418: Mod-16 counter
   {
-    const c = CHIPS_BLOCK_66['74418'];
+    const c = CHIPS_BLOCK_66['74x418'];
     const inPins = c.pinout.filter(p => p.type === 'input');
     const outPins = c.pinout.filter(p => p.type === 'output');
     assert(inPins.length === 7, 'PI.74418: 7 inputs (CLK,PL,CLR,P0-P3)');
@@ -377,7 +377,7 @@ console.log('── PI: Pinout integrity ────');
 
   // 74419: Dual mod-4 counter
   {
-    const c = CHIPS_BLOCK_66['74419'];
+    const c = CHIPS_BLOCK_66['74x419'];
     const inPins = c.pinout.filter(p => p.type === 'input');
     const outPins = c.pinout.filter(p => p.type === 'output');
     assert(inPins.length === 8, 'PI.74419: 8 inputs');
@@ -386,7 +386,7 @@ console.log('── PI: Pinout integrity ────');
 
   // 74450: Counter/7-seg OC
   {
-    const c = CHIPS_BLOCK_66['74450'];
+    const c = CHIPS_BLOCK_66['74x450'];
     const inPins = c.pinout.filter(p => p.type === 'input');
     const outPins = c.pinout.filter(p => p.type === 'output');
     assert(inPins.length === 3, 'PI.74450: 3 inputs (CLK,LE,RST)');
@@ -395,7 +395,7 @@ console.log('── PI: Pinout integrity ────');
 
   // 74453: Dual binary counter
   {
-    const c = CHIPS_BLOCK_66['74453'];
+    const c = CHIPS_BLOCK_66['74x453'];
     const inPins = c.pinout.filter(p => p.type === 'input');
     const outPins = c.pinout.filter(p => p.type === 'output');
     assert(inPins.length === 4, 'PI.74453: 4 inputs (CLK1,CLR1,CLK2,CLR2)');
@@ -404,7 +404,7 @@ console.log('── PI: Pinout integrity ────');
 
   // 74455: Dual up/down counter
   {
-    const c = CHIPS_BLOCK_66['74455'];
+    const c = CHIPS_BLOCK_66['74x455'];
     const inPins = c.pinout.filter(p => p.type === 'input');
     const outPins = c.pinout.filter(p => p.type === 'output');
     assert(inPins.length === 12, 'PI.74455: 12 inputs');
@@ -413,7 +413,7 @@ console.log('── PI: Pinout integrity ────');
 
   // 74456: 4 bit NBCD adder
   {
-    const c = CHIPS_BLOCK_66['74456'];
+    const c = CHIPS_BLOCK_66['74x456'];
     const inPins = c.pinout.filter(p => p.type === 'input');
     const outPins = c.pinout.filter(p => p.type === 'output');
     assert(inPins.length === 9, 'PI.74456: 9 inputs (A0-A3,B0-B3,CIN)');
@@ -422,7 +422,7 @@ console.log('── PI: Pinout integrity ────');
 
   // 74460: 4 bit bus switch
   {
-    const c = CHIPS_BLOCK_66['74460'];
+    const c = CHIPS_BLOCK_66['74x460'];
     const inPins = c.pinout.filter(p => p.type === 'input');
     const outPins = c.pinout.filter(p => p.type === 'output');
     // All signal pins are 'input' since bus switch is bidirectional
@@ -432,12 +432,12 @@ console.log('── PI: Pinout integrity ────');
 
   // 74934: ADC
   {
-    const c = CHIPS_BLOCK_66['74934'];
+    const c = CHIPS_BLOCK_66['74x934'];
     const inPins = c.pinout.filter(p => p.type === 'input');
     const outPins = c.pinout.filter(p => p.type === 'output');
     assert(inPins.length === 17, 'PI.74934: 17 inputs');
     assert(outPins.length === 9, 'PI.74934: 9 outputs (INT,D0-D7)');
-    assert(c.pins === 28, 'PI.74934: 28-pin package');
+    assert(c.pins === 28, 'PI.74934: 28 pin package');
   }
 }
 

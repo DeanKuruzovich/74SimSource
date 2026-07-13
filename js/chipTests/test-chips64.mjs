@@ -1,6 +1,6 @@
 // test-chips64.mjs - Tests for all chips defined in js/chips/chips64.js
 // Implemented: 74x9014, 74x9015, 74x9034, 74x9035, 74x9114, 74x9115, 74x9134,
-//              74x8244, 74x8245, 74x8373, 74x8374, 74x8541, 74x8996, 74x9046
+//              74x8244, 74x8245, 74x8373, 74x8374, 74x8541, 74x8996
 // Stubs: 74x8980, 74x9000
 
 import { CHIPS_BLOCK_64 } from '../chips/chips64.js';
@@ -76,7 +76,7 @@ function simulate(world, wm, chips) {
 const EXPECTED_IDS = [
   '74x8244', '74x8245', '74x8373', '74x8374', '74x8541',
   '74x8980', '74x8996', '74x9000', '74x9014', '74x9015',
-  '74x9034', '74x9035', '74x9046', '74x9114', '74x9115', '74x9134',
+  '74x9034', '74x9035', '74x9114', '74x9115', '74x9134',
 ];
 
 const EXPECTED_SPECS = {
@@ -92,7 +92,6 @@ const EXPECTED_SPECS = {
   '74x9015': { pins: 20, gnd: 10, vcc: 20 },
   '74x9034': { pins: 20, gnd: 10, vcc: 20 },
   '74x9035': { pins: 20, gnd: 10, vcc: 20 },
-  '74x9046': { pins: 16, gnd:  8, vcc: 16 },
   '74x9114': { pins: 20, gnd: 10, vcc: 20 },
   '74x9115': { pins: 20, gnd: 10, vcc: 20 },
   '74x9134': { pins: 20, gnd: 10, vcc: 20 },
@@ -102,10 +101,10 @@ const OC_CHIPS = ['74x9114', '74x9115', '74x9134'];
 
 console.log('\n=== SECTION S: Structure ===');
 
-// S1 - 16 entries
+// S1 - 15 entries
 {
   const keys = Object.keys(CHIPS_BLOCK_64);
-  assert(keys.length === 16, `S1: block has ${keys.length} entries, expected 16`);
+  assert(keys.length === 15, `S1: block has ${keys.length} entries, expected 15`);
 }
 // S2 - All expected IDs present
 for (const id of EXPECTED_IDS) {
@@ -594,7 +593,7 @@ console.log('\n=== SECTION J: JTAG chips ===');
 
 const JTAG_CHIPS = ['74x8244', '74x8245', '74x8373', '74x8374'];
 
-// J1 - JTAG chips are 24-pin
+// J1 - JTAG chips are 24 pin
 for (const id of JTAG_CHIPS) {
   const def = CHIPS_BLOCK_64[id];
   assert(def.pins === 24, `J1-${id}: 24 pins`);
@@ -617,10 +616,10 @@ for (const id of JTAG_CHIPS) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SECTION K - 74x8244 (Octal Non-Inverting Buffer + JTAG)
+// SECTION K - 74x8244 (Octal Non Inverting Buffer + JTAG)
 // ─────────────────────────────────────────────────────────────────────────────
 
-console.log('\n=== SECTION K: 74x8244 Octal Non-Inverting Buffer ===');
+console.log('\n=== SECTION K: 74x8244 Octal Non Inverting Buffer ===');
 
 {
   const chipId = '74x8244';
@@ -649,7 +648,7 @@ console.log('\n=== SECTION K: 74x8244 Octal Non-Inverting Buffer ===');
     }
   }
 
-  // K3 - 1OE HIGH (group 1 tri-stated), 2OE LOW → group 2 still active
+  // K3 - 1OE HIGH (group 1 tri stated), 2OE LOW → group 2 still active
   {
     const { world, chip, wm } = setupChipWithPower(chipId);
     connectHigh(wm, chip, '1OE'); connectLow(wm, chip, '2OE');
@@ -660,7 +659,7 @@ console.log('\n=== SECTION K: 74x8244 Octal Non-Inverting Buffer ===');
     }
   }
 
-  // K4 - 1OE LOW, 2OE HIGH → group 1 active, group 2 tri-stated
+  // K4 - 1OE LOW, 2OE HIGH → group 1 active, group 2 tri stated
   {
     const { world, chip, wm } = setupChipWithPower(chipId);
     connectLow(wm, chip, '1OE'); connectHigh(wm, chip, '2OE');
@@ -802,10 +801,10 @@ console.log('\n=== SECTION M: 74x8373 Octal Transparent Latch ===');
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SECTION N - 74x8374 (Octal D Flip-Flop + JTAG)
+// SECTION N - 74x8374 (Octal D Flip Flop + JTAG)
 // ─────────────────────────────────────────────────────────────────────────────
 
-console.log('\n=== SECTION N: 74x8374 Octal D Flip-Flop ===');
+console.log('\n=== SECTION N: 74x8374 Octal D Flip Flop ===');
 
 {
   const chipId = '74x8374';
@@ -872,7 +871,7 @@ console.log('\n=== SECTION O: 74x8541 Selectable Inversion Buffer ===');
 {
   const chipId = '74x8541';
 
-  // O1 - OE1=LOW, INV=LOW → non-inverting (Y=A)
+  // O1 - OE1=LOW, INV=LOW → non inverting (Y=A)
   {
     const { world, chip, wm } = setupChipWithPower(chipId);
     connectLow(wm, chip, 'OE1'); connectLow(wm, chip, 'INV');
@@ -931,7 +930,7 @@ console.log('\n=== SECTION O: 74x8541 Selectable Inversion Buffer ===');
     }
   }
 
-  // O6 - alternating inputs with INV=LOW (non-inverting)
+  // O6 - alternating inputs with INV=LOW (non inverting)
   {
     const { world, chip, wm } = setupChipWithPower(chipId);
     connectLow(wm, chip, 'OE1'); connectLow(wm, chip, 'INV');
@@ -1032,101 +1031,6 @@ console.log('\n=== SECTION Q: 74x8996 JTAG ASP ===');
   {
     const def = CHIPS_BLOCK_64[chipId];
     assert(def.tags.includes('jtag'), 'Q5: 74x8996 has jtag tag');
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// SECTION P - 74x9046 PLL
-// ─────────────────────────────────────────────────────────────────────────────
-
-console.log('\n=== SECTION P: 74x9046 PLL ===');
-
-{
-  const chipId = '74x9046';
-
-  // P1 - gate structure: one PLL_9046 gate
-  {
-    const def = CHIPS_BLOCK_64[chipId];
-    assert(def.gates.length === 1, 'P1: 74x9046 has 1 gate');
-    assert(def.gates[0].type === 'PLL_9046', 'P1: gate type is PLL_9046');
-  }
-
-  // P2 - PC1out = SIGin XOR COMPin (XOR phase comparator)
-  {
-    const { world, chip, wm } = setupChipWithPower(chipId);
-    connectHigh(wm, chip, 'SIGin'); connectLow(wm, chip, 'COMPin');
-    connectLow(wm, chip, 'INH');
-    const sim = simulate(world, wm, chip);
-    assertPinHigh(sim, chip, 'PC1out', 'P2a: SIG=H COMPin=L → PC1=H');
-    assertPinLow(sim, chip,  'PC3out', 'P2a: SIG=H COMPin=L → PC3=L');
-  }
-  {
-    const { world, chip, wm } = setupChipWithPower(chipId);
-    connectHigh(wm, chip, 'SIGin'); connectHigh(wm, chip, 'COMPin');
-    connectLow(wm, chip, 'INH');
-    const sim = simulate(world, wm, chip);
-    assertPinLow(sim, chip,  'PC1out', 'P2b: SIG=H COMPin=H → PC1=L');
-    assertPinHigh(sim, chip, 'PC3out', 'P2b: SIG=H COMPin=H → PC3=H');
-  }
-  {
-    const { world, chip, wm } = setupChipWithPower(chipId);
-    connectLow(wm, chip, 'SIGin'); connectLow(wm, chip, 'COMPin');
-    connectLow(wm, chip, 'INH');
-    const sim = simulate(world, wm, chip);
-    assertPinLow(sim, chip,  'PC1out', 'P2c: SIG=L COMPin=L → PC1=L');
-    assertPinHigh(sim, chip, 'PC3out', 'P2c: SIG=L COMPin=L → PC3=H');
-  }
-
-  // P3 - LD: high when SIGin === COMPin, low when different
-  {
-    const { world, chip, wm } = setupChipWithPower(chipId);
-    connectHigh(wm, chip, 'SIGin'); connectHigh(wm, chip, 'COMPin');
-    connectLow(wm, chip, 'INH');
-    const sim = simulate(world, wm, chip);
-    assertPinHigh(sim, chip, 'LD', 'P3a: SIG=H COMPin=H → LD=H (locked)');
-  }
-  {
-    const { world, chip, wm } = setupChipWithPower(chipId);
-    connectLow(wm, chip, 'SIGin'); connectLow(wm, chip, 'COMPin');
-    connectLow(wm, chip, 'INH');
-    const sim = simulate(world, wm, chip);
-    assertPinHigh(sim, chip, 'LD', 'P3b: SIG=L COMPin=L → LD=H (locked)');
-  }
-  {
-    const { world, chip, wm } = setupChipWithPower(chipId);
-    connectHigh(wm, chip, 'SIGin'); connectLow(wm, chip, 'COMPin');
-    connectLow(wm, chip, 'INH');
-    const sim = simulate(world, wm, chip);
-    assertPinLow(sim, chip, 'LD', 'P3c: SIG=H COMPin=L → LD=L (unlocked)');
-  }
-
-  // P4 - VCOout: follows SIGin when INH=L; LOW when INH=H
-  {
-    const { world, chip, wm } = setupChipWithPower(chipId);
-    connectHigh(wm, chip, 'SIGin'); connectLow(wm, chip, 'COMPin');
-    connectLow(wm, chip, 'INH');
-    const sim = simulate(world, wm, chip);
-    assertPinHigh(sim, chip, 'VCOout', 'P4a: INH=L, SIG=H → VCOout=H');
-  }
-  {
-    const { world, chip, wm } = setupChipWithPower(chipId);
-    connectLow(wm, chip, 'SIGin'); connectLow(wm, chip, 'COMPin');
-    connectLow(wm, chip, 'INH');
-    const sim = simulate(world, wm, chip);
-    assertPinLow(sim, chip, 'VCOout', 'P4b: INH=L, SIG=L → VCOout=L');
-  }
-  {
-    const { world, chip, wm } = setupChipWithPower(chipId);
-    connectHigh(wm, chip, 'SIGin'); connectLow(wm, chip, 'COMPin');
-    connectHigh(wm, chip, 'INH');
-    const sim = simulate(world, wm, chip);
-    assertPinLow(sim, chip, 'VCOout', 'P4c: INH=H, SIG=H → VCOout=L (inhibited)');
-  }
-
-  // P5 - tags include 'pll'
-  {
-    const def = CHIPS_BLOCK_64[chipId];
-    assert(def.tags.includes('pll'), 'P5: 74x9046 has pll tag');
   }
 }
 

@@ -82,7 +82,7 @@ class Component {
 //   Top row  (row 4, E): pin N, N-1, ... N/2+1  (left → right)
 //   Bottom row(row 5, F): pin 1,  2, ...   N/2  (left → right)
 //
-// So for a 14-pin DIP:
+// So for a 14 pin DIP:
 //   Top:    VCC(14) 13 12 11 10 9 8
 //   Bottom:  1A(1)   2  3  4  5 6 GND(7)
 
@@ -93,7 +93,7 @@ export class ChipComponent extends Component {
     this.chipId = chipId;
     this.chipDef = def;
     this.colSpan = def ? def.pins / 2 : 7;
-    // Sequential state for flip-flops and latches.
+    // Sequential state for flip flops and latches.
     this.ffState = new Map();
     // Sequential state for memory devices like the 7489.
     this.ramState = null;
@@ -118,7 +118,11 @@ export class ChipComponent extends Component {
         col = this.col + (i - half);
         row = 5; // Row F (top of bottom half)
       }
-      const pinDef = this.chipDef.pinout[pinDefIndex];
+      // Guard against malformed defs whose pinout array is shorter than the
+      // declared pin count (a few stub chips ship with partial pinouts).
+      // Synthesize an NC placeholder so placement can't crash.
+      const pinDef = this.chipDef.pinout[pinDefIndex] ||
+        { pin: pinDefIndex + 1, name: `NC_P${pinDefIndex + 1}`, type: 'nc' };
       this.pins.push({
         pinIndex: pinDefIndex,
         pin: pinDef.pin,
@@ -160,6 +164,8 @@ export class LEDComponent extends Component {
   constructor(color = 'red') {
     super(COMP.LED, 'LED');
     this.lit = false;
+    this.brightness = 0;     // 0..1, derived from MNA current; renderer fades by this
+    this.overdrive = false;  // true when current exceeds rated max → red warning ring
     this.color = color;
     this.startHoleId = null;
     this.endHoleId = null;
@@ -185,7 +191,7 @@ export class LEDComponent extends Component {
   }
 }
 
-// ── 7-Segment Display ────────────────────────────────────────────────────────
+// ── 7 Segment Display ────────────────────────────────────────────────────────
 // 10 pins: a-g segments, dp, and 2 common pins
 // Lays out as a DIP-like package spanning the channel
 
@@ -193,6 +199,8 @@ export class SevenSegComponent extends Component {
   constructor(commonAnode = true, displayName = '7-SEG') {
     super(COMP.SEVEN_SEG, displayName);
     this.segments = { a: 0, b: 0, c: 0, d: 0, e: 0, f: 0, g: 0, dp: 0 };
+    this.segmentBrightness = { a: 0, b: 0, c: 0, d: 0, e: 0, f: 0, g: 0, dp: 0 };
+    this.segmentOverdrive  = { a: false, b: false, c: false, d: false, e: false, f: false, g: false, dp: false };
     this.commonAnode = commonAnode;
   }
 
@@ -201,7 +209,7 @@ export class SevenSegComponent extends Component {
   }
 
   computePins() {
-    // 10-pin layout, 5 per side, straddling the channel like a DIP
+    // 10 pin layout, 5 per side, straddling the channel like a DIP
     // Top row (row 2): indices 0-4 left to right → g, f, COM1, a, b
     // Bottom row (row 6): indices 5-9 right to left col-wise → dp, c, COM2, d, e
     const pinNames = [
@@ -253,7 +261,7 @@ export class SevenSegComponent extends Component {
   isValidAnchor(row) { return row === 4; }
 }
 
-// ── Button (Momentary, 4-pin Tactile) ────────────────────────────────────────
+// ── Button (Momentary, 4 pin Tactile) ────────────────────────────────────────
 // Two orientations:
 // Horizontal (vertical=false): 3 col gap × 2 row gap. colSpan=4.
 //   TL=(col, row), TR=(col+3, row), BL=(col, row+2), BR=(col+3, row+2)
@@ -418,14 +426,73 @@ export class SlideSwitchComponent extends Component {
   }
 }
 
+// ── DIP Switch Component ─────────────────────────────────────────────────────
+// N individual SPST switches in a DIP package. Straddles the center channel
+// like a chip (row 4 = E, row 5 = F). Each switch i connects top pin i to
+// bottom pin i (same column) when closed.
+
+export class DipSwitchComponent extends Component {
+  constructor(count = 4) {
+    super(COMP.DIP_SWITCH, `DIP${count}`);
+    this.count = count;
+    this.states = new Array(count).fill(false); // false = open, true = closed
+    this.colSpan = count;
+  }
+
+  computePins() {
+    this.pins = [];
+    // Top row (D = row 3, second from bottom of top half)
+    for (let i = 0; i < this.count; i++) {
+      this.pins.push({
+        pinIndex: i,
+        name: `${i + 1}T`,
+        type: 'passive',
+        holeId: holeId(this.tileX, this.tileY, 'main', this.col + i, 3),
+      });
+    }
+    // Bottom row (G = row 6, second from top of bottom half)
+    for (let i = 0; i < this.count; i++) {
+      this.pins.push({
+        pinIndex: this.count + i,
+        name: `${i + 1}B`,
+        type: 'passive',
+        holeId: holeId(this.tileX, this.tileY, 'main', this.col + i, 6),
+      });
+    }
+  }
+
+  isValidAnchor(row) {
+    return row === 4; // anchor stays at channel; pins extend to rows 3 and 6
+  }
+
+  getOccupiedHoles() {
+    // Block all 4 rows the body covers (D=3, E=4, F=5, G=6) at each column
+    const holes = [];
+    for (let i = 0; i < this.count; i++) {
+      for (const row of [3, 4, 5, 6]) {
+        holes.push(holeId(this.tileX, this.tileY, 'main', this.col + i, row));
+      }
+    }
+    return holes;
+  }
+
+  serialize() {
+    return { ...super.serialize(), count: this.count, states: [...this.states] };
+  }
+}
+
 // ── Clock Component ───────────────────────────────────────────────────────────
-// Single-pin clock source. Drives its output HIGH then LOW at a set frequency.
-// Assumed internally powered no VCC/GND connection required.
+// Single-pin push-pull clock source. The one CLK terminal is internally switched
+// between 5V (push) and GND (pull) at the set frequency, so it is always
+// actively driven and never needs a pull-up/pull-down. Assumed internally
+// powered no VCC/GND connection required. Driven via DRIVE.PUSH_PULL in
+// simulator.js (_drivePinBit at the start of each evaluate).
 
 export class ClockComponent extends Component {
-  constructor(frequencyHz = 1) {
+  constructor(frequencyHz = 1, dutyCycle = 0.5) {
     super(COMP.CLOCK, 'CLK');
     this.frequencyHz = frequencyHz;
+    this.dutyCycle = dutyCycle; // fraction of period spent HIGH, 0.01–0.99
     this.high = false; // current output state, updated by simulator
   }
 
@@ -436,7 +503,32 @@ export class ClockComponent extends Component {
   }
 
   serialize() {
-    return { ...super.serialize(), frequencyHz: this.frequencyHz };
+    return { ...super.serialize(), frequencyHz: this.frequencyHz, dutyCycle: this.dutyCycle };
+  }
+}
+
+// ── Test Point Component ─────────────────────────────────────────────────────
+// Single-hole passive probe. It senses its net without driving or loading it
+// (no drive state, no pull-up — electrically invisible to the solver). On the
+// board it lights up like a wire terminal when the net is above the family
+// VIH; in Timing Analysis mode it becomes a labelled recorder lane
+// on the timing diagram (js/timing.js auto-watches every placed test point).
+
+export class TestPointComponent extends Component {
+  constructor(label = '') {
+    super(COMP.TESTPOINT, 'TP');
+    this.label = label;        // auto-assigned "TP1", "TP2", … at placement
+    this.color = '#f39c12';    // lane color, auto-cycled at placement
+  }
+
+  computePins() {
+    this.pins = [
+      { pinIndex: 0, name: 'TP', type: 'sense', holeId: holeId(this.tileX, this.tileY, 'main', this.col, this.row) },
+    ];
+  }
+
+  serialize() {
+    return { ...super.serialize(), label: this.label, color: this.color };
   }
 }
 
@@ -567,6 +659,51 @@ export class PolarizedCapacitorComponent extends Component {
   }
 }
 
+// ── Inductor Component ───────────────────────────────────────────────────────
+// 2 pins placed on any two holes (wire-like). Click to change inductance.
+// Electrical dual of the capacitor: remembers the current flowing through it
+// (iPrev, amps, signed pin A → pin B) instead of the voltage across it.
+
+export class InductorComponent extends Component {
+  constructor(inductance = 10e-3) {
+    super(COMP.INDUCTOR, 'L');
+    this.inductance = inductance; // henries
+    this.startHoleId = null;
+    this.endHoleId = null;
+    // Time-domain state: current through the inductor at previous time step
+    this.iPrev = 0;
+  }
+
+  placeWireLike(startHoleId, endHoleId) {
+    this.startHoleId = startHoleId;
+    this.endHoleId = endHoleId;
+    this.placed = true;
+    this.computePins();
+  }
+
+  computePins() {
+    if (!this.startHoleId || !this.endHoleId) return;
+    this.pins = [
+      { pinIndex: 0, name: 'A', type: 'passive', holeId: this.startHoleId },
+      { pinIndex: 1, name: 'B', type: 'passive', holeId: this.endHoleId },
+    ];
+  }
+
+  setInductance(l) {
+    this.inductance = l;
+  }
+
+  getLabel() {
+    if (this.inductance >= 1) return this.inductance.toFixed(1) + 'H';
+    if (this.inductance >= 1e-3) return (this.inductance * 1e3).toFixed(1) + 'mH';
+    return (this.inductance * 1e6).toFixed(1) + 'µH';
+  }
+
+  serialize() {
+    return { id: this.id, type: this.type, inductance: this.inductance, startHoleId: this.startHoleId, endHoleId: this.endHoleId };
+  }
+}
+
 export class DiodeComponent extends Component {
   constructor() {
     super(COMP.DIODE, 'D');
@@ -596,6 +733,53 @@ export class DiodeComponent extends Component {
   }
 }
 
+// ── Crystal Component ────────────────────────────────────────────────────────
+// 2-pin quartz crystal in an HC-49 can, placed wire-like between two holes.
+// A real bare crystal is passive and needs an external inverter loop to swing;
+// here it's idealized as a self-running, fixed-frequency clock source so it's
+// useful on its own. Pin A (OUT) emits the square wave; pin B is the ground
+// reference leg. Duty is FIXED at 50% — that's what a crystal buys you. The
+// frequency is set per-part (click / right-click panel), which models
+// swapping in a different crystal can, not tuning one.
+export class CrystalComponent extends Component {
+  constructor(frequencyHz = 10) {
+    super(COMP.CRYSTAL, 'XTAL');
+    this.frequencyHz = frequencyHz;
+    this.high = false; // current OUT state, updated by simulator
+    this.startHoleId = null;
+    this.endHoleId = null;
+  }
+
+  placeWireLike(startHoleId, endHoleId) {
+    this.startHoleId = startHoleId;
+    this.endHoleId = endHoleId;
+    this.placed = true;
+    this.computePins();
+  }
+
+  computePins() {
+    if (!this.startHoleId || !this.endHoleId) return;
+    this.pins = [
+      { pinIndex: 0, name: 'OUT', type: 'output',  holeId: this.startHoleId },
+      { pinIndex: 1, name: 'GND', type: 'passive', holeId: this.endHoleId },
+    ];
+  }
+
+  getLabel() {
+    // Up to 3 decimals, trailing zeros trimmed, so the classic watch crystal
+    // reads "32.768 kHz" rather than a rounded "32.8 kHz".
+    const f = this.frequencyHz;
+    const fmt = (v) => parseFloat(v.toFixed(3)).toString();
+    if (f >= 1e6) return fmt(f / 1e6) + ' MHz';
+    if (f >= 1e3) return fmt(f / 1e3) + ' kHz';
+    return fmt(f) + ' Hz';
+  }
+
+  serialize() {
+    return { id: this.id, type: this.type, frequencyHz: this.frequencyHz, startHoleId: this.startHoleId, endHoleId: this.endHoleId };
+  }
+}
+
 // ── Factory ──────────────────────────────────────────────────────────────────
 
 export function createComponent(type, subtype) {
@@ -607,11 +791,15 @@ export function createComponent(type, subtype) {
     case COMP.PUSH_BUTTON: return new PushButtonComponent();
     case COMP.SWITCH: return new SwitchComponent();
     case COMP.SLIDE_SWITCH: return new SlideSwitchComponent();
+    case COMP.DIP_SWITCH: return new DipSwitchComponent(typeof subtype === 'number' ? subtype : 4);
     case COMP.RESISTOR: return new ResistorComponent();
     case COMP.CAPACITOR: return new CapacitorComponent();
     case COMP.POLARIZED_CAPACITOR: return new PolarizedCapacitorComponent();
+    case COMP.INDUCTOR: return new InductorComponent();
     case COMP.DIODE: return new DiodeComponent();
     case COMP.CLOCK: return new ClockComponent();
+    case COMP.CRYSTAL: return new CrystalComponent();
+    case COMP.TESTPOINT: return new TestPointComponent();
     default: return null;
   }
 }
@@ -637,15 +825,27 @@ export function deserializeComponent(data) {
     case COMP.PUSH_BUTTON: comp = new PushButtonComponent(); break;
     case COMP.SWITCH: comp = new SwitchComponent(); comp.on = data.on || false; break;
     case COMP.SLIDE_SWITCH: comp = new SlideSwitchComponent(); comp.state = data.state ?? 1; break;
+    case COMP.DIP_SWITCH: {
+      comp = new DipSwitchComponent(data.count || 4);
+      if (Array.isArray(data.states)) comp.states = [...data.states];
+      break;
+    }
     case COMP.RESISTOR: comp = new ResistorComponent(data.resistance || 1000); break;
     case COMP.CAPACITOR: comp = new CapacitorComponent(data.capacitance || 100e-9); break;
     case COMP.POLARIZED_CAPACITOR: comp = new PolarizedCapacitorComponent(data.capacitance || 10e-6); break;
+    case COMP.INDUCTOR: comp = new InductorComponent(data.inductance || 10e-3); break;
     case COMP.DIODE: comp = new DiodeComponent(); break;
-    case COMP.CLOCK: comp = new ClockComponent(data.frequencyHz || 1); break;
+    case COMP.CLOCK: comp = new ClockComponent(data.frequencyHz || 1, data.dutyCycle ?? 0.5); break;
+    case COMP.CRYSTAL: comp = new CrystalComponent(data.frequencyHz || 10); break;
+    case COMP.TESTPOINT: {
+      comp = new TestPointComponent(data.label || '');
+      if (data.color) comp.color = data.color;
+      break;
+    }
     default: return null;
   }
   comp.id = data.id;
-  // Wire-like 2-pin components
+  // Wire-like 2 pin components
   if (data.startHoleId && data.endHoleId && comp.placeWireLike) {
     comp.placeWireLike(data.startHoleId, data.endHoleId);
   } else if (data.col !== undefined) {

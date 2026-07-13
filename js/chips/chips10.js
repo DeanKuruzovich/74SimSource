@@ -8,7 +8,7 @@ export const CHIPS_BLOCK_10 = {
   // ── 74x94: 4 bit shift register, dual async presets, 16-pin ───────────────
   /* Primary source: Texas Instruments, SN7494 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn7494.pdf
      Shift register concept: https://en.wikipedia.org/wiki/Shift_register */
-  '7494': {
+  '74x94': {
     name: '74x94',
     simpleName: '4 bit Shift Reg (dual preset)',
     description: '4 bit right-shift register with dual asynchronous parallel presets (16-pin)',
@@ -17,7 +17,7 @@ export const CHIPS_BLOCK_10 = {
     gnd: 8,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn7494.pdf',
     tags: ['shift register', '4 bit', 'sequential', 'preset'],
-    guideOverview: 'The 7494 is a 4 bit right-shift register with two independent asynchronous parallel-preset inputs. Either preset group (P1 or P2) can be gated with its strobe (S1 or S2) to force specific bit patterns into the register without waiting for a clock edge. Use it when you need fast, gated loading of a 4 bit value into a serial pipeline.',
+    guideOverview: 'The 74x94 is a 4 bit right-shift register with two independent asynchronous parallel preset inputs. Either preset group (P1 or P2) can be gated with its strobe (S1 or S2) to force specific bit patterns into the register without waiting for a clock edge. Use it when you need fast, gated loading of a 4 bit value into a serial pipeline.',
     guidePinDescriptions: {
       P1A:  'Preset data bit A for preset group 1.',
       P1B:  'Preset data bit B for preset group 1.',
@@ -31,7 +31,7 @@ export const CHIPS_BLOCK_10 = {
       S2:   'Active HIGH strobe that enables preset group 2 to load P2A P2D asynchronously.',
       SER:  'Serial data input shifted into the register on each rising clock edge.',
       CLR:  'CLR (active LOW). Asynchronous clear; forces all bits LOW immediately.',
-      CLK:  'Rising-edge clock that shifts the register one position toward QD.',
+      CLK:  'Rising edge clock that shifts the register one position toward QD.',
       QD:   'Serial output of the last (4th) stage.',
       GND:  'Ground reference (pin 8).',
       VCC:  'Positive supply (+5 V) at pin 16.',
@@ -68,62 +68,94 @@ export const CHIPS_BLOCK_10 = {
     sequential: true,
   },
 
-  // ── 74x96: 5 bit PIPO shift register, async preset, 16-pin ────────────────
-  /* Primary source: Texas Instruments, SN74LS96 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls96.pdf
+  // ── 74x96: 5 bit shift register, async set-only preset + clear, 16-pin ────
+  /* Source: Texas Instruments, "SN5496, SN54LS96, SN7496, SN74LS96 5-Bit Shift
+       Registers", SDLS946 (March 1974, revised March 1988). [Online]. Available:
+       https://unicornelectronics.com/ftp/Data%20Sheets/7496.pdf  (TI's own
+       ti.com/lit/ds/symlink/sn7496.pdf and sn74ls96.pdf now 404; this mirror
+       carries the identical TI document, doc SDLS946). Verified: terminal
+       assignment (TOP VIEW), function table, and positive-logic logic diagram,
+       page 1, read as 300-dpi PDF page images (issues.md C4). Non-standard
+       power pins confirmed from the terminal diagram: VCC = pin 5, GND = pin 12.
      Shift register concept: https://en.wikipedia.org/wiki/Shift_register */
-  '7496': {
+  '74x96': {
     name: '74x96',
     simpleName: '5 bit Shift Reg (PIPO)',
-    description: '5 bit parallel-in/parallel-out shift register with asynchronous preset (16-pin)',
+    description: '5-bit shift register, async clear, set-only parallel preset (16-pin)',
     pins: 16,
-    vcc: 16,
-    gnd: 8,
-    datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls96.pdf',
+    vcc: 5,
+    gnd: 12,
+    datasheet: 'https://unicornelectronics.com/ftp/Data%20Sheets/7496.pdf',
     tags: ['shift register', '5 bit', 'sequential', 'preset', 'pipo'],
-    guideOverview: 'The 7496 is a 5 bit parallel-in/parallel-out shift register with asynchronous clear and a separate parallel-enable (PE) for synchronous loading. It stores five bits and provides all outputs simultaneously. Use it to convert a 5 bit parallel word into a serial stream or to buffer five independent data bits.',
+    guideOverview: 'The 74x96 is a 5 bit shift register built from five clocked flip flops in a chain. All five outputs and all five data inputs are brought out, so it can turn serial data into parallel or parallel into serial. Two things about this specific part trip people up. First, the power pins sit in odd places: VCC is pin 5 and GND is pin 12, not the usual corners. Second, its parallel load is a set-only preset it can force outputs HIGH but never LOW so loading an exact word means clearing to zero first, then presetting the 1s. Reach for it when you need a small serial/parallel register and can live with that two step load.',
     guidePinDescriptions: {
-      A:    'Parallel data input for stage A.',
-      B:    'Parallel data input for stage B.',
-      C:    'Parallel data input for stage C.',
-      D:    'Parallel data input for stage D.',
-      E:    'Parallel data input for stage E.',
-      SER:  'Serial data input shifted in on rising CLK when PE is LOW.',
-      CLR:  'Active LOW asynchronous clear; forces all outputs LOW immediately.',
-      CLK:  'Rising-edge clock for both serial shifting and parallel loading.',
-      PE:   'Parallel enable (active HIGH). HIGH synchronously loads A through E on the next clock edge.',
-      QA:   'Registered output for stage A.',
-      QB:   'Registered output for stage B.',
-      QC:   'Registered output for stage C.',
-      QD:   'Registered output for stage D.',
-      QE:   'Registered output for stage E (last stage in serial chain).',
-      GND:  'Ground reference (pin 8).',
-      VCC:  'Positive supply (+5 V) at pin 16.',
+      CLK:  'Clock. On the rising edge (with PE low) the register shifts one place toward QE.',
+      A:    'Preset data input for stage A. Only its HIGH level matters (the preset is set-only).',
+      B:    'Preset data input for stage B.',
+      C:    'Preset data input for stage C.',
+      D:    'Preset data input for stage D.',
+      E:    'Preset data input for stage E.',
+      PE:   'Preset enable (active HIGH; marked PRE on the package). HIGH asynchronously sets every stage whose A E input is HIGH. It cannot clear a stage.',
+      SER:  'Serial data input. Enters QA on each rising clock edge when PE is LOW.',
+      CLR:  'Clear (active LOW). LOW forces all five outputs to 0 immediately, independent of the clock.',
+      QA:   'Output of stage A the first stage, where serial data enters.',
+      QB:   'Output of stage B.',
+      QC:   'Output of stage C.',
+      QD:   'Output of stage D.',
+      QE:   'Output of stage E the last stage, and the serial output.',
+      VCC:  'Positive supply (+5 V). Note: this is pin 5, not a corner pin.',
+      GND:  'Ground reference. Note: this is pin 12, not a corner pin.',
     },
     guideSections: [
       {
-        title: 'Load and Shift Modes',
+        title: 'How it works',
         paragraphs: [
-          'When PE is HIGH the next rising CLK edge loads A E into QA QE. When PE is LOW, each rising CLK shifts the register right and SER enters QA. CLR# overrides both modes asynchronously.',
+          'Inside are five flip flops wired in a chain. Every output (QA through QE) and every data input (A through E) is pinned out, so you can move data in or out one bit at a time (serial) or all five at once (parallel).',
+          'On each rising edge of CLK the register shifts one place: the serial input SER enters QA, QA’s old value moves to QB, QB to QC, and so on down to QE. QE is the serial output the last bit to leave. For a clean shift, CLR must be HIGH and PE must be LOW.',
+        ],
+      },
+      {
+        title: 'Loading five bits: clear, then preset',
+        paragraphs: [
+          'The parallel load on this chip is unusual and catches people out. The preset is asynchronous (it ignores the clock) and it is set-only: raising PE forces a stage HIGH wherever its A E input is HIGH, but a LOW input does nothing that stage just holds. There is no way to write a 0 through the preset.',
+          'So to load an exact five bit word you do it in two steps: first pulse CLR LOW to force every output to 0, then put your data on A E and take PE HIGH. The 1s in your word get set; the 0s were already cleared. Both clear and preset work with the clock stopped.',
+        ],
+        list: [
+          'CLR=0 → QA..QE = 0 0 0 0 0 (asynchronous clear; overrides everything).',
+          'CLR=1, PE=1 → each stage whose A..E input is HIGH is set HIGH; LOW inputs leave that stage unchanged.',
+          'CLR=1, PE=0, rising CLK → shift: QA←SER, QB←old QA, QC←old QB, QD←old QC, QE←old QD.',
+          'CLR=1, PE=0, no clock edge → hold.',
+        ],
+      },
+      {
+        title: 'Common uses and gotchas',
+        list: [
+          'Serial to parallel: feed a bit stream into SER, clock five times, then read the whole word off QA QE.',
+          'Parallel to serial: load a word (clear, then preset), then clock and read it out bit by bit on QE.',
+          'A short 5 bit delay line or storage register.',
+          'Gotcha: VCC is pin 5 and GND is pin 12. Wiring it like an ordinary 16-pin chip (VCC 16, GND 8) leaves it dead or damages it.',
+          'Gotcha: the preset can only set 1s, never 0s always clear first if you need an exact value.',
+          'Gotcha: do not hold CLR LOW and PE HIGH together that fights the same flip flops. (This simulator lets clear win.)',
         ],
       },
     ],
     pinout: [
-      { pin:  1, name: 'A',    type: 'input' },
-      { pin:  2, name: 'SER',  type: 'input' },
+      { pin:  1, name: 'CLK',  type: 'input' },
+      { pin:  2, name: 'A',    type: 'input' },
       { pin:  3, name: 'B',    type: 'input' },
       { pin:  4, name: 'C',    type: 'input' },
-      { pin:  5, name: 'D',    type: 'input' },
-      { pin:  6, name: 'E',    type: 'input' },
-      { pin:  7, name: 'CLR',  type: 'input' },
-      { pin:  8, name: 'GND',  type: 'power' },
-      { pin:  9, name: 'CLK',  type: 'input' },
-      { pin: 10, name: 'PE',   type: 'input' },
-      { pin: 11, name: 'QA',   type: 'output' },
-      { pin: 12, name: 'QB',   type: 'output' },
+      { pin:  5, name: 'VCC',  type: 'power' },
+      { pin:  6, name: 'D',    type: 'input' },
+      { pin:  7, name: 'E',    type: 'input' },
+      { pin:  8, name: 'PE',   type: 'input' },
+      { pin:  9, name: 'SER',  type: 'input' },
+      { pin: 10, name: 'QE',   type: 'output' },
+      { pin: 11, name: 'QD',   type: 'output' },
+      { pin: 12, name: 'GND',  type: 'power' },
       { pin: 13, name: 'QC',   type: 'output' },
-      { pin: 14, name: 'QD',   type: 'output' },
-      { pin: 15, name: 'QE',   type: 'output' },
-      { pin: 16, name: 'VCC',  type: 'power' },
+      { pin: 14, name: 'QB',   type: 'output' },
+      { pin: 15, name: 'QA',   type: 'output' },
+      { pin: 16, name: 'CLR',  type: 'input' },
     ],
     gates: [
       { type: 'SHIFT_REG_5BIT', inputs: ['CLK', 'CLR', 'SER', 'A', 'B', 'C', 'D', 'E', 'PE'], outputs: ['QA', 'QB', 'QC', 'QD', 'QE'] },
@@ -133,7 +165,7 @@ export const CHIPS_BLOCK_10 = {
 
   // ── 74x97: synchronous 6 bit binary rate multiplier, 16-pin ───────────────
   /* Primary source: Texas Instruments, SN7497 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn7497.pdf */
-  '7497': {
+  '74x97': {
     name: '74x97',
     simpleName: '6 bit Rate Multiplier',
     description: 'Synchronous 6 bit binary rate multiplier (16-pin)',
@@ -142,7 +174,7 @@ export const CHIPS_BLOCK_10 = {
     gnd: 8,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn7497.pdf',
     tags: ['rate multiplier', 'combinational', '6 bit'],
-    guideOverview: 'The 7497 is a synchronous 6 bit binary rate multiplier that produces output pulses on Y at a rate equal to N/64 times the input clock rate, where N is the 6 bit binary value on A F. A unity/cascade output (UNITY) and Z output allow cascading for higher-resolution rate multiplication. Use it to generate precise clock fractions for timing or motor-control applications.',
+    guideOverview: 'The 74x97 is a synchronous 6 bit binary rate multiplier that produces output pulses on Y at a rate equal to N/64 times the input clock rate, where N is the 6 bit binary value on A F. A unity/cascade output (UNITY) and Z output allow cascading for higher resolution rate multiplication. Use it to generate precise clock fractions for timing or motor control applications.',
     guidePinDescriptions: {
       A:      'Rate input bit A (LSB, weight 1).',
       B:      'Rate input bit B (weight 2).',
@@ -152,7 +184,7 @@ export const CHIPS_BLOCK_10 = {
       F:      'Rate input bit F (MSB, weight 32).',
       ENP:    'Enable (active LOW). Must be LOW for the multiplier to produce output pulses.',
       CLK:    'Input clock whose frequency is to be divided.',
-      Y:      'Rate-multiplied output; produces N pulses for every 64 input clocks.',
+      Y:      'Rate multiplied output; produces N pulses for every 64 input clocks.',
       Z:      'Cascade output; passes through input clock pulses not consumed by Y.',
       UNITY:  'Goes HIGH when N = 63, indicating the output equals the input rate; used in cascading.',
       NC1:    'No connection.',
@@ -196,7 +228,7 @@ export const CHIPS_BLOCK_10 = {
   // ── 74x98: 4 bit data selector/storage register, 16-pin ──────────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Multiplexer concept: https://en.wikipedia.org/wiki/Multiplexer */
-  '7498': {
+  '74x98': {
     name: '74x98',
     simpleName: '4 bit Data Selector/Reg',
     description: '4 bit data selector/storage register (16-pin)',
@@ -205,7 +237,7 @@ export const CHIPS_BLOCK_10 = {
     gnd: 8,
     datasheet: 'https://en.wikipedia.org/wiki/7400-series_integrated_circuits',
     tags: ['register', 'selector', 'sequential', '4 bit'],
-    guideOverview: 'The 7498 is a 4 bit data selector and storage register that can synchronously capture either of two 4 bit data words (word 0: 0A 0D, or word 1: 1A 1D) selected by the S pin. The selected word is stored on the rising CLK edge and held until the next clock. Use it to multiplex two data sources into a single registered storage element.',
+    guideOverview: 'The 74x98 is a 4 bit data selector and storage register that can synchronously capture either of two 4 bit data words (word 0: 0A 0D, or word 1: 1A 1D) selected by the S pin. The selected word is stored on the rising CLK edge and held until the next clock. Use it to multiplex two data sources into a single registered storage element.',
     guidePinDescriptions: {
       '0A':  'Data bit A of input word 0.',
       '0B':  'Data bit B of input word 0.',
@@ -216,7 +248,7 @@ export const CHIPS_BLOCK_10 = {
       '1C':  'Data bit C of input word 1.',
       '1D':  'Data bit D of input word 1.',
       S:     'Select input: LOW selects word 0 (0A 0D); HIGH selects word 1 (1A 1D).',
-      CLK:   'Rising-edge clock; latches the selected word into QA QD.',
+      CLK:   'Rising edge clock; latches the selected word into QA-QD.',
       QA:    'Registered output for bit A.',
       QB:    'Registered output for bit B.',
       QC:    'Registered output for bit C.',
@@ -228,7 +260,7 @@ export const CHIPS_BLOCK_10 = {
       {
         title: 'Selection and Storage',
         paragraphs: [
-          'The S input selects which 4 bit word is presented to the register inputs. On the next rising CLK edge, the selected word is captured into QA QD and held. Changing S between clock edges has no effect on the outputs until the following clock.',
+          'The S input selects which 4 bit word is presented to the register inputs. On the next rising CLK edge, the selected word is captured into QA-QD and held. Changing S between clock edges has no effect on the outputs until the following clock.',
         ],
       },
     ],
@@ -259,7 +291,7 @@ export const CHIPS_BLOCK_10 = {
   // ── 74x99: 4 bit bidirectional universal shift register, 16-pin ───────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Shift register concept: https://en.wikipedia.org/wiki/Shift_register */
-  '7499': {
+  '74x99': {
     name: '74x99',
     simpleName: '4 bit Bidir Shift Reg',
     description: '4 bit bidirectional universal shift register (16-pin)',
@@ -268,7 +300,7 @@ export const CHIPS_BLOCK_10 = {
     gnd: 8,
     datasheet: 'https://en.wikipedia.org/wiki/7400-series_integrated_circuits',
     tags: ['shift register', '4 bit', 'sequential', 'bidirectional', 'universal'],
-    guideOverview: 'The 7499 is a 4 bit universal bidirectional shift register capable of right-shift, left-shift, parallel load, and hold, selected by S0 and S1. Both a right serial input (SER_R) and a left serial input (SER_L) are provided. Use it wherever a register needs to shift in either direction or be asynchronously loaded.',
+    guideOverview: 'The 74x99 is a 4 bit universal bidirectional shift register capable of right-shift, left-shift, parallel load, and hold, selected by S0 and S1. Both a right serial input (SER_R) and a left serial input (SER_L) are provided. Use it wherever a register needs to shift in either direction or be asynchronously loaded.',
     guidePinDescriptions: {
       SER_R:  'Serial data input used when shifting right (toward QD).',
       SER_L:  'Serial data input used when shifting left (toward QA).',
@@ -278,7 +310,7 @@ export const CHIPS_BLOCK_10 = {
       D:      'Parallel data input for stage D.',
       S0:     'Mode select bit 0. Combined with S1 to choose operation (shift right, shift left, load, or hold).',
       S1:     'Mode select bit 1. Combined with S0 to choose operation.',
-      CLK:    'Rising-edge clock that executes the selected operation.',
+      CLK:    'Rising edge clock that executes the selected operation.',
       QA:     'Registered output for stage A.',
       QB:     'Registered output for stage B.',
       QC:     'Registered output for stage C.',
@@ -297,7 +329,7 @@ export const CHIPS_BLOCK_10 = {
           'S1=0, S0=0 → Hold',
           'S1=0, S0=1 → Shift right (SER_R → QA)',
           'S1=1, S0=0 → Shift left (SER_L → QD)',
-          'S1=1, S0=1 → Parallel load (A D → QA QD)',
+          'S1=1, S0=1 → Parallel load (A D → QA-QD)',
         ],
       },
     ],
@@ -327,8 +359,8 @@ export const CHIPS_BLOCK_10 = {
 
   // ── 74x100: dual 4 bit bistable latch, 24-pin ─────────────────────────────
   /* Primary source: Texas Instruments, SN74100 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74100.pdf
-     Latch/flip-flop concept: https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
-  '74100': {
+     Latch/flip flop concept: https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
+  '74x100': {
     name: '74x100',
     simpleName: 'Dual 4 bit Latch',
     description: 'Dual 4 bit bistable latch with separate enable for each group (24-pin)',
@@ -337,7 +369,7 @@ export const CHIPS_BLOCK_10 = {
     gnd: 12,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74100.pdf',
     tags: ['latch', 'bistable', '4 bit', 'sequential', 'dual', 'register'],
-    guideOverview: 'The 74100 is a dual 4 bit bistable latch in a 24-pin package, providing two independent groups of four D-latches each with its own enable. While the enable (1E or 2E) is HIGH, the outputs follow the data inputs transparently; when the enable goes LOW, the last data state is latched. Use it to capture and hold two separate 4 bit nibbles simultaneously.',
+    guideOverview: 'The 74x100 is a dual 4 bit bistable latch in a 24-pin package, providing two independent groups of four D-latches each with its own enable. While the enable (1E or 2E) is HIGH, the outputs follow the data inputs transparently; when the enable goes LOW, the last data state is latched. Use it to capture and hold two separate 4 bit nibbles simultaneously.',
     guidePinDescriptions: {
       '1D1':  'Data input for latch 1 of group 1.',
       '1D2':  'Data input for latch 2 of group 1.',
@@ -368,7 +400,7 @@ export const CHIPS_BLOCK_10 = {
       {
         title: 'Transparent Latch Behavior',
         paragraphs: [
-          'Each 4 bit group operates as a level-sensitive transparent latch. While the enable is HIGH the outputs track the data inputs. When the enable returns LOW the outputs freeze and hold the last valid data state until the enable goes HIGH again.',
+          'Each 4 bit group operates as a level sensitive transparent latch. While the enable is HIGH the outputs track the data inputs. When the enable returns LOW the outputs freeze and hold the last valid data state until the enable goes HIGH again.',
         ],
       },
     ],
@@ -411,29 +443,29 @@ export const CHIPS_BLOCK_10 = {
     sequential: true,
   },
 
-  // ── 74x101: AND-OR-gated JK neg-edge FF, preset, 14-pin ──────────────────
+  // ── 74x101: AND OR gated JK neg edge FF, preset, 14-pin ──────────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
-     Flip-flop concept: https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
-  '74101': {
+     Flip flop concept: https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
+  '74x101': {
     name: '74x101',
-    simpleName: 'JK FF (AND-OR, NEG, PRE)',
-    description: 'AND-OR-gated J-K negative-edge-triggered flip-flop with preset (no clear) (14-pin)',
+    simpleName: 'JK FF (AND OR, NEG, PRE)',
+    description: 'AND-OR gated JK neg-edge flip-flop, preset, no clear (14-pin)',
     pins: 14,
     vcc: 14,
     gnd: 7,
     datasheet: 'https://en.wikipedia.org/wiki/7400-series_integrated_circuits',
-    tags: ['flip-flop', 'jk', 'sequential', 'preset', 'negative-edge'],
-    guideOverview: 'The 74101 is a single J-K negative-edge-triggered flip-flop with AND-OR-gated J inputs and an asynchronous preset but no clear. The effective J input is (J1 AND J2) OR J3, giving flexible logic steering before the clock. Use it when only preset (not clear) is needed and a gated J condition simplifies external logic.',
+    tags: ['flip flop', 'jk', 'sequential', 'preset', 'negative edge'],
+    guideOverview: 'The 74x101 is a single JK negative edge triggered flip flop with AND OR gated J inputs and an asynchronous preset but no clear. The effective J input is (J1 AND J2) OR J3, giving flexible logic steering before the clock. Use it when only preset (not clear) is needed and a gated J condition simplifies external logic.',
     guidePinDescriptions: {
       PRE:  'Active LOW asynchronous preset; forces Q HIGH immediately.',
-      J1:   'First J AND-gate input. J is asserted when J1=1 AND J2=1, or when J3=1.',
-      J2:   'Second J AND-gate input (ANDed with J1).',
-      J3:   'OR-gated J input; when HIGH it asserts J regardless of J1/J2.',
-      K1:   'First K AND-gate input.',
-      K2:   'Second K AND-gate input (ANDed with K1).',
-      K3:   'OR-gated K input; when HIGH it asserts K regardless of K1/K2.',
-      CLK:  'Falling-edge clock that clocks the J-K flip-flop.',
-      Q:    'Non-inverting output.',
+      J1:   'First J AND gate input. J is asserted when J1=1 AND J2=1, or when J3=1.',
+      J2:   'Second J AND gate input (ANDed with J1).',
+      J3:   'OR gated J input; when HIGH it asserts J regardless of J1/J2.',
+      K1:   'First K AND gate input.',
+      K2:   'Second K AND gate input (ANDed with K1).',
+      K3:   'OR gated K input; when HIGH it asserts K regardless of K1/K2.',
+      CLK:  'Falling edge clock that clocks the JK flip flop.',
+      Q:    'Non inverting output.',
       Qn:   'Complementary (inverted) output.',
       NC1:  'No connection.',
       NC2:  'No connection.',
@@ -442,9 +474,9 @@ export const CHIPS_BLOCK_10 = {
     },
     guideSections: [
       {
-        title: 'AND-OR Gate Structure',
+        title: 'AND OR Gate Structure',
         paragraphs: [
-          'Effective J = (J1 AND J2) OR J3; effective K = (K1 AND K2) OR K3. The flip-flop samples these composite J/K values on the falling CLK edge. PRE# sets Q HIGH asynchronously; there is no CLR input.',
+          'Effective J = (J1 AND J2) OR J3; effective K = (K1 AND K2) OR K3. The flip flop samples these composite J/K values on the falling CLK edge. PRE# sets Q HIGH asynchronously; there is no CLR input.',
         ],
         formulas: ['J_eff = (J1 · J2) + J3', 'K_eff = (K1 · K2) + K3'],
       },
@@ -471,30 +503,30 @@ export const CHIPS_BLOCK_10 = {
     sequential: true,
   },
 
-  // ── 74x102: AND-gated JK neg-edge FF, preset and clear, 14-pin ───────────
+  // ── 74x102: AND gated JK neg edge FF, preset and clear, 14-pin ───────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
-     Flip-flop concept: https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
-  '74102': {
+     Flip flop concept: https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
+  '74x102': {
     name: '74x102',
-    simpleName: 'JK FF (AND-gated, NEG)',
-    description: 'AND-gated J-K negative-edge-triggered flip-flop with preset and clear (14-pin)',
+    simpleName: 'JK FF (AND gated, NEG)',
+    description: 'AND-gated JK neg-edge flip-flop, preset and clear (14-pin)',
     pins: 14,
     vcc: 14,
     gnd: 7,
     datasheet: 'https://en.wikipedia.org/wiki/7400-series_integrated_circuits',
-    tags: ['flip-flop', 'jk', 'sequential', 'preset', 'clear', 'negative-edge'],
-    guideOverview: 'The 74102 is a single AND-gated J-K negative-edge-triggered flip-flop with both asynchronous preset and clear. Three J inputs and three K inputs are each ANDed together before clocking, allowing complex conditions without external gates. Use it when you need both preset and clear control plus multi-input gating on a single negative-edge JK element.',
+    tags: ['flip flop', 'jk', 'sequential', 'preset', 'clear', 'negative edge'],
+    guideOverview: 'The 74x102 is a single AND gated JK negative edge triggered flip flop with both asynchronous preset and clear. Three J inputs and three K inputs are each ANDed together before clocking, allowing complex conditions without external gates. Use it when you need both preset and clear control plus multi input gating on a single negative edge JK element.',
     guidePinDescriptions: {
       CLR:  'Active LOW asynchronous clear; forces Q LOW immediately.',
       PRE:  'Active LOW asynchronous preset; forces Q HIGH immediately.',
-      J1:   'First J AND-gate input.',
-      J2:   'Second J AND-gate input.',
-      J3:   'Third J AND-gate input.',
-      K1:   'First K AND-gate input.',
-      K2:   'Second K AND-gate input.',
-      K3:   'Third K AND-gate input.',
-      CLK:  'Falling-edge clock.',
-      Q:    'Non-inverting output.',
+      J1:   'First J AND gate input.',
+      J2:   'Second J AND gate input.',
+      J3:   'Third J AND gate input.',
+      K1:   'First K AND gate input.',
+      K2:   'Second K AND gate input.',
+      K3:   'Third K AND gate input.',
+      CLK:  'Falling edge clock.',
+      Q:    'Non inverting output.',
       Qn:   'Complementary (inverted) output.',
       NC1:  'No connection.',
       GND:  'Ground reference (pin 7).',
@@ -502,7 +534,7 @@ export const CHIPS_BLOCK_10 = {
     },
     guideSections: [
       {
-        title: 'AND-Gated JK Operation',
+        title: 'AND Gated JK Operation',
         paragraphs: [
           'Effective J = J1 AND J2 AND J3; effective K = K1 AND K2 AND K3. The falling CLK edge samples these values. PRE# overrides with Q=1 and CLR# overrides with Q=0; both are asynchronous and independent of the clock.',
         ],
@@ -531,38 +563,38 @@ export const CHIPS_BLOCK_10 = {
     sequential: true,
   },
 
-  // ── 74x103: dual JK neg-edge FF, clear, 14-pin ────────────────────────────
+  // ── 74x103: dual JK neg edge FF, clear, 14-pin ────────────────────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
-     Flip-flop concept: https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
-  '74103': {
+     Flip flop concept: https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
+  '74x103': {
     name: '74x103',
     simpleName: 'Dual JK FF (NEG, CLR)',
-    description: 'Dual J-K negative-edge-triggered flip-flop with clear (no preset) (14-pin)',
+    description: 'Dual JK negative edge triggered flip flop with clear (no preset) (14-pin)',
     pins: 14,
     vcc: 14,
     gnd: 7,
     datasheet: 'https://en.wikipedia.org/wiki/7400-series_integrated_circuits',
-    tags: ['flip-flop', 'jk', 'sequential', 'dual', 'clear', 'negative-edge'],
-    guideOverview: 'The 74103 contains two independent J-K negative-edge-triggered flip-flops each with its own clock and asynchronous clear but no preset. The two sections share nothing except the power supply. Use it for dual independent one-bit state machines where only a reset (not a set) is needed.',
+    tags: ['flip flop', 'jk', 'sequential', 'dual', 'clear', 'negative edge'],
+    guideOverview: 'The 74x103 contains two independent JK negative edge triggered flip flops each with its own clock and asynchronous clear but no preset. The two sections share nothing except the power supply. Use it for dual independent one bit state machines where only a reset (not a set) is needed.',
     guidePinDescriptions: {
       '1CLR': 'Active LOW asynchronous clear for FF1; forces 1Q LOW.',
-      '1CLK': 'Falling-edge clock for FF1.',
+      '1CLK': 'Falling edge clock for FF1.',
       '1J':   'J input for FF1.',
       '1K':   'K input for FF1.',
-      '1Q':   'Non-inverting output of FF1.',
+      '1Q':   'Non inverting output of FF1.',
       '1Qn':  'Complementary output of FF1.',
       '2CLR': 'Active LOW asynchronous clear for FF2; forces 2Q LOW.',
-      '2CLK': 'Falling-edge clock for FF2.',
+      '2CLK': 'Falling edge clock for FF2.',
       '2J':   'J input for FF2.',
       '2K':   'K input for FF2.',
-      '2Q':   'Non-inverting output of FF2.',
+      '2Q':   'Non inverting output of FF2.',
       '2Qn':  'Complementary output of FF2.',
       GND:    'Ground reference (pin 7).',
       VCC:    'Positive supply (+5 V) at pin 14.',
     },
     guideSections: [
       {
-        title: 'JK Flip-Flop Truth Table',
+        title: 'JK Flip Flop Truth Table',
         paragraphs: [
           'On each falling CLK edge: J=0,K=0 → hold; J=1,K=0 → set; J=0,K=1 → reset; J=1,K=1 → toggle. CLR# overrides asynchronously to reset Q.',
         ],
@@ -591,30 +623,30 @@ export const CHIPS_BLOCK_10 = {
     sequential: true,
   },
 
-  // ── 74x104: JK controller-device FF (3 input AND J/K), 14-pin ─────────────────
+  // ── 74x104: JK controller device FF (3 input AND J/K), 14-pin ─────────────────
   /* Primary source: Texas Instruments, SN74104 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74104.pdf
-     Flip-flop concept: https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
-  '74104': {
+     Flip flop concept: https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
+  '74x104': {
     name: '74x104',
     simpleName: 'JK MS FF',
-    description: 'J-K controller-device flip-flop with AND-gated J and K inputs (14-pin)',
+    description: 'JK controller device flip flop with AND gated J and K inputs (14-pin)',
     pins: 14,
     vcc: 14,
     gnd: 7,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74104.pdf',
-    tags: ['flip-flop', 'jk', 'sequential', 'controller-device'],
-    guideOverview: 'The 74104 is a single J-K master-slave (controller-device) flip-flop with three-input AND gating on both J and K, plus preset and clear. The master captures data while the clock is HIGH and the slave transfers on the falling edge. Use it when setup-time isolation between master and slave stages is important or when gated J/K inputs simplify the design.',
+    tags: ['flip flop', 'jk', 'sequential', 'controller device'],
+    guideOverview: 'The 74x104 is a single JK master slave (controller device) flip flop with three input AND gating on both J and K, plus preset and clear. The master captures data while the clock is HIGH and the slave transfers on the falling edge. Use it when setup time isolation between master and slave stages is important or when gated J/K inputs simplify the design.',
     guidePinDescriptions: {
       CLR:  'Active LOW asynchronous clear; forces Q LOW immediately.',
       PRE:  'Active LOW asynchronous preset; forces Q HIGH immediately.',
-      J1:   'First J AND-gate input.',
-      J2:   'Second J AND-gate input.',
-      J3:   'Third J AND-gate input.',
-      K1:   'First K AND-gate input.',
-      K2:   'Second K AND-gate input.',
-      K3:   'Third K AND-gate input.',
+      J1:   'First J AND gate input.',
+      J2:   'Second J AND gate input.',
+      J3:   'Third J AND gate input.',
+      K1:   'First K AND gate input.',
+      K2:   'Second K AND gate input.',
+      K3:   'Third K AND gate input.',
       CLK:  'Clock input; master samples on HIGH level, slave transfers on falling edge.',
-      Q:    'Non-inverting output (slave output).',
+      Q:    'Non inverting output (slave output).',
       Qn:   'Complementary output.',
       NC1:  'No connection.',
       GND:  'Ground reference (pin 7).',
@@ -622,9 +654,9 @@ export const CHIPS_BLOCK_10 = {
     },
     guideSections: [
       {
-        title: 'Master-Slave Operation',
+        title: 'Controller Device Operation',
         paragraphs: [
-          'While CLK is HIGH the master latch tracks J_eff = J1·J2·J3 and K_eff = K1·K2·K3. The slave output (Q/Qn) updates on the falling edge. PRE# and CLR# override the outputs asynchronously at any time.',
+          'While CLK is HIGH the controller latch tracks J_eff = J1·J2·J3 and K_eff = K1·K2·K3. The device output (Q/Qn) updates on the falling edge. PRE# and CLR# override the outputs asynchronously at any time.',
         ],
       },
     ],
@@ -652,28 +684,28 @@ export const CHIPS_BLOCK_10 = {
 
   // ── 74x105: JK MS FF, J2 and K2 inverted, 14-pin ─────────────────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
-     Flip-flop concept: https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
-  '74105': {
+     Flip flop concept: https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
+  '74x105': {
     name: '74x105',
     simpleName: 'JK MS FF (J2n/K2n)',
-    description: 'J-K controller-device flip-flop with J2 and K2 inputs inverted internally (14-pin)',
+    description: 'JK flip-flop, J2 and K2 inputs inverted internally (14-pin)',
     pins: 14,
     vcc: 14,
     gnd: 7,
     datasheet: 'https://en.wikipedia.org/wiki/7400-series_integrated_circuits',
-    tags: ['flip-flop', 'jk', 'sequential', 'controller-device', 'inverted'],
-    guideOverview: 'The 74105 is a J-K master-slave flip-flop identical to the 74104 except that J2 and K2 are complemented internally before the AND gates. This built in inversion saves an external inverter when one AND-gate term must be active LOW. Use it as a drop-in for 74104 when one J or K condition is naturally active LOW.',
+    tags: ['flip flop', 'jk', 'sequential', 'controller device', 'inverted'],
+    guideOverview: 'The 74x105 is a JK controller device flip flop identical to the 74x104 except that J2 and K2 are complemented internally before the AND gates. This built in inversion saves an external inverter when one AND gate term must be active LOW. Use it as a drop-in for 74x104 when one J or K condition is naturally active LOW.',
     guidePinDescriptions: {
       CLR:   'Active LOW asynchronous clear; forces Q LOW immediately.',
       PRE:   'Active LOW asynchronous preset; forces Q HIGH immediately.',
-      J1:    'First J AND-gate input.',
+      J1:    'First J AND gate input.',
       J2n:   'Second J input, internally inverted before ANDing.',
-      J3:    'Third J AND-gate input.',
-      K1:    'First K AND-gate input.',
+      J3:    'Third J AND gate input.',
+      K1:    'First K AND gate input.',
       K2n:   'Second K input, internally inverted before ANDing.',
-      K3:    'Third K AND-gate input.',
+      K3:    'Third K AND gate input.',
       CLK:   'Clock input; master captures while HIGH, slave transfers on falling edge.',
-      Q:     'Non-inverting output.',
+      Q:     'Non inverting output.',
       Qn:    'Complementary output.',
       NC1:   'No connection.',
       GND:   'Ground reference (pin 7).',
@@ -681,11 +713,14 @@ export const CHIPS_BLOCK_10 = {
     },
     guideSections: [
       {
-        title: 'Inverted AND-Gate Inputs',
+        title: 'Inverted AND Gate Inputs',
         paragraphs: [
-          'Effective J = J1 AND (NOT J2n) AND J3; effective K = K1 AND (NOT K2n) AND K3. Apart from the internal inversion of J2 and K2, operation is identical to the 74104 master-slave JK flip-flop.',
+          'Effective J = J1 AND (NOT J2n) AND J3; effective K = K1 AND (NOT K2n) AND K3. Apart from the internal inversion of J2 and K2, operation is identical to the 74x104 controller device JK flip flop.',
         ],
-        formulas: ['J_eff = J1 · J2n · J3', 'K_eff = K1 · K2n · K3'],
+        formulas: [
+          'J_eff = J1 · J2n · J3',
+          'K_eff = K1 · K2n · K3',
+        ],
       },
     ],
     pinout: [
@@ -710,42 +745,42 @@ export const CHIPS_BLOCK_10 = {
     sequential: true,
   },
 
-  // ── 74x106: dual JK neg-edge FF, preset and clear, 16-pin ─────────────────
+  // ── 74x106: dual JK neg edge FF, preset and clear, 16-pin ─────────────────
   /* Primary source: Texas Instruments, SN74ALS106 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74als106.pdf
-     Flip-flop concept: https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
-  '74106': {
+     Flip flop concept: https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
+  '74x106': {
     name: '74x106',
     simpleName: 'Dual JK FF (NEG, PRE/CLR)',
-    description: 'Dual J-K negative-edge-triggered flip-flop with preset and clear (16-pin)',
+    description: 'Dual JK negative edge triggered flip flop with preset and clear (16-pin)',
     pins: 16,
     vcc: 16,
     gnd: 8,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74als106.pdf',
-    tags: ['flip-flop', 'jk', 'sequential', 'dual', 'preset', 'clear', 'negative-edge'],
-    guideOverview: 'The 74106 packages two independent J-K negative-edge-triggered flip-flops each with its own clock, preset, and clear in a 16-pin DIP. Both Q and Qn are available for each section. Use it as a versatile dual flip-flop wherever individual preset and clear control are required on two separate one-bit state elements.',
+    tags: ['flip flop', 'jk', 'sequential', 'dual', 'preset', 'clear', 'negative edge'],
+    guideOverview: 'The 74x106 packages two independent JK negative edge triggered flip flops each with its own clock, preset, and clear in a 16-pin DIP. Both Q and Qn are available for each section. Use it as a versatile dual flip flop wherever individual preset and clear control are required on two separate one bit state elements.',
     guidePinDescriptions: {
-      '1CLK': 'Falling-edge clock for FF1.',
+      '1CLK': 'Falling edge clock for FF1.',
       '1PRE': 'Active LOW asynchronous preset for FF1; forces 1Q HIGH.',
       '1CLR': 'Active LOW asynchronous clear for FF1; forces 1Q LOW.',
       '1J':   'J input for FF1.',
       '1K':   'K input for FF1.',
-      '1Q':   'Non-inverting output of FF1.',
+      '1Q':   'Non inverting output of FF1.',
       '1Qn':  'Complementary output of FF1.',
-      '2CLK': 'Falling-edge clock for FF2.',
+      '2CLK': 'Falling edge clock for FF2.',
       '2PRE': 'Active LOW asynchronous preset for FF2; forces 2Q HIGH.',
       '2CLR': 'Active LOW asynchronous clear for FF2; forces 2Q LOW.',
       '2J':   'J input for FF2.',
       '2K':   'K input for FF2.',
-      '2Q':   'Non-inverting output of FF2.',
+      '2Q':   'Non inverting output of FF2.',
       '2Qn':  'Complementary output of FF2.',
       GND:    'Ground reference (pin 8).',
       VCC:    'Positive supply (+5 V) at pin 5.',
     },
     guideSections: [
       {
-        title: 'JK Flip-Flop Operation',
+        title: 'JK Flip Flop Operation',
         paragraphs: [
-          'Each flip-flop clocks on the falling edge of its own CLK. J=0,K=0 holds; J=1,K=0 sets; J=0,K=1 resets; J=1,K=1 toggles. PRE# and CLR# override the clock asynchronously and must not both be asserted simultaneously.',
+          'Each flip flop clocks on the falling edge of its own CLK. J=0,K=0 holds; J=1,K=0 sets; J=0,K=1 resets; J=1,K=1 toggles. PRE# and CLR# override the clock asynchronously and must not both be asserted simultaneously.',
         ],
       },
     ],
@@ -774,31 +809,31 @@ export const CHIPS_BLOCK_10 = {
     sequential: true,
   },
 
-  // ── 74x108: dual JK neg-edge FF, preset, shared CLK+CLR, 14-pin ──────────
+  // ── 74x108: dual JK neg edge FF, preset, shared CLK+CLR, 14-pin ──────────
   /* Primary source: Texas Instruments, SN74108 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74108.pdf
-     Flip-flop concept: https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
-  '74108': {
+     Flip flop concept: https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
+  '74x108': {
     name: '74x108',
     simpleName: 'Dual JK FF (shared CLK/CLR)',
-    description: 'Dual J-K negative-edge-triggered flip-flop with preset, shared clock and clear (14-pin)',
+    description: 'Dual JK neg-edge flip-flop, preset, shared clock and clear (14-pin)',
     pins: 14,
     vcc: 14,
     gnd: 7,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74108.pdf',
-    tags: ['flip-flop', 'jk', 'sequential', 'dual', 'preset', 'clear', 'negative-edge'],
-    guideOverview: 'The 74108 contains two J-K negative-edge-triggered flip-flops that share a single clock and a single asynchronous clear, but each has its own independent preset. This saves pins when two flip-flops in an application always clock and reset together. Use it in counters or state machines where both bits advance on the same edge and reset simultaneously.',
+    tags: ['flip flop', 'jk', 'sequential', 'dual', 'preset', 'clear', 'negative edge'],
+    guideOverview: 'The 74x108 contains two JK negative edge triggered flip flops that share a single clock and a single asynchronous clear, but each has its own independent preset. This saves pins when two flip flops in an application always clock and reset together. Use it in counters or state machines where both bits advance on the same edge and reset simultaneously.',
     guidePinDescriptions: {
       '1J':   'J input for FF1.',
       '1PRE': 'Active LOW asynchronous preset for FF1 only; forces 1Q HIGH.',
       '1K':   'K input for FF1.',
-      '1Q':   'Non-inverting output of FF1.',
+      '1Q':   'Non inverting output of FF1.',
       '1Qn':  'Complementary output of FF1.',
       '2J':   'J input for FF2.',
       '2PRE': 'Active LOW asynchronous preset for FF2 only; forces 2Q HIGH.',
       '2K':   'K input for FF2.',
-      '2Q':   'Non-inverting output of FF2.',
+      '2Q':   'Non inverting output of FF2.',
       '2Qn':  'Complementary output of FF2.',
-      CLK:    'Shared falling-edge clock for both FF1 and FF2.',
+      CLK:    'Shared falling edge clock for both FF1 and FF2.',
       CLR:    'Shared active LOW asynchronous clear for both FFs; forces both Q outputs LOW.',
       GND:    'Ground reference (pin 7).',
       VCC:    'Positive supply (+5 V) at pin 14.',
@@ -807,7 +842,7 @@ export const CHIPS_BLOCK_10 = {
       {
         title: 'Shared Clock and Clear',
         paragraphs: [
-          'Both flip-flops clock on the same falling CLK edge and share the same active LOW CLR. Individual PRE# pins allow one section to be preset independently. This makes the 74108 useful as a 2 bit counter stage where both bits reset together but may be preset to different initial values.',
+          'Both flip flops clock on the same falling CLK edge and share the same active LOW CLR. Individual PRE# pins allow one section to be preset independently. This makes the 74x108 useful as a 2 bit counter stage where both bits reset together but may be preset to different initial values.',
         ],
       },
     ],
@@ -834,30 +869,30 @@ export const CHIPS_BLOCK_10 = {
     sequential: true,
   },
 
-  // ── 74x110: AND-gated JK MS FF, data lockout, 14-pin ─────────────────────
+  // ── 74x110: AND gated JK MS FF, data lockout, 14-pin ─────────────────────
   /* Primary source: Texas Instruments, SN74ALS110 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74als110.pdf
-     Flip-flop concept: https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
-  '74110': {
+     Flip flop concept: https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
+  '74x110': {
     name: '74x110',
     simpleName: 'JK FF (data lockout)',
-    description: 'AND-gated J-K controller-device flip-flop with data lockout, preset and clear (14-pin)',
+    description: 'AND-gated JK flip-flop, data lockout, preset and clear (14-pin)',
     pins: 14,
     vcc: 14,
     gnd: 7,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74als110.pdf',
-    tags: ['flip-flop', 'jk', 'sequential', 'controller-device', 'data-lockout'],
-    guideOverview: 'The 74110 is an AND-gated J-K master-slave flip-flop with data lockout, preset, and clear. Data lockout means the master stops accepting new data as soon as the clock goes HIGH, preventing race-around glitches. Use it wherever the race-around problem of older JK master-slave designs must be avoided while retaining three-input AND gating on J and K.',
+    tags: ['flip flop', 'jk', 'sequential', 'controller device', 'data-lockout'],
+    guideOverview: 'The 74x110 is an AND gated JK controller device flip flop with data lockout, preset, and clear. Data lockout means the master stops accepting new data as soon as the clock goes HIGH, preventing race around glitches. Use it wherever the race around problem of older JK controller device designs must be avoided while retaining three input AND gating on J and K.',
     guidePinDescriptions: {
       CLR:  'Active LOW asynchronous clear; forces Q LOW immediately.',
       PRE:  'Active LOW asynchronous preset; forces Q HIGH immediately.',
-      J1:   'First J AND-gate input.',
-      J2:   'Second J AND-gate input.',
-      J3:   'Third J AND-gate input.',
-      K1:   'First K AND-gate input.',
-      K2:   'Second K AND-gate input.',
-      K3:   'Third K AND-gate input.',
+      J1:   'First J AND gate input.',
+      J2:   'Second J AND gate input.',
+      J3:   'Third J AND gate input.',
+      K1:   'First K AND gate input.',
+      K2:   'Second K AND gate input.',
+      K3:   'Third K AND gate input.',
       CLK:  'Clock input; data is locked out (master closed) once CLK goes HIGH.',
-      Q:    'Non-inverting output.',
+      Q:    'Non inverting output.',
       Qn:   'Complementary output.',
       NC1:  'No connection.',
       GND:  'Ground reference (pin 7).',
@@ -867,7 +902,7 @@ export const CHIPS_BLOCK_10 = {
       {
         title: 'Data Lockout Feature',
         paragraphs: [
-          'Unlike classic master-slave JK devices, the 74110 locks out J/K data changes once CLK goes HIGH. The master captures J_eff=J1·J2·J3 and K_eff=K1·K2·K3 on the rising edge and holds that state; the slave transfers to Q/Qn on the falling edge. PRE# and CLR# operate asynchronously at any time.',
+          'Unlike classic controller device JK devices, the 74x110 locks out J/K data changes once CLK goes HIGH. The master captures J_eff=J1·J2·J3 and K_eff=K1·K2·K3 on the rising edge and holds that state; the slave transfers to Q/Qn on the falling edge. PRE# and CLR# operate asynchronously at any time.',
         ],
       },
     ],
@@ -895,31 +930,31 @@ export const CHIPS_BLOCK_10 = {
 
   // ── 74x111: dual JK MS FF, data lockout, reset, set, 16-pin ──────────────
   /* Primary source: Texas Instruments, SN74ALS111 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74als111.pdf
-     Flip-flop concept: https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
-  '74111': {
+     Flip flop concept: https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
+  '74x111': {
     name: '74x111',
     simpleName: 'Dual JK FF (data lockout)',
-    description: 'Dual J-K controller-device flip-flop with data lockout, individual preset and clear (16-pin)',
+    description: 'Dual JK flip-flop, data lockout, individual preset and clear (16-pin)',
     pins: 16,
     vcc: 16,
     gnd: 8,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74als111.pdf',
-    tags: ['flip-flop', 'jk', 'sequential', 'dual', 'controller-device', 'data-lockout'],
-    guideOverview: 'The 74111 packages two independent J-K master-slave flip-flops with data lockout in a 16-pin DIP, each having its own clock, preset, and clear. Data lockout prevents race-around by freezing the master once the clock rises. Use it as a dual version of the 74110 wherever two race-around-safe JK flip-flops with individual control are needed.',
+    tags: ['flip flop', 'jk', 'sequential', 'dual', 'controller device', 'data-lockout'],
+    guideOverview: 'The 74x111 packages two independent JK controller device flip flops with data lockout in a 16-pin DIP, each having its own clock, preset, and clear. Data lockout prevents race around by freezing the master once the clock rises. Use it as a dual version of the 74x110 wherever two race around safe JK flip flops with individual control are needed.',
     guidePinDescriptions: {
       '1CLK': 'Clock for FF1; master locks out data on rising edge, slave transfers on falling edge.',
       '1PRE': 'Active LOW asynchronous preset for FF1; forces 1Q HIGH.',
       '1CLR': 'Active LOW asynchronous clear for FF1; forces 1Q LOW.',
       '1J':   'J input for FF1.',
       '1K':   'K input for FF1.',
-      '1Q':   'Non-inverting output of FF1.',
+      '1Q':   'Non inverting output of FF1.',
       '1Qn':  'Complementary output of FF1.',
       '2CLK': 'Clock for FF2; master locks out data on rising edge, slave transfers on falling edge.',
       '2PRE': 'Active LOW asynchronous preset for FF2; forces 2Q HIGH.',
       '2CLR': 'Active LOW asynchronous clear for FF2; forces 2Q LOW.',
       '2J':   'J input for FF2.',
       '2K':   'K input for FF2.',
-      '2Q':   'Non-inverting output of FF2.',
+      '2Q':   'Non inverting output of FF2.',
       '2Qn':  'Complementary output of FF2.',
       GND:    'Ground reference (pin 8).',
       VCC:    'Positive supply (+5 V) at pin 5.',
@@ -928,7 +963,7 @@ export const CHIPS_BLOCK_10 = {
       {
         title: 'Dual Data-Lockout JK Operation',
         paragraphs: [
-          'Each flip-flop independently locks J/K inputs on its own rising CLK edge and transfers to the output on its falling edge. Individual PRE# and CLR# allow asynchronous set/reset at any time. The two sections are fully independent they can run at different frequencies and carry unrelated state.',
+          'Each flip flop independently locks J/K inputs on its own rising CLK edge and transfers to the output on its falling edge. Individual PRE# and CLR# allow asynchronous set/reset at any time. The two sections are fully independent they can run at different frequencies and carry unrelated state.',
         ],
       },
     ],

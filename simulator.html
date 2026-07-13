@@ -3,8 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>74sim</title>
+  <title>74Sim</title>
   <link rel="icon" type="image/png" href="assets/Logo74Sim.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/tokens.css">
   <link rel="stylesheet" href="css/style.css">
 </head>
@@ -12,20 +15,20 @@
   <div id="app">
     <!-- ── Toolbar ──────────────────────────────────────────────────────── -->
     <div id="toolbar">
-      <a href="/" class="toolbar-title" style="text-decoration:none;color:inherit;">74Sim</a>
+      <a href="/" class="toolbar-title" style="text-decoration:none;color:inherit;" translate="no">74Sim</a>
 
       <!-- Chip Button -->
       <div style="position:relative">
-        <button class="toolbar-btn" id="btn-chip">Chip ▾</button>
+        <button class="toolbar-btn" id="btn-chip" data-i18n="toolbar.chipSearch">Chip Search ▾</button>
         <div class="dropdown-panel" id="dropdown-chip">
           <div class="dropdown-section">
-            <div class="dropdown-section-title">Last Used</div>
+            <div class="dropdown-section-title" data-i18n="chip.lastUsed">Last Used</div>
             <div id="chip-last-used"></div>
           </div>
           <div class="dropdown-section">
-            <input type="text" class="dropdown-search" id="chip-search" placeholder="Search:">
+            <input type="text" class="dropdown-search" id="chip-search" placeholder="Search:" data-i18n-placeholder="chip.searchPlaceholder">
             <label class="chip-sort-label">
-              <input type="checkbox" id="chip-sort-by-number"> Most used
+              <input type="checkbox" id="chip-sort-by-number"> <span data-i18n="chip.mostUsed">Most used</span>
             </label>
           </div>
           <div class="dropdown-list" id="chip-list"></div>
@@ -34,20 +37,40 @@
 
       <!-- Input Button -->
       <div style="position:relative">
-        <button class="toolbar-btn" id="btn-input">Input ▾</button>
+        <button class="toolbar-btn" id="btn-input" data-i18n="toolbar.input">Input ▾</button>
         <div class="dropdown-panel" id="dropdown-input">
           <div class="dropdown-list">
             <div class="dropdown-item" data-type="button">
-              <span class="dropdown-item-name">4-pin Push Button</span>
+              <span class="dropdown-item-name" data-i18n="input.pushButton4">4-pin Push Button</span>
             </div>
             <div class="dropdown-item" data-type="push_button">
-              <span class="dropdown-item-name">2-pin Push Button</span>
+              <span class="dropdown-item-name" data-i18n="input.pushButton2">2-pin Push Button</span>
             </div>
             <div class="dropdown-item" data-type="switch">
-              <span class="dropdown-item-name">2-pin SPST Rocker Switch</span>
+              <span class="dropdown-item-name" data-i18n="input.switchSpst">2-pin SPST Slide Switch</span>
             </div>
             <div class="dropdown-item" data-type="slide_switch">
-              <span class="dropdown-item-name">3-pin SPDT Slide Switch</span>
+              <span class="dropdown-item-name" data-i18n="input.switchSpdt">3-pin SPDT Slide Switch</span>
+            </div>
+            <div class="dropdown-item dropdown-submenu-trigger" id="input-dip-toggle">
+              <span class="dropdown-item-name" data-i18n="input.dipSwitch">DIP Switch ▸</span>
+            </div>
+            <div class="dropdown-submenu" id="dip-sizes-list" style="display:none;">
+              <div class="dropdown-item" data-type="dip_switch" data-count="2">
+                <span class="dropdown-item-name" data-i18n="input.dip2">2-Switch</span>
+              </div>
+              <div class="dropdown-item" data-type="dip_switch" data-count="4">
+                <span class="dropdown-item-name" data-i18n="input.dip4">4-Switch</span>
+              </div>
+              <div class="dropdown-item" data-type="dip_switch" data-count="6">
+                <span class="dropdown-item-name" data-i18n="input.dip6">6-Switch</span>
+              </div>
+              <div class="dropdown-item" data-type="dip_switch" data-count="8">
+                <span class="dropdown-item-name" data-i18n="input.dip8">8-Switch</span>
+              </div>
+              <div class="dropdown-item" data-type="dip_switch" data-count="10">
+                <span class="dropdown-item-name" data-i18n="input.dip10">10-Switch</span>
+              </div>
             </div>
           </div>
         </div>
@@ -55,40 +78,40 @@
 
       <!-- Output Button -->
       <div style="position:relative">
-        <button class="toolbar-btn" id="btn-output">Output ▾</button>
+        <button class="toolbar-btn" id="btn-output" data-i18n="toolbar.output">Output ▾</button>
         <div class="dropdown-panel" id="dropdown-output">
           <div class="dropdown-list">
             <div class="dropdown-item dropdown-submenu-trigger" id="output-led-toggle">
-              <span class="dropdown-item-name">LED ▸</span>
+              <span class="dropdown-item-name" data-i18n="output.led">LED ▸</span>
             </div>
             <div class="dropdown-submenu" id="led-colors-list" style="display:none;">
               <div class="dropdown-item" data-type="led" data-color="red">
-                <span class="dropdown-item-name">Red</span>
+                <span class="dropdown-item-name" data-i18n="color.red">Red</span>
               </div>
               <div class="dropdown-item" data-type="led" data-color="green">
-                <span class="dropdown-item-name">Green</span>
+                <span class="dropdown-item-name" data-i18n="color.green">Green</span>
               </div>
               <div class="dropdown-item" data-type="led" data-color="blue">
-                <span class="dropdown-item-name">Blue</span>
+                <span class="dropdown-item-name" data-i18n="color.blue">Blue</span>
               </div>
               <div class="dropdown-item" data-type="led" data-color="yellow">
-                <span class="dropdown-item-name">Yellow</span>
+                <span class="dropdown-item-name" data-i18n="color.yellow">Yellow</span>
               </div>
               <div class="dropdown-item" data-type="led" data-color="white">
-                <span class="dropdown-item-name">White</span>
+                <span class="dropdown-item-name" data-i18n="color.white">White</span>
               </div>
             </div>
             <div class="dropdown-item dropdown-submenu-trigger" id="output-7seg-toggle">
-              <span class="dropdown-item-name">7 Segment Display ▸</span>
+              <span class="dropdown-item-name" data-i18n="output.sevenSeg">7 Segment Display ▸</span>
             </div>
             <div class="dropdown-submenu" id="sevenseg-types-list" style="display:none;">
               <div class="dropdown-item" data-type="seven_seg_cathode">
-                <span class="dropdown-item-name">Common Cathode</span>
-                
+                <span class="dropdown-item-name" data-i18n="output.commonCathode">Common Cathode</span>
+
               </div>
               <div class="dropdown-item" data-type="seven_seg_anode">
-                <span class="dropdown-item-name">Common Anode</span>
-                
+                <span class="dropdown-item-name" data-i18n="output.commonAnode">Common Anode</span>
+
               </div>
             </div>
           </div>
@@ -97,48 +120,75 @@
 
       <!-- Analog dropdown -->
       <div style="position:relative">
-        <button class="toolbar-btn" id="btn-analog">Analog ▾</button>
+        <button class="toolbar-btn" id="btn-analog" data-i18n="toolbar.analog">Analog ▾</button>
         <div class="dropdown-panel" id="dropdown-analog">
           <div class="dropdown-list">
             <div class="dropdown-item" id="analog-resistor">
-              <span class="dropdown-item-name">Resistor</span>
+              <span class="dropdown-item-name" data-i18n="analog.resistor">Resistor</span>
             </div>
             <div class="dropdown-item" id="analog-capacitor">
-              <span class="dropdown-item-name">Capacitor</span>
+              <span class="dropdown-item-name" data-i18n="analog.capacitor">Capacitor</span>
             </div>
             <div class="dropdown-item" id="analog-polarized-capacitor">
-              <span class="dropdown-item-name">Polarized Capacitor</span>
+              <span class="dropdown-item-name" data-i18n="analog.polarizedCapacitor">Polarized Capacitor</span>
             </div>
             <div class="dropdown-item" id="analog-diode">
-              <span class="dropdown-item-name">Diode</span>
+              <span class="dropdown-item-name" data-i18n="analog.diode">Diode</span>
+            </div>
+            <!-- -1.2push- hidden for release; remove style to re-enable -->
+            <div class="dropdown-item" id="analog-inductor" style="display:none;">
+              <span class="dropdown-item-name" data-i18n="analog.inductor">Inductor</span>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Wire Button -->
-      <button class="toolbar-btn" id="btn-wire">Wire</button>
+      <button class="toolbar-btn" id="btn-wire" data-i18n="toolbar.wire">Wire</button>
 
       <!-- More dropdown -->
       <div style="position:relative">
-        <button class="toolbar-btn" id="btn-more">More ▾</button>
+        <button class="toolbar-btn" id="btn-more" data-i18n="toolbar.more">More ▾</button>
         <div class="dropdown-panel" id="dropdown-more" style="min-width:220px;">
           <div class="dropdown-list">
-            <div class="dropdown-item" id="more-add-textbox">
-              <span class="dropdown-item-name">Text box</span>
-              <span class="dropdown-item-desc"></span>
-            </div>
+            <div class="dropdown-section-title" style="padding:6px 10px 0;" data-i18n="more.clocks">Clocks</div>
             <div class="dropdown-item" id="more-simple-clock">
-              <span class="dropdown-item-name">Simple Clock</span>
+              <span class="dropdown-item-name" data-i18n="more.simpleClock">Simple Clock</span>
+              <span class="dropdown-item-desc">single pin push/pull clock signal generator</span>
+            </div>
+            <!-- -1.2push- hidden for release; remove style to re-enable -->
+            <div class="dropdown-item" id="more-crystal" style="display:none;">
+              <span class="dropdown-item-name" data-i18n="more.crystal">2-Pin Crystal</span>
+              <span class="dropdown-item-desc">fixed 50% duty quartz clock; right-click to set frequency</span>
+            </div>
+            <!-- -1.2push- hidden for release; remove style to re-enable -->
+            <div class="dropdown-item" id="more-crystal-can" style="display:none;">
+              <span class="dropdown-item-name" data-i18n="more.crystalCan">Crystal Oscillator Can</span>
+              <span class="dropdown-item-desc">self contained crystal oscillator</span>
             </div>
             <div class="dropdown-divider"></div>
-            <div class="dropdown-item" id="more-help">
-              <span class="dropdown-item-name">74Sim Docs</span>
+            <div class="dropdown-item" id="more-test-point">
+              <span class="dropdown-item-name" data-i18n="more.testPoint">Test Point</span>
+              <span class="dropdown-item-desc" data-i18n="more.testPointDesc">Voltage probe used in Timing Analysis</span>
             </div>
+            <div class="dropdown-divider"></div>
+            <div class="dropdown-item" id="more-add-textbox">
+              <span class="dropdown-item-name" data-i18n="more.textBox">Text box</span>
+              <span class="dropdown-item-desc"></span>
+            </div>
+            <div class="dropdown-item" id="more-add-imagebox">
+              <span class="dropdown-item-name" data-i18n="more.imageBox">Image box</span>
+            </div>
+            <div class="dropdown-divider"></div>
             <div class="dropdown-item dropdown-submenu-trigger" id="more-examples">
-              <span class="dropdown-item-name">Example Projects ▸</span>
+              <span class="dropdown-item-name" data-i18n="more.examples">Example Projects ▸</span>
             </div>
             <div class="dropdown-submenu" id="examples-list" style="display:none;"></div>
+            <div class="dropdown-divider"></div>
+            <div class="dropdown-item" id="more-help">
+              <span class="dropdown-item-name" data-i18n="more.docs">74Sim Docs</span>
+            </div>
+
           </div>
         </div>
       </div>
@@ -147,14 +197,17 @@
 
       <!-- Analysis dropdown -->
       <div style="position:relative">
-        <button class="toolbar-btn" id="btn-analysis">Analysis ▾</button>
+        <button class="toolbar-btn" id="btn-analysis" data-i18n="toolbar.analysis">Analysis ▾</button>
         <div class="dropdown-panel" id="dropdown-analysis" style="left:auto;right:0;min-width:180px;">
           <div class="dropdown-list">
             <div class="dropdown-item" id="more-circuit-info">
-              <span class="dropdown-item-name">Circuit Analyzer</span>
+              <span class="dropdown-item-name" data-i18n="analysis.circuit">Circuit Analyzer</span>
             </div>
             <div class="dropdown-item" id="btn-logic">
-              <span class="dropdown-item-name">Combinational Logic Analyzer</span>
+              <span class="dropdown-item-name" data-i18n="analysis.logic">Combinational Logic Analyzer</span>
+            </div>
+            <div class="dropdown-item" id="more-timing">
+              <span class="dropdown-item-name" data-i18n="analysis.timing">Timing Analysis</span>
             </div>
           </div>
         </div>
@@ -162,32 +215,26 @@
 
       <!-- Settings dropdown -->
       <div style="position:relative">
-        <button class="toolbar-btn" id="btn-settings">Settings ▾</button>
+        <button class="toolbar-btn" id="btn-settings" data-i18n="toolbar.settings">Settings ▾</button>
         <div class="dropdown-panel" id="dropdown-settings" style="left:auto;right:0;min-width:240px;">
           <div class="dropdown-list">
             <div class="dropdown-item dropdown-item-toggle" id="more-view-wires">
-              <span class="dropdown-item-name">View Wires</span>
+              <span class="dropdown-item-name" data-i18n="settings.viewWires">View Wires</span>
             </div>
             <div class="dropdown-item dropdown-item-toggle" id="more-simple-names">
-              <span class="dropdown-item-name">Simple Chip Names</span>
+              <span class="dropdown-item-name" data-i18n="settings.simpleNames">Simple Chip Names</span>
             </div>
             <div class="dropdown-item dropdown-item-toggle" id="more-realistic-board">
-              <span class="dropdown-item-name">Realistic Board</span>
-            </div>
-            <div class="dropdown-item dropdown-item-toggle" id="more-pure-digital">
-              <span class="dropdown-item-name">Pure Digital Simulation</span>
-            </div>
-            <div class="dropdown-item dropdown-item-toggle desktop-only" id="more-autosave" style="display:none;">
-              <span class="dropdown-item-name">Autosave</span>
-              
+              <span class="dropdown-item-name" data-i18n="settings.realisticBoard">Realistic Board</span>
             </div>
             <div class="dropdown-divider"></div>
             <div class="dropdown-item" style="cursor:default;">
-              <span class="dropdown-item-name">Defalt Chip Family</span>
-              <select id="settings-chip-family" style="margin-top:6px;background:#2a2a2a;border:1px solid #444;color:#ffffff;padding:4px 6px;font-family:inherit;font-size:12px;border-radius:3px;outline:none;">
+              <span class="dropdown-item-name" data-i18n="settings.chipFamily">Defalt Chip Family</span>
+              <select id="settings-chip-family" translate="no" style="margin-top:6px;background:#2a2a2a;border:1px solid #444;color:#ffffff;padding:4px 6px;font-family:inherit;font-size:12px;border-radius:3px;outline:none;">
                 <option value="LS" selected>74LS</option>
                 <option value="HC">74HC</option>
                 <option value="HCT">74HCT</option>
+                <option value="LVC">74LVC</option>
               </select>
             </div>
           </div>
@@ -196,46 +243,45 @@
 
       <!-- File dropdown (right side) -->
       <div style="position:relative">
-        <button class="toolbar-btn" id="btn-file">File ▾</button>
+        <button class="toolbar-btn" id="btn-file" data-i18n="toolbar.file">File ▾</button>
         <div class="dropdown-panel" id="dropdown-file" style="left:auto;right:0;">
           <div class="dropdown-list">
-            <div class="dropdown-item desktop-only" id="file-save-fs" style="display:none;">
-              <span class="dropdown-item-name">Save</span>
-              <span class="dropdown-item-desc" id="file-save-fs-desc">Save to current file</span>
+            <div class="dropdown-item" id="file-save">
+              <span class="dropdown-item-name" data-i18n="file.save">Save to local</span>
+
             </div>
-            <div class="dropdown-item desktop-only" id="file-save-as" style="display:none;">
-              <span class="dropdown-item-name">Save As</span>
-              
+            <div class="dropdown-item" id="file-load">
+              <span class="dropdown-item-name" data-i18n="file.load">Load from local</span>
+
             </div>
-            <div class="dropdown-item desktop-only" id="file-open" style="display:none;">
-              <span class="dropdown-item-name">Open</span>
-              
-            </div>
-            <div class="dropdown-divider desktop-only" id="file-divider-1" style="display:none;"></div>
+            <div class="dropdown-divider"></div>
             <div class="dropdown-item" id="file-clear">
-              <span class="dropdown-item-name">Clear Current Project</span>
+              <span class="dropdown-item-name" data-i18n="file.clear">Clear Current Project</span>
+            </div>
+            <div class="dropdown-divider"></div>
+            <div class="cached-projects-header" data-i18n="file.cachedProjects">Cached Projects</div>
+            <div id="cached-projects-list">
+              <div class="cached-project-empty" data-i18n="file.noCached">No cached projects yet</div>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Pure Digital mode indicator -->
-    <div id="pure-digital-badge" style="display:none; position:fixed; top:calc(clamp(42px,5.5vh,72px) + 6px); right:clamp(8px,1vw,18px); font-size:9px; font-weight:600; letter-spacing:0.1em; color:#888; border:1px solid #444; border-radius:3px; padding:2px 6px; pointer-events:none; z-index:99;">PURE DIGITAL</div>
-
 
     <!-- ── Main Area ────────────────────────────────────────────────────── -->
     <div id="main-area">
       <div id="canvas-container">
         <canvas id="board-canvas"></canvas>
+        <div id="imagebox-layer"></div>
         <div id="textbox-layer"></div>
       </div>
 
       <!-- ── Side Panel ───────────────────────────────────────────────── -->
       <div id="side-panel" class="collapsed">
         <div class="panel-header">
-          <button class="panel-toggle" id="panel-close" title="Close">✕</button>
-          <span class="panel-title">Info</span>
+          <button class="panel-toggle" id="panel-close" title="Close" data-i18n-title="panel.close">✕</button>
+          <span class="panel-title" data-i18n="panel.info">Info</span>
         </div>
         <div id="analysis-content"></div>
       </div>
@@ -248,35 +294,35 @@
     </div>
 
     <div id="bug-report-backdrop" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.72);z-index:200;align-items:center;justify-content:center;">
-      <div style="background:#1f1f1f;border:1px solid #2e2e2e;border-radius:6px;padding:32px 32px 24px;width:100%;max-width:480px;position:relative;font-family:'SF Mono','Menlo',monospace;">
+      <div style="background:#1f1f1f;border:1px solid #2e2e2e;border-radius:6px;padding:32px 32px 24px;width:100%;max-width:480px;position:relative;font-family:var(--font-body);">
         <button id="bug-report-close" style="position:absolute;top:12px;right:14px;background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer;">&times;</button>
-        <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:20px;">Report a bug</div>
+        <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:20px;" data-i18n="bug.title">Report a bug</div>
         <form id="bug-report-form" style="display:flex;flex-direction:column;gap:16px;">
           <div style="display:flex;flex-direction:column;gap:5px;">
-            <label style="font-size:11px;font-weight:600;color:var(--text-muted);">Explanation</label>
-            <textarea id="bug-explanation" rows="5" placeholder="Describe the bug..." style="background:#141414;border:1px solid #2a2a2a;border-radius:3px;color:var(--text);font-family:inherit;font-size:12px;padding:8px 11px;outline:none;resize:vertical;"></textarea>
+            <label style="font-size:11px;font-weight:600;color:var(--text-muted);" data-i18n="bug.explanation">Explanation</label>
+            <textarea id="bug-explanation" rows="5" placeholder="Describe the bug..." data-i18n-placeholder="bug.explanationPlaceholder" style="background:#141414;border:1px solid #2a2a2a;border-radius:3px;color:var(--text);font-family:inherit;font-size:12px;padding:8px 11px;outline:none;resize:vertical;"></textarea>
           </div>
           <div style="display:flex;flex-direction:column;gap:5px;">
-            <label style="font-size:11px;font-weight:600;color:var(--text-muted);">Upload images</label>
+            <label style="font-size:11px;font-weight:600;color:var(--text-muted);" data-i18n="bug.uploadImages">Upload images</label>
             <input id="bug-images" type="file" accept="image/*" multiple style="background:#141414;border:1px solid #2a2a2a;border-radius:3px;color:var(--text-dim);font-family:inherit;font-size:12px;padding:6px;cursor:pointer;outline:none;width:100%;">
           </div>
-          <button type="submit" id="bug-report-submit" style="background:#ddd;border:none;border-radius:3px;color:#111;font-family:inherit;font-size:12px;font-weight:700;padding:10px;cursor:pointer;">Submit Bug Report</button>
-          <div id="bug-report-status" style="font-size:11px;text-align:center;min-height:14px;color:#888;"></div>
+          <button type="submit" style="background:#ddd;border:none;border-radius:3px;color:var(--text-inverse);font-family:inherit;font-size:12px;font-weight:700;padding:10px;cursor:pointer;" data-i18n="bug.download">Download bug report</button>
+          <div style="font-size:11px;color:var(--text-muted);text-align:center;" data-i18n-html="bug.shareHtml">Share the downloaded report on <a href="https://www.reddit.com/r/74Sim" target="_blank" rel="noopener noreferrer" style="color:var(--link);text-decoration:underline;">r/74Sim</a> or the GitHub issue tracker.</div>
         </form>
       </div>
     </div>
 
     <div id="feedback-backdrop" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.72);z-index:200;align-items:center;justify-content:center;">
-      <div style="background:#1f1f1f;border:1px solid #2e2e2e;border-radius:6px;padding:32px 32px 24px;width:100%;max-width:480px;position:relative;font-family:'SF Mono','Menlo',monospace;">
+      <div style="background:#1f1f1f;border:1px solid #2e2e2e;border-radius:6px;padding:32px 32px 24px;width:100%;max-width:480px;position:relative;font-family:var(--font-body);">
         <button id="feedback-close" style="position:absolute;top:12px;right:14px;background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer;">&times;</button>
-        <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:20px;">Feedback</div>
+        <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:20px;" data-i18n="feedback.title">Feedback</div>
         <form id="feedback-form" style="display:flex;flex-direction:column;gap:16px;">
           <div style="display:flex;flex-direction:column;gap:5px;">
-            <label style="font-size:11px;font-weight:600;color:var(--text-muted);">Your feedback</label>
-            <textarea id="feedback-text" rows="6" placeholder="Share your thoughts, suggestions, or questions..." style="background:#141414;border:1px solid #2a2a2a;border-radius:3px;color:var(--text);font-family:inherit;font-size:12px;padding:8px 11px;outline:none;resize:vertical;"></textarea>
+            <label style="font-size:11px;font-weight:600;color:var(--text-muted);" data-i18n="feedback.label">Your feedback</label>
+            <textarea id="feedback-text" rows="6" placeholder="Share your thoughts, suggestions, or questions..." data-i18n-placeholder="feedback.placeholder" style="background:#141414;border:1px solid #2a2a2a;border-radius:3px;color:var(--text);font-family:inherit;font-size:12px;padding:8px 11px;outline:none;resize:vertical;"></textarea>
           </div>
-          <button type="submit" id="feedback-submit" style="background:#ddd;border:none;border-radius:3px;color:#111;font-family:inherit;font-size:12px;font-weight:700;padding:10px;cursor:pointer;">Submit Feedback</button>
-          <div id="feedback-status" style="font-size:11px;text-align:center;min-height:14px;color:#888;"></div>
+          <button type="submit" style="background:#ddd;border:none;border-radius:3px;color:var(--text-inverse);font-family:inherit;font-size:12px;font-weight:700;padding:10px;cursor:pointer;" data-i18n="feedback.download">Download feedback</button>
+          <div style="font-size:11px;color:var(--text-muted);text-align:center;" data-i18n-html="feedback.shareHtml">Share the downloaded file on <a href="https://www.reddit.com/r/74Sim" target="_blank" rel="noopener noreferrer" style="color:var(--link);text-decoration:underline;">r/74Sim</a> or the GitHub issue tracker.</div>
         </form>
       </div>
     </div>
@@ -285,17 +331,21 @@
     <!-- ── Welcome Screen ──────────────────────────────────────────────── -->
     <div id="welcome-overlay" class="hidden">
       <div id="welcome-modal">
-        <h1 id="welcome-title">Welcome to 74SIM</h1>
+        <h1 id="welcome-title" data-i18n="welcome.title">Welcome to 74Sim</h1>
         <div id="welcome-actions">
-          <a href="docs.html" target="_blank" rel="noopener noreferrer" class="welcome-btn welcome-btn-secondary">How to Use</a>
-          <button class="welcome-btn welcome-btn-secondary" id="welcome-examples-btn">Example Projects</button>
-          <button class="welcome-btn welcome-btn-primary" id="welcome-close-btn">Start Building</button>
+          <a href="/docs" target="_blank" rel="noopener noreferrer" class="welcome-btn welcome-btn-secondary" data-i18n="welcome.howToUse">How to Use</a>
+          <button class="welcome-btn welcome-btn-secondary" id="welcome-examples-btn" data-i18n="welcome.examples">Example Projects</button>
+          <button class="welcome-btn welcome-btn-primary" id="welcome-close-btn" data-i18n="welcome.startBuilding">Start Building</button>
         </div>
       </div>
     </div>
 
   </div>
 
+  <script type="module" src="js/i18n.js"></script>
   <script type="module" src="js/main.js"></script>
+  <script type="module" src="js/updateLog.js"></script>
+<!-- 100% privacy-first analytics -->
+<script async src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
 </body>
 </html>

@@ -1,21 +1,21 @@
 // test-chips40.mjs - Tests for all chips defined in js/chips/chips40.js
 // Chips under test:
-//   74802        : Triple 4 input OR/NOR driver             (GENERIC_STUB, 20-pin)
-//   74803        : Quad D flip-flop                         (GENERIC_STUB, 14-pin)
-//   74804        : Hex 2 input NAND driver                  (GENERIC_STUB, 20-pin)
-//   74805        : Hex 2 input NOR driver                   (GENERIC_STUB, 20-pin)
-//   74807        : 1-to-10 clock driver                     (GENERIC_STUB, 20-pin)
-//   74808        : Hex 2 input AND driver                   (GENERIC_STUB, 20-pin)
-//   74810        : Quad 2 input XNOR                        (GENERIC_STUB, 14-pin)
-//   74811        : Quad 2 input XNOR, OC                    (GENERIC_STUB + OC, 14-pin)
-//   74817        : GTL+/LV-TTL fanout driver                (GENERIC_STUB, 24-pin)
-//   74818        : 8 bit diagnostic register                (GENERIC_STUB, 24-pin)
-//   74819        : 8 bit diagnostic/pipeline register       (GENERIC_STUB, 24-pin)
-//   74821        : 10 bit bus interface FF                  (GENERIC_STUB, 24-pin)
-//   74822        : 10 bit bus interface FF, inv in          (GENERIC_STUB, 24-pin)
-//   74823        : 9 bit D-FF w/ CLRn+CEN                  (GENERIC_STUB, 24-pin)
-//   74824        : 9 bit D-FF w/ CLRn+CEN, inv in          (GENERIC_STUB, 24-pin)
-//   74825        : 8 bit D-FF w/ CLRn+CEN                  (GENERIC_STUB, 24-pin)
+//   74802        : Triple 4 input OR/NOR driver             (GENERIC_STUB, 20 pin)
+//   74803        : Quad D flip flop                         (GENERIC_STUB, 14 pin)
+//   74804        : Hex 2 input NAND driver                  (GENERIC_STUB, 20 pin)
+//   74805        : Hex 2 input NOR driver                   (GENERIC_STUB, 20 pin)
+//   74807        : 1-to-10 clock driver                     (GENERIC_STUB, 20 pin)
+//   74808        : Hex 2 input AND driver                   (GENERIC_STUB, 20 pin)
+//   74810        : Quad 2 input XNOR                        (GENERIC_STUB, 14 pin)
+//   74811        : Quad 2 input XNOR, OC                    (GENERIC_STUB + OC, 14 pin)
+//   74817        : GTL+/LV-TTL fanout driver                (GENERIC_STUB, 24 pin)
+//   74818        : 8 bit diagnostic register                (GENERIC_STUB, 24 pin)
+//   74819        : 8 bit diagnostic/pipeline register       (GENERIC_STUB, 24 pin)
+//   74821        : 10 bit bus interface FF                  (GENERIC_STUB, 24 pin)
+//   74822        : 10 bit bus interface FF, inv in          (GENERIC_STUB, 24 pin)
+//   74823        : 9 bit D-FF w/ CLRn+CEN                  (GENERIC_STUB, 24 pin)
+//   74824        : 9 bit D-FF w/ CLRn+CEN, inv in          (GENERIC_STUB, 24 pin)
+//   74825        : 8 bit D-FF w/ CLRn+CEN                  (GENERIC_STUB, 24 pin)
 
 import { CHIPS_BLOCK_40 } from '../chips/chips40.js';
 import { BreadboardWorld, holeId } from '../breadboard.js';
@@ -83,35 +83,35 @@ function setupChipWithPower(chipId) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const EXPECTED_IDS = [
-  '74802',
-  '74804','74805',
-  '74807','74808',
-  '74810','74811',
-  '74817',
-  '74818','74819',
-  '74821','74822',
-  '74823','74824','74825',
+  '74x802',
+  '74x804','74x805',
+  '74x807','74x808',
+  '74x810','74x811',
+  '74x817',
+  '74x818','74x819',
+  '74x821','74x822',
+  '74x823','74x824','74x825',
 ];
 
 const EXPECTED_SPECS = {
-  '74802': { pins: 20, gnd: 10, vcc: 20 },
-  '74804': { pins: 20, gnd: 10, vcc: 20 },
-  '74805': { pins: 20, gnd: 10, vcc: 20 },
-  '74807': { pins: 20, gnd: 10, vcc: 20 },
-  '74808': { pins: 20, gnd: 10, vcc: 20 },
-  '74810': { pins: 14, gnd:  7, vcc: 14 },
-  '74811': { pins: 14, gnd:  7, vcc: 14 },
-  '74817': { pins: 24, gnd: 12, vcc: 24 },
-  '74818': { pins: 24, gnd: 12, vcc: 24 },
-  '74819': { pins: 24, gnd: 12, vcc: 24 },
-  '74821': { pins: 24, gnd: 12, vcc: 24 },
-  '74822': { pins: 24, gnd: 12, vcc: 24 },
-  '74823': { pins: 24, gnd: 12, vcc: 24 },
-  '74824': { pins: 24, gnd: 12, vcc: 24 },
-  '74825': { pins: 24, gnd: 12, vcc: 24 },
+  '74x802': { pins: 20, gnd: 10, vcc: 20 },
+  '74x804': { pins: 20, gnd: 10, vcc: 20 },
+  '74x805': { pins: 20, gnd: 10, vcc: 20 },
+  '74x807': { pins: 20, gnd: 10, vcc: 20 },
+  '74x808': { pins: 20, gnd: 10, vcc: 20 },
+  '74x810': { pins: 14, gnd:  7, vcc: 14 },
+  '74x811': { pins: 14, gnd:  7, vcc: 14 },
+  '74x817': { pins: 24, gnd: 12, vcc: 24 },
+  '74x818': { pins: 24, gnd: 12, vcc: 24 },
+  '74x819': { pins: 24, gnd: 12, vcc: 24 },
+  '74x821': { pins: 24, gnd: 12, vcc: 24 },
+  '74x822': { pins: 24, gnd: 12, vcc: 24 },
+  '74x823': { pins: 24, gnd: 12, vcc: 24 },
+  '74x824': { pins: 24, gnd: 12, vcc: 24 },
+  '74x825': { pins: 24, gnd: 12, vcc: 24 },
 };
 
-const OC_IDS = ['74811'];
+const OC_IDS = ['74x811'];
 
 console.log('\n=== SECTION S: Structure ===');
 
@@ -149,20 +149,20 @@ for (const id of EXPECTED_IDS) {
 console.log('\n=== SECTION A: Stub chips (HiZ outputs) ===');
 
 const STUB_CONFIGS = [
-  { id: '74802', outputs: ['Y0','Y0n','Y1','Y1n','Y2','Y2n'] },
-  { id: '74804', outputs: ['Y0n','Y1n','Y2n','Y3n','Y4n','Y5n'] },
-  { id: '74805', outputs: ['Y0n','Y1n','Y2n','Y3n','Y4n','Y5n'] },
-  { id: '74807', outputs: ['Y0','Y1','Y2','Y3','Y4','Y5','Y6','Y7','Y8','Y9'] },
-  { id: '74808', outputs: ['Y0','Y1','Y2','Y3','Y4','Y5'] },
-  { id: '74810', outputs: ['Y0','Y1','Y2','Y3'] },
-  { id: '74817', outputs: ['Y0','Y1','Y2','Y3','Y4','Y5','B0','B1'] },
-  { id: '74818', outputs: ['Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7'] },
-  { id: '74819', outputs: ['Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7'] },
-  { id: '74821', outputs: ['Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7','Q8','Q9'] },
-  { id: '74822', outputs: ['Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7','Q8','Q9'] },
-  { id: '74823', outputs: ['Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7','Q8'] },
-  { id: '74824', outputs: ['Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7','Q8'] },
-  { id: '74825', outputs: ['Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7'] },
+  { id: '74x802', outputs: ['Y0','Y0n','Y1','Y1n','Y2','Y2n'] },
+  { id: '74x804', outputs: ['Y0n','Y1n','Y2n','Y3n','Y4n','Y5n'] },
+  { id: '74x805', outputs: ['Y0n','Y1n','Y2n','Y3n','Y4n','Y5n'] },
+  { id: '74x807', outputs: ['Y0','Y1','Y2','Y3','Y4','Y5','Y6','Y7','Y8','Y9'] },
+  { id: '74x808', outputs: ['Y0','Y1','Y2','Y3','Y4','Y5'] },
+  { id: '74x810', outputs: ['Y0','Y1','Y2','Y3'] },
+  { id: '74x817', outputs: ['Y0','Y1','Y2','Y3','Y4','Y5','B0','B1'] },
+  { id: '74x818', outputs: ['Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7'] },
+  { id: '74x819', outputs: ['Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7'] },
+  { id: '74x821', outputs: ['Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7','Q8','Q9'] },
+  { id: '74x822', outputs: ['Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7','Q8','Q9'] },
+  { id: '74x823', outputs: ['Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7','Q8'] },
+  { id: '74x824', outputs: ['Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7','Q8'] },
+  { id: '74x825', outputs: ['Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7'] },
 ];
 
 for (const { id, outputs } of STUB_CONFIGS) {
@@ -181,7 +181,7 @@ for (const { id, outputs } of STUB_CONFIGS) {
 console.log('\n=== SECTION B: OC stub chips (outputs pulled HIGH) ===');
 
 const OC_STUB_CONFIGS = [
-  { id: '74811', outputs: ['Y0','Y1','Y2','Y3'] },
+  { id: '74x811', outputs: ['Y0','Y1','Y2','Y3'] },
 ];
 
 for (const { id, outputs } of OC_STUB_CONFIGS) {

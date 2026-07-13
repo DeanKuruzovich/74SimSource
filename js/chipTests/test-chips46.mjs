@@ -1,21 +1,21 @@
 // test-chips46.mjs - Tests for all chips defined in js/chips/chips46.js
 // Chips under test:
-//   74978        : Octal FF with serial scanner                 (GENERIC_STUB, 24-pin)
-//   74989        : 64 bit RAM 16x4 inv TRI                      (GENERIC_STUB, 16-pin)
-//   74990        : 8 bit transparent latch read-back TRI        (GENERIC_STUB, 20-pin)
-//   74991        : 8 bit transparent latch read-back inv TRI     (GENERIC_STUB, 20-pin)
-//   74992        : 9 bit transparent latch read-back TRI        (GENERIC_STUB, 24-pin)
-//   74993        : 9 bit transparent latch read-back inv TRI     (GENERIC_STUB, 24-pin)
-//   74994        : 10 bit transparent latch read-back TRI       (GENERIC_STUB, 24-pin)
-//   74995        : 10 bit transparent latch read-back inv TRI    (GENERIC_STUB, 24-pin)
-//   74996        : 8 bit edge-triggered latch read-back TRI      (GENERIC_STUB, 24-pin)
-//   74x1000      : Quad 2 input NAND gate driver                (NAND, 14-pin)
-//   74x1002      : Quad 2 input NOR gate driver                 (NOR, 14-pin)
-//   74x1003      : Quad 2 input NAND OC driver                  (NAND+OC, 14-pin)
-//   74x1004      : Hex inverting buffer driver                  (NOT, 14-pin)
-//   74x1005      : Hex inverting buffer OC driver               (NOT+OC, 14-pin)
-//   74x1008      : Quad 2 input AND gate driver                 (AND, 14-pin)
-//   74ALS1010    : Triple 3 input NAND gate driver              (NAND, 14-pin)
+//   74978        : Octal FF with serial scanner                 (GENERIC_STUB, 24 pin)
+//   74989        : 64 bit RAM 16x4 inv TRI                      (GENERIC_STUB, 16 pin)
+//   74990        : 8 bit transparent latch read-back TRI        (GENERIC_STUB, 20 pin)
+//   74991        : 8 bit transparent latch read-back inv TRI     (GENERIC_STUB, 20 pin)
+//   74992        : 9 bit transparent latch read-back TRI        (GENERIC_STUB, 24 pin)
+//   74993        : 9 bit transparent latch read-back inv TRI     (GENERIC_STUB, 24 pin)
+//   74994        : 10 bit transparent latch read-back TRI       (GENERIC_STUB, 24 pin)
+//   74995        : 10 bit transparent latch read-back inv TRI    (GENERIC_STUB, 24 pin)
+//   74996        : 8 bit edge triggered latch read-back TRI      (GENERIC_STUB, 24 pin)
+//   74x1000      : Quad 2 input NAND gate driver                (NAND, 14 pin)
+//   74x1002      : Quad 2 input NOR gate driver                 (NOR, 14 pin)
+//   74x1003      : Quad 2 input NAND OC driver                  (NAND+OC, 14 pin)
+//   74x1004      : Hex inverting buffer driver                  (NOT, 14 pin)
+//   74x1005      : Hex inverting buffer OC driver               (NOT+OC, 14 pin)
+//   74x1008      : Quad 2 input AND gate driver                 (AND, 14 pin)
+//   74ALS1010    : Triple 3 input NAND gate driver              (NAND, 14 pin)
 
 import { CHIPS_BLOCK_46 } from '../chips/chips46.js';
 import { BreadboardWorld, holeId } from '../breadboard.js';
@@ -91,20 +91,20 @@ function connectLow(wm, chip, name) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const EXPECTED_IDS = [
-  '74978','74989','74990','74991','74992','74993','74994','74995','74996',
+  '74x978','74x989','74x990','74x991','74x992','74x993','74x994','74x995','74x996',
   '74x1000','74x1002','74x1003','74x1004','74x1005','74x1008','74ALS1010',
 ];
 
 const EXPECTED_SPECS = {
-  '74978':    { pins: 24, gnd: 12, vcc: 24 },
-  '74989':    { pins: 16, gnd:  8, vcc: 16 },
-  '74990':    { pins: 20, gnd: 10, vcc: 20 },
-  '74991':    { pins: 20, gnd: 10, vcc: 20 },
-  '74992':    { pins: 24, gnd: 12, vcc: 24 },
-  '74993':    { pins: 24, gnd: 12, vcc: 24 },
-  '74994':    { pins: 24, gnd: 12, vcc: 24 },
-  '74995':    { pins: 24, gnd: 12, vcc: 24 },
-  '74996':    { pins: 24, gnd: 12, vcc: 24 },
+  '74x978':    { pins: 24, gnd: 12, vcc: 24 },
+  '74x989':    { pins: 16, gnd:  8, vcc: 16 },
+  '74x990':    { pins: 20, gnd: 10, vcc: 20 },
+  '74x991':    { pins: 20, gnd: 10, vcc: 20 },
+  '74x992':    { pins: 24, gnd: 12, vcc: 24 },
+  '74x993':    { pins: 24, gnd: 12, vcc: 24 },
+  '74x994':    { pins: 24, gnd: 12, vcc: 24 },
+  '74x995':    { pins: 24, gnd: 12, vcc: 24 },
+  '74x996':    { pins: 24, gnd: 12, vcc: 24 },
   '74x1000':  { pins: 14, gnd:  7, vcc: 14 },
   '74x1002':  { pins: 14, gnd:  7, vcc: 14 },
   '74x1003':  { pins: 14, gnd:  7, vcc: 14 },
@@ -155,15 +155,16 @@ for (const id of EXPECTED_IDS) {
 console.log('\n=== SECTION A: Stub chips (HiZ outputs) ===');
 
 const STUB_CONFIGS = [
-  { id: '74978', outputs: ['SO','Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7'] },
-  { id: '74989', outputs: [] },  // bidir data pins, no driven outputs
-  { id: '74990', outputs: ['Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7'] },
-  { id: '74991', outputs: ['Q0n','Q1n','Q2n','Q3n','Q4n','Q5n','Q6n','Q7n'] },
-  { id: '74992', outputs: ['Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7','Q8'] },
-  { id: '74993', outputs: ['Q0n','Q1n','Q2n','Q3n','Q4n','Q5n','Q6n','Q7n','Q8n'] },
-  { id: '74994', outputs: ['Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7','Q8','Q9'] },
-  { id: '74995', outputs: ['Q0n','Q1n','Q2n','Q3n','Q4n','Q5n','Q6n','Q7n','Q8n','Q9n'] },
-  { id: '74996', outputs: ['Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7'] },
+  { id: '74x978', outputs: ['SO','Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7'] },
+  { id: '74x989', outputs: [] },  // bidir data pins, no driven outputs
+  { id: '74x990', outputs: ['Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7'] },
+  { id: '74x991', outputs: ['Q0n','Q1n','Q2n','Q3n','Q4n','Q5n','Q6n','Q7n'] },
+  { id: '74x992', outputs: ['Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7','Q8'] },
+  { id: '74x993', outputs: ['Q0n','Q1n','Q2n','Q3n','Q4n','Q5n','Q6n','Q7n','Q8n'] },
+  { id: '74x994', outputs: ['Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7','Q8','Q9'] },
+  { id: '74x995', outputs: ['Q0n','Q1n','Q2n','Q3n','Q4n','Q5n','Q6n','Q7n','Q8n','Q9n'] },
+  // 74x996 is no longer a stub — it now simulates (REG_READBACK_996). Its
+  // functional regression lives in js/debug/scenarios/74x996-readback-latch.mjs.
 ];
 
 for (const { id, outputs } of STUB_CONFIGS) {

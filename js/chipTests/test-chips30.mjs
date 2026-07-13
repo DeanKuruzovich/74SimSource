@@ -84,7 +84,7 @@ function evalComp(comp) {
 console.log('--- DECODER_3TO8_TRI (74538) ---');
 {
   // OEn=1 → all Y=HiZ
-  const c = makeComp('74538');
+  const c = makeComp('74x538');
   setPin(c, 'A', 0); setPin(c, 'B', 0); setPin(c, 'C', 0);
   setPin(c, 'G1', 1); setPin(c, 'G2An', 0); setPin(c, 'G2Bn', 0); setPin(c, 'OEn', 1);
   evalComp(c);
@@ -92,7 +92,7 @@ console.log('--- DECODER_3TO8_TRI (74538) ---');
 }
 {
   // Not enabled (G1=0) → all Y=0
-  const c = makeComp('74538');
+  const c = makeComp('74x538');
   setPin(c, 'A', 0); setPin(c, 'B', 0); setPin(c, 'C', 0);
   setPin(c, 'G1', 0); setPin(c, 'G2An', 0); setPin(c, 'G2Bn', 0); setPin(c, 'OEn', 0);
   evalComp(c);
@@ -101,7 +101,7 @@ console.log('--- DECODER_3TO8_TRI (74538) ---');
 {
   // Decode each of 0-7
   for (let sel = 0; sel < 8; sel++) {
-    const c = makeComp('74538');
+    const c = makeComp('74x538');
     setPin(c, 'A', (sel >> 0) & 1); setPin(c, 'B', (sel >> 1) & 1); setPin(c, 'C', (sel >> 2) & 1);
     setPin(c, 'G1', 1); setPin(c, 'G2An', 0); setPin(c, 'G2Bn', 0); setPin(c, 'OEn', 0);
     evalComp(c);
@@ -116,7 +116,7 @@ console.log('--- DECODER_3TO8_TRI (74538) ---');
 console.log('--- DECODER_2TO4_TRI (74539) ---');
 {
   // OEn=1 → all HiZ
-  const c = makeComp('74539');
+  const c = makeComp('74x539');
   setPin(c, '1OEn', 1); setPin(c, '1G', 1); setPin(c, '1A0', 0); setPin(c, '1A1', 0);
   setPin(c, '2OEn', 1); setPin(c, '2G', 1); setPin(c, '2A0', 0); setPin(c, '2A1', 0);
   evalComp(c);
@@ -128,7 +128,7 @@ console.log('--- DECODER_2TO4_TRI (74539) ---');
 {
   // Decode 0-3 for both halves
   for (let sel = 0; sel < 4; sel++) {
-    const c = makeComp('74539');
+    const c = makeComp('74x539');
     setPin(c, '1OEn', 0); setPin(c, '1G', 1);
     setPin(c, '1A0', sel & 1); setPin(c, '1A1', (sel >> 1) & 1);
     setPin(c, '2OEn', 0); setPin(c, '2G', 1);
@@ -147,7 +147,7 @@ console.log('--- DECODER_2TO4_TRI (74539) ---');
 console.log('--- BUF_OCTAL_INV_TRI (74540) ---');
 {
   // OEn=1 → HiZ
-  const c = makeComp('74540');
+  const c = makeComp('74x540');
   setPin(c, 'OEn', 1);
   for (let i = 0; i < 8; i++) setPin(c, `A${i}`, 1);
   evalComp(c);
@@ -155,7 +155,7 @@ console.log('--- BUF_OCTAL_INV_TRI (74540) ---');
 }
 {
   // Invert: A=0 → Y=1, A=1 → Y=0
-  const c = makeComp('74540');
+  const c = makeComp('74x540');
   setPin(c, 'OEn', 0);
   const data = 0b10110101;
   for (let i = 0; i < 8; i++) setPin(c, `A${i}`, (data >> i) & 1);
@@ -169,7 +169,7 @@ console.log('--- BUF_OCTAL_INV_TRI (74540) ---');
 console.log('--- TRANSCEIVER_OCTAL_REG (74543) ---');
 {
   // DIR=1 (A→B): rising CLK captures A; OEABn=0 → B output driven
-  const c = makeComp('74543');
+  const c = makeComp('74x543');
   setPin(c, 'DIR', 1); setPin(c, 'OEABn', 0); setPin(c, 'OEBAn', 1);
   setPin(c, 'CLK', 0); setPin(c, 'LEAB', 0); setPin(c, 'LEBA', 0);
   const data = 0b10110101;
@@ -182,7 +182,7 @@ console.log('--- TRANSCEIVER_OCTAL_REG (74543) ---');
 }
 {
   // DIR=1 (A→B): OEABn=1 → B=HiZ
-  const c = makeComp('74543');
+  const c = makeComp('74x543');
   setPin(c, 'DIR', 1); setPin(c, 'OEABn', 1); setPin(c, 'OEBAn', 1);
   setPin(c, 'CLK', 0); setPin(c, 'LEAB', 0); setPin(c, 'LEBA', 0);
   for (let i = 0; i < 8; i++) { setPin(c, `A${i}`, 1); setPin(c, `B${i}`, 0); }
@@ -193,7 +193,7 @@ console.log('--- TRANSCEIVER_OCTAL_REG (74543) ---');
 }
 {
   // DIR=0 (B→A): rising CLK captures B; OEBAn=0 → A output driven
-  const c = makeComp('74543');
+  const c = makeComp('74x543');
   setPin(c, 'DIR', 0); setPin(c, 'OEABn', 1); setPin(c, 'OEBAn', 0);
   setPin(c, 'CLK', 0); setPin(c, 'LEAB', 0); setPin(c, 'LEBA', 0);
   const data = 0b01001011;
@@ -211,7 +211,7 @@ console.log('--- TRANSCEIVER_OCTAL_REG (74543) ---');
 console.log('--- TRANSCEIVER_OCTAL_REG_INV (74544) ---');
 {
   // DIR=1 (A→B inverted): rising CLK latch A; B=NOT(A)
-  const c = makeComp('74544');
+  const c = makeComp('74x544');
   setPin(c, 'DIR', 1); setPin(c, 'OEABn', 0); setPin(c, 'OEBAn', 1);
   setPin(c, 'CLK', 0); setPin(c, 'LEAB', 0); setPin(c, 'LEBA', 0);
   const data = 0b11001100;
@@ -228,8 +228,8 @@ console.log('--- TRANSCEIVER_OCTAL_REG_INV (74544) ---');
 // ─────────────────────────────────────────────────────────────────────────────
 console.log('--- TRANSCEIVER_8BIT reuse (74545) ---');
 {
-  assert(CHIPS_BLOCK_30['74545'].gates[0].type === 'TRANSCEIVER_8BIT', '74545 uses TRANSCEIVER_8BIT');
-  assert(CHIPS_BLOCK_30['74545'].pins === 20, '74545 has 20 pins');
+  assert(CHIPS_BLOCK_30['74x545'].gates[0].type === 'TRANSCEIVER_8BIT', '74545 uses TRANSCEIVER_8BIT');
+  assert(CHIPS_BLOCK_30['74x545'].pins === 20, '74545 has 20 pins');
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -238,7 +238,7 @@ console.log('--- TRANSCEIVER_8BIT reuse (74545) ---');
 console.log('--- TRANSCEIVER_OCTAL_LATCH (74547) ---');
 {
   // DIR=1 (A→B): LEAB=1 latches A; OEABn=0 → B=latch
-  const c = makeComp('74547');
+  const c = makeComp('74x547');
   setPin(c, 'DIR', 1); setPin(c, 'OEABn', 0); setPin(c, 'OEBAn', 1);
   setPin(c, 'LEAB', 1); setPin(c, 'LEBA', 0);
   const data = 0b01100110;
@@ -249,7 +249,7 @@ console.log('--- TRANSCEIVER_OCTAL_LATCH (74547) ---');
 }
 {
   // LEAB=0 → hold
-  const c = makeComp('74547');
+  const c = makeComp('74x547');
   setPin(c, 'DIR', 1); setPin(c, 'OEABn', 0); setPin(c, 'OEBAn', 1);
   setPin(c, 'LEAB', 1); setPin(c, 'LEBA', 0);
   const data = 0b10100101;
@@ -306,7 +306,7 @@ console.log('--- DECODER_3TO8_LATCH_ACK (74547F) ---');
 console.log('--- REG_8BIT_PIPELINE (74548) ---');
 {
   // Two CLK edges needed to get data through pipeline
-  const c = makeComp('74548');
+  const c = makeComp('74x548');
   setPin(c, 'OEn', 0); setPin(c, 'CLK1', 0); setPin(c, 'CLK2', 0);
   const data = 0b10110011;
   for (let i = 0; i < 8; i++) setPin(c, `D${i}`, (data >> i) & 1);
@@ -320,7 +320,7 @@ console.log('--- REG_8BIT_PIPELINE (74548) ---');
 }
 {
   // OEn=1 → HiZ
-  const c = makeComp('74548');
+  const c = makeComp('74x548');
   setPin(c, 'OEn', 1); setPin(c, 'CLK1', 0); setPin(c, 'CLK2', 0);
   evalComp(c);
   for (let i = 0; i < 8; i++) assert(getPin(c, `Q${i}`) === 'Z', `74548 OEn=1 → Q${i}=HiZ`);
@@ -356,7 +356,7 @@ console.log('--- DECODER_3TO8_ACK (74548F) ---');
 console.log('--- LATCH_8BIT_PIPELINE (74549) ---');
 {
   // LE1=1 transparent to stage1; LE2=1 transparent to stage2
-  const c = makeComp('74549');
+  const c = makeComp('74x549');
   setPin(c, 'OEn', 0); setPin(c, 'LE1', 1); setPin(c, 'LE2', 1);
   const data = 0b11010110;
   for (let i = 0; i < 8; i++) setPin(c, `D${i}`, (data >> i) & 1);
@@ -366,7 +366,7 @@ console.log('--- LATCH_8BIT_PIPELINE (74549) ---');
 }
 {
   // LE1=1, LE2=0: stage2 holds
-  const c = makeComp('74549');
+  const c = makeComp('74x549');
   setPin(c, 'OEn', 0); setPin(c, 'LE1', 1); setPin(c, 'LE2', 1);
   const data1 = 0b10101010;
   for (let i = 0; i < 8; i++) setPin(c, `D${i}`, (data1 >> i) & 1);
@@ -380,7 +380,7 @@ console.log('--- LATCH_8BIT_PIPELINE (74549) ---');
 }
 {
   // OEn=1 → HiZ
-  const c = makeComp('74549');
+  const c = makeComp('74x549');
   setPin(c, 'OEn', 1);
   evalComp(c);
   for (let i = 0; i < 8; i++) assert(getPin(c, `Q${i}`) === 'Z', `74549 OEn=1 → Q${i}=HiZ`);
@@ -392,7 +392,7 @@ console.log('--- LATCH_8BIT_PIPELINE (74549) ---');
 console.log('--- MULTIPLIER_8BIT_TC (74559) stub ---');
 {
   // OEn=0: P=0, TCp=1
-  const c = makeComp('74559');
+  const c = makeComp('74x559');
   setPin(c, 'OEn', 0); setPin(c, 'TCn', 1);
   for (let i = 0; i < 8; i++) setPin(c, `A${i}`, 1);
   for (let i = 0; i < 3; i++) setPin(c, `B${i}`, 1);
@@ -402,7 +402,7 @@ console.log('--- MULTIPLIER_8BIT_TC (74559) stub ---');
 }
 {
   // OEn=1 → P=HiZ
-  const c = makeComp('74559');
+  const c = makeComp('74x559');
   setPin(c, 'OEn', 1);
   evalComp(c);
   for (let i = 0; i < 8; i++) assert(getPin(c, `P${i}`) === 'Z', `74559 OEn=1 → P${i}=HiZ`);
@@ -413,8 +413,8 @@ console.log('--- MULTIPLIER_8BIT_TC (74559) stub ---');
 // ─────────────────────────────────────────────────────────────────────────────
 console.log('--- COUNTER_SYNC_DECADE_TRI (74560) ---');
 {
-  // Count 0→9→0 with tri-state off
-  const c = makeComp('74560');
+  // Count 0→9→0 with tri state off
+  const c = makeComp('74x560');
   setPin(c, 'CLRn', 1); setPin(c, 'CLK', 0); setPin(c, 'ENP', 1);
   setPin(c, 'LOAD', 1); setPin(c, 'ENT', 1); setPin(c, 'OEn', 0);
   setPin(c, 'A', 0); setPin(c, 'B', 0); setPin(c, 'C', 0); setPin(c, 'D', 0);
@@ -435,7 +435,7 @@ console.log('--- COUNTER_SYNC_DECADE_TRI (74560) ---');
 }
 {
   // OEn=1 → Q=HiZ (RCO still driven)
-  const c = makeComp('74560');
+  const c = makeComp('74x560');
   setPin(c, 'CLRn', 1); setPin(c, 'CLK', 0); setPin(c, 'ENP', 1);
   setPin(c, 'LOAD', 1); setPin(c, 'ENT', 1); setPin(c, 'OEn', 1);
   evalComp(c);
@@ -444,7 +444,7 @@ console.log('--- COUNTER_SYNC_DECADE_TRI (74560) ---');
 }
 {
   // CLRn=0 → synchronous clear
-  const c = makeComp('74560');
+  const c = makeComp('74x560');
   setPin(c, 'CLRn', 1); setPin(c, 'CLK', 0); setPin(c, 'ENP', 1);
   setPin(c, 'LOAD', 1); setPin(c, 'ENT', 1); setPin(c, 'OEn', 0);
   setPin(c, 'A', 0); setPin(c, 'B', 0); setPin(c, 'C', 0); setPin(c, 'D', 0);
@@ -461,7 +461,7 @@ console.log('--- COUNTER_SYNC_DECADE_TRI (74560) ---');
 console.log('--- COUNTER_SYNC_BIN_TRI (74561) ---');
 {
   // Count 0→15→0
-  const c = makeComp('74561');
+  const c = makeComp('74x561');
   setPin(c, 'CLRn', 1); setPin(c, 'CLK', 0); setPin(c, 'ENP', 1);
   setPin(c, 'LOAD', 1); setPin(c, 'ENT', 1); setPin(c, 'OEn', 0);
   setPin(c, 'A', 0); setPin(c, 'B', 0); setPin(c, 'C', 0); setPin(c, 'D', 0);
@@ -473,7 +473,7 @@ console.log('--- COUNTER_SYNC_BIN_TRI (74561) ---');
 }
 {
   // Load: LOAD=0 → load data
-  const c = makeComp('74561');
+  const c = makeComp('74x561');
   setPin(c, 'CLRn', 1); setPin(c, 'CLK', 0); setPin(c, 'ENP', 1);
   setPin(c, 'LOAD', 0); setPin(c, 'ENT', 1); setPin(c, 'OEn', 0);
   setPin(c, 'A', 1); setPin(c, 'B', 0); setPin(c, 'C', 1); setPin(c, 'D', 0); // load 5
@@ -486,9 +486,9 @@ console.log('--- COUNTER_SYNC_BIN_TRI (74561) ---');
 // ─────────────────────────────────────────────────────────────────────────────
 console.log('--- LATCH_OCTAL_INV_TRI reuse (74563) ---');
 {
-  assert(CHIPS_BLOCK_30['74563'].gates[0].type === 'LATCH_OCTAL_INV_TRI', '74563 uses LATCH_OCTAL_INV_TRI');
+  assert(CHIPS_BLOCK_30['74x563'].gates[0].type === 'LATCH_OCTAL_INV_TRI', '74563 uses LATCH_OCTAL_INV_TRI');
   // Quick functional check
-  const chip = CHIPS_BLOCK_30['74563'];
+  const chip = CHIPS_BLOCK_30['74x563'];
   const c = { id: 'U1', type: 'LATCH_OCTAL_INV_TRI', pins: {} };
   setPin(c, 'OEn', 0); setPin(c, 'LE', 1);
   const data = 0b10101010;

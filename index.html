@@ -3,77 +3,125 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>74SIM</title>
+  <title>74Sim</title>
   <link rel="icon" type="image/png" href="assets/Logo74Sim.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/tokens.css">
   <link rel="stylesheet" href="/css/landing.css">
 </head>
 <body>
 
-  <div class="desk-shell">
-    <header class="desk-header">
-      <img src="/assets/Logo74Sim.png" alt="74SIM" class="desk-logo">
-    </header>
+  <!-- ── Top header ──────────────────────────────────────────────────────── -->
+  <header class="topbar">
+    <a href="/" class="topbar-brand">
+      <img src="/assets/Logo74Sim.png" alt="74Sim" class="topbar-logo">
 
-    <section class="desk-actions">
-      <button class="desk-action desk-action-primary" id="desk-new">
-        <span class="desk-action-title">New Circuit</span>
-      </button>
-      <button class="desk-action" id="desk-open">
-        <span class="desk-action-title">Open File</span>
-      </button>
-      <button class="desk-action" id="desk-resume">
-        <span class="desk-action-title">Resume Last Session</span>
-      </button>
-    </section>
+    </a>
+  </header>
 
-    <section class="desk-recents">
-      <div class="desk-section-head">
-        <span>Recent Files</span>
-        <button class="desk-link" id="desk-clear-recents" type="button">Clear</button>
-      </div>
-      <ul class="desk-recent-list" id="desk-recent-list">
-        <li class="desk-recent-empty">No recent files yet.</li>
+  <div class="page">
+
+    <!-- ── Sidebar ───────────────────────────────────────────────────────── -->
+    <aside>
+      <ul class="nav-links">
+        <li><a href="/" data-i18n="nav.home">Home</a></li>
+        <!-- <li><span class="coming">Educator Portal</span></li> -->
+        <li><a href="#" id="link-report-bug" data-i18n="nav.reportBug">Report a Bug</a></li>
+        <li><a href="#" id="link-feedback" data-i18n="nav.feedback">Feedback</a></li>
+        <li><a href="#" id="link-education" data-i18n="nav.education">Education Use</a></li>
+        <li><a href="http://github.com/DeanKuruzovich/74SimSource" id="link-github" translate="no" data-i18n="nav.github">Github</a></li>
+       <li><a href="https://www.reddit.com/r/74sim/" id="link-reddit" data-i18n="nav.reddit">Reddit</a></li>
+       
+       <!-- lesson comment123 — lessons/courses hidden for this push; un-comment to restore111
+       <li class="nav-sep"></li>
+       <li class="nav-tutorial"><a href="/onramp/lessons" data-i18n="nav.introCourse">Introduction to Digital Hardware</a></li>
+       <li class="nav-tutorial"><a href="/onramp/lessons?course=beneater" data-i18n="nav.beneaterCourse">Ben Eater 8-bit CPU</a></li>
+       -->
       </ul>
-    </section>
+    </aside>
 
-    <footer class="desk-footer">
-      <a href="/docs.html" class="desk-link">Docs</a>
-      <span class="desk-footer-sep">·</span>
-      <button class="desk-link" id="desk-bug-report" type="button">Report a Bug</button>
-      <span class="desk-footer-sep">·</span>
-      <button class="desk-link" id="desk-feedback" type="button">Feedback</button>
-      <span class="desk-footer-sep">·</span>
-      <span class="desk-version">beta</span>
-    </footer>
+    <!-- ── Main ──────────────────────────────────────────────────────────── -->
+    <main>
+      <div id="view-home">
+      <div class="screenshot">
+        <img src="assets/homepagescreenshot.png" alt="74Sim simulator screenshot" class="screenshot-frame" style="object-fit:cover;">
+        <div class="btn-row">
+          <a href="/simulator" class="btn-simulator" data-i18n="landing.simulatorBtn">Simulator</a>
+          <a href="/docs" class="btn-docs" data-i18n="landing.docsBtn">Chip Documentation</a>
+          <a href="/download" class="btn-download" data-i18n="landing.downloadBtn">Download for Desktop</a>
+        </div>
+      </div>
+
+      <p data-i18n="landing.intro">74Sim is an open source simulator for 74 series logic chips. You place chips on a virtual breadboard, wire up switches and LEDs, and use buttons and switches to interact with the logic chips.</p>
+
+
+      <p data-i18n="landing.pitch">It's designed for students, hobbyists, and educators who want the feel of working with
+      real hardware without the cost, or wire strippers. Every gate behaves like
+      its real world counterpart, so the circuits you prototype here translate directly to the
+      bench.</p>
+
+      <h2 data-i18n="landing.featuresTitle">Features</h2>
+
+      <ul class="features">
+        <li data-i18n="landing.feature1">An extensive library of 74 series logic chips.</li>
+        <li data-i18n="landing.feature2">Place components with a drag and drop breadboard interface.</li>
+        <li data-i18n="landing.feature3">More then just 74 Chips, simulate 555 timers, resistors, capacitors, and CMOS 4000 series chips </li>
+        <li data-i18n="landing.feature4">Simulation for diffrent chip familys: LS, HC, HCT.</li>
+        <li data-i18n="landing.feature5">Educational and Helpful documentation.</li>
+        <li data-i18n="landing.feature6">Circuits built mirror the behavior of physical parts, so designs move cleanly
+        from the simulator to a real circuit.</li>
+      </ul>
+
+
+
+      </div><!-- #view-home -->
+
+      <div id="view-education" style="display:none">
+        <h2 data-i18n="landing.educationTitle">Education Use</h2>
+        <p data-i18n-html="landing.educationHtml">74Sim is free for educational institutions.</p>
+      </div><!-- #view-education -->
+
+      <div id="view-bug" style="display:none" class="view-form">
+        <h2 data-i18n="landing.bugTitle">Report a Bug</h2>
+        <form id="bug-report-form">
+          <div class="form-group">
+            <textarea id="bug-description" rows="6" placeholder="Describe the bug what happened, what you expected, and how to reproduce it..." data-i18n-placeholder="landing.bugPlaceholder" required></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label" data-i18n="landing.screenshotsLabel">Screenshots / Images</label>
+            <input id="bug-images" type="file" accept="image/*" multiple>
+          </div>
+          <div class="form-group">
+            <label class="form-label" data-i18n="landing.projectFileLabel">Project File</label>
+            <div class="project-row">
+              <span class="project-label" id="bug-project-label" data-i18n="landing.noFileSelected">No file selected</span>
+              <label class="project-replace"><span data-i18n="landing.attach">Attach</span> <input id="bug-project-file" type="file" accept=".json,.74sim,.zip" style="display:none;"></label>
+            </div>
+          </div>
+          <button type="submit" class="btn-submit" id="bug-submit-btn" data-i18n="landing.submitBug">Submit Bug Report</button>
+          <div class="status-msg" id="bug-status-msg"></div>
+        </form>
+      </div>
+
+      <div id="view-feedback" style="display:none" class="view-form">
+        <h2 data-i18n="landing.feedbackTitle">Feedback</h2>
+        <form id="feedback-form">
+          <div class="form-group">
+            <textarea id="feedback-description" rows="6" placeholder="Share your thoughts, suggestions, or questions..." data-i18n-placeholder="landing.feedbackPlaceholder" required></textarea>
+          </div>
+          <button type="submit" class="btn-submit" id="feedback-submit-btn" data-i18n="landing.submitFeedback">Submit Feedback</button>
+          <div class="status-msg" id="feedback-status-msg"></div>
+        </form>
+      </div>
+    </main>
+
   </div>
 
-  <!-- Bug report modal -->
-  <div class="desk-modal-backdrop" id="desk-bug-backdrop" style="display:none;">
-    <div class="desk-modal">
-      <button class="desk-modal-close" id="desk-bug-close">&times;</button>
-      <div class="desk-modal-title">Report a Bug</div>
-      <form id="desk-bug-form">
-        <textarea id="desk-bug-description" rows="6" placeholder="Describe the bug — what happened, what you expected, and how to reproduce it..." required></textarea>
-        <button type="submit" class="desk-modal-submit" id="desk-bug-submit">Submit Bug Report</button>
-        <div class="desk-modal-status" id="desk-bug-status"></div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Feedback modal -->
-  <div class="desk-modal-backdrop" id="desk-feedback-backdrop" style="display:none;">
-    <div class="desk-modal">
-      <button class="desk-modal-close" id="desk-feedback-close">&times;</button>
-      <div class="desk-modal-title">Feedback</div>
-      <form id="desk-feedback-form">
-        <textarea id="desk-feedback-description" rows="6" placeholder="Share your thoughts, suggestions, or questions..." required></textarea>
-        <button type="submit" class="desk-modal-submit" id="desk-feedback-submit">Submit Feedback</button>
-        <div class="desk-modal-status" id="desk-feedback-status"></div>
-      </form>
-    </div>
-  </div>
-
-  <script type="module" src="/js/landing-desktop.js"></script>
+  <script type="module" src="/js/i18n.js"></script>
+  <script type="module" src="/js/landing.js"></script>
+<!-- 100% privacy-first analytics -->
+<script async src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
 </body>
 </html>

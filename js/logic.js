@@ -249,10 +249,29 @@ export class LogicAnalyzer {
     const netToInputName = new Map();
 
     for (const sw of inputComps) {
-      const outputPinName = sw.type === COMP.SLIDE_SWITCH ? '2' : 'A';
-      const outputPin = sw.pins.find(p => p.name === outputPinName);
-      if (!outputPin) continue;
-      const net = this.netlist.findNetByHole(outputPin.holeId);
+      // Candidate "logic side" pins per component type. 4-pin tactile buttons
+      // have no 'A' pin (their pins are TL/TR/BL/BR), and on 2-pin switches
+      // either lead may face the logic — so prefer the pin whose net is NOT a
+      // power rail: the rail side carries no signal information, and naming a
+      // VCC/GND net would mislabel everything else tied to that rail.
+      const candidates = sw.type === COMP.SLIDE_SWITCH ? ['2']
+        : sw.type === COMP.BUTTON ? ['TR', 'TL']
+        : ['A', 'B'];
+      // Pick the best candidate net: a non-rail net that is actually wired to
+      // something beyond the switch's own pin beats a non-rail dangling net,
+      // which beats a rail net (last-resort fallback only).
+      let net = null;
+      let netScore = -1;
+      for (const pinName of candidates) {
+        const pin = sw.pins.find(p => p.name === pinName);
+        if (!pin) continue;
+        const n = this.netlist.findNetByHole(pin.holeId);
+        if (!n) continue;
+        const isRail = n.isVCC || n.isGND;
+        const isConnected = n.pins.length > 1 || n.holes.size > 1;
+        const score = isRail ? 0 : (isConnected ? 2 : 1);
+        if (score > netScore) { net = n; netScore = score; }
+      }
       if (!net) continue;
       const name = `${sw.name}${sw.id}`;
       inputNames.push(name);
@@ -309,13 +328,18 @@ export class LogicAnalyzer {
 
         if (!isOutput) continue;
 
-        // Prevent infinite loops
+        // Cycle guard: a pin counts as "already seen" only while it is on the
+        // CURRENT trace path (a true feedback loop). The key is removed again
+        // before returning, so legal reconvergent fanout — one gate output
+        // feeding several downstream inputs — is re-traced each time instead
+        // of collapsing to a constant 0.
         const key = `${chip.id}:${pinName}`;
         if (visited.has(key)) return exprConst(0);
         visited.add(key);
 
-        if (gate.type === 'D_FF' || gate.type === 'BCD_7SEG' || gate.type === 'BCD_7SEG_CC' || gate.type === 'DECODER_3TO8') {
+        if (gate.type === 'D_FF' || gate.type === 'BCD_7SEG' || gate.type === 'BCD_7SEG_CC' || gate.type === 'BCD_7SEG_CC_7448' || gate.type === 'DECODER_3TO8') {
           // Sequential or complex just label it
+          visited.delete(key);
           return exprInput(`${chip.name}[${pinName}]`);
         }
 
@@ -335,6 +359,7 @@ export class LogicAnalyzer {
           const inputExpr = this._traceNet(inputNet, netToInputName, chips, visited);
           inputExprs.push(inputExpr || exprConst(0));
         }
+        visited.delete(key);
 
         // Build gate expression
         if (gate.type === 'NOT') {
@@ -406,7 +431,7 @@ export class LogicAnalyzer {
     result.hasSequential = this.hasSequential;
 
     if (this.hasSequential) {
-      result.warnings.push('Circuit contains sequential elements (flip-flops). Full evaluation not supported in Phase 1.');
+      result.warnings.push('Circuit contains sequential elements (flip flops). Full evaluation not supported in Phase 1.');
     }
 
     return result;

@@ -3,40 +3,41 @@
 //
 // Transceivers (non-registered):
 //   74620   octal transceiver, inverting, TRI         → new TRANSCEIVER_8BIT_INV
-//   74621   octal transceiver, non-inverting, OC      → reuse TRANSCEIVER_8BIT
+//   74621   octal transceiver, non inverting, OC      → reuse TRANSCEIVER_8BIT
 //   74622   octal transceiver, inverting, OC          → reuse TRANSCEIVER_8BIT_INV
-//   74623   octal transceiver, non-inverting, TRI     → reuse TRANSCEIVER_8BIT
+//   74623   octal transceiver, non inverting, TRI     → reuse TRANSCEIVER_8BIT
 //   74638   octal transceiver, inverting, TRI+OC      → reuse TRANSCEIVER_8BIT_INV
-//   74639   octal transceiver, non-inverting, TRI+OC  → reuse TRANSCEIVER_8BIT
+//   74639   octal transceiver, non inverting, TRI+OC  → reuse TRANSCEIVER_8BIT
 //   74640   octal transceiver, inverting, TRI         → reuse TRANSCEIVER_8BIT_INV
 //
 // Registered transceiver:
-//   74615   octal transceiver + register, non-inverting, OC → reuse TRANSCEIVER_OCTAL_REG
+//   74615   octal transceiver + register, non inverting, OC → reuse TRANSCEIVER_OCTAL_REG
 //
 // VCO stubs (analog not simulatable): 74624-629
 // ECC stubs:  74636-637
 
 export const CHIPS_BLOCK_33 = {
 
-  // ── 74615: Octal registered bus transceiver, non-inverting, OC ──────────
+  // ── 74615: Octal registered bus transceiver, non inverting, OC ──────────
   /* Primary source: Texas Instruments, 74615 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74als615.pdf
      https://en.wikipedia.org/wiki/Bus_transceiver */
   // Like 74543 (TRANSCEIVER_OCTAL_REG). OC vs TRI not distinguished in sim.
-  '74615': {
+  '74x615': {
     name: '74x615',
     simpleName: 'Octal Reg Xcvr (OC)',
-    description: 'Octal bus transceiver and register with non-inverting outputs (open-collector) (24-pin)',
+    description: 'Octal registered bus transceiver, non-inv, open collector (24-pin)',
     pins: 24,
     vcc: 24,
     gnd: 12,
+    openCollector: true,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74als615.pdf',
-    tags: ['transceiver', 'registered', 'bidirectional', 'octal', 'open-collector'],
-    guideOverview: 'The 74x615 is an octal registered bidirectional transceiver with non-inverting open-collector outputs. It is the OC version of the 74x543. LEAB/LEBA are latch enables, CLK registers the output, and DIR/OEABn/OEBAn control direction and drive. Open-collector outputs require external pull ups.',
+    tags: ['transceiver', 'registered', 'bidirectional', 'octal', 'open collector'],
+    guideOverview: 'The 74x615 is an octal registered bidirectional transceiver with non inverting open collector outputs. It is the OC version of the 74x543. LEAB/LEBA are latch enables, CLK registers the output, and DIR/OEABn/OEBAn control direction and drive. Open collector outputs require external pull ups.',
     guidePinDescriptions: {
-      'OEABn': 'A-to-B Output Enable (active LOW).',
-      'OEBAn': 'B-to-A Output Enable (active LOW).',
-      'LEAB':  'Latch Enable A-to-B.',
-      'LEBA':  'Latch Enable B-to-A.',
+      'OEABn': 'A-to B Output Enable (active LOW).',
+      'OEBAn': 'B-to A Output Enable (active LOW).',
+      'LEAB':  'Latch Enable A-to B.',
+      'LEBA':  'Latch Enable B-to A.',
       'CLK':   'Register clock.',
       'DIR':   'Direction select.',
       'A0':    'Port A bit 0.',
@@ -62,7 +63,7 @@ export const CHIPS_BLOCK_33 = {
       {
         title: '74x543 vs 74x615',
         paragraphs: [
-          '74x543 has tri-state outputs; 74x615 has open-collector. Both are non-inverting registered transceivers with the same control structure.',
+          '74x543 has tri state outputs; 74x615 has open collector. Both are non inverting registered transceivers with the same control structure.',
         ],
         note: 'External pull up resistors required on all A/B port pins.',
       },
@@ -109,16 +110,16 @@ export const CHIPS_BLOCK_33 = {
      https://en.wikipedia.org/wiki/Bus_transceiver */
   // Like 74245 but all data is inverted on output.
   // OEn=0: enabled. DIR=1: A→/B. DIR=0: B→/A.
-  '74620': {
+  '74x620': {
     name: '74x620',
     simpleName: 'Octal Xcvr Inv (TS)',
-    description: 'Octal bus transceiver with inverting tri-state outputs (20-pin)',
+    description: 'Octal bus transceiver with inverting tri state outputs (20-pin)',
     pins: 20,
     vcc: 20,
     gnd: 10,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls620.pdf',
-    tags: ['transceiver', 'bus', 'octal', 'tri-state', 'bidirectional', 'inverting'],
-    guideOverview: 'The 74x620 is an 8 bit bidirectional inverting bus transceiver with tri-state outputs. DIR HIGH routes A to inverted B; DIR LOW routes B to inverted A. OE (active LOW) enables the drive. It is the inverting-output complement of the 74x245.',
+    tags: ['transceiver', 'bus', 'octal', 'tri state', 'bidirectional', 'inverting'],
+    guideOverview: 'The 74x620 is an 8 bit bidirectional inverting bus transceiver with tri state outputs. DIR HIGH routes A to inverted B; DIR LOW routes B to inverted A. OE (active LOW) enables the drive. It is the inverting output complement of the 74x245.',
     guidePinDescriptions: {
       'DIR': 'Direction. HIGH = A drives inverted B; LOW = B drives inverted A.',
       'A1':  'Port A bit 1.',
@@ -180,20 +181,20 @@ export const CHIPS_BLOCK_33 = {
     ],
   },
 
-  // ── 74621: Octal bus transceiver, non-inverting, OC ──────────────────────
+  // ── 74621: Octal bus transceiver, non inverting, OC ──────────────────────
   /* Primary source: Texas Instruments, 74621 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls621.pdf
      https://en.wikipedia.org/wiki/Bus_transceiver */
-  // Same function as 74245 (non-inverting, same pinout), but OC outputs.
-  '74621': {
+  // Same function as 74245 (non inverting, same pinout), but OC outputs.
+  '74x621': {
     name: '74x621',
     simpleName: 'Octal Xcvr (OC)',
-    description: 'Octal bus transceiver with non-inverting outputs (open-collector) (20-pin)',
+    description: 'Octal bus transceiver with non inverting outputs (open collector) (20-pin)',
     pins: 20,
     vcc: 20,
     gnd: 10,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls621.pdf',
-    tags: ['transceiver', 'bus', 'octal', 'open-collector', 'bidirectional'],
-    guideOverview: 'The 74x621 is an 8 bit bidirectional non-inverting bus transceiver with open-collector outputs. Same DIR/OE (active LOW) interface as the 74x245 but with OC outputs requiring external pull ups. Useful for wire-OR bus sharing or driving optocouplers.',
+    tags: ['transceiver', 'bus', 'octal', 'open collector', 'bidirectional'],
+    guideOverview: 'The 74x621 is an 8 bit bidirectional non inverting bus transceiver with open collector outputs. Same DIR/OE (active LOW) interface as the 74x245 but with OC outputs requiring external pull ups. Useful for wire OR bus sharing or driving optocouplers.',
     guidePinDescriptions: {
       'DIR': 'Direction. HIGH = A drives B; LOW = B drives A.',
       'A1':  'Port A bit 1.',
@@ -220,7 +221,7 @@ export const CHIPS_BLOCK_33 = {
       {
         title: 'OC Bidirectional Transceiver',
         paragraphs: [
-          'Open-collector enables multiple 74x621s to share the same bus lines via wired AND. External pull up resistors (1-4.7 kΩ) are required.',
+          'Open collector enables multiple 74x621s to share the same bus lines via wired AND. External pull up resistors (1-4.7 kΩ) are required.',
         ],
       },
     ],
@@ -258,16 +259,16 @@ export const CHIPS_BLOCK_33 = {
   // ── 74622: Octal bus transceiver, inverting, OC ──────────────────────────
   /* Primary source: Texas Instruments, 74622 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls622.pdf
      https://en.wikipedia.org/wiki/Bus_transceiver */
-  '74622': {
+  '74x622': {
     name: '74x622',
     simpleName: 'Octal Xcvr Inv (OC)',
-    description: 'Octal bus transceiver with inverting outputs (open-collector) (20-pin)',
+    description: 'Octal bus transceiver with inverting outputs (open collector) (20-pin)',
     pins: 20,
     vcc: 20,
     gnd: 10,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls622.pdf',
-    tags: ['transceiver', 'bus', 'octal', 'open-collector', 'bidirectional', 'inverting'],
-    guideOverview: 'The 74x622 is an 8 bit bidirectional inverting bus transceiver with open-collector outputs. It is the OC version of the 74x620. All data is inverted through the transceiver; external pull ups required.',
+    tags: ['transceiver', 'bus', 'octal', 'open collector', 'bidirectional', 'inverting'],
+    guideOverview: 'The 74x622 is an 8 bit bidirectional inverting bus transceiver with open collector outputs. It is the OC version of the 74x620. All data is inverted through the transceiver; external pull ups required.',
     guidePinDescriptions: {
       'DIR': 'Direction. HIGH = A drives inverted B; LOW = B drives inverted A.',
       'A1':  'Port A bit 1.',
@@ -295,9 +296,9 @@ export const CHIPS_BLOCK_33 = {
         title: '74x620/621/622/623 Family',
         list: [
           '74x620: TRI outputs, inverting',
-          '74x621: OC outputs, non-inverting',
+          '74x621: OC outputs, non inverting',
           '74x622: OC outputs, inverting',
-          '74x623: TRI outputs, non-inverting',
+          '74x623: TRI outputs, non inverting',
         ],
       },
     ],
@@ -332,20 +333,20 @@ export const CHIPS_BLOCK_33 = {
     ],
   },
 
-  // ── 74623: Octal bus transceiver, non-inverting, TRI ─────────────────────
+  // ── 74623: Octal bus transceiver, non inverting, TRI ─────────────────────
   /* Primary source: Texas Instruments, 74623 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls623.pdf
      https://en.wikipedia.org/wiki/Bus_transceiver */
   // Same as 74245. Reuse TRANSCEIVER_8BIT.
-  '74623': {
+  '74x623': {
     name: '74x623',
     simpleName: 'Octal Xcvr (TS)',
-    description: 'Octal bus transceiver with non-inverting tri-state outputs (20-pin)',
+    description: 'Octal bus transceiver with non inverting tri state outputs (20-pin)',
     pins: 20,
     vcc: 20,
     gnd: 10,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls623.pdf',
-    tags: ['transceiver', 'bus', 'octal', 'tri-state', 'bidirectional'],
-    guideOverview: 'The 74x623 is an 8 bit bidirectional non-inverting bus transceiver with tri-state outputs, functionally equivalent to the 74x245. DIR controls direction; OE (active LOW) enables the outputs. A pin-for-pin compatible replacement for 74x245 in many designs.',
+    tags: ['transceiver', 'bus', 'octal', 'tri state', 'bidirectional'],
+    guideOverview: 'The 74x623 is an 8 bit bidirectional non inverting bus transceiver with tri state outputs, functionally equivalent to the 74x245. DIR controls direction; OE (active LOW) enables the outputs. A pin for pin compatible replacement for 74x245 in many designs.',
     guidePinDescriptions: {
       'DIR': 'Direction. HIGH = A drives B; LOW = B drives A.',
       'A1':  'Port A bit 1.',
@@ -370,7 +371,7 @@ export const CHIPS_BLOCK_33 = {
     },
     guideSections: [
       {
-        title: 'Non-Inverting Transceiver',
+        title: 'Non Inverting Transceiver',
         paragraphs: [
           'Functionally the same as the 74x245 the standard bidirectional bus transceiver. Select 74x623 vs 74x245 based on logic family speed or availability.',
         ],
@@ -407,19 +408,19 @@ export const CHIPS_BLOCK_33 = {
     ],
   },
 
-  // ── 74624: Voltage-Controlled Oscillator (analog stub) ────────────────────
+  // ── 74624: Voltage Controlled Oscillator (analog stub) ────────────────────
   /* Primary source: Texas Instruments, 74624 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls624.pdf
      https://en.wikipedia.org/wiki/Electronic_oscillator */
-  '74624': {
+  '74x624': {
     name: '74x624',
     simpleName: 'VCO Single',
-    description: 'Voltage-controlled oscillator with enable, range, and two-phase outputs (14-pin)',
+    description: 'Voltage controlled oscillator, enable, range, 2 phase outs (14-pin)',
     pins: 14,
     vcc: 14,
     gnd: 7,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls624.pdf',
     tags: ['vco', 'oscillator', 'analog', 'stub'],
-    guideOverview: 'The 74x624 is a voltage-controlled oscillator (VCO). An analog voltage on FREQ1/FREQ2 controls the output frequency; RNG selects a coarse frequency range; OE (active LOW) enables the two complementary outputs (OUT and OUTn). This is an analog device the simulator outputs a fixed logic level stub.',
+    guideOverview: 'The 74x624 is a voltage controlled oscillator (VCO). An analog voltage on FREQ1/FREQ2 controls the output frequency; RNG selects a coarse frequency range; OE (active LOW) enables the two complementary outputs (OUT and OUTn). In the simulator the oscillator runs behaviorally: FREQ1 voltage sets the frequency (0 V ≈ 10 Hz, 5 V ≈ 1 kHz, RNG ×10), and pulling OEn LOW enables the outputs.',
     guidePinDescriptions: {
       'FREQ1': 'Frequency control input 1 (analog voltage).',
       'FREQ2': 'Frequency control input 2 (analog voltage).',
@@ -438,11 +439,11 @@ export const CHIPS_BLOCK_33 = {
     },
     guideSections: [
       {
-        title: 'Voltage-Controlled Oscillator',
+        title: 'Voltage Controlled Oscillator',
         paragraphs: [
-          'A VCO produces a digital clock whose frequency is proportional to an analog control voltage. Typical applications include phase-locked loops (PLLs), frequency synthesizers, and clock generators.',
+          'A VCO produces a digital clock whose frequency is proportional to an analog control voltage. Typical applications include phase locked loops (PLLs), frequency synthesizers, and clock generators.',
         ],
-        note: 'Not simulatable as a digital component. The simulator outputs a stub.',
+        note: 'Simulated behaviorally: the output toggles at a frequency set by the FREQ pin voltage (0 V ≈ 10 Hz, 5 V ≈ 1 kHz; RNG ×10 where present), and an active LOW OEn (where present) halts the oscillator with OUT held LOW.',
       },
     ],
     pinout: [
@@ -463,7 +464,7 @@ export const CHIPS_BLOCK_33 = {
     ],
     gates: [
       { type: 'VCO_STUB',
-        inputs:  ['OEn'],
+        inputs:  ['OEn', 'FREQ1', 'RNG'],
         outputs: ['OUT', 'OUTn'] },
     ],
   },
@@ -471,16 +472,16 @@ export const CHIPS_BLOCK_33 = {
   // ── 74625: Dual VCO ────────────────────────────────────────────────────────
   /* Primary source: Texas Instruments, 74625 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls625.pdf
      https://en.wikipedia.org/wiki/Electronic_oscillator */
-  '74625': {
+  '74x625': {
     name: '74x625',
     simpleName: 'Dual VCO',
-    description: 'Dual voltage-controlled oscillator with two-phase outputs (16-pin)',
+    description: 'Dual voltage controlled oscillator with two phase outputs (16-pin)',
     pins: 16,
     vcc: 16,
     gnd: 8,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls625.pdf',
     tags: ['vco', 'oscillator', 'analog', 'dual', 'stub'],
-    guideOverview: 'The 74x625 contains two independent voltage-controlled oscillators in a single 16-pin package. Each VCO has separate FREQ1/FREQ2 and RNG control inputs and complementary outputs. Useful when two independent clock sources are needed on the same board.',
+    guideOverview: 'The 74x625 contains two independent voltage controlled oscillators in a single 16-pin package. Each VCO has separate FREQ1/FREQ2 and RNG control inputs and complementary outputs. Useful when two independent clock sources are needed on the same board.',
     guidePinDescriptions: {
       'FREQ1A': 'Frequency control 1 for VCO A.',
       'FREQ2A': 'Frequency control 2 for VCO A.',
@@ -505,7 +506,7 @@ export const CHIPS_BLOCK_33 = {
         paragraphs: [
           'The 74x625 integrates two VCOs, reducing board space compared to two 74x624 chips. Both VCOs are analog and not simulatable.',
         ],
-        note: 'Analog device simulator outputs a stub only.',
+        note: 'Simulated behaviorally: the output toggles at a frequency set by the FREQ pin voltage (0 V ≈ 10 Hz, 5 V ≈ 1 kHz; RNG ×10 where present), and an active LOW OEn (where present) halts the oscillator with OUT held LOW.',
       },
     ],
     pinout: [
@@ -527,24 +528,24 @@ export const CHIPS_BLOCK_33 = {
       { pin: 16, name: 'VCC',    type: 'power' },
     ],
     gates: [
-      { type: 'VCO_STUB', inputs: [], outputs: ['OUTA', 'OUTnA'] },
-      { type: 'VCO_STUB', inputs: [], outputs: ['OUTB', 'OUTnB'] },
+      { type: 'VCO_STUB', inputs: [null, 'FREQ1A', 'RNGA'], outputs: ['OUTA', 'OUTnA'] },
+      { type: 'VCO_STUB', inputs: [null, 'FREQ1B', 'RNGB'], outputs: ['OUTB', 'OUTnB'] },
     ],
   },
 
   // ── 74626: Dual VCO with enable ───────────────────────────────────────────
   /* Primary source: Texas Instruments, 74626 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls626.pdf
      https://en.wikipedia.org/wiki/Electronic_oscillator */
-  '74626': {
+  '74x626': {
     name: '74x626',
     simpleName: 'Dual VCO (EN)',
-    description: 'Dual voltage-controlled oscillator with enable control and two-phase outputs (16-pin)',
+    description: 'Dual voltage controlled oscillator, enable, 2 phase outs (16-pin)',
     pins: 16,
     vcc: 16,
     gnd: 8,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls626.pdf',
     tags: ['vco', 'oscillator', 'analog', 'dual', 'enable', 'stub'],
-    guideOverview: 'The 74x626 is a dual VCO with per-section enable pins (OEnA, OEnB). Each VCO has independent FREQ1/FREQ2 controls. The enable pins allow the outputs to be disabled without removing power, useful in frequency-switching applications.',
+    guideOverview: 'The 74x626 is a dual VCO with per section enable pins (OEnA, OEnB). Each VCO has independent FREQ1/FREQ2 controls. The enable pins allow the outputs to be disabled without removing power, useful in frequency switching applications.',
     guidePinDescriptions: {
       'FREQ1A': 'Frequency control 1 for VCO A.',
       'FREQ2A': 'Frequency control 2 for VCO A.',
@@ -569,7 +570,7 @@ export const CHIPS_BLOCK_33 = {
         paragraphs: [
           'Adding OEn to each VCO section allows dynamic selection of which oscillator drives the output bus, useful in PLLs that switch between reference and feedback paths.',
         ],
-        note: 'Analog device simulator outputs a stub only.',
+        note: 'Simulated behaviorally: the output toggles at a frequency set by the FREQ pin voltage (0 V ≈ 10 Hz, 5 V ≈ 1 kHz; RNG ×10 where present), and an active LOW OEn (where present) halts the oscillator with OUT held LOW.',
       },
     ],
     pinout: [
@@ -591,18 +592,18 @@ export const CHIPS_BLOCK_33 = {
       { pin: 16, name: 'VCC',    type: 'power' },
     ],
     gates: [
-      { type: 'VCO_STUB', inputs: ['OEnA'], outputs: ['OUTA', 'OUTnA'] },
-      { type: 'VCO_STUB', inputs: ['OEnB'], outputs: ['OUTB', 'OUTnB'] },
+      { type: 'VCO_STUB', inputs: ['OEnA', 'FREQ1A', null], outputs: ['OUTA', 'OUTnA'] },
+      { type: 'VCO_STUB', inputs: ['OEnB', 'FREQ1B', null], outputs: ['OUTB', 'OUTnB'] },
     ],
   },
 
   // ── 74627: Dual VCO (no enable) ───────────────────────────────────────────
   /* Primary source: Texas Instruments, 74627 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls627.pdf
      https://en.wikipedia.org/wiki/Electronic_oscillator */
-  '74627': {
+  '74x627': {
     name: '74x627',
     simpleName: 'Dual VCO',
-    description: 'Dual voltage-controlled oscillator with two-phase outputs (14-pin)',
+    description: 'Dual voltage controlled oscillator with two phase outputs (14-pin)',
     pins: 14,
     vcc: 14,
     gnd: 7,
@@ -631,7 +632,7 @@ export const CHIPS_BLOCK_33 = {
         paragraphs: [
           '74x625 is 16-pin; 74x627 is 14-pin. The 74x625 adds a RNG (range) pin per section. Choose 74x627 when RNG is not needed and package size is critical.',
         ],
-        note: 'Analog device simulator outputs a stub only.',
+        note: 'Simulated behaviorally: the output toggles at a frequency set by the FREQ pin voltage (0 V ≈ 10 Hz, 5 V ≈ 1 kHz; RNG ×10 where present), and an active LOW OEn (where present) halts the oscillator with OUT held LOW.',
       },
     ],
     pinout: [
@@ -651,18 +652,18 @@ export const CHIPS_BLOCK_33 = {
       { pin: 14, name: 'VCC',    type: 'power' },
     ],
     gates: [
-      { type: 'VCO_STUB', inputs: [], outputs: ['OUTA', 'OUTnA'] },
-      { type: 'VCO_STUB', inputs: [], outputs: ['OUTB', 'OUTnB'] },
+      { type: 'VCO_STUB', inputs: [null, 'FREQ1A', null], outputs: ['OUTA', 'OUTnA'] },
+      { type: 'VCO_STUB', inputs: [null, 'FREQ1B', null], outputs: ['OUTB', 'OUTnB'] },
     ],
   },
 
   // ── 74628: VCO with enable, range, external temp compensation ─────────────
   /* Primary source: Texas Instruments, 74628 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls628.pdf
      https://en.wikipedia.org/wiki/Electronic_oscillator */
-  '74628': {
+  '74x628': {
     name: '74x628',
     simpleName: 'VCO Single (Ext)',
-    description: 'Voltage-controlled oscillator with enable, range, external temp compensation (14-pin)',
+    description: 'Voltage controlled oscillator, enable, range, ext temp comp (14-pin)',
     pins: 14,
     vcc: 14,
     gnd: 7,
@@ -691,7 +692,7 @@ export const CHIPS_BLOCK_33 = {
         paragraphs: [
           '74x628 adds a TC (temperature compensation) pin to the 74x624 for improved frequency stability over temperature using an external component network.',
         ],
-        note: 'Analog device simulator outputs a stub only.',
+        note: 'Simulated behaviorally: the output toggles at a frequency set by the FREQ pin voltage (0 V ≈ 10 Hz, 5 V ≈ 1 kHz; RNG ×10 where present), and an active LOW OEn (where present) halts the oscillator with OUT held LOW.',
       },
     ],
     pinout: [
@@ -711,23 +712,23 @@ export const CHIPS_BLOCK_33 = {
       { pin: 14, name: 'VCC',   type: 'power' },
     ],
     gates: [
-      { type: 'VCO_STUB', inputs: ['OEn'], outputs: ['OUT', 'OUTn'] },
+      { type: 'VCO_STUB', inputs: ['OEn', 'FREQ1', 'RNG'], outputs: ['OUT', 'OUTn'] },
     ],
   },
 
   // ── 74629: Dual VCO with enable and range control ────────────────────────
   /* Primary source: Texas Instruments, 74629 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls629.pdf
      https://en.wikipedia.org/wiki/Electronic_oscillator */
-  '74629': {
+  '74x629': {
     name: '74x629',
     simpleName: 'Dual VCO (EN+RNG)',
-    description: 'Dual voltage-controlled oscillator with enable and range control (16-pin)',
+    description: 'Dual voltage controlled oscillator with enable and range control (16-pin)',
     pins: 16,
     vcc: 16,
     gnd: 8,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls629.pdf',
     tags: ['vco', 'oscillator', 'analog', 'dual', 'enable', 'stub'],
-    guideOverview: 'The 74x629 is a dual VCO with both enable (OEn) and range (RNG) control per section. It is the most feature-complete of the VCO family combining the enable of 74x626 with the range select of 74x625. Analog device, not simulatable.',
+    guideOverview: 'The 74x629 is a dual VCO with both enable (OEn) and range (RNG) control per section. It is the most feature complete of the VCO family combining the enable of 74x626 with the range select of 74x625. Analog device, not simulatable.',
     guidePinDescriptions: {
       'FREQ1A': 'Frequency control 1 for VCO A.',
       'FREQ2A': 'Frequency control 2 for VCO A.',
@@ -755,7 +756,7 @@ export const CHIPS_BLOCK_33 = {
           '74x626: dual VCO, enable only',
           '74x629: dual VCO, enable + range (most complete)',
         ],
-        note: 'Analog device simulator outputs a stub only.',
+        note: 'Simulated behaviorally: the output toggles at a frequency set by the FREQ pin voltage (0 V ≈ 10 Hz, 5 V ≈ 1 kHz; RNG ×10 where present), and an active LOW OEn (where present) halts the oscillator with OUT held LOW.',
       },
     ],
     pinout: [
@@ -777,24 +778,24 @@ export const CHIPS_BLOCK_33 = {
       { pin: 16, name: 'VCC',    type: 'power' },
     ],
     gates: [
-      { type: 'VCO_STUB', inputs: ['OEnA'], outputs: ['OUTA', 'OUTnA'] },
-      { type: 'VCO_STUB', inputs: ['OEnB'], outputs: ['OUTB', 'OUTnB'] },
+      { type: 'VCO_STUB', inputs: ['OEnA', 'FREQ1A', 'RNGA'], outputs: ['OUTA', 'OUTnA'] },
+      { type: 'VCO_STUB', inputs: ['OEnB', 'FREQ1B', 'RNGB'], outputs: ['OUTB', 'OUTnB'] },
     ],
   },
 
   // ── 74636: 8 bit ECC (TRI) ────────────────────────────────────────────────
   /* Primary source: Texas Instruments, 74636 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls636.pdf */
   // Error detection and correction not simulatable. Stub: drives all HiZ.
-  '74636': {
+  '74x636': {
     name: '74x636',
     simpleName: '8 bit ECC (TS)',
-    description: '8 bit parallel error detection and correction with tri-state outputs (20-pin)',
+    description: '8 bit parallel error detection/correction, tri state (20-pin)',
     pins: 20,
     vcc: 20,
     gnd: 10,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls636.pdf',
-    tags: ['ecc', 'error-correction', 'parity', 'stub'],
-    guideOverview: 'The 74x636 is an 8 bit parallel error detection and correction (SECDED) circuit with tri-state outputs. It generates and checks 7 check bits (CB0-CB6) for 8 data bits, detecting and correcting single-bit errors. fE indicates an uncorrectable double-bit error. OEn and SEn control output enables. This is too complex to simulate digitally stub only.',
+    tags: ['ecc', 'error-correction', 'parity', 'secded'],
+    guideOverview: 'The 74x636 is an 8 bit parallel error detection and correction (SECDED) circuit with tri state outputs. It generates and checks 7 check bits (CB0-CB6) for 8 data bits, detecting and correcting single bit errors. fE indicates an uncorrectable double bit error. OEn and SEn control output enables. This is too complex to simulate digitally stub only.',
     guidePinDescriptions: {
       'D0':  'Data bit 0.',
       'D1':  'Data bit 1.',
@@ -823,7 +824,7 @@ export const CHIPS_BLOCK_33 = {
         paragraphs: [
           'SECDED (Single Error Correct, Double Error Detect) uses Hamming code extended with a parity bit. The 74x636 implements this for 8 bit memory bytes, generating and checking 7 check bits per byte.',
         ],
-        note: 'Digital simulator stub only actual ECC logic is not simulated.',
+        note: 'Simulator implements SEC-DED behaviorally: write mode generates the 7 check bits, read mode computes the syndrome and asserts fE on uncorrectable (even-weight) syndromes. The internal H matrix is a clean SEC-DED code, not the bit-exact Hsiao matrix used by TI silicon, so injected bit-flip patterns may not reproduce the exact check bits a real chip produces. Active single-bit correction (driving the data line) is not modeled.',
       },
     ],
     pinout: [
@@ -849,7 +850,7 @@ export const CHIPS_BLOCK_33 = {
       { pin: 20, name: 'VCC', type: 'power' },
     ],
     gates: [
-      { type: 'ECC_STUB',
+      { type: 'ECC_SECDED',
         inputs:  ['OEn', 'SEn', 'D0','D1','D2','D3','D4','D5','D6','D7',
                   'CB0','CB1','CB2','CB3','CB4','CB5','CB6'],
         outputs: ['D0','D1','D2','D3','D4','D5','D6','D7',
@@ -859,16 +860,17 @@ export const CHIPS_BLOCK_33 = {
 
   // ── 74637: 8 bit ECC (OC) ────────────────────────────────────────────────
   /* Primary source: Texas Instruments, 74637 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls637.pdf */
-  '74637': {
+  '74x637': {
     name: '74x637',
     simpleName: '8 bit ECC (OC)',
-    description: '8 bit parallel error detection and correction with open-collector outputs (20-pin)',
+    description: '8 bit parallel error detection/correction, open collector (20-pin)',
     pins: 20,
     vcc: 20,
     gnd: 10,
+    openCollector: true,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls637.pdf',
-    tags: ['ecc', 'error-correction', 'parity', 'open-collector', 'stub'],
-    guideOverview: 'The 74x637 is the open-collector version of the 74x636 SECDED ECC chip. Identical function (8 bit data + 7 check bits, single-error correct, double-error detect) but with OC outputs that require pull up resistors. OC allows wire-OR of the error-flag lines in multi-bank ECC memory designs.',
+    tags: ['ecc', 'error-correction', 'parity', 'open collector', 'secded'],
+    guideOverview: 'The 74x637 is the open collector version of the 74x636 SECDED ECC chip. Identical function (8 bit data + 7 check bits, single error correct, double error detect) but with OC outputs that require pull up resistors. OC allows wire OR of the error flag lines in multi bank ECC memory designs.',
     guidePinDescriptions: {
       'D0':  'Data bit 0.',
       'D1':  'Data bit 1.',
@@ -895,9 +897,9 @@ export const CHIPS_BLOCK_33 = {
       {
         title: '74x636 vs 74x637',
         paragraphs: [
-          '74x636 has tri-state outputs; 74x637 has open-collector. Use 74x637 when the fE flag needs to be wire-OR’d across multiple ECC chips in a memory system.',
+          '74x636 has tri state outputs; 74x637 has open collector. Use 74x637 when the fE flag needs to be wire OR’d across multiple ECC chips in a memory system.',
         ],
-        note: 'Digital simulator stub only.',
+        note: 'Same SEC-DED model as the 74x636; only the output drive style (open collector) differs.',
       },
     ],
     pinout: [
@@ -923,7 +925,7 @@ export const CHIPS_BLOCK_33 = {
       { pin: 20, name: 'VCC', type: 'power' },
     ],
     gates: [
-      { type: 'ECC_STUB',
+      { type: 'ECC_SECDED',
         inputs:  ['OEn', 'SEn', 'D0','D1','D2','D3','D4','D5','D6','D7',
                   'CB0','CB1','CB2','CB3','CB4','CB5','CB6'],
         outputs: ['D0','D1','D2','D3','D4','D5','D6','D7',
@@ -936,19 +938,19 @@ export const CHIPS_BLOCK_33 = {
      https://en.wikipedia.org/wiki/Bus_transceiver */
   // A-side: TRI outputs. B-side: OC outputs. Inverting.
   // Model as 74620 (TRANSCEIVER_8BIT_INV).
-  '74638': {
+  '74x638': {
     name: '74x638',
     simpleName: 'Octal Xcvr Inv (TS/OC)',
-    description: 'Octal bus transceiver with inverting outputs (tri-state A-side, OC B-side) (20-pin)',
+    description: 'Octal bus transceiver, inverting, tri state A-side, OC B-side (20-pin)',
     pins: 20,
     vcc: 20,
     gnd: 10,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls638.pdf',
-    tags: ['transceiver', 'bus', 'octal', 'tri-state', 'open-collector', 'bidirectional', 'inverting'],
-    guideOverview: 'The 74x638 is an 8 bit inverting bidirectional transceiver where the A-side outputs are tri-state and the B-side outputs are open-collector. This mixed output structure was designed for interfacing between a tri-state bus (e.g., CPU bus) and an open-collector bus (e.g., legacy TTL bus).',
+    tags: ['transceiver', 'bus', 'octal', 'tri state', 'open collector', 'bidirectional', 'inverting'],
+    guideOverview: 'The 74x638 is an 8 bit inverting bidirectional transceiver where the A-side outputs are tri state and the B-side outputs are open collector. This mixed output structure was designed for interfacing between a tri state bus (e.g., CPU bus) and an open collector bus (e.g., legacy TTL bus).',
     guidePinDescriptions: {
       'DIR': 'Direction. HIGH = A (TRI) drives inverted B (OC); LOW = B drives inverted A.',
-      'A1':  'Port A bit 1 (tri-state).',
+      'A1':  'Port A bit 1 (tri state).',
       'A2':  'Port A bit 2.',
       'A3':  'Port A bit 3.',
       'A4':  'Port A bit 4.',
@@ -957,7 +959,7 @@ export const CHIPS_BLOCK_33 = {
       'A7':  'Port A bit 7.',
       'A8':  'Port A bit 8.',
       'GND': 'Ground reference (pin 10).',
-      'B8':  'Port B bit 8 (open-collector).',
+      'B8':  'Port B bit 8 (open collector).',
       'B7':  'Port B bit 7.',
       'B6':  'Port B bit 6.',
       'B5':  'Port B bit 5.',
@@ -972,7 +974,7 @@ export const CHIPS_BLOCK_33 = {
       {
         title: 'Mixed TRI/OC Output Transceiver',
         paragraphs: [
-          'The A-side tri-state interface suits modern buses; the B-side OC interface suits wire-OR legacy buses. The inverting output handles active LOW bus conventions.',
+          'The A-side tri state interface suits modern buses; the B-side OC interface suits wire OR legacy buses. The inverting output handles active LOW bus conventions.',
         ],
         note: 'B-side outputs require external pull up resistors.',
       },
@@ -1008,19 +1010,19 @@ export const CHIPS_BLOCK_33 = {
     ],
   },
 
-  // ── 74639: Octal bus transceiver, non-inverting, TRI+OC mixed ────────────
+  // ── 74639: Octal bus transceiver, non inverting, TRI+OC mixed ────────────
   /* Primary source: Texas Instruments, 74639 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls639.pdf
      https://en.wikipedia.org/wiki/Bus_transceiver */
-  '74639': {
+  '74x639': {
     name: '74x639',
     simpleName: 'Octal Xcvr (TS/OC)',
-    description: 'Octal bus transceiver with non-inverting outputs (tri-state A-side, OC B-side) (20-pin)',
+    description: 'Octal bus transceiver, non-inv, tri state A-side, OC B-side (20-pin)',
     pins: 20,
     vcc: 20,
     gnd: 10,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls639.pdf',
-    tags: ['transceiver', 'bus', 'octal', 'tri-state', 'open-collector', 'bidirectional'],
-    guideOverview: 'The 74x639 is an 8 bit non-inverting bidirectional transceiver with mixed outputs: A-side is tri-state, B-side is open-collector. Same DIR/OEn interface as the 74x638 but without output inversion. For non-inverting mixed-output bus bridging.',
+    tags: ['transceiver', 'bus', 'octal', 'tri state', 'open collector', 'bidirectional'],
+    guideOverview: 'The 74x639 is an 8 bit non inverting bidirectional transceiver with mixed outputs: A-side is tri state, B-side is open collector. Same DIR/OEn interface as the 74x638 but without output inversion. For non inverting mixed output bus bridging.',
     guidePinDescriptions: {
       'DIR': 'Direction. HIGH = A (TRI) drives B (OC); LOW = B drives A.',
       'A1':  'Port A bit 1.',
@@ -1032,7 +1034,7 @@ export const CHIPS_BLOCK_33 = {
       'A7':  'Port A bit 7.',
       'A8':  'Port A bit 8.',
       'GND': 'Ground reference (pin 10).',
-      'B8':  'Port B bit 8 (open-collector).',
+      'B8':  'Port B bit 8 (open collector).',
       'B7':  'Port B bit 7.',
       'B6':  'Port B bit 6.',
       'B5':  'Port B bit 5.',
@@ -1047,7 +1049,7 @@ export const CHIPS_BLOCK_33 = {
       {
         title: '74x638 vs 74x639',
         paragraphs: [
-          '74x638 inverts data through the transceiver; 74x639 passes data non-inverted. Both have TRI A-side and OC B-side.',
+          '74x638 inverts data through the transceiver; 74x639 passes data non inverted. Both have TRI A-side and OC B-side.',
         ],
       },
     ],
@@ -1086,16 +1088,16 @@ export const CHIPS_BLOCK_33 = {
   /* Primary source: Texas Instruments, 74640 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls640.pdf
      https://en.wikipedia.org/wiki/Bus_transceiver */
   // Like 74620. Reuse TRANSCEIVER_8BIT_INV.
-  '74640': {
+  '74x640': {
     name: '74x640',
     simpleName: 'Octal Xcvr Inv (TS)',
-    description: 'Octal bus transceiver with inverting tri-state outputs (20-pin)',
+    description: 'Octal bus transceiver with inverting tri state outputs (20-pin)',
     pins: 20,
     vcc: 20,
     gnd: 10,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls640.pdf',
-    tags: ['transceiver', 'bus', 'octal', 'tri-state', 'bidirectional', 'inverting'],
-    guideOverview: 'The 74x640 is an 8 bit bidirectional inverting bus transceiver with tri-state outputs, functionally equivalent to the 74x620. DIR controls direction and OEn enables the outputs. Data is inverted as it passes through in either direction.',
+    tags: ['transceiver', 'bus', 'octal', 'tri state', 'bidirectional', 'inverting'],
+    guideOverview: 'The 74x640 is an 8 bit bidirectional inverting bus transceiver with tri state outputs, functionally equivalent to the 74x620. DIR controls direction and OEn enables the outputs. Data is inverted as it passes through in either direction.',
     guidePinDescriptions: {
       'DIR': 'Direction. HIGH = A drives inverted B; LOW = B drives inverted A.',
       'A1':  'Port A bit 1.',
@@ -1122,7 +1124,7 @@ export const CHIPS_BLOCK_33 = {
       {
         title: '74x620 vs 74x640',
         paragraphs: [
-          'Both 74x620 and 74x640 are inverting tri-state bidirectional transceivers. They are functionally identical; the part number difference reflects the logic family or manufacturer variant.',
+          'Both 74x620 and 74x640 are inverting tri state bidirectional transceivers. They are functionally identical; the part number difference reflects the logic family or manufacturer variant.',
         ],
       },
     ],

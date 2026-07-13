@@ -4,14 +4,14 @@
 
 export const CHIPS_BLOCK_54 = {
 
-  // 74x2825: 8 bit D-type flip-flop with clear and clock enable, TRI+25Ω (24-pin)
+  // 74x2825: 8 bit D type flip flop with clear and clock enable, TRI+25Ω (24-pin)
   '74x2825': {
     name: '74x2825',
-    simpleName: '8 bit D-Flip-Flop with Clear and Clock Enable (25Ω)',
-    description: '8 bit D-type flip-flop with asynchronous clear and clock enable, TRI-STATE with 25 Ω series resistor (24-pin)',
+    simpleName: '8 bit D-Flip Flop with Clear and Clock Enable (25Ω)',
+    description: '8-bit D flip-flop, async clear+clock enable, 3-state 25Ω series (24-pin)',
     pins: 24, vcc: 24, gnd: 12,
     datasheet: '',
-    tags: ['flip-flop', '8 bit', 'D-type', 'clear', 'clock-enable', 'tri-state', 'stub'],
+    tags: ['flip flop', '8 bit', 'D type', 'clear', 'clock-enable', 'tri state', 'stub'],
     pinout: [
       { pin:  1, name: 'OEn',  type: 'input'  },
       { pin:  2, name: 'CLK',  type: 'input'  },
@@ -43,14 +43,14 @@ export const CHIPS_BLOCK_54 = {
     ],
   },
 
-  // 74x2827: 10 bit buffer, non-inverting, TRI+25Ω (24-pin)
+  // 74x2827: 10 bit buffer, non inverting, TRI+25Ω (24-pin)
   '74x2827': {
     name: '74x2827',
-    simpleName: '10 bit Non-Inverting Buffer (25Ω)',
-    description: '10 bit non-inverting buffer, TRI-STATE with 25 Ω series resistor (24-pin)',
+    simpleName: '10 bit Non Inverting Buffer (25Ω)',
+    description: '10 bit non inverting buffer, TRI STATE with 25 Ω series resistor (24-pin)',
     pins: 24, vcc: 24, gnd: 12,
     datasheet: '',
-    tags: ['buffer', '10 bit', 'non-inverting', 'tri-state', 'stub'],
+    tags: ['buffer', '10 bit', 'non inverting', 'tri state', 'stub'],
     pinout: [
       { pin:  1, name: 'OE1n', type: 'input'  },
       { pin:  2, name: 'A0',   type: 'input'  },
@@ -86,10 +86,10 @@ export const CHIPS_BLOCK_54 = {
   '74x2828': {
     name: '74x2828',
     simpleName: '10 bit Inverting Buffer (25Ω)',
-    description: '10 bit inverting buffer, TRI-STATE with 25 Ω series resistor (24-pin)',
+    description: '10 bit inverting buffer, TRI STATE with 25 Ω series resistor (24-pin)',
     pins: 24, vcc: 24, gnd: 12,
     datasheet: '',
-    tags: ['buffer', '10 bit', 'inverting', 'tri-state', 'stub'],
+    tags: ['buffer', '10 bit', 'inverting', 'tri state', 'stub'],
     pinout: [
       { pin:  1, name: 'OE1n', type: 'input'  },
       { pin:  2, name: 'A0',   type: 'input'  },
@@ -121,11 +121,11 @@ export const CHIPS_BLOCK_54 = {
     ],
   },
 
-  // 74x2833: 8 bit bus transceiver with parity error flip-flop, TRI+25Ω (24-pin)
+  // 74x2833: 8 bit bus transceiver with parity error flip flop, TRI+25Ω (24-pin)
   '74x2833': {
     name: '74x2833',
-    simpleName: '8 bit Bus Transceiver with Parity Error Flip-Flop (25Ω)',
-    description: '8 bit bus transceiver with parity error flip-flop, TRI-STATE with 25 Ω series resistor (24-pin)',
+    simpleName: '8 bit Bus Transceiver with Parity Error Flip Flop (25Ω)',
+    description: '8-bit bus transceiver, parity error flip-flop, 3-state 25Ω series (24-pin)',
     pins: 24, vcc: 24, gnd: 12,
     datasheet: '',
     tags: ['transceiver', '8 bit', 'parity', 'bidir', 'stub'],
@@ -164,10 +164,10 @@ export const CHIPS_BLOCK_54 = {
   '74x2841': {
     name: '74x2841',
     simpleName: '10 bit Transparent Latch (25Ω)',
-    description: '10 bit transparent latch, TRI-STATE with 25 Ω series resistor (24-pin)',
+    description: '10 bit transparent latch, TRI STATE with 25 Ω series resistor (24-pin)',
     pins: 24, vcc: 24, gnd: 12,
     datasheet: '',
-    tags: ['latch', '10 bit', 'transparent', 'tri-state', 'stub'],
+    tags: ['latch', '10 bit', 'transparent', 'tri state', 'stub'],
     pinout: [
       { pin:  1, name: 'OEn',  type: 'input'  },
       { pin:  2, name: 'LE',   type: 'input'  },
@@ -203,10 +203,10 @@ export const CHIPS_BLOCK_54 = {
   '74x2843': {
     name: '74x2843',
     simpleName: '9 bit Transparent Latch with Async Reset (25Ω)',
-    description: '9 bit transparent latch with asynchronous reset, TRI-STATE with 25 Ω series resistor (24-pin)',
+    description: '9-bit transparent latch, async reset, 3-state 25Ω series (24-pin)',
     pins: 24, vcc: 24, gnd: 12,
     datasheet: '',
-    tags: ['latch', '9 bit', 'transparent', 'reset', 'tri-state', 'stub'],
+    tags: ['latch', '9 bit', 'transparent', 'reset', 'tri state', 'stub'],
     pinout: [
       { pin:  1, name: 'OEn',  type: 'input'  },
       { pin:  2, name: 'LE',   type: 'input'  },
@@ -242,10 +242,10 @@ export const CHIPS_BLOCK_54 = {
   '74x2845': {
     name: '74x2845',
     simpleName: '8 bit Transparent Latch with Async Reset and Multi-OE (25Ω)',
-    description: '8 bit transparent latch with asynchronous reset and multiple output enable, TRI-STATE with 25 Ω series resistor (24-pin)',
+    description: '8-bit transparent latch, async reset, multi OE, 3-state 25Ω (24-pin)',
     pins: 24, vcc: 24, gnd: 12,
     datasheet: '',
-    tags: ['latch', '8 bit', 'transparent', 'reset', 'tri-state', 'stub'],
+    tags: ['latch', '8 bit', 'transparent', 'reset', 'tri state', 'stub'],
     pinout: [
       { pin:  1, name: 'OE1n', type: 'input'  },
       { pin:  2, name: 'OE2n', type: 'input'  },
@@ -281,7 +281,7 @@ export const CHIPS_BLOCK_54 = {
   '74x2853': {
     name: '74x2853',
     simpleName: '8 bit Bus Transceiver with Parity Error Latch (25Ω)',
-    description: '8 bit bus transceiver with parity error latch, TRI-STATE with 25 Ω series resistor (24-pin)',
+    description: '8-bit bus transceiver, parity error latch, 3-state 25Ω series (24-pin)',
     pins: 24, vcc: 24, gnd: 12,
     datasheet: '',
     tags: ['transceiver', '8 bit', 'parity', 'bidir', 'stub'],
@@ -316,14 +316,14 @@ export const CHIPS_BLOCK_54 = {
     ],
   },
 
-  // 74x2861: 10 bit non-inverting bus transceiver, TRI+25Ω (24-pin)
+  // 74x2861: 10 bit non inverting bus transceiver, TRI+25Ω (24-pin)
   '74x2861': {
     name: '74x2861',
-    simpleName: '10 bit Non-Inverting Bus Transceiver (25Ω)',
-    description: '10 bit non-inverting bus transceiver, TRI-STATE with 25 Ω series resistor (24-pin)',
+    simpleName: '10 bit Non Inverting Bus Transceiver (25Ω)',
+    description: '10-bit non-inverting bus transceiver, 3-state 25Ω series (24-pin)',
     pins: 24, vcc: 24, gnd: 12,
     datasheet: '',
-    tags: ['transceiver', '10 bit', 'non-inverting', 'bidir', 'stub'],
+    tags: ['transceiver', '10 bit', 'non inverting', 'bidir', 'stub'],
     pinout: [
       { pin:  1, name: 'OEABn', type: 'input'  },
       { pin:  2, name: 'OEBAn', type: 'input'  },
@@ -359,7 +359,7 @@ export const CHIPS_BLOCK_54 = {
   '74x2862': {
     name: '74x2862',
     simpleName: '10 bit Inverting Bus Transceiver (25Ω)',
-    description: '10 bit inverting bus transceiver, TRI-STATE with 25 Ω series resistor (24-pin)',
+    description: '10-bit inverting bus transceiver, 3-state 25Ω series (24-pin)',
     pins: 24, vcc: 24, gnd: 12,
     datasheet: '',
     tags: ['transceiver', '10 bit', 'inverting', 'bidir', 'stub'],
@@ -394,14 +394,14 @@ export const CHIPS_BLOCK_54 = {
     ],
   },
 
-  // 74x2863: 9 bit non-inverting bus transceiver with dual output enable, TRI+25Ω (24-pin)
+  // 74x2863: 9 bit non inverting bus transceiver with dual output enable, TRI+25Ω (24-pin)
   '74x2863': {
     name: '74x2863',
-    simpleName: '9 bit Non-Inverting Bus Transceiver with Dual OE (25Ω)',
-    description: '9 bit non-inverting bus transceiver with dual output enable, TRI-STATE with 25 Ω series resistor (24-pin)',
+    simpleName: '9 bit Non Inverting Bus Transceiver with Dual OE (25Ω)',
+    description: '9-bit non-inverting bus transceiver, dual OE, 3-state 25Ω series (24-pin)',
     pins: 24, vcc: 24, gnd: 12,
     datasheet: '',
-    tags: ['transceiver', '9 bit', 'non-inverting', 'bidir', 'stub'],
+    tags: ['transceiver', '9 bit', 'non inverting', 'bidir', 'stub'],
     pinout: [
       { pin:  1, name: 'OEABn', type: 'input'  },
       { pin:  2, name: 'OEBAn', type: 'input'  },
@@ -437,7 +437,7 @@ export const CHIPS_BLOCK_54 = {
   '74x2864': {
     name: '74x2864',
     simpleName: '9 bit Inverting Bus Transceiver with Dual OE (25Ω)',
-    description: '9 bit inverting bus transceiver with dual output enable, TRI-STATE with 25 Ω series resistor (24-pin)',
+    description: '9-bit inverting bus transceiver, dual OE, 3-state 25Ω series (24-pin)',
     pins: 24, vcc: 24, gnd: 12,
     datasheet: '',
     tags: ['transceiver', '9 bit', 'inverting', 'bidir', 'stub'],
@@ -472,17 +472,17 @@ export const CHIPS_BLOCK_54 = {
     ],
   },
 
-  // 74x2952: Octal bus transceiver and register, non-inverting, TRI (24-pin)
+  // 74x2952: Octal bus transceiver and register, non inverting, TRI (24-pin)
   '74x2952': {
     name: '74x2952',
-    simpleName: 'Octal Bus Transceiver and Register Non-Inverting',
-    description: 'Octal bus transceiver and register, non-inverting, TRI-STATE (24-pin)',
+    simpleName: 'Octal Bus Transceiver and Register Non Inverting',
+    description: 'Octal bus transceiver and register, non inverting, TRI STATE (24-pin)',
     pins: 24, vcc: 24, gnd: 12,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74lvc2952a.pdf',
-    tags: ['transceiver', 'octal', 'registered', 'non-inverting', 'bidir', 'stub'],
-    guideOverview: 'The 74x2952 combines two common bus functions in one package: bidirectional transceiving and clocked data registration. It can move data between two 8 bit buses under direction control, while the clocked internal staging makes it useful when bus transfers need to line up cleanly with a system clock rather than pass straight through combinationally. This is the kind of device used in higher-speed bus interfaces where timing control matters as much as simple buffering.',
+    tags: ['transceiver', 'octal', 'registered', 'non inverting', 'bidir'],
+    guideOverview: 'The 74x2952 combines two common bus functions in one package: bidirectional transceiving and clocked data registration. It can move data between two 8 bit buses under direction control, while the clocked internal staging makes it useful when bus transfers need to line up cleanly with a system clock rather than pass straight through combinationally. This is the kind of device used in higher speed bus interfaces where timing control matters as much as simple buffering.',
     guidePinDescriptions: {
-      'OEABn': 'Enable control (active LOW) for the A-to-B path. Use it to decide when that direction is allowed to drive the bus.',
+      'OEABn': 'Enable control (active LOW) for the A-to B path. Use it to decide when that direction is allowed to drive the bus.',
       'CLK': 'Clock input for the internal register stage. Data transfer timing is referenced to this clock.',
       'A1': 'Bit 1 of the A-side bus. It participates in the registered transceiver path.',
       'A2': 'Bit 2 of the A-side bus.',
@@ -492,7 +492,7 @@ export const CHIPS_BLOCK_54 = {
       'A6': 'Bit 6 of the A-side bus.',
       'A7': 'Bit 7 of the A-side bus.',
       'A8': 'Bit 8 of the A-side bus.',
-      'OEBAn': 'Enable control (active LOW) for the B-to-A path.',
+      'OEBAn': 'Enable control (active LOW) for the B-to A path.',
       'GND': 'Ground reference for the device.',
       'DIR': 'Direction control input. It selects which side of the bus is treated as the source in the current cycle.',
       'B8': 'Bit 8 of the B-side bus. It is the B-side mate for A8.',
@@ -520,7 +520,7 @@ export const CHIPS_BLOCK_54 = {
         paragraphs: [
           'DIR chooses the active flow of information, while the two active LOW enable controls decide which path is allowed to drive. Together they prevent contention and let one package support complex bus ownership schemes.',
         ],
-        note: 'This entry remains a documented stub in the simulator. The guide explains the intended hardware role, but full registered bus-transfer behavior is not modeled here.',
+        note: 'Modeled in the simulator as an 8-bit registered transceiver: rising CLK edges latch the source-side data, OEABn/OEBAn gate the destination drivers, and DIR selects the active direction. The simulator collapses the real chip\'s separate CLKAB/CLKBA inputs into a single CLK.',
       },
     ],
     pinout: [
@@ -550,18 +550,24 @@ export const CHIPS_BLOCK_54 = {
       { pin: 24, name: 'VCC',   type: 'power'  },
     ],
     gates: [
-      { type: 'GENERIC_STUB', inputs: ['OEABn','OEBAn','CLK','DIR'], outputs: [] },
+      { type: 'TRANSCEIVER_OCTAL_REG',
+        inputs:  ['OEABn','OEBAn','NC','NC2','CLK','DIR',
+                  'A1','A2','A3','A4','A5','A6','A7','A8',
+                  'B1','B2','B3','B4','B5','B6','B7','B8'],
+        outputs: ['A1','A2','A3','A4','A5','A6','A7','A8',
+                  'B1','B2','B3','B4','B5','B6','B7','B8'] },
     ],
+    sequential: true,
   },
 
   // 74x2953: Octal bus transceiver and register, inverting, TRI (24-pin)
   '74x2953': {
     name: '74x2953',
     simpleName: 'Octal Bus Transceiver and Register Inverting',
-    description: 'Octal bus transceiver and register, inverting, TRI-STATE (24-pin)',
+    description: 'Octal bus transceiver and register, inverting, TRI STATE (24-pin)',
     pins: 24, vcc: 24, gnd: 12,
     datasheet: '',
-    tags: ['transceiver', 'octal', 'registered', 'inverting', 'bidir', 'stub'],
+    tags: ['transceiver', 'octal', 'registered', 'inverting', 'bidir'],
     pinout: [
       { pin:  1, name: 'OEABn', type: 'input'  },
       { pin:  2, name: 'CLK',   type: 'input'  },
@@ -589,18 +595,24 @@ export const CHIPS_BLOCK_54 = {
       { pin: 24, name: 'VCC',   type: 'power'  },
     ],
     gates: [
-      { type: 'GENERIC_STUB', inputs: ['OEABn','OEBAn','CLK','DIR'], outputs: [] },
+      { type: 'TRANSCEIVER_OCTAL_REG_INV',
+        inputs:  ['OEABn','OEBAn','NC','NC2','CLK','DIR',
+                  'A1','A2','A3','A4','A5','A6','A7','A8',
+                  'B1','B2','B3','B4','B5','B6','B7','B8'],
+        outputs: ['A1','A2','A3','A4','A5','A6','A7','A8',
+                  'B1','B2','B3','B4','B5','B6','B7','B8'] },
     ],
+    sequential: true,
   },
 
   // 74x2961: 4 bit EDAC bus buffer, inverting (Am2961 equivalent), TRI (24-pin)
   '74x2961': {
     name: '74x2961',
     simpleName: '4 bit EDAC Bus Buffer, Inverting (Am2961 Equivalent)',
-    description: '4 bit EDAC bus buffer, inverting, equivalent to Am2961, TRI-STATE (24-pin)',
+    description: '4 bit EDAC bus buffer, inverting, equivalent to Am2961, TRI STATE (24-pin)',
     pins: 24, vcc: 24, gnd: 12,
     datasheet: '',
-    tags: ['buffer', 'EDAC', '4 bit', 'inverting', 'tri-state', 'stub'],
+    tags: ['buffer', 'EDAC', '4 bit', 'inverting', 'tri state', 'stub'],
     pinout: [
       { pin:  1, name: 'OEn',  type: 'input'  },
       { pin:  2, name: 'A0',   type: 'input'  },
@@ -632,14 +644,14 @@ export const CHIPS_BLOCK_54 = {
     ],
   },
 
-  // 74x2962: 4 bit EDAC bus buffer, non-inverting (Am2962 equivalent), TRI (24-pin)
+  // 74x2962: 4 bit EDAC bus buffer, non inverting (Am2962 equivalent), TRI (24-pin)
   '74x2962': {
     name: '74x2962',
-    simpleName: '4 bit EDAC Bus Buffer, Non-Inverting (Am2962 Equivalent)',
-    description: '4 bit EDAC bus buffer, non-inverting, equivalent to Am2962, TRI-STATE (24-pin)',
+    simpleName: '4 bit EDAC Bus Buffer, Non Inverting (Am2962 Equivalent)',
+    description: '4-bit EDAC bus buffer, non-inverting, Am2962 equivalent, 3-state (24-pin)',
     pins: 24, vcc: 24, gnd: 12,
     datasheet: '',
-    tags: ['buffer', 'EDAC', '4 bit', 'non-inverting', 'tri-state', 'stub'],
+    tags: ['buffer', 'EDAC', '4 bit', 'non inverting', 'tri state', 'stub'],
     pinout: [
       { pin:  1, name: 'OEn',  type: 'input'  },
       { pin:  2, name: 'A0',   type: 'input'  },

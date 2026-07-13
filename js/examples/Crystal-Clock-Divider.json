@@ -1,0 +1,161 @@
+{
+  "components": [
+    {
+      "id": 1,
+      "type": "chip",
+      "tileX": 0,
+      "tileY": 0,
+      "col": 20,
+      "row": 4,
+      "chipId": "74x393"
+    },
+    {
+      "id": 2,
+      "type": "crystal",
+      "frequencyHz": 16,
+      "startHoleId": "0:0:main:20:8",
+      "endHoleId": "0:0:power:20:2"
+    },
+    {
+      "id": 3,
+      "type": "resistor",
+      "resistance": 470,
+      "startHoleId": "0:0:main:20:6",
+      "endHoleId": "0:0:main:16:6"
+    },
+    {
+      "id": 4,
+      "type": "led",
+      "color": "red",
+      "startHoleId": "0:0:main:16:7",
+      "endHoleId": "0:0:power:16:2"
+    },
+    {
+      "id": 5,
+      "type": "resistor",
+      "resistance": 470,
+      "startHoleId": "0:0:main:22:6",
+      "endHoleId": "0:0:main:28:6"
+    },
+    {
+      "id": 6,
+      "type": "led",
+      "color": "green",
+      "startHoleId": "0:0:main:28:7",
+      "endHoleId": "0:0:power:28:2"
+    },
+    {
+      "id": 7,
+      "type": "resistor",
+      "resistance": 470,
+      "startHoleId": "0:0:main:23:7",
+      "endHoleId": "0:0:main:32:6"
+    },
+    {
+      "id": 8,
+      "type": "led",
+      "color": "green",
+      "startHoleId": "0:0:main:32:7",
+      "endHoleId": "0:0:power:32:2"
+    },
+    {
+      "id": 9,
+      "type": "resistor",
+      "resistance": 470,
+      "startHoleId": "0:0:main:24:8",
+      "endHoleId": "0:0:main:35:6"
+    },
+    {
+      "id": 10,
+      "type": "led",
+      "color": "green",
+      "startHoleId": "0:0:main:35:7",
+      "endHoleId": "0:0:power:35:2"
+    },
+    {
+      "id": 11,
+      "type": "resistor",
+      "resistance": 470,
+      "startHoleId": "0:0:main:25:9",
+      "endHoleId": "0:0:main:39:6"
+    },
+    {
+      "id": 12,
+      "type": "led",
+      "color": "blue",
+      "startHoleId": "0:0:main:39:7",
+      "endHoleId": "0:0:power:39:2"
+    }
+  ],
+  "wires": [
+    {
+      "id": 1,
+      "startHoleId": "0:0:main:20:3",
+      "endHoleId": "0:0:power:20:1",
+      "color": "#ff6b6b"
+    },
+    {
+      "id": 2,
+      "startHoleId": "0:0:main:26:6",
+      "endHoleId": "0:0:power:26:2",
+      "color": "#2244bb"
+    },
+    {
+      "id": 3,
+      "startHoleId": "0:0:main:21:6",
+      "endHoleId": "0:0:power:21:2",
+      "color": "#2244bb"
+    },
+    {
+      "id": 4,
+      "startHoleId": "0:0:main:22:3",
+      "endHoleId": "0:0:power:22:1",
+      "color": "#ff6b6b"
+    },
+    {
+      "id": 5,
+      "startHoleId": "0:0:main:21:2",
+      "endHoleId": "0:0:power:21:0",
+      "color": "#2244bb"
+    }
+  ],
+  "extraTiles": [],
+  "textBoxes": [
+    {
+      "id": 1,
+      "x": 180,
+      "y": -150,
+      "w": 560,
+      "h": 44,
+      "text": "Title: 2-Pin Crystal Clock Divider",
+      "v": 2
+    },
+    {
+      "id": 2,
+      "x": 180,
+      "y": -100,
+      "w": 720,
+      "h": 60,
+      "text": "Description: A 16 Hz quartz crystal drives a 74x393 counter that halves the frequency four times -- 8, 4, 2, then exactly 1 Hz -- the same way a quartz watch turns its crystal into seconds.",
+      "v": 2
+    },
+    {
+      "id": 3,
+      "x": 180,
+      "y": 430,
+      "w": 760,
+      "h": 250,
+      "text": "Details: The silver can is a 2-pin quartz crystal. A real crystal is a passive sliver of quartz -- it only oscillates with an amplifier (usually an inverter) wrapped around it. This simulator idealizes it as a ready-made clock: pin A outputs a square wave at the can's fixed frequency (50% duty cycle) and pin B is its ground leg. A crystal's frequency is fixed by its quartz cut -- in real life you change it by swapping the can, and that is exactly what right-clicking the crystal models: pick a different can (or type a custom frequency). Duty stays locked at 50%. The red LED hangs straight off the crystal: at 16 Hz it flickers too fast to follow. The 74x393's first counter divides by 2 at every stage: QA blinks at 8 Hz, QB at 4 Hz, QC at 2 Hz, and QD (blue) at exactly 1 Hz -- one blink per second, derived purely from the crystal. A quartz watch does the identical trick: a 32,768 Hz crystal divided by two 15 times gives the 1 Hz that steps the second hand. Wiring notes: the counter advances on falling clock edges; CLR1 is tied LOW so counter 1 runs free, and the unused second counter is parked (CLR2 tied HIGH holds it cleared, CLK2 tied LOW).",
+      "v": 2
+    }
+  ],
+  "chipFamily": "LS",
+  "showNetPower": false,
+  "showSimpleChipNames": false,
+  "showRealisticBoard": false,
+  "showLogicView": false,
+  "showCircuitInfo": false,
+  "showValues": false,
+  "lastUsedChips": ["74x393"],
+  "logicFormat": "programming"
+}

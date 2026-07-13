@@ -1,7 +1,7 @@
 // ── Netlist Builder ──────────────────────────────────────────────────────────
 // Traverses wires + breadboard internal connections to build a set of nodes.
 // Each net is a set of connected hole IDs + the component pins attached.
-// 2-pin components (resistors, LEDs, buttons, switches) act as NET BOUNDARIES 
+// 2 pin components (resistors, LEDs, buttons, switches) act as NET BOUNDARIES 
 // their pins are on separate nodes. Closed switches/pressed buttons are
 // recorded in `conductingPairs` so the simulator can bridge their nets with
 // a low-resistance stamp (voltage conducts, but VCC/GND identity does not).
@@ -13,6 +13,11 @@ export class Netlist {
   constructor() {
     this.nodes = [];  // Array of { id, holes: Set<holeId>, pins: [{comp, pin}], isVCC, isGND }
     this.conductingPairs = [];  // [{ comp, holeA, holeB }] closed switches/pressed buttons
+    // O(1) lookup indexes, rebuilt by build(). findNetByHole/findNetByPin are
+    // called from inside the MNA stamping loops (thousands of times per
+    // evaluate), so they must not scan this.nodes.
+    this._holeToNet = new Map();   // holeId → net
+    this._pinKeyToNet = new Map(); // "compId:pinName" → net
   }
 
   // Build the netlist from the current state
@@ -31,7 +36,7 @@ export class Netlist {
     const occupiedHoles = new Set();
     const holeToPins = new Map(); // holeId → [{ comp, pin }]
 
-    // Build a set of hole pairs that belong to the same 2-pin component
+    // Build a set of hole pairs that belong to the same 2 pin component
     // and should NOT be connected (component acts as net boundary)
     const componentBoundaryPairs = new Set(); // "holeA|holeB" strings
 
@@ -48,7 +53,7 @@ export class Netlist {
         holeToPins.get(pin.holeId).push({ comp, pin });
       }
 
-      // 2-pin switch: net boundary. When closed, recorded as a conducting pair
+      // 2 pin switch: net boundary. When closed, recorded as a conducting pair
       // so the simulator can conduct voltage across without merging rail identity.
       if (comp.type === COMP.SWITCH && comp.pins.length === 2) {
         const h0 = comp.pins[0].holeId;
@@ -60,7 +65,7 @@ export class Netlist {
         addBoundary(comp.pins[0].holeId, comp.pins[1].holeId);
       }
 
-      // 4-pin tactile button: vertical pairs (TL↔BL, TR↔BR) are physically the
+      // 4 pin tactile button: vertical pairs (TL↔BL, TR↔BR) are physically the
       // same terminal (always merged). Horizontal (TL↔TR) is the switched path:
       // conducting pair only when pressed voltage conducts across without
       // propagating VCC/GND identity.
@@ -76,7 +81,7 @@ export class Netlist {
         }
       }
 
-      // 2-pin push button: net boundary always; conducting pair when pressed.
+      // 2 pin push button: net boundary always; conducting pair when pressed.
       if (comp.type === COMP.PUSH_BUTTON && comp.pins.length === 2) {
         const h0 = comp.pins[0].holeId;
         const h1 = comp.pins[1].holeId;
@@ -84,7 +89,18 @@ export class Netlist {
         if (comp.pressed) this.conductingPairs.push({ comp, holeA: h0, holeB: h1 });
       }
 
-      // 3-pin slide switch: all three pin-pairs are net boundaries; the active
+      // DIP switch: each individual switch is an independent net boundary.
+      // Closed switches are recorded as conducting pairs.
+      if (comp.type === COMP.DIP_SWITCH && comp.pins.length === 2 * comp.count) {
+        for (let i = 0; i < comp.count; i++) {
+          const hTop = comp.pins[i].holeId;
+          const hBot = comp.pins[comp.count + i].holeId;
+          addBoundary(hTop, hBot);
+          if (comp.states[i]) this.conductingPairs.push({ comp, holeA: hTop, holeB: hBot });
+        }
+      }
+
+      // 3 pin slide switch: all three pin-pairs are net boundaries; the active
       // pair (per state) is recorded as a conducting pair.
       if (comp.type === COMP.SLIDE_SWITCH && comp.pins.length === 3) {
         const h0 = comp.pins[0].holeId; // pin 1
@@ -99,25 +115,26 @@ export class Netlist {
           this.conductingPairs.push({ comp, holeA: h1, holeB: h2 });
         }
       }
-    }
 
-    // Add wire connections: group by net number
-    const netGroups = new Map(); // netNum → [holeId]
-    for (const wire of wireManager.wires) {
-      if (!netGroups.has(wire.startNet)) netGroups.set(wire.startNet, []);
-      netGroups.get(wire.startNet).push(wire.startHoleId);
-      if (!netGroups.has(wire.endNet)) netGroups.set(wire.endNet, []);
-      netGroups.get(wire.endNet).push(wire.endHoleId);
-    }
-
-    // Connect all holes in the same net group
-    for (const [netNum, holes] of netGroups) {
-      for (let i = 0; i < holes.length; i++) {
-        for (let j = i + 1; j < holes.length; j++) {
-          addEdge(holes[i], holes[j]);
-        }
-        if (!adj.has(holes[i])) adj.set(holes[i], new Set());
+      // 7-segment display: the two common pins (COM1 / COM2, pins 3 & 8) are a
+      // single internally-bonded terminal on a real device. Merge their nets so
+      // wiring VCC/GND to EITHER common drives the whole display. Without this
+      // the segment LEDs (stamped against COM1) float when the user wired the
+      // supply to COM2, and nothing lights.
+      if (comp.type === COMP.SEVEN_SEG) {
+        const c1 = comp.getPinByName('COM1');
+        const c2 = comp.getPinByName('COM2');
+        if (c1 && c2) addEdge(c1.holeId, c2.holeId);
       }
+    }
+
+    // Each wire is one connection between its two endpoints. We do NOT
+    // cross-group wires by stored net number — physical breadboard
+    // connectivity (added in the loop below) is the source of truth.
+    // Trusting wire.startNet here would silently propagate stale data
+    // after any wire mutation that misses the recompute path.
+    for (const wire of wireManager.wires) {
+      addEdge(wire.startHoleId, wire.endHoleId);
     }
 
     // Add breadboard internal connections for all occupied holes & wire holes
@@ -180,22 +197,26 @@ export class Netlist {
       }
     }
 
+    // Rebuild the O(1) lookup indexes. Nets are immutable between builds
+    // (evaluate() only reads them), so there is no invalidation to manage.
+    this._holeToNet = new Map();
+    this._pinKeyToNet = new Map();
+    for (const net of this.nodes) {
+      for (const h of net.holes) this._holeToNet.set(h, net);
+      for (const p of net.pins) this._pinKeyToNet.set(p.comp.id + ':' + p.pin.name, net);
+    }
+
     return this.nodes;
   }
 
   // Find the net containing a specific hole
   findNetByHole(holeId) {
-    return this.nodes.find(n => n.holes.has(holeId)) || null;
+    return this._holeToNet.get(holeId) || null;
   }
 
   // Find the net containing a specific component pin
   findNetByPin(comp, pinName) {
-    for (const net of this.nodes) {
-      for (const p of net.pins) {
-        if (p.comp.id === comp.id && p.pin.name === pinName) return net;
-      }
-    }
-    return null;
+    return this._pinKeyToNet.get(comp.id + ':' + pinName) || null;
   }
 
   // Check if connecting two holes would create a VCC-GND short.

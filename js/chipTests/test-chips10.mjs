@@ -83,10 +83,10 @@ function clockChip(world, chip, clkPinName) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const EXPECTED_CHIP_IDS = [
-  '7494', '7496', '7497', '7498', '7499',
-  '74100',
-  '74101', '74102', '74103', '74104', '74105', '74106',
-  '74108', '74110', '74111',
+  '74x94', '74x96', '74x97', '74x98', '74x99',
+  '74x100',
+  '74x101', '74x102', '74x103', '74x104', '74x105', '74x106',
+  '74x108', '74x110', '74x111',
 ];
 
 console.log('\nS1: All chip IDs present in CHIPS_BLOCK_10');
@@ -131,28 +131,28 @@ for (const [id, def] of Object.entries(CHIPS_BLOCK_10)) {
 console.log('\nG2: 7494 - Shift reg (dual preset)');
 {
   // CLR=0 → all zeros (QD=0)
-  const { world, chip, wm } = setupChipWithPower('7494');
+  const { world, chip, wm } = setupChipWithPower('74x94');
   applyInputs(wm, chip, { CLK: 0, CLR: 0, SER: 0, P1A: 1, P1B: 1, P1C: 1, P1D: 1, P2A: 0, P2B: 0, P2C: 0, P2D: 0, S1: 0, S2: 0 });
   const sim = simulate(world, chip, wm);
   assert(isLow(getPinVoltage(sim, findPin(chip, 'QD'))), '7494 CLR=0 → QD=0');
 }
 {
   // S1=1 → async load from P1 (P1D=1)
-  const { world, chip, wm } = setupChipWithPower('7494');
+  const { world, chip, wm } = setupChipWithPower('74x94');
   applyInputs(wm, chip, { CLK: 0, CLR: 1, SER: 0, P1A: 1, P1B: 1, P1C: 1, P1D: 1, P2A: 0, P2B: 0, P2C: 0, P2D: 0, S1: 1, S2: 0 });
   const sim = simulate(world, chip, wm);
   assert(isHigh(getPinVoltage(sim, findPin(chip, 'QD'))), '7494 S1=1 → QD preset to P1D=1');
 }
 {
   // S2=1 → async load from P2 (P2D=0)
-  const { world, chip, wm } = setupChipWithPower('7494');
+  const { world, chip, wm } = setupChipWithPower('74x94');
   applyInputs(wm, chip, { CLK: 0, CLR: 1, SER: 0, P1A: 1, P1B: 1, P1C: 1, P1D: 1, P2A: 0, P2B: 0, P2C: 0, P2D: 0, S1: 0, S2: 1 });
   const sim = simulate(world, chip, wm);
   assert(isLow(getPinVoltage(sim, findPin(chip, 'QD'))), '7494 S2=1 → QD preset to P2D=0');
 }
 {
   // Shift operation: SER=1 shifts through 4 stages → after 4 clocks, QD=1
-  const { world, chip, wm } = setupChipWithPower('7494');
+  const { world, chip, wm } = setupChipWithPower('74x94');
   // Step1: CLR
   applyInputs(wm, chip, { CLK: 0, CLR: 0, SER: 1, P1A: 0, P1B: 0, P1C: 0, P1D: 0, P2A: 0, P2B: 0, P2C: 0, P2D: 0, S1: 0, S2: 0 });
   simulate(world, chip, wm);
@@ -182,7 +182,7 @@ console.log('\nG2: 7494 - Shift reg (dual preset)');
 console.log('\nG3: 7496 - 5 bit shift register');
 {
   // CLR=0 → all zero
-  const { world, chip, wm } = setupChipWithPower('7496');
+  const { world, chip, wm } = setupChipWithPower('74x96');
   applyInputs(wm, chip, { CLK: 0, CLR: 0, SER: 0, A: 1, B: 1, C: 1, D: 1, E: 1, PE: 0 });
   const sim = simulate(world, chip, wm);
   assert(isLow(getPinVoltage(sim, findPin(chip, 'QA'))), '7496 CLR=0 → QA=0');
@@ -190,7 +190,7 @@ console.log('\nG3: 7496 - 5 bit shift register');
 }
 {
   // Parallel load: CLK rising with PE=1 → load A-E
-  const { world, chip, wm } = setupChipWithPower('7496');
+  const { world, chip, wm } = setupChipWithPower('74x96');
   // CLR first
   applyInputs(wm, chip, { CLK: 0, CLR: 0, SER: 0, A: 1, B: 0, C: 1, D: 0, E: 1, PE: 1 });
   simulate(world, chip, wm);
@@ -214,7 +214,7 @@ console.log('\nG3: 7496 - 5 bit shift register');
 }
 {
   // Shift: CLR→clear, then SER=1, PE=0, clk → QA=1
-  const { world, chip, wm } = setupChipWithPower('7496');
+  const { world, chip, wm } = setupChipWithPower('74x96');
   applyInputs(wm, chip, { CLK: 0, CLR: 0, SER: 1, A: 0, B: 0, C: 0, D: 0, E: 0, PE: 0 });
   simulate(world, chip, wm);
   const wm2 = new WireManager(); resetWireCounter();
@@ -235,21 +235,21 @@ console.log('\nG3: 7496 - 5 bit shift register');
 console.log('\nG4: 7497 - Rate multiplier');
 {
   // ENP=1, CLK=1 → Y=1
-  const { world, chip, wm } = setupChipWithPower('7497');
+  const { world, chip, wm } = setupChipWithPower('74x97');
   applyInputs(wm, chip, { CLK: 1, ENP: 1, A: 0, B: 0, C: 0, D: 0, E: 0, F: 0 });
   const sim = simulate(world, chip, wm);
   assert(isHigh(getPinVoltage(sim, findPin(chip, 'Y'))), '7497 CLK=1, ENP=1 → Y=1');
 }
 {
   // ENP=0 → Y=0
-  const { world, chip, wm } = setupChipWithPower('7497');
+  const { world, chip, wm } = setupChipWithPower('74x97');
   applyInputs(wm, chip, { CLK: 1, ENP: 0, A: 1, B: 1, C: 1, D: 1, E: 1, F: 1 });
   const sim = simulate(world, chip, wm);
   assert(isLow(getPinVoltage(sim, findPin(chip, 'Y'))), '7497 ENP=0 → Y=0');
 }
 {
   // CLK=0 → Y=0
-  const { world, chip, wm } = setupChipWithPower('7497');
+  const { world, chip, wm } = setupChipWithPower('74x97');
   applyInputs(wm, chip, { CLK: 0, ENP: 1, A: 1, B: 1, C: 1, D: 1, E: 1, F: 1 });
   const sim = simulate(world, chip, wm);
   assert(isLow(getPinVoltage(sim, findPin(chip, 'Y'))), '7497 CLK=0 → Y=0');
@@ -259,7 +259,7 @@ console.log('\nG4: 7497 - Rate multiplier');
 console.log('\nG5: 7498 - Data selector/storage register');
 {
   // S=0: load from group 0 on rising CLK
-  const { world, chip, wm } = setupChipWithPower('7498');
+  const { world, chip, wm } = setupChipWithPower('74x98');
   applyInputs(wm, chip, { CLK: 0, S: 0, '0A': 1, '0B': 0, '0C': 1, '0D': 0, '1A': 0, '1B': 1, '1C': 0, '1D': 1 });
   simulate(world, chip, wm);
   const wm2 = new WireManager(); resetWireCounter();
@@ -274,7 +274,7 @@ console.log('\nG5: 7498 - Data selector/storage register');
 }
 {
   // S=1: load from group 1 on rising CLK
-  const { world, chip, wm } = setupChipWithPower('7498');
+  const { world, chip, wm } = setupChipWithPower('74x98');
   applyInputs(wm, chip, { CLK: 0, S: 1, '0A': 1, '0B': 1, '0C': 1, '0D': 1, '1A': 0, '1B': 1, '1C': 0, '1D': 1 });
   simulate(world, chip, wm);
   const wm2 = new WireManager(); resetWireCounter();
@@ -292,7 +292,7 @@ console.log('\nG5: 7498 - Data selector/storage register');
 console.log('\nG6: 7499 - 4 bit bidirectional shift register');
 {
   // Parallel load (S1=1, S0=1)
-  const { world, chip, wm } = setupChipWithPower('7499');
+  const { world, chip, wm } = setupChipWithPower('74x99');
   applyInputs(wm, chip, { CLK: 0, S0: 1, S1: 1, SER_R: 0, SER_L: 0, A: 1, B: 0, C: 1, D: 0 });
   simulate(world, chip, wm);
   const wm2 = new WireManager(); resetWireCounter();
@@ -307,7 +307,7 @@ console.log('\nG6: 7499 - 4 bit bidirectional shift register');
 }
 {
   // Hold (S1=0, S0=0): after parallel load, state should stay
-  const { world, chip, wm } = setupChipWithPower('7499');
+  const { world, chip, wm } = setupChipWithPower('74x99');
   // Load ABCD=1010
   applyInputs(wm, chip, { CLK: 0, S0: 1, S1: 1, SER_R: 0, SER_L: 0, A: 1, B: 0, C: 1, D: 0 });
   simulate(world, chip, wm);
@@ -332,7 +332,7 @@ console.log('\nG6: 7499 - 4 bit bidirectional shift register');
 }
 {
   // Shift right (S1=0, S0=1): SER_R=1 → QA becomes 1, QD gets old QC
-  const { world, chip, wm } = setupChipWithPower('7499');
+  const { world, chip, wm } = setupChipWithPower('74x99');
   // Clear by loading 0000
   applyInputs(wm, chip, { CLK: 0, S0: 1, S1: 1, SER_R: 0, SER_L: 0, A: 0, B: 0, C: 0, D: 0 });
   simulate(world, chip, wm);
@@ -357,7 +357,7 @@ console.log('\nG6: 7499 - 4 bit bidirectional shift register');
 }
 {
   // Shift left (S1=1, S0=0): SER_L=1 → QD becomes 1
-  const { world, chip, wm } = setupChipWithPower('7499');
+  const { world, chip, wm } = setupChipWithPower('74x99');
   // Clear
   applyInputs(wm, chip, { CLK: 0, S0: 1, S1: 1, SER_R: 0, SER_L: 0, A: 0, B: 0, C: 0, D: 0 });
   simulate(world, chip, wm);
@@ -381,11 +381,11 @@ console.log('\nG6: 7499 - 4 bit bidirectional shift register');
   assert(isLow(getPinVoltage(sim4, findPin(chip, 'QC'))), '7499 shift left: QC=old QD=0');
 }
 
-// G7: 74x100 - Dual 4 bit bistable latch (24-pin)
+// G7: 74x100 - Dual 4 bit bistable latch (24 pin)
 console.log('\nG7: 74100 - Dual 4 bit bistable latch');
 {
   // Group 1: 1E=1 (transparent) → 1Q follows 1D
-  const { world, chip, wm } = setupChipWithPower('74100');
+  const { world, chip, wm } = setupChipWithPower('74x100');
   applyInputs(wm, chip, { '1D1': 1, '1D2': 0, '1D3': 1, '1D4': 0, '1E': 1, '2D1': 0, '2D2': 0, '2D3': 0, '2D4': 0, '2E': 0 });
   const sim = simulate(world, chip, wm);
   assert(isHigh(getPinVoltage(sim, findPin(chip, '1Q1'))), '74100 1E=1, 1D1=1 → 1Q1=1');
@@ -395,7 +395,7 @@ console.log('\nG7: 74100 - Dual 4 bit bistable latch');
 }
 {
   // Group 2: 2E=1 (transparent) → 2Q follows 2D
-  const { world, chip, wm } = setupChipWithPower('74100');
+  const { world, chip, wm } = setupChipWithPower('74x100');
   applyInputs(wm, chip, { '1D1': 0, '1D2': 0, '1D3': 0, '1D4': 0, '1E': 0, '2D1': 1, '2D2': 0, '2D3': 1, '2D4': 0, '2E': 1 });
   const sim = simulate(world, chip, wm);
   assert(isHigh(getPinVoltage(sim, findPin(chip, '2Q1'))), '74100 2E=1, 2D1=1 → 2Q1=1');
@@ -404,7 +404,7 @@ console.log('\nG7: 74100 - Dual 4 bit bistable latch');
 }
 {
   // Hold: 1E=0, data changes, Q should stay
-  const { world, chip, wm } = setupChipWithPower('74100');
+  const { world, chip, wm } = setupChipWithPower('74x100');
   applyInputs(wm, chip, { '1D1': 1, '1D2': 1, '1D3': 1, '1D4': 1, '1E': 1, '2E': 0, '2D1': 0, '2D2': 0, '2D3': 0, '2D4': 0 });
   simulate(world, chip, wm);
   const wm2 = new WireManager(); resetWireCounter();
@@ -415,11 +415,11 @@ console.log('\nG7: 74100 - Dual 4 bit bistable latch');
   assert(isHigh(getPinVoltage(sim2, findPin(chip, '1Q1'))), '74100 latch hold: 1Q1 stays 1 after 1E=0');
 }
 
-// G8: 74x101 - JK FF (AND-OR gated, preset only)
-console.log('\nG8: 74101 - JK FF (AND-OR, preset only)');
+// G8: 74x101 - JK FF (AND OR gated, preset only)
+console.log('\nG8: 74101 - JK FF (AND OR, preset only)');
 {
   // PRE=0 → Q=1
-  const { world, chip, wm } = setupChipWithPower('74101');
+  const { world, chip, wm } = setupChipWithPower('74x101');
   applyInputs(wm, chip, { J1: 0, J2: 0, J3: 0, K1: 0, K2: 0, K3: 0, CLK: 0, PRE: 0 });
   const sim = simulate(world, chip, wm);
   assert(isHigh(getPinVoltage(sim, findPin(chip, 'Q'))), '74101 PRE=0 → Q=1');
@@ -427,7 +427,7 @@ console.log('\nG8: 74101 - JK FF (AND-OR, preset only)');
 }
 {
   // Set J=1, K=0, clock
-  const { world, chip, wm } = setupChipWithPower('74101');
+  const { world, chip, wm } = setupChipWithPower('74x101');
   applyInputs(wm, chip, { J1: 1, J2: 1, J3: 1, K1: 0, K2: 0, K3: 0, CLK: 0, PRE: 1 });
   simulate(world, chip, wm);
   const wm2 = new WireManager(); resetWireCounter();
@@ -439,7 +439,7 @@ console.log('\nG8: 74101 - JK FF (AND-OR, preset only)');
 }
 {
   // Reset K=1, J=0, then clock
-  const { world, chip, wm } = setupChipWithPower('74101');
+  const { world, chip, wm } = setupChipWithPower('74x101');
   // First set
   applyInputs(wm, chip, { J1: 1, J2: 1, J3: 1, K1: 0, K2: 0, K3: 0, CLK: 0, PRE: 1 });
   simulate(world, chip, wm);
@@ -462,25 +462,25 @@ console.log('\nG8: 74101 - JK FF (AND-OR, preset only)');
   assert(isLow(getPinVoltage(sim4, findPin(chip, 'Q'))), '74101 K=1,J=0, clock → Q=0');
 }
 
-// G9: 74x102 - JK FF (AND-gated, preset+clr)
-console.log('\nG9: 74102 - JK FF (AND-gated, preset+clear)');
+// G9: 74x102 - JK FF (AND gated, preset+clr)
+console.log('\nG9: 74102 - JK FF (AND gated, preset+clear)');
 {
   // PRE=0 → Q=1
-  const { world, chip, wm } = setupChipWithPower('74102');
+  const { world, chip, wm } = setupChipWithPower('74x102');
   applyInputs(wm, chip, { J1: 0, J2: 0, J3: 0, K1: 0, K2: 0, K3: 0, CLK: 0, PRE: 0, CLR: 1 });
   const sim = simulate(world, chip, wm);
   assert(isHigh(getPinVoltage(sim, findPin(chip, 'Q'))), '74102 PRE=0 → Q=1');
 }
 {
   // CLR=0 → Q=0
-  const { world, chip, wm } = setupChipWithPower('74102');
+  const { world, chip, wm } = setupChipWithPower('74x102');
   applyInputs(wm, chip, { J1: 1, J2: 1, J3: 1, K1: 0, K2: 0, K3: 0, CLK: 0, PRE: 1, CLR: 0 });
   const sim = simulate(world, chip, wm);
   assert(isLow(getPinVoltage(sim, findPin(chip, 'Q'))), '74102 CLR=0 → Q=0');
 }
 {
   // J=1,K=0, clk → Q=1
-  const { world, chip, wm } = setupChipWithPower('74102');
+  const { world, chip, wm } = setupChipWithPower('74x102');
   applyInputs(wm, chip, { J1: 1, J2: 1, J3: 1, K1: 0, K2: 0, K3: 0, CLK: 0, PRE: 1, CLR: 1 });
   simulate(world, chip, wm);
   const wm2 = new WireManager(); resetWireCounter();
@@ -495,7 +495,7 @@ console.log('\nG9: 74102 - JK FF (AND-gated, preset+clear)');
 console.log('\nG10: 74103 - Dual JK FF (CLR only)');
 {
   // 1CLR=0 → 1Q=0
-  const { world, chip, wm } = setupChipWithPower('74103');
+  const { world, chip, wm } = setupChipWithPower('74x103');
   applyInputs(wm, chip, { '1J': 1, '1K': 0, '1CLK': 0, '1CLR': 0, '2J': 0, '2K': 0, '2CLK': 0, '2CLR': 1 });
   const sim = simulate(world, chip, wm);
   assert(isLow(getPinVoltage(sim, findPin(chip, '1Q'))), '74103 1CLR=0 → 1Q=0');
@@ -503,7 +503,7 @@ console.log('\nG10: 74103 - Dual JK FF (CLR only)');
 }
 {
   // FF1: J=1, K=0, CLK→ Q=1; FF2: J=0,K=1 CLK→ Q=0
-  const { world, chip, wm } = setupChipWithPower('74103');
+  const { world, chip, wm } = setupChipWithPower('74x103');
   applyInputs(wm, chip, { '1J': 1, '1K': 0, '1CLK': 0, '1CLR': 1, '2J': 0, '2K': 1, '2CLK': 0, '2CLR': 1 });
   simulate(world, chip, wm);
   const wm2 = new WireManager(); resetWireCounter();
@@ -516,7 +516,7 @@ console.log('\nG10: 74103 - Dual JK FF (CLR only)');
 }
 {
   // 2CLR=0 → 2Q=0
-  const { world, chip, wm } = setupChipWithPower('74103');
+  const { world, chip, wm } = setupChipWithPower('74x103');
   applyInputs(wm, chip, { '1J': 0, '1K': 0, '1CLK': 0, '1CLR': 1, '2J': 0, '2K': 0, '2CLK': 0, '2CLR': 0 });
   const sim = simulate(world, chip, wm);
   assert(isLow(getPinVoltage(sim, findPin(chip, '2Q'))), '74103 2CLR=0 → 2Q=0');
@@ -526,21 +526,21 @@ console.log('\nG10: 74103 - Dual JK FF (CLR only)');
 console.log('\nG11: 74104 - JK MS FF (3 input AND)');
 {
   // PRE=0 → Q=1
-  const { world, chip, wm } = setupChipWithPower('74104');
+  const { world, chip, wm } = setupChipWithPower('74x104');
   applyInputs(wm, chip, { J1: 0, J2: 0, J3: 0, K1: 0, K2: 0, K3: 0, CLK: 0, PRE: 0, CLR: 1 });
   const sim = simulate(world, chip, wm);
   assert(isHigh(getPinVoltage(sim, findPin(chip, 'Q'))), '74104 PRE=0 → Q=1');
 }
 {
   // CLR=0 → Q=0
-  const { world, chip, wm } = setupChipWithPower('74104');
+  const { world, chip, wm } = setupChipWithPower('74x104');
   applyInputs(wm, chip, { J1: 0, J2: 0, J3: 0, K1: 0, K2: 0, K3: 0, CLK: 0, PRE: 1, CLR: 0 });
   const sim = simulate(world, chip, wm);
   assert(isLow(getPinVoltage(sim, findPin(chip, 'Q'))), '74104 CLR=0 → Q=0');
 }
 {
   // J=1 (all 3),K=0, clk → Q=1
-  const { world, chip, wm } = setupChipWithPower('74104');
+  const { world, chip, wm } = setupChipWithPower('74x104');
   applyInputs(wm, chip, { J1: 1, J2: 1, J3: 1, K1: 0, K2: 0, K3: 0, CLK: 0, PRE: 1, CLR: 1 });
   simulate(world, chip, wm);
   const wm2 = new WireManager(); resetWireCounter();
@@ -552,7 +552,7 @@ console.log('\nG11: 74104 - JK MS FF (3 input AND)');
 }
 {
   // J gate blocked (J2=0): J=0 even if J1=J3=1, K=0 → no set
-  const { world, chip, wm } = setupChipWithPower('74104');
+  const { world, chip, wm } = setupChipWithPower('74x104');
   applyInputs(wm, chip, { J1: 1, J2: 0, J3: 1, K1: 0, K2: 0, K3: 0, CLK: 0, PRE: 1, CLR: 1 });
   simulate(world, chip, wm);
   const wm2 = new WireManager(); resetWireCounter();
@@ -567,21 +567,21 @@ console.log('\nG11: 74104 - JK MS FF (3 input AND)');
 console.log('\nG12: 74105 - JK MS FF (J2n/K2n inverted)');
 {
   // PRE=0 → Q=1
-  const { world, chip, wm } = setupChipWithPower('74105');
+  const { world, chip, wm } = setupChipWithPower('74x105');
   applyInputs(wm, chip, { J1: 0, J2n: 0, J3: 0, K1: 0, K2n: 0, K3: 0, CLK: 0, PRE: 0, CLR: 1 });
   const sim = simulate(world, chip, wm);
   assert(isHigh(getPinVoltage(sim, findPin(chip, 'Q'))), '74105 PRE=0 → Q=1');
 }
 {
   // CLR=0 → Q=0
-  const { world, chip, wm } = setupChipWithPower('74105');
+  const { world, chip, wm } = setupChipWithPower('74x105');
   applyInputs(wm, chip, { J1: 0, J2n: 0, J3: 0, K1: 0, K2n: 0, K3: 0, CLK: 0, PRE: 1, CLR: 0 });
   const sim = simulate(world, chip, wm);
   assert(isLow(getPinVoltage(sim, findPin(chip, 'Q'))), '74105 CLR=0 → Q=0');
 }
 {
   // J2n inverted: J1=1,J2n=0(→inv=1),J3=1 → J=1; K=0 → set on clk
-  const { world, chip, wm } = setupChipWithPower('74105');
+  const { world, chip, wm } = setupChipWithPower('74x105');
   applyInputs(wm, chip, { J1: 1, J2n: 0, J3: 1, K1: 0, K2n: 1, K3: 0, CLK: 0, PRE: 1, CLR: 1 });
   simulate(world, chip, wm);
   const wm2 = new WireManager(); resetWireCounter();
@@ -593,7 +593,7 @@ console.log('\nG12: 74105 - JK MS FF (J2n/K2n inverted)');
 }
 {
   // J2n=1 blocks J: J1=1,J2n=1(→inv=0),J3=1 → J=0; K=0 → no set
-  const { world, chip, wm } = setupChipWithPower('74105');
+  const { world, chip, wm } = setupChipWithPower('74x105');
   applyInputs(wm, chip, { J1: 1, J2n: 1, J3: 1, K1: 0, K2n: 1, K3: 0, CLK: 0, PRE: 1, CLR: 1 });
   simulate(world, chip, wm);
   const wm2 = new WireManager(); resetWireCounter();
@@ -604,11 +604,11 @@ console.log('\nG12: 74105 - JK MS FF (J2n/K2n inverted)');
   assert(isLow(getPinVoltage(sim2, findPin(chip, 'Q'))), '74105 J2n=1(inv=0) blocks J → Q stays 0');
 }
 
-// G13: 74x106 - Dual JK FF (preset+clear, 16-pin)
+// G13: 74x106 - Dual JK FF (preset+clear, 16 pin)
 console.log('\nG13: 74106 - Dual JK FF (preset+clear)');
 {
   // 1PRE=0 → 1Q=1
-  const { world, chip, wm } = setupChipWithPower('74106');
+  const { world, chip, wm } = setupChipWithPower('74x106');
   applyInputs(wm, chip, { '1J': 0, '1K': 0, '1CLK': 0, '1PRE': 0, '1CLR': 1,
                            '2J': 0, '2K': 0, '2CLK': 0, '2PRE': 1, '2CLR': 1 });
   const sim = simulate(world, chip, wm);
@@ -617,7 +617,7 @@ console.log('\nG13: 74106 - Dual JK FF (preset+clear)');
 }
 {
   // 2CLR=0 → 2Q=0
-  const { world, chip, wm } = setupChipWithPower('74106');
+  const { world, chip, wm } = setupChipWithPower('74x106');
   applyInputs(wm, chip, { '1J': 0, '1K': 0, '1CLK': 0, '1PRE': 1, '1CLR': 1,
                            '2J': 0, '2K': 0, '2CLK': 0, '2PRE': 1, '2CLR': 0 });
   const sim = simulate(world, chip, wm);
@@ -625,7 +625,7 @@ console.log('\nG13: 74106 - Dual JK FF (preset+clear)');
 }
 {
   // Set FF1 by clk with J=1, K=0
-  const { world, chip, wm } = setupChipWithPower('74106');
+  const { world, chip, wm } = setupChipWithPower('74x106');
   applyInputs(wm, chip, { '1J': 1, '1K': 0, '1CLK': 0, '1PRE': 1, '1CLR': 1,
                            '2J': 0, '2K': 0, '2CLK': 0, '2PRE': 1, '2CLR': 1 });
   simulate(world, chip, wm);
@@ -642,7 +642,7 @@ console.log('\nG13: 74106 - Dual JK FF (preset+clear)');
 console.log('\nG14: 74108 - Dual JK FF (shared CLK/CLR)');
 {
   // CLR=0 → both Q=0
-  const { world, chip, wm } = setupChipWithPower('74108');
+  const { world, chip, wm } = setupChipWithPower('74x108');
   applyInputs(wm, chip, { '1J': 1, '1K': 0, '1PRE': 1, '2J': 1, '2K': 0, '2PRE': 1, CLK: 0, CLR: 0 });
   const sim = simulate(world, chip, wm);
   assert(isLow(getPinVoltage(sim, findPin(chip, '1Q'))), '74108 CLR=0 → 1Q=0');
@@ -650,14 +650,14 @@ console.log('\nG14: 74108 - Dual JK FF (shared CLK/CLR)');
 }
 {
   // 1PRE=0 → 1Q=1
-  const { world, chip, wm } = setupChipWithPower('74108');
+  const { world, chip, wm } = setupChipWithPower('74x108');
   applyInputs(wm, chip, { '1J': 0, '1K': 0, '1PRE': 0, '2J': 0, '2K': 0, '2PRE': 1, CLK: 0, CLR: 1 });
   const sim = simulate(world, chip, wm);
   assert(isHigh(getPinVoltage(sim, findPin(chip, '1Q'))), '74108 1PRE=0 → 1Q=1');
 }
 {
   // Set both: 1J=1,1K=0 and 2J=1,2K=0, shared CLK
-  const { world, chip, wm } = setupChipWithPower('74108');
+  const { world, chip, wm } = setupChipWithPower('74x108');
   applyInputs(wm, chip, { '1J': 1, '1K': 0, '1PRE': 1, '2J': 1, '2K': 0, '2PRE': 1, CLK: 0, CLR: 1 });
   simulate(world, chip, wm);
   const wm2 = new WireManager(); resetWireCounter();
@@ -669,25 +669,25 @@ console.log('\nG14: 74108 - Dual JK FF (shared CLK/CLR)');
   assert(isHigh(getPinVoltage(sim2, findPin(chip, '2Q'))), '74108 2J=1,2K=0, shared CLK → 2Q=1');
 }
 
-// G15: 74x110 - JK FF (AND-gated, data lockout)
+// G15: 74x110 - JK FF (AND gated, data lockout)
 console.log('\nG15: 74110 - JK FF (data lockout)');
 {
   // PRE=0 → Q=1
-  const { world, chip, wm } = setupChipWithPower('74110');
+  const { world, chip, wm } = setupChipWithPower('74x110');
   applyInputs(wm, chip, { J1: 0, J2: 0, J3: 0, K1: 0, K2: 0, K3: 0, CLK: 0, PRE: 0, CLR: 1 });
   const sim = simulate(world, chip, wm);
   assert(isHigh(getPinVoltage(sim, findPin(chip, 'Q'))), '74110 PRE=0 → Q=1');
 }
 {
   // CLR=0 → Q=0
-  const { world, chip, wm } = setupChipWithPower('74110');
+  const { world, chip, wm } = setupChipWithPower('74x110');
   applyInputs(wm, chip, { J1: 0, J2: 0, J3: 0, K1: 0, K2: 0, K3: 0, CLK: 0, PRE: 1, CLR: 0 });
   const sim = simulate(world, chip, wm);
   assert(isLow(getPinVoltage(sim, findPin(chip, 'Q'))), '74110 CLR=0 → Q=0');
 }
 {
   // J=1(all 3), K=0, clk → set Q
-  const { world, chip, wm } = setupChipWithPower('74110');
+  const { world, chip, wm } = setupChipWithPower('74x110');
   applyInputs(wm, chip, { J1: 1, J2: 1, J3: 1, K1: 0, K2: 0, K3: 0, CLK: 0, PRE: 1, CLR: 1 });
   simulate(world, chip, wm);
   const wm2 = new WireManager(); resetWireCounter();
@@ -699,7 +699,7 @@ console.log('\nG15: 74110 - JK FF (data lockout)');
 }
 {
   // K=1(all 3), J=0, reset Q
-  const { world, chip, wm } = setupChipWithPower('74110');
+  const { world, chip, wm } = setupChipWithPower('74x110');
   // Set first
   applyInputs(wm, chip, { J1: 1, J2: 1, J3: 1, K1: 0, K2: 0, K3: 0, CLK: 0, PRE: 1, CLR: 1 });
   simulate(world, chip, wm);
@@ -726,7 +726,7 @@ console.log('\nG15: 74110 - JK FF (data lockout)');
 console.log('\nG16: 74111 - Dual JK MS FF (data lockout)');
 {
   // 1PRE=0 → 1Q=1
-  const { world, chip, wm } = setupChipWithPower('74111');
+  const { world, chip, wm } = setupChipWithPower('74x111');
   applyInputs(wm, chip, { '1J': 0, '1K': 0, '1CLK': 0, '1PRE': 0, '1CLR': 1,
                            '2J': 0, '2K': 0, '2CLK': 0, '2PRE': 1, '2CLR': 1 });
   const sim = simulate(world, chip, wm);
@@ -735,7 +735,7 @@ console.log('\nG16: 74111 - Dual JK MS FF (data lockout)');
 }
 {
   // 2CLR=0 → 2Q=0
-  const { world, chip, wm } = setupChipWithPower('74111');
+  const { world, chip, wm } = setupChipWithPower('74x111');
   applyInputs(wm, chip, { '1J': 0, '1K': 0, '1CLK': 0, '1PRE': 1, '1CLR': 1,
                            '2J': 0, '2K': 0, '2CLK': 0, '2PRE': 1, '2CLR': 0 });
   const sim = simulate(world, chip, wm);
@@ -743,7 +743,7 @@ console.log('\nG16: 74111 - Dual JK MS FF (data lockout)');
 }
 {
   // Set FF1 by clk with J=1, K=0
-  const { world, chip, wm } = setupChipWithPower('74111');
+  const { world, chip, wm } = setupChipWithPower('74x111');
   applyInputs(wm, chip, { '1J': 1, '1K': 0, '1CLK': 0, '1PRE': 1, '1CLR': 1,
                            '2J': 0, '2K': 0, '2CLK': 0, '2PRE': 1, '2CLR': 1 });
   simulate(world, chip, wm);
@@ -757,7 +757,7 @@ console.log('\nG16: 74111 - Dual JK MS FF (data lockout)');
 }
 {
   // Reset FF2 by clk with J=0, K=1
-  const { world, chip, wm } = setupChipWithPower('74111');
+  const { world, chip, wm } = setupChipWithPower('74x111');
   // First set FF2
   applyInputs(wm, chip, { '1J': 0, '1K': 0, '1CLK': 0, '1PRE': 1, '1CLR': 1,
                            '2J': 1, '2K': 0, '2CLK': 0, '2PRE': 1, '2CLR': 1 });

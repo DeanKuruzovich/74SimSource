@@ -2,9 +2,9 @@
 // Chips under test:
 //   74678/679/680       - Address comparator stubs
 //   74681               - 4 bit accumulator stub
-//   74682/683/684/685   - 8 bit magnitude comparator (P>Q), 20-pin
-//   74686/687           - 8 bit magnitude comparator (P>Q + P==Q), 24-pin with dual enable
-//   74688/689           - 8 bit identity comparator (P==Q), 20-pin
+//   74682/683/684/685   - 8 bit magnitude comparator (P>Q), 20 pin
+//   74686/687           - 8 bit magnitude comparator (P>Q + P==Q), 24 pin with dual enable
+//   74688/689           - 8 bit identity comparator (P==Q), 20 pin
 //   74690/691/692/693   - 4 bit counter/latch/mux stubs
 
 import { CHIPS_BLOCK_36 } from '../chips/chips36.js';
@@ -101,16 +101,16 @@ function disconnectAll(wm, wires) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const EXPECTED_IDS = [
-  '74678','74679','74680','74681',
-  '74682','74683','74684','74685',
-  '74686','74687',
-  '74688','74689',
-  '74690','74691','74692','74693',
+  '74x678','74x679','74x680','74x681',
+  '74x682','74x683','74x684','74x685',
+  '74x686','74x687',
+  '74x688','74x689',
+  '74x690','74x691','74x692','74x693',
 ];
 
 const SEQUENTIAL_IDS = [
-  '74678','74679','74680','74681',
-  '74690','74691','74692','74693',
+  '74x678','74x679','74x680','74x681',
+  '74x690','74x691','74x692','74x693',
 ];
 
 console.log('\n=== SECTION S: Structure ===');
@@ -150,14 +150,13 @@ for (const id of EXPECTED_IDS) {
 console.log('\n=== SECTION A: Stub chips (HiZ outputs) ===');
 
 const STUB_CHIPS = [
-  { id: '74678', outputs: ['GEn','EQout'] },
-  { id: '74679', outputs: ['GEn','EQout'] },
-  { id: '74680', outputs: ['GEn','EQout'] },
-  { id: '74681', outputs: ['F0','F1','F2','F3','COUT'] },
-  { id: '74690', outputs: ['Q0','Q1','Q2','Q3','RCO'] },
-  { id: '74691', outputs: ['Q0','Q1','Q2','Q3','RCO'] },
-  { id: '74692', outputs: ['Q0','Q1','Q2','Q3','RCO'] },
-  { id: '74693', outputs: ['Q0','Q1','Q2','Q3','RCO'] },
+  { id: '74x678', outputs: ['GEn','EQout'] },
+  { id: '74x679', outputs: ['GEn','EQout'] },
+  { id: '74x681', outputs: ['F0','F1','F2','F3','COUT'] },
+  { id: '74x690', outputs: ['Q0','Q1','Q2','Q3','RCO'] },
+  { id: '74x691', outputs: ['Q0','Q1','Q2','Q3','RCO'] },
+  { id: '74x692', outputs: ['Q0','Q1','Q2','Q3','RCO'] },
+  { id: '74x693', outputs: ['Q0','Q1','Q2','Q3','RCO'] },
 ];
 
 for (const { id, outputs } of STUB_CHIPS) {
@@ -169,13 +168,26 @@ for (const { id, outputs } of STUB_CHIPS) {
   }
 }
 
+// 74x680 has a behavioral evaluator (fixed-reference comparator): with G
+// floating (TTL pull-up HIGH = disabled) it actively drives the inactive
+// levels — GEn HIGH, EQout LOW — rather than going HiZ.
+{
+  const { world, chip, wm } = setupChipWithPower('74x680');
+  const sim = new CircuitSimulator();
+  sim.evaluate(world, [chip], wm);
+  const vGen = getPinVoltage(sim, findPin(chip, 'GEn'));
+  const vEq  = getPinVoltage(sim, findPin(chip, 'EQout'));
+  assert(vGen !== undefined && vGen > 2.5, `74x680 idle: GEn driven HIGH (got ${vGen})`);
+  assert(vEq === undefined || vEq < 2.5,   `74x680 idle: EQout LOW (got ${vEq})`);
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
-// SECTION B - 74682/684: 8 bit comparator P>Q (TRI, 20-pin)
+// SECTION B - 74682/684: 8 bit comparator P>Q (TRI, 20 pin)
 // ─────────────────────────────────────────────────────────────────────────────
 
 console.log('\n=== SECTION B: 74682/74684 - 8 bit comparator P>Q ===');
 
-for (const id of ['74682', '74684']) {
+for (const id of ['74x682', '74x684']) {
   // Test 1: G=1 (disabled) → PGQ HiZ
   {
     const { world, chip, wm } = setupChipWithPower(id);
@@ -233,12 +245,12 @@ for (const id of ['74682', '74684']) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SECTION C - 74683/685: 8 bit comparator P>Q, open-collector (20-pin)
+// SECTION C - 74683/685: 8 bit comparator P>Q, open collector (20 pin)
 // ─────────────────────────────────────────────────────────────────────────────
 
 console.log('\n=== SECTION C: 74683/74685 - 8 bit comparator P>Q OC ===');
 
-for (const id of ['74683', '74685']) {
+for (const id of ['74x683', '74x685']) {
   const cd = CHIPS_BLOCK_36[id];
   assert(cd.openCollector === true, `${id}: openCollector flag set`);
 
@@ -278,13 +290,13 @@ for (const id of ['74683', '74685']) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SECTION D - 74686/687: 8 bit comparator P>Q+P==Q, dual enable (24-pin)
+// SECTION D - 74686/687: 8 bit comparator P>Q+P==Q, dual enable (24 pin)
 // ─────────────────────────────────────────────────────────────────────────────
 
 console.log('\n=== SECTION D: 74686/74687 - dual enable, PGQ+PEQQ ===');
 
-for (const id of ['74686', '74687']) {
-  const isOC = id === '74687';
+for (const id of ['74x686', '74x687']) {
+  const isOC = id === '74x687';
   const cd = CHIPS_BLOCK_36[id];
   if (isOC) assert(cd.openCollector === true, `${id}: openCollector flag set`);
 
@@ -385,8 +397,8 @@ for (const id of ['74686', '74687']) {
 
 console.log('\n=== SECTION E: 74688/74689 - 8 bit identity comparator (P==Q) ===');
 
-for (const id of ['74688', '74689']) {
-  const isOC = id === '74689';
+for (const id of ['74x688', '74x689']) {
+  const isOC = id === '74x689';
   const cd = CHIPS_BLOCK_36[id];
   if (isOC) assert(cd.openCollector === true, `${id}: openCollector flag set`);
 

@@ -1,14 +1,14 @@
 // test-chips32.mjs - Tests for chips defined in js/chips/chips32.js
 // Chips under test:
-//   74589   8 bit shift register with input latch, tri-state output
-//   74590   8 bit binary counter with output registers (tri-state)
+//   74589   8 bit shift register with input latch, tri state output
+//   74590   8 bit binary counter with output registers (tri state)
 //   74591   8 bit binary counter with output registers (OC)
 //   74592   8 bit binary counter with input registers
-//   74593   8 bit binary counter with input registers (tri-state)
+//   74593   8 bit binary counter with input registers (tri state)
 //   74594   8 bit SIPO shift register with output latch (buffered)
 //   74596   8 bit SIPO shift register with output latch (OC) [reuses SHIFT_REG_LATCH]
 //   74597   8 bit PISO shift register with input latches
-//   74598   8 bit shift register with selectable PI/PO (tri-state)
+//   74598   8 bit shift register with selectable PI/PO (tri state)
 //   74599   8 bit SIPO shift register with output latch, OC [reuses SHIFT_REG_8BIT_LATCH_BUF]
 //   74600   DRAM refresh controller stub
 //   74601   DRAM refresh controller stub
@@ -89,7 +89,7 @@ function setupChipWithPower(chipId) {
   return { world, chip, wm };
 }
 
-/** Pulse a pin HIGH then LOW (rising-edge trigger). */
+/** Pulse a pin HIGH then LOW (rising edge trigger). */
 function pulseClock(sim, world, chip, wm, pinName = 'CLK') {
   const w = connectPinToVcc(wm, findPin(chip, pinName));
   sim.evaluate(world, [chip], wm);
@@ -99,7 +99,7 @@ function pulseClock(sim, world, chip, wm, pinName = 'CLK') {
   disconnectWire(wm, gw);
 }
 
-/** Pulse a pin LOW then HIGH (falling-edge trigger, e.g. CCLKn). */
+/** Pulse a pin LOW then HIGH (falling edge trigger, e.g. CCLKn). */
 function pulseClockLow(sim, world, chip, wm, pinName) {
   // Pin goes LOW (active edge), then HIGH
   const w = connectPinToGnd(wm, findPin(chip, pinName));
@@ -115,10 +115,10 @@ function pulseClockLow(sim, world, chip, wm, pinName) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const EXPECTED_CHIP_IDS = [
-  '74589', '74590', '74591', '74592', '74593',
-  '74594', '74596', '74597', '74598', '74599',
-  '74600', '74601', '74602', '74603',
-  '74608', '74614',
+  '74x589', '74x590', '74x591', '74x592', '74x593',
+  '74x594', '74x596', '74x597', '74x598', '74x599',
+  '74x600', '74x601', '74x602', '74x603',
+  '74x608', '74x614',
 ];
 
 console.log('\nS1: All 16 chip IDs present in CHIPS_BLOCK_32');
@@ -179,16 +179,16 @@ console.log('\nS4: Sequential chips are marked sequential');
 // ─────────────────────────────────────────────────────────────────────────────
 
 
-// ── G1: 74589 - 8 bit Shift Register with Input Latch, Tri-State ─────────────
+// ── G1: 74589 - 8 bit Shift Register with Input Latch, Tri State ─────────────
 // D0-D7 transparently captured while RCK=1 (high).
 // CKEN=0: shift clock enabled. Rising SRCK shifts SER into bit0, shifts toward bit7.
 // OE=0: QH=SR[7] driven; OE=1: QH HiZ.
 
-console.log('\nG1: 74589 - 8 bit Shift Register with Input Latch, Tri-State');
+console.log('\nG1: 74589 - 8 bit Shift Register with Input Latch, Tri State');
 
 console.log('  G1a: OE=H → QH is HiZ');
 {
-  const { world, chip, wm } = setupChipWithPower('74589');
+  const { world, chip, wm } = setupChipWithPower('74x589');
   connectPinsHigh(wm, chip, ['OE']); // OE=H → disabled
   connectPinToGnd(wm, findPin(chip, 'CKEN')); // CKEN=0 (enabled)
   connectPinToGnd(wm, findPin(chip, 'SER'));
@@ -202,7 +202,7 @@ console.log('  G1a: OE=H → QH is HiZ');
 console.log('  G1b: OE=L, CKEN=0, shift SER=H 8x → QH=1');
 {
   // SRCK starts grounded so initial eval doesn't fire spurious edge
-  const { world, chip, wm } = setupChipWithPower('74589');
+  const { world, chip, wm } = setupChipWithPower('74x589');
   connectPinToGnd(wm, findPin(chip, 'OE'));   // OE=L → output enabled
   connectPinToGnd(wm, findPin(chip, 'CKEN')); // CKEN=L → shift enabled
   connectPinsHigh(wm, chip, ['SER']);         // SER=H
@@ -221,7 +221,7 @@ console.log('  G1b: OE=L, CKEN=0, shift SER=H 8x → QH=1');
 
 console.log('  G1c: CKEN=H inhibits shift clock');
 {
-  const { world, chip, wm } = setupChipWithPower('74589');
+  const { world, chip, wm } = setupChipWithPower('74x589');
   connectPinToGnd(wm, findPin(chip, 'OE'));
   connectPinsHigh(wm, chip, ['CKEN', 'SER']); // CKEN=H → clock inhibited
   connectPinToGnd(wm, findPin(chip, 'RCK'));
@@ -240,7 +240,7 @@ console.log('  G1c: CKEN=H inhibits shift clock');
 
 console.log('  G1d: Shift one 1 bit: after 8 shifts it reaches QH');
 {
-  const { world, chip, wm } = setupChipWithPower('74589');
+  const { world, chip, wm } = setupChipWithPower('74x589');
   connectPinToGnd(wm, findPin(chip, 'OE'));
   connectPinToGnd(wm, findPin(chip, 'CKEN'));
   connectPinToGnd(wm, findPin(chip, 'RCK'));
@@ -274,7 +274,7 @@ console.log('  G1d: Shift one 1 bit: after 8 shifts it reaches QH');
 }
 
 
-// ── G2: 74590 - 8 bit Binary Counter with Output Registers (Tri-State) ────────
+// ── G2: 74590 - 8 bit Binary Counter with Output Registers (Tri State) ────────
 // CCLKn: count on falling edge. CCLR=0: async clear counter.
 // RCLK rising: latch counter→output reg. RCLR=0: async clear output reg.
 // OEn=0: drive Q0-Q7. RC=1 when counter==255.
@@ -283,7 +283,7 @@ console.log('\nG2: 74590 - 8 bit Binary Counter with Output Registers (TRI)');
 
 console.log('  G2a: CCLR=0 async clear counter → Q0-Q7 show 0 after RCLK');
 {
-  const { world, chip, wm } = setupChipWithPower('74590');
+  const { world, chip, wm } = setupChipWithPower('74x590');
   // CCLR=0 → async clear counter; RCLR=1 → reg not cleared
   const [cclrGnd] = [connectPinToGnd(wm, findPin(chip, 'CCLR'))];
   connectPinsHigh(wm, chip, ['RCLR']); // RCLR=H (don't clear output reg)
@@ -302,7 +302,7 @@ console.log('  G2a: CCLR=0 async clear counter → Q0-Q7 show 0 after RCLK');
 
 console.log('  G2b: Count up on falling CCLKn; latch to output reg via RCLK');
 {
-  const { world, chip, wm } = setupChipWithPower('74590');
+  const { world, chip, wm } = setupChipWithPower('74x590');
   connectPinsHigh(wm, chip, ['CCLR', 'RCLR']); // enabled; CCLKn floats HIGH
   connectPinToGnd(wm, findPin(chip, 'OEn'));
   let rclkGnd = connectPinToGnd(wm, findPin(chip, 'RCLK')); // RCLK starts LOW
@@ -321,7 +321,7 @@ console.log('  G2b: Count up on falling CCLKn; latch to output reg via RCLK');
 
 console.log('  G2c: OEn=H → Q0-Q7 are HiZ; RC still driven');
 {
-  const { world, chip, wm } = setupChipWithPower('74590');
+  const { world, chip, wm } = setupChipWithPower('74x590');
   connectPinsHigh(wm, chip, ['CCLR', 'RCLR', 'CCLKn', 'OEn']); // OEn=H → HiZ
   let rclkGnd = connectPinToGnd(wm, findPin(chip, 'RCLK'));
   const sim = new CircuitSimulator();
@@ -330,13 +330,13 @@ console.log('  G2c: OEn=H → Q0-Q7 are HiZ; RC still driven');
   pulseClock(sim, world, chip, wm, 'RCLK');
   for (const q of ['Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7'])
     assertPinBit(sim, chip, q, 0, `74590 OEn=H → ${q}=HiZ (reads 0)`);
-  // RC is always driven (not tri-stated)
+  // RC is always driven (not tri stated)
   assertPinBit(sim, chip, 'RC', 0, '74590 count=0 → RC=0 always driven');
 }
 
 console.log('  G2d: RCLR=0 async clear output register → Q0-Q7=0');
 {
-  const { world, chip, wm } = setupChipWithPower('74590');
+  const { world, chip, wm } = setupChipWithPower('74x590');
   connectPinsHigh(wm, chip, ['CCLR', 'CCLKn']);
   connectPinToGnd(wm, findPin(chip, 'RCLR')); // RCLR=0 → clear output reg
   connectPinToGnd(wm, findPin(chip, 'OEn'));
@@ -354,7 +354,7 @@ console.log('\nG3: 74591 - 8 bit Binary Counter with Output Registers (OC)');
 
 console.log('  G3a: CCLR=0 async clear; count=0 latched and driven');
 {
-  const { world, chip, wm } = setupChipWithPower('74591');
+  const { world, chip, wm } = setupChipWithPower('74x591');
   connectPinToGnd(wm, findPin(chip, 'CCLR'));
   connectPinsHigh(wm, chip, ['RCLR', 'CCLKn']);
   connectPinToGnd(wm, findPin(chip, 'OEn'));
@@ -369,7 +369,7 @@ console.log('  G3a: CCLR=0 async clear; count=0 latched and driven');
 
 console.log('  G3b: Count 5 then latch');
 {
-  const { world, chip, wm } = setupChipWithPower('74591');
+  const { world, chip, wm } = setupChipWithPower('74x591');
   connectPinsHigh(wm, chip, ['CCLR', 'RCLR']); // CCLKn floats HIGH via TTL pullup
   connectPinToGnd(wm, findPin(chip, 'OEn'));
   let rclkGnd = connectPinToGnd(wm, findPin(chip, 'RCLK')); // RCLK starts LOW
@@ -393,7 +393,7 @@ console.log('\nG4: 74592 - 8 bit Binary Counter with Input Registers');
 
 console.log('  G4a: CCLR=0 async clear → RC=0');
 {
-  const { world, chip, wm } = setupChipWithPower('74592');
+  const { world, chip, wm } = setupChipWithPower('74x592');
   connectPinToGnd(wm, findPin(chip, 'CCLR')); // async clear
   const sim = new CircuitSimulator();
   sim.evaluate(world, [chip], wm);
@@ -402,7 +402,7 @@ console.log('  G4a: CCLR=0 async clear → RC=0');
 
 console.log('  G4b: CKEN=0 on CCK rising → parallel load');
 {
-  const { world, chip, wm } = setupChipWithPower('74592');
+  const { world, chip, wm } = setupChipWithPower('74x592');
   // Load value 5 via D pins
   connectPinsHigh(wm, chip, ['CCLR']); // CCLR=1 (not cleared)
   // D0=1, D2=1 → value = 5 (binary 00000101)
@@ -434,7 +434,7 @@ console.log('  G4b: CKEN=0 on CCK rising → parallel load');
 
 console.log('  G4c: Count up from 0 using CKEN=1 repeatedly');
 {
-  const { world, chip, wm } = setupChipWithPower('74592');
+  const { world, chip, wm } = setupChipWithPower('74x592');
   connectPinsHigh(wm, chip, ['CCLR', 'CKEN']); // CKEN=1 → count mode
   for (const d of ['D0','D1','D2','D3','D4','D5','D6','D7'])
     connectPinToGnd(wm, findPin(chip, d));
@@ -456,14 +456,14 @@ console.log('  G4c: Count up from 0 using CKEN=1 repeatedly');
 }
 
 
-// ── G5: 74593 - 8 bit Binary Counter with Input Registers, Tri-State ──────────
+// ── G5: 74593 - 8 bit Binary Counter with Input Registers, Tri State ──────────
 // Like 74592 but OEn=0 drives D0-D7 with counter value (bidirectional).
 
 console.log('\nG5: 74593 - 8 bit Binary Counter with Input Registers (TRI)');
 
 console.log('  G5a: CCLR=0 async clear → RC=0, D-bus all 0 when OEn=0');
 {
-  const { world, chip, wm } = setupChipWithPower('74593');
+  const { world, chip, wm } = setupChipWithPower('74x593');
   connectPinToGnd(wm, findPin(chip, 'CCLR'));
   connectPinToGnd(wm, findPin(chip, 'OEn')); // OEn=0: drive D0-D7
   const sim = new CircuitSimulator();
@@ -475,7 +475,7 @@ console.log('  G5a: CCLR=0 async clear → RC=0, D-bus all 0 when OEn=0');
 
 console.log('  G5b: OEn=H → D-bus HiZ');
 {
-  const { world, chip, wm } = setupChipWithPower('74593');
+  const { world, chip, wm } = setupChipWithPower('74x593');
   connectPinToGnd(wm, findPin(chip, 'CCLR'));
   connectPinsHigh(wm, chip, ['OEn']); // OEn=1: HiZ
   const sim = new CircuitSimulator();
@@ -487,7 +487,7 @@ console.log('  G5b: OEn=H → D-bus HiZ');
 
 console.log('  G5c: CKEN=1 count up; OEn=0 shows counter on D-bus');
 {
-  const { world, chip, wm } = setupChipWithPower('74593');
+  const { world, chip, wm } = setupChipWithPower('74x593');
   connectPinsHigh(wm, chip, ['CCLR', 'CKEN']); // Count mode
   connectPinsHigh(wm, chip, ['OEn']); // Outputs HiZ while counting
   let cckGnd = connectPinToGnd(wm, findPin(chip, 'CCK'));
@@ -522,7 +522,7 @@ console.log('\nG6: 74594 - 8 bit SIPO Shift Register with Output Latch (Buffered
 
 console.log('  G6a: SRCLR=0 clears SR; QHs=0; QA-QH unchanged (OR may differ)');
 {
-  const { world, chip, wm } = setupChipWithPower('74594');
+  const { world, chip, wm } = setupChipWithPower('74x594');
   connectPinToGnd(wm, findPin(chip, 'SRCLR'));
   connectPinsHigh(wm, chip, ['RCLR']); // RCLR=H (output reg not cleared)
   connectPinToGnd(wm, findPin(chip, 'SER'));
@@ -535,7 +535,7 @@ console.log('  G6a: SRCLR=0 clears SR; QHs=0; QA-QH unchanged (OR may differ)');
 
 console.log('  G6b: Shift 8 SER=H into SR; RCLK copies to OR → all Q=1');
 {
-  const { world, chip, wm } = setupChipWithPower('74594');
+  const { world, chip, wm } = setupChipWithPower('74x594');
   connectPinsHigh(wm, chip, ['SRCLR', 'RCLR', 'SER']); // SER=H
   let srclkGnd = connectPinToGnd(wm, findPin(chip, 'SRCLK'));
   let rclkGnd = connectPinToGnd(wm, findPin(chip, 'RCLK'));
@@ -560,7 +560,7 @@ console.log('  G6b: Shift 8 SER=H into SR; RCLK copies to OR → all Q=1');
 
 console.log('  G6c: RCLR=0 clears output register → QA-QH=0');
 {
-  const { world, chip, wm } = setupChipWithPower('74594');
+  const { world, chip, wm } = setupChipWithPower('74x594');
   connectPinsHigh(wm, chip, ['SRCLR', 'SER']);
   connectPinToGnd(wm, findPin(chip, 'RCLR')); // RCLR=0 → clear OR
   let srclkGnd = connectPinToGnd(wm, findPin(chip, 'SRCLK'));
@@ -590,7 +590,7 @@ console.log('\nG7: 74596 - 8 bit SIPO Shift Register (OC, reuses SHIFT_REG_LATCH
 
 console.log('  G7a: Shift 8 SER=H, RCLK → all QA-QH=1 when OEn=0');
 {
-  const { world, chip, wm } = setupChipWithPower('74596');
+  const { world, chip, wm } = setupChipWithPower('74x596');
   connectPinsHigh(wm, chip, ['SRCLR', 'SER']); // SRCLR=H (no clear), SER=H
   connectPinToGnd(wm, findPin(chip, 'OEn')); // OEn=L (enabled)
   let srclkGnd = connectPinToGnd(wm, findPin(chip, 'SRCLK'));
@@ -612,7 +612,7 @@ console.log('  G7a: Shift 8 SER=H, RCLK → all QA-QH=1 when OEn=0');
 
 console.log('  G7b: OEn=H → outputs HiZ; QHs always active');
 {
-  const { world, chip, wm } = setupChipWithPower('74596');
+  const { world, chip, wm } = setupChipWithPower('74x596');
   connectPinsHigh(wm, chip, ['SRCLR', 'SER', 'OEn']); // OEn=H → HiZ
   let srclkGnd = connectPinToGnd(wm, findPin(chip, 'SRCLK'));
   let rclkGnd = connectPinToGnd(wm, findPin(chip, 'RCLK'));
@@ -641,7 +641,7 @@ console.log('\nG8: 74597 - 8 bit PISO Shift Register with Input Latches');
 
 console.log('  G8a: Parallel load via RCK then SHLD=0 → QH=D7 (MSB) immediately');
 {
-  const { world, chip, wm } = setupChipWithPower('74597');
+  const { world, chip, wm } = setupChipWithPower('74x597');
   // Load D=0xFF (all 1s) via RCK, then async parallel-load
   connectPinsHigh(wm, chip, ['D0','D1','D2','D3','D4','D5','D6','D7']);
   connectPinToGnd(wm, findPin(chip, 'SER'));
@@ -664,7 +664,7 @@ console.log('  G8a: Parallel load via RCK then SHLD=0 → QH=D7 (MSB) immediatel
 
 console.log('  G8b: Shift out: load D=0x01 (D0=1,rest=0), then shift 8× → QH traces LSB movement');
 {
-  const { world, chip, wm } = setupChipWithPower('74597');
+  const { world, chip, wm } = setupChipWithPower('74x597');
   connectPinsHigh(wm, chip, ['D0']); // D0=1, rest 0
   for (const d of ['D1','D2','D3','D4','D5','D6','D7'])
     connectPinToGnd(wm, findPin(chip, d));
@@ -702,7 +702,7 @@ console.log('  G8b: Shift out: load D=0x01 (D0=1,rest=0), then shift 8× → QH 
 }
 
 
-// ── G9: 74598 - 8 bit Shift Register with Selectable PI/PO (Tri-State) ────────
+// ── G9: 74598 - 8 bit Shift Register with Selectable PI/PO (Tri State) ────────
 // S1/S0 mode on CLK rising: 00=hold, 01=shift right, 10=parallel load, 11=parallel out.
 // D0-D7 latched on RCK rising. OEn=0: drive D-bus.
 
@@ -710,7 +710,7 @@ console.log('\nG9: 74598 - 8 bit Shift Register with Selectable PI/PO (TRI)');
 
 console.log('  G9a: S1=0,S0=1 (shift right); OEn=0 → QH reflects SR[7]');
 {
-  const { world, chip, wm } = setupChipWithPower('74598');
+  const { world, chip, wm } = setupChipWithPower('74x598');
   connectPinsHigh(wm, chip, ['SER', 'S0']); // SER=1; mode=01=shift right
   connectPinToGnd(wm, findPin(chip, 'S1'));
   connectPinToGnd(wm, findPin(chip, 'OEn'));
@@ -732,7 +732,7 @@ console.log('  G9a: S1=0,S0=1 (shift right); OEn=0 → QH reflects SR[7]');
 
 console.log('  G9b: S1=1,S0=0 (parallel load from latch); then OEn=0 drives D-bus');
 {
-  const { world, chip, wm } = setupChipWithPower('74598');
+  const { world, chip, wm } = setupChipWithPower('74x598');
   // D5, D7 high → latch value = 0b10100000
   connectPinsHigh(wm, chip, ['D5', 'D7']);
   for (const d of ['D0','D1','D2','D3','D4','D6'])
@@ -768,7 +768,7 @@ console.log('  G9b: S1=1,S0=0 (parallel load from latch); then OEn=0 drives D-bu
 
 console.log('  G9c: S1=0,S0=0 (hold) → SR unchanged after CLK');
 {
-  const { world, chip, wm } = setupChipWithPower('74598');
+  const { world, chip, wm } = setupChipWithPower('74x598');
   connectPinsHigh(wm, chip, ['SER']); // SER=H
   connectPinToGnd(wm, findPin(chip, 'S0'));
   connectPinToGnd(wm, findPin(chip, 'S1')); // mode 00 = hold
@@ -797,7 +797,7 @@ console.log('\nG10: 74599 - 8 bit SIPO Shift Register with Output Latch (OC)');
 
 console.log('  G10a: Shift 8 SER=H, RCLK → all Q=1');
 {
-  const { world, chip, wm } = setupChipWithPower('74599');
+  const { world, chip, wm } = setupChipWithPower('74x599');
   connectPinsHigh(wm, chip, ['SRCLR', 'RCLR', 'SER']);
   let srclkGnd = connectPinToGnd(wm, findPin(chip, 'SRCLK'));
   let rclkGnd = connectPinToGnd(wm, findPin(chip, 'RCLK'));
@@ -818,7 +818,7 @@ console.log('  G10a: Shift 8 SER=H, RCLK → all Q=1');
 
 console.log('  G10b: RCLR=0 clears output register');
 {
-  const { world, chip, wm } = setupChipWithPower('74599');
+  const { world, chip, wm } = setupChipWithPower('74x599');
   connectPinsHigh(wm, chip, ['SRCLR', 'SER']);
   connectPinToGnd(wm, findPin(chip, 'RCLR')); // RCLR=0
   let srclkGnd = connectPinToGnd(wm, findPin(chip, 'SRCLK'));
@@ -844,7 +844,7 @@ console.log('  G10b: RCLR=0 clears output register');
 
 console.log('\nG11: 74600/601/602/603 - DRAM Refresh Controller Stubs');
 
-for (const id of ['74600', '74601', '74602', '74603']) {
+for (const id of ['74x600', '74x601', '74x602', '74x603']) {
   console.log(`  G11 ${id}: all outputs HiZ (stub)`);
   const { world, chip, wm } = setupChipWithPower(id);
   connectPinsHigh(wm, chip, ['OSC', 'BURST', 'MR', 'OEn']);
@@ -862,7 +862,7 @@ console.log('\nG12: 74608 - Memory Cycle Controller Stub');
 
 console.log('  G12a: EN1=H → CS inactive (CS=1), OE=1, WE=1, WAIT=1');
 {
-  const { world, chip, wm } = setupChipWithPower('74608');
+  const { world, chip, wm } = setupChipWithPower('74x608');
   connectPinsHigh(wm, chip, ['EN1', 'EN2', 'MR']); // EN1=H → not enabled
   connectPinToGnd(wm, findPin(chip, 'RD'));
   connectPinToGnd(wm, findPin(chip, 'WR'));
@@ -878,7 +878,7 @@ console.log('  G12a: EN1=H → CS inactive (CS=1), OE=1, WE=1, WAIT=1');
 
 console.log('  G12b: EN1=0, EN2=0, MR=1, RD=0 → CS=0, OE=0');
 {
-  const { world, chip, wm } = setupChipWithPower('74608');
+  const { world, chip, wm } = setupChipWithPower('74x608');
   connectPinToGnd(wm, findPin(chip, 'EN1')); // EN1=0
   connectPinToGnd(wm, findPin(chip, 'EN2')); // EN2=0
   connectPinsHigh(wm, chip, ['MR']);          // MR=1
@@ -895,7 +895,7 @@ console.log('  G12b: EN1=0, EN2=0, MR=1, RD=0 → CS=0, OE=0');
 
 console.log('  G12c: MR=0 → CS=1 (controller reset disables chip)');
 {
-  const { world, chip, wm } = setupChipWithPower('74608');
+  const { world, chip, wm } = setupChipWithPower('74x608');
   connectPinToGnd(wm, findPin(chip, 'EN1'));
   connectPinToGnd(wm, findPin(chip, 'EN2'));
   connectPinToGnd(wm, findPin(chip, 'MR')); // MR=0 → disabled

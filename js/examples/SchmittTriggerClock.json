@@ -1,0 +1,127 @@
+{
+  "components": [
+    {
+      "id": 1,
+      "type": "chip",
+      "tileX": 0,
+      "tileY": 0,
+      "col": 6,
+      "row": 4,
+      "chipId": "7414"
+    },
+    {
+      "id": 3,
+      "type": "capacitor",
+      "capacitance": 0.000009999999999999999,
+      "startHoleId": "0:0:main:8:0",
+      "endHoleId": "0:0:power:8:0"
+    },
+    {
+      "id": 6,
+      "type": "chip",
+      "tileX": 0,
+      "tileY": 0,
+      "col": 6,
+      "row": 4,
+      "chipId": "74x14"
+    },
+    {
+      "id": 19,
+      "type": "resistor",
+      "resistance": 10,
+      "startHoleId": "0:0:main:8:3",
+      "endHoleId": "0:0:main:7:3"
+    },
+    {
+      "id": 20,
+      "type": "chip",
+      "tileX": 0,
+      "tileY": 0,
+      "col": 14,
+      "row": 4,
+      "chipId": "74x14"
+    },
+    {
+      "id": 22,
+      "type": "led",
+      "color": "red",
+      "startHoleId": "0:0:main:23:2",
+      "endHoleId": "0:0:power:23:0"
+    }
+  ],
+  "wires": [
+    {
+      "id": 50,
+      "startHoleId": "0:0:main:6:3",
+      "endHoleId": "0:0:power:6:1",
+      "color": "#00cec9"
+    },
+    {
+      "id": 51,
+      "startHoleId": "0:0:main:12:6",
+      "endHoleId": "0:0:power:12:2",
+      "color": "#3498db"
+    },
+    {
+      "id": 61,
+      "startHoleId": "0:0:main:8:2",
+      "endHoleId": "0:0:main:15:3",
+      "color": "#e84393"
+    },
+    {
+      "id": 62,
+      "startHoleId": "0:0:main:14:3",
+      "endHoleId": "0:0:power:14:1",
+      "color": "#f39c12"
+    },
+    {
+      "id": 63,
+      "startHoleId": "0:0:main:20:6",
+      "endHoleId": "0:0:power:20:2",
+      "color": "#3498db"
+    },
+    {
+      "id": 64,
+      "startHoleId": "0:0:main:16:3",
+      "endHoleId": "0:0:main:23:3",
+      "color": "#ff7675"
+    }
+  ],
+  "extraTiles": [],
+  "textBoxes": [
+    {
+      "id": 1,
+      "x": -194,
+      "y": -77,
+      "w": 297.1578666133488,
+      "h": 98.11491922388124,
+      "text": "Title: Schmitt Trigger Inverter RC Oscillator",
+      "v": 2
+    },
+    {
+      "id": 2,
+      "x": -194,
+      "y": 36,
+      "w": 267,
+      "h": 88,
+      "text": "Description: ...",
+      "v": 2
+    }
+  ],
+  "chipFamily": "LS",
+  "showNetPower": false,
+  "showSimpleChipNames": false,
+  "showRealisticBoard": false,
+  "pureDigital": false,
+  "showLogicView": false,
+  "showCircuitInfo": false,
+  "showValues": false,
+  "lastUsedChips": [
+    "74x14",
+    "74x04",
+    "7414",
+    "74164",
+    "74165"
+  ],
+  "logicFormat": "programming"
+}

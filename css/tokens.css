@@ -4,6 +4,9 @@
    slightly darker --bg) but should not redefine the whole palette. */
 
 :root {
+  /* Typography   loaded via Google Fonts <link> in every page's <head>. */
+  --font-body:    Roboto, Arial, sans-serif;
+
   /* Surfaces   default to the simulator's lighter base; marketing/docs
      pages override --bg to #0f0f0f for a deeper feel. */
   --bg:           #1a1a1a;

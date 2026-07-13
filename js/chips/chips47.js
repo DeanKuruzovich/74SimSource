@@ -9,7 +9,7 @@ export const CHIPS_BLOCK_47 = {
   '74x1011': {
     name: '74x1011',
     simpleName: 'Triple 3-Input AND Gate Driver',
-    description: 'Triple 3 input AND gate with high-drive outputs (14-pin)',
+    description: 'Triple 3 input AND gate with high drive outputs (14-pin)',
     pins: 14, vcc: 14, gnd: 7,
     datasheet: '',
     tags: ['and', 'gate', 'triple', 'driver'],
@@ -44,7 +44,7 @@ export const CHIPS_BLOCK_47 = {
     pins: 20, vcc: 20, gnd: 10,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74f1016.pdf',
     tags: ['termination', 'diode', 'passive', 'bus', 'stub'],
-    guideOverview: 'The 74F1016 is not a logic gate; it is a packaged bus-termination network for sixteen signal lines. Inside the package, each line is tied into an internal Schottky diode and R-C damping network referenced by the VR pin so fast TTL edges ring less and overshoot is clamped before they disturb the bus. Parts like this were used on backplanes and long ribbon-cable runs where plain TTL wiring became too noisy to leave unterminated.',
+    guideOverview: 'The 74F1016 is not a logic gate; it is a packaged bus termination network for sixteen signal lines. Inside the package, each line is tied into an internal Schottky diode and R-C damping network referenced by the VR pin so fast TTL edges ring less and overshoot is clamped before they disturb the bus. Parts like this were used on backplanes and long ribbon cable runs where plain TTL wiring became too noisy to leave unterminated.',
     guidePinDescriptions: {
       'A0': 'Termination node for bus line A0. Connect the signal that needs damping here; this pin is part of the passive network, not a logic output.',
       'A1': 'Termination node for bus line A1. Use it on one of the lines you want the internal damping network to condition.',
@@ -54,7 +54,7 @@ export const CHIPS_BLOCK_47 = {
       'A5': 'Termination node for bus line A5. It gives the attached line the same damping behavior as the other A and B channels.',
       'A6': 'Termination node for bus line A6. Use it as another conditioned bus line input/output node.',
       'A7': 'Termination node for bus line A7. This line is treated exactly like the other active termination channels.',
-      'VR': 'Reference-voltage input for the internal termination network. Tie this to the bias/reference voltage recommended by the datasheet so the clamps and RC network operate at the intended threshold.',
+      'VR': 'Reference voltage input for the internal termination network. Tie this to the bias/reference voltage recommended by the datasheet so the clamps and RC network operate at the intended threshold.',
       'GND': 'Ground reference for the package and the clamp network.',
       'B0': 'Termination node for bus line B0. Use it like the A-side pins for a second group of conditioned traces.',
       'B1': 'Termination node for bus line B1. It is another passive channel in the internal network.',
@@ -62,7 +62,7 @@ export const CHIPS_BLOCK_47 = {
       'B3': 'Termination node for bus line B3. This pin does not source logic; it only loads and clamps the attached trace.',
       'B4': 'Termination node for bus line B4. Leave it unused if you do not need that termination channel.',
       'B5': 'Termination node for bus line B5. It behaves the same as the other B-side bus connections.',
-      'B6': 'Termination node for bus line B6. Use it to terminate another high-speed TTL signal line.',
+      'B6': 'Termination node for bus line B6. Use it to terminate another high speed TTL signal line.',
       'B7': 'Termination node for bus line B7. This is the eighth B-side termination channel.',
       'NC': 'No internal connection. Leave this pin unconnected.',
       'VCC': 'Positive supply for the internal termination network.',
@@ -72,11 +72,11 @@ export const CHIPS_BLOCK_47 = {
         title: 'Why Bus Termination Exists',
         paragraphs: [
           'Fast TTL edges do not behave like ideal wires on long traces. If the interconnect impedance is mismatched, the edge reflects, creating overshoot, undershoot, and ringing that can cause false logic transitions.',
-          'A bus-termination array gives each line a controlled load so the edge is absorbed more cleanly. Packaging many channels into one DIP saved board area compared with scattering discrete resistors, capacitors, and diodes around the backplane.',
+          'A bus termination array gives each line a controlled load so the edge is absorbed more cleanly. Packaging many channels into one DIP saved board area compared with scattering discrete resistors, capacitors, and diodes around the backplane.',
         ],
       },
       {
-        title: 'Reference-Biased Termination',
+        title: 'Reference Biased Termination',
         paragraphs: [
           'The VR pin sets the reference point used by the internal network. Instead of terminating directly to a hard HIGH or LOW, the array biases each channel around the chosen reference so reflections are reduced without loading the line as heavily as a simple resistor to ground.',
         ],
@@ -154,7 +154,7 @@ export const CHIPS_BLOCK_47 = {
   '74x1020': {
     name: '74x1020',
     simpleName: 'Dual 4 Input NAND Gate Driver',
-    description: 'Dual 4 input NAND gate with high-drive outputs (14-pin)',
+    description: 'Dual 4 input NAND gate with high drive outputs (14-pin)',
     pins: 14, vcc: 14, gnd: 7,
     datasheet: '',
     tags: ['nand', 'gate', 'dual', 'driver'],
@@ -184,11 +184,11 @@ export const CHIPS_BLOCK_47 = {
   '74x1032': {
     name: '74x1032',
     simpleName: 'Quad 2 Input OR Gate Driver',
-    description: 'Quad 2 input OR gate with high-drive outputs (14-pin)',
+    description: 'Quad 2 input OR gate with high drive outputs (14-pin)',
     pins: 14, vcc: 14, gnd: 7,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74as1032a.pdf',
     tags: ['or', 'gate', 'quad', 'driver'],
-    guideOverview: 'The 74x1032 contains four independent 2 input OR gates with higher-current output stages than a small-signal logic gate. An OR gate goes HIGH when either input is HIGH, so it is useful whenever several events are allowed to trigger the same downstream signal. On a breadboard or prototype card, parts like this are a straightforward way to combine enables, interrupt requests, or control conditions while still driving multiple TTL inputs.',
+    guideOverview: 'The 74x1032 contains four independent 2 input OR gates with higher current output stages than a small-signal logic gate. An OR gate goes HIGH when either input is HIGH, so it is useful whenever several events are allowed to trigger the same downstream signal. On a breadboard or prototype card, parts like this are a straightforward way to combine enables, interrupt requests, or control conditions while still driving multiple TTL inputs.',
     guidePinDescriptions: {
       '1A': 'Input A of OR gate 1. This input is combined with 1B.',
       '1B': 'Input B of OR gate 1. If either 1A or 1B is HIGH, 1Y goes HIGH.',
@@ -229,7 +229,7 @@ export const CHIPS_BLOCK_47 = {
         list: [
           'Combining several interrupt or request lines into one service signal.',
           'Merging multiple enable conditions so any one event can turn on a function block.',
-          'Creating simple sum-of-products logic when paired with AND gates or decoders.',
+          'Creating simple sum of products logic when paired with AND gates or decoders.',
         ],
       },
     ],
@@ -257,19 +257,19 @@ export const CHIPS_BLOCK_47 = {
     ],
   },
 
-  // 74x1034: Hex non-inverting buffer driver (14-pin)
+  // 74x1034: Hex non inverting buffer driver (14-pin)
   '74x1034': {
     name: '74x1034',
-    simpleName: 'Hex Non-Inverting Buffer Driver',
-    description: 'Hex non-inverting buffer with high-drive outputs (14-pin)',
+    simpleName: 'Hex Non Inverting Buffer Driver',
+    description: 'Hex non inverting buffer with high drive outputs (14-pin)',
     pins: 14, vcc: 14, gnd: 7,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74als1034.pdf',
     tags: ['buffer', 'hex', 'driver'],
-    guideOverview: 'The 74x1034 provides six independent non-inverting buffers. A buffer copies the logic state at its input to its output, but the output stage is designed to drive more load than the signal source might safely handle by itself. This makes the chip useful when one TTL signal must fan out to several destinations, run down a longer trace, or be cleaned up before it reaches the next stage.',
+    guideOverview: 'The 74x1034 provides six independent non inverting buffers. A buffer copies the logic state at its input to its output, but the output stage is designed to drive more load than the signal source might safely handle by itself. This makes the chip useful when one TTL signal must fan out to several destinations, run down a longer trace, or be cleaned up before it reaches the next stage.',
     guidePinDescriptions: {
       '1A': 'Input of buffer 1. Whatever logic level appears here is reproduced at 1Y.',
       '1Y': 'Output of buffer 1. It follows 1A without inversion.',
-      '2A': 'Input of buffer 2. Use it when you need a higher-drive copy of that signal.',
+      '2A': 'Input of buffer 2. Use it when you need a higher drive copy of that signal.',
       '2Y': 'Output of buffer 2. It is the buffered version of 2A.',
       '3A': 'Input of buffer 3. This channel is independent of the others.',
       '3Y': 'Output of buffer 3. It follows 3A directly.',
@@ -277,7 +277,7 @@ export const CHIPS_BLOCK_47 = {
       '4Y': 'Output of buffer 4. It copies the logic level on 4A.',
       '4A': 'Input of buffer 4. Drive it with the signal you want repeated at 4Y.',
       '5Y': 'Output of buffer 5. It follows 5A.',
-      '5A': 'Input of buffer 5. This is another non-inverting channel.',
+      '5A': 'Input of buffer 5. This is another non inverting channel.',
       '6Y': 'Output of buffer 6. It copies 6A.',
       '6A': 'Input of buffer 6. Use this last channel like the other five.',
       'VCC': 'Positive supply pin, typically +5 V.',
@@ -286,22 +286,22 @@ export const CHIPS_BLOCK_47 = {
       {
         title: 'What a Buffer Does',
         paragraphs: [
-          'A non-inverting buffer does not change the logic meaning of a signal. If the input is LOW, the output is LOW; if the input is HIGH, the output is HIGH.',
-          'What changes is the drive capability and isolation. The buffer lets a weak or timing-sensitive source hand the job of driving the outside world to a stronger output stage.',
+          'A non inverting buffer does not change the logic meaning of a signal. If the input is LOW, the output is LOW; if the input is HIGH, the output is HIGH.',
+          'What changes is the drive capability and isolation. The buffer lets a weak or timing sensitive source hand the job of driving the outside world to a stronger output stage.',
         ],
         formulas: ['Y = A'],
       },
       {
         title: 'Why Use a Driver Version',
         paragraphs: [
-          'Driver variants are chosen when fan-out matters. Instead of loading a flip-flop or counter output with many destinations directly, you buffer it once and let the buffer feed the heavier load.',
+          'Driver variants are chosen when fan out matters. Instead of loading a flip flop or counter output with many destinations directly, you buffer it once and let the buffer feed the heavier load.',
         ],
       },
       {
         title: 'Common Uses',
         list: [
-          'Increasing fan-out for a clock, enable, or control line.',
-          'Refreshing a logic level before it goes off-board or across a longer trace.',
+          'Increasing fan out for a clock, enable, or control line.',
+          'Refreshing a logic level before it goes off board or across a longer trace.',
           'Adding one stage of isolation between logic blocks to reduce interaction.',
         ],
       },
@@ -332,29 +332,29 @@ export const CHIPS_BLOCK_47 = {
     ],
   },
 
-  // 74x1035: Hex non-inverting buffer OC driver (14-pin)
+  // 74x1035: Hex non inverting buffer OC driver (14-pin)
   '74x1035': {
     name: '74x1035',
-    simpleName: 'Hex Non-Inverting Buffer OC Driver',
-    description: 'Hex non-inverting buffer with open-collector high-drive outputs (14-pin)',
+    simpleName: 'Hex Non Inverting Buffer OC Driver',
+    description: 'Hex non inverting buffer with open collector high drive outputs (14-pin)',
     pins: 14, vcc: 14, gnd: 7,
     openCollector: true,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74als1035.pdf',
     tags: ['buffer', 'hex', 'driver', 'open collector'],
-    guideOverview: 'The 74x1035 is a six-channel non-inverting buffer with open-collector outputs. Logically it still behaves like a plain buffer, but the output transistor can only pull LOW; an external pull up resistor provides the HIGH level in real hardware. That makes the part useful when several outputs must share a line, when the output voltage is set by something other than the chip itself, or when you need a stronger sink driver than a standard gate offers.',
+    guideOverview: 'The 74x1035 is a six channel non inverting buffer with open collector outputs. Logically it still behaves like a plain buffer, but the output transistor can only pull LOW; an external pull up resistor provides the HIGH level in real hardware. That makes the part useful when several outputs must share a line, when the output voltage is set by something other than the chip itself, or when you need a stronger sink driver than a standard gate offers.',
     guidePinDescriptions: {
       '1A': 'Input of buffer 1. The output logic follows this input without inversion.',
-      '1Y': 'Open-collector output of buffer 1. It pulls LOW when 1A is LOW and otherwise releases the line so an external pull up can bring it HIGH.',
+      '1Y': 'Open collector output of buffer 1. It pulls LOW when 1A is LOW and otherwise releases the line so an external pull up can bring it HIGH.',
       '2A': 'Input of buffer 2. Drive this pin with the logic signal you want buffered.',
-      '2Y': 'Open-collector output of buffer 2. Treat it like a sink-only version of a normal buffer output.',
+      '2Y': 'Open collector output of buffer 2. Treat it like a sink only version of a normal buffer output.',
       '3A': 'Input of buffer 3. This channel works independently of the others.',
-      '3Y': 'Open-collector output of buffer 3. Add a pull up resistor if you want a defined HIGH level on real hardware.',
+      '3Y': 'Open collector output of buffer 3. Add a pull up resistor if you want a defined HIGH level on real hardware.',
       'GND': 'Ground reference for the device and the sink transistors.',
-      '4Y': 'Open-collector output of buffer 4. It follows 4A logically but only drives LOW actively.',
+      '4Y': 'Open collector output of buffer 4. It follows 4A logically but only drives LOW actively.',
       '4A': 'Input of buffer 4. A HIGH here releases 4Y; a LOW makes 4Y sink current.',
-      '5Y': 'Open-collector output of buffer 5. It behaves like the other OC outputs.',
+      '5Y': 'Open collector output of buffer 5. It behaves like the other OC outputs.',
       '5A': 'Input of buffer 5. Use it as another independent buffered control signal.',
-      '6Y': 'Open-collector output of buffer 6. This last channel also needs a pull up in real circuits.',
+      '6Y': 'Open collector output of buffer 6. This last channel also needs a pull up in real circuits.',
       '6A': 'Input of buffer 6. It controls the state of 6Y.',
       'VCC': 'Positive supply for the input and output circuitry.',
     },
@@ -362,24 +362,24 @@ export const CHIPS_BLOCK_47 = {
       {
         title: 'Open Collector Output',
         paragraphs: [
-          'An open-collector output is different from a push-pull TTL output. It has a transistor that can pull the line LOW strongly, but it does not drive HIGH on its own.',
+          'An open collector output is different from a push pull TTL output. It has a transistor that can pull the line LOW strongly, but it does not drive HIGH on its own.',
           'When the transistor turns off, the output is effectively released. A pull up resistor or another external source is then responsible for bringing the line HIGH.',
         ],
       },
       {
         title: 'Logic Function',
         paragraphs: [
-          'Ignoring the electrical interface, each channel is still a simple non-inverting buffer. The output state represents the same logic value as the input.',
+          'Ignoring the electrical interface, each channel is still a simple non inverting buffer. The output state represents the same logic value as the input.',
         ],
         formulas: ['Y = A'],
-        note: 'In real hardware, remember that a released open-collector output is not the same thing as an actively driven HIGH unless a pull up resistor is present.',
+        note: 'In real hardware, remember that a released open collector output is not the same thing as an actively driven HIGH unless a pull up resistor is present.',
       },
       {
         title: 'Common Uses',
         list: [
           'Wired OR style shared control lines in TTL systems.',
           'Driving lamps, relays, or other loads that need current sinking rather than sourcing.',
-          'Level-shifting or bus-sharing schemes where the pull up voltage is chosen externally.',
+          'Level shifting or bus sharing schemes where the pull up voltage is chosen externally.',
         ],
       },
     ],
@@ -413,7 +413,7 @@ export const CHIPS_BLOCK_47 = {
   '74x1036': {
     name: '74x1036',
     simpleName: 'Quad 2 Input NOR Gate Driver',
-    description: 'Quad 2 input NOR gate with high-drive outputs (14-pin)',
+    description: 'Quad 2 input NOR gate with high drive outputs (14-pin)',
     pins: 14, vcc: 14, gnd: 7,
     datasheet: '',
     tags: ['nor', 'gate', 'quad', 'driver'],
@@ -480,11 +480,11 @@ export const CHIPS_BLOCK_47 = {
     pins: 16, vcc: 16, gnd: 8,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74s1051.pdf',
     tags: ['termination', 'diode', 'passive', 'bus', 'stub'],
-    guideOverview: 'The 74x1051 is a twelve-channel bus-termination network packaged in a 16-pin DIP. Instead of acting like a logic gate, each channel provides Schottky diode clamping to both supply rails so a bus line is protected against overshoot above VCC and undershoot below ground. Parts like this were used on fast TTL buses where clean edges mattered more than adding another active logic function.',
+    guideOverview: 'The 74x1051 is a twelve channel bus termination network packaged in a 16-pin DIP. Instead of acting like a logic gate, each channel provides Schottky diode clamping to both supply rails so a bus line is protected against overshoot above VCC and undershoot below ground. Parts like this were used on fast TTL buses where clean edges mattered more than adding another active logic function.',
     guidePinDescriptions: {
       'A0': 'Termination channel A0. Connect one bus line here so the internal clamp network can limit voltage excursions on that trace.',
       'A1': 'Termination channel A1. This is another passive protection/conditioning connection for a signal line.',
-      'A2': 'Termination channel A2. It behaves like the other bus-line pins and is not a driven logic output.',
+      'A2': 'Termination channel A2. It behaves like the other bus line pins and is not a driven logic output.',
       'A3': 'Termination channel A3. Use it on a line that needs overshoot and undershoot control.',
       'A4': 'Termination channel A4. Leave it unused if that channel is not needed.',
       'A5': 'Termination channel A5. This completes the A-side set of six conditioned bus nodes.',
@@ -493,7 +493,7 @@ export const CHIPS_BLOCK_47 = {
       'B0': 'Termination channel B0. Use it like the A-side pins for another bus line.',
       'B1': 'Termination channel B1. This is a passive clamp connection, not an output driver.',
       'B2': 'Termination channel B2. Connect a TTL bus trace here to add the built in protection/clamping.',
-      'B3': 'Termination channel B3. It provides the same rail-clamp behavior as the other channels.',
+      'B3': 'Termination channel B3. It provides the same rail clamp behavior as the other channels.',
       'B4': 'Termination channel B4. Use it for another conditioned bus node.',
       'B5': 'Termination channel B5. This is the last active channel in the package.',
       'NC2': 'No internal connection. Leave this pin unconnected.',
@@ -501,7 +501,7 @@ export const CHIPS_BLOCK_47 = {
     },
     guideSections: [
       {
-        title: 'Clamp-to-Rail Termination',
+        title: 'Clamp to Rail Termination',
         paragraphs: [
           'When a fast TTL edge reaches a trace discontinuity, the reflected wave can swing above the normal HIGH level or below ground. The 74x1051 limits those excursions by clamping each protected line to the supply rails through Schottky diodes.',
           'Because Schottky diodes switch quickly and clamp at a relatively low forward voltage, they help tame spikes before they stress receiving inputs or create false transitions.',
@@ -581,7 +581,7 @@ export const CHIPS_BLOCK_47 = {
     pins: 20, vcc: 20, gnd: 10,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74s1053.pdf',
     tags: ['termination', 'diode', 'passive', 'bus', 'stub'],
-    guideOverview: 'The 74x1053 extends the same clamp-to-rail bus-termination idea to sixteen channels. Each signal line is tied into an internal Schottky protection network that limits large positive and negative transients, making it easier to keep wide TTL buses clean across backplanes or cable assemblies. You would choose this part when a 16 bit bus needs consistent line conditioning in one package rather than a row of discrete clamps.',
+    guideOverview: 'The 74x1053 extends the same clamp to rail bus termination idea to sixteen channels. Each signal line is tied into an internal Schottky protection network that limits large positive and negative transients, making it easier to keep wide TTL buses clean across backplanes or cable assemblies. You would choose this part when a 16 bit bus needs consistent line conditioning in one package rather than a row of discrete clamps.',
     guidePinDescriptions: {
       'A0': 'Termination channel A0. Connect one bus trace here to give it the internal clamp protection.',
       'A1': 'Termination channel A1. This is another passive conditioning node for a signal line.',
@@ -589,7 +589,7 @@ export const CHIPS_BLOCK_47 = {
       'A3': 'Termination channel A3. Use it for another protected bus bit.',
       'A4': 'Termination channel A4. It behaves like the other A-side termination pins.',
       'A5': 'Termination channel A5. Connect this pin if you need another conditioned line.',
-      'A6': 'Termination channel A6. This channel adds the same rail-clamp behavior as the rest.',
+      'A6': 'Termination channel A6. This channel adds the same rail clamp behavior as the rest.',
       'A7': 'Termination channel A7. It is the eighth A-side termination connection.',
       'NC': 'No internal connection. Leave this pin unconnected.',
       'GND': 'Ground reference and lower clamp rail.',
@@ -599,7 +599,7 @@ export const CHIPS_BLOCK_47 = {
       'B3': 'Termination channel B3. It behaves like the other active channels.',
       'B4': 'Termination channel B4. This is another passive clamp node.',
       'B5': 'Termination channel B5. Use it for one more conditioned bus line.',
-      'B6': 'Termination channel B6. It provides the same supply-rail clamping as the other channels.',
+      'B6': 'Termination channel B6. It provides the same supply rail clamping as the other channels.',
       'B7': 'Termination channel B7. This is the last active B-side channel.',
       'NC2': 'No internal connection. Leave this pin unconnected.',
       'VCC': 'Positive supply and upper clamp rail.',
@@ -608,7 +608,7 @@ export const CHIPS_BLOCK_47 = {
       {
         title: 'Protecting a Wide Bus',
         paragraphs: [
-          'The wider the bus, the more attractive a multi-channel termination package becomes. A 16 bit data path can be conditioned with one IC instead of sixteen discrete clamp networks, keeping layout cleaner and more uniform.',
+          'The wider the bus, the more attractive a multi channel termination package becomes. A 16 bit data path can be conditioned with one IC instead of sixteen discrete clamp networks, keeping layout cleaner and more uniform.',
           'This does not add logic functionality. Its job is signal integrity: reducing the amplitude of line excursions so the real logic devices on the bus see cleaner waveforms.',
         ],
       },
@@ -617,7 +617,7 @@ export const CHIPS_BLOCK_47 = {
         paragraphs: [
           'Because the channels clamp toward both rails, the part helps with both overshoot above VCC and undershoot below ground. That is especially useful on backplanes and long interconnects where impedance mismatches create ringing in both directions.',
         ],
-        note: 'The simulator treats this device as a documentation-oriented passive placeholder rather than a full analog transmission-line model.',
+        note: 'The simulator treats this device as a documentation oriented passive placeholder rather than a full analog transmission line model.',
       },
     ],
     pinout: [
@@ -655,19 +655,19 @@ export const CHIPS_BLOCK_47 = {
     pins: 16, vcc: 16, gnd: 8,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74f1056.pdf',
     tags: ['termination', 'diode', 'passive', 'bus', 'stub'],
-    guideOverview: 'The 74x1056 is an eight-channel termination network that clamps bus-line transients toward ground. It is intended for fast TTL-style interconnects where ringing and undershoot need to be controlled but a full active logic IC is not required. For someone studying classic digital hardware, it is a good reminder that many "74xx" packages existed to solve signal-integrity problems, not just Boolean logic problems.',
+    guideOverview: 'The 74x1056 is an eight channel termination network that clamps bus line transients toward ground. It is intended for fast TTL style interconnects where ringing and undershoot need to be controlled but a full active logic IC is not required. For someone studying classic digital hardware, it is a good reminder that many "74xx" packages existed to solve signal integrity problems, not just Boolean logic problems.',
     guidePinDescriptions: {
       'A0': 'Termination channel A0. Connect the first signal line you want conditioned here.',
       'A1': 'Termination channel A1. This pin is a passive clamp node for another bus trace.',
-      'A2': 'Termination channel A2. It behaves like the other active bus-line channels.',
+      'A2': 'Termination channel A2. It behaves like the other active bus line channels.',
       'A3': 'Termination channel A3. Use it for another line that needs transient control.',
       'NC': 'No internal connection. Leave this pin unconnected.',
       'NC2': 'No internal connection. Leave this pin unconnected.',
       'NC3': 'No internal connection. Leave this pin unconnected.',
       'GND': 'Ground reference and clamp destination for the active channels.',
-      'B0': 'Termination channel B0. Use it for one of the second-group signal lines.',
+      'B0': 'Termination channel B0. Use it for one of the second group signal lines.',
       'B1': 'Termination channel B1. This is another passive clamp connection.',
-      'B2': 'Termination channel B2. Connect a bus trace here to add the internal ground-clamp behavior.',
+      'B2': 'Termination channel B2. Connect a bus trace here to add the internal ground clamp behavior.',
       'B3': 'Termination channel B3. This is the last active channel in the package.',
       'NC4': 'No internal connection. Leave this pin unconnected.',
       'NC5': 'No internal connection. Leave this pin unconnected.',
@@ -676,16 +676,16 @@ export const CHIPS_BLOCK_47 = {
     },
     guideSections: [
       {
-        title: 'Ground-Clamp Termination',
+        title: 'Ground Clamp Termination',
         paragraphs: [
-          'Unlike the dual-rail clamp versions, the 74x1056 focuses on controlling excursions toward ground. It is aimed at keeping negative-going spikes and undershoot from becoming large enough to upset neighboring TTL inputs.',
-          'Only eight channels are provided, so the part fits smaller buses or control-line groups where a full 12 bit or 16 bit network would waste channels.',
+          'Unlike the dual rail clamp versions, the 74x1056 focuses on controlling excursions toward ground. It is aimed at keeping negative going spikes and undershoot from becoming large enough to upset neighboring TTL inputs.',
+          'Only eight channels are provided, so the part fits smaller buses or control line groups where a full 12 bit or 16 bit network would waste channels.',
         ],
       },
       {
         title: 'Typical Use',
         paragraphs: [
-          'Designers would place a part like this close to the connector or receiver side of a bus. The package then acts as a tidy, repeatable way to protect each line from the worst of transmission-line reflections.',
+          'Designers would place a part like this close to the connector or receiver side of a bus. The package then acts as a tidy, repeatable way to protect each line from the worst of transmission line reflections.',
         ],
         note: 'As with the other termination arrays in this block, the simulator documents the part and pins but does not numerically model analog ringing or clamp current.',
       },
@@ -713,45 +713,45 @@ export const CHIPS_BLOCK_47 = {
     ],
   },
 
-  // 74x1071: 10 bit bus termination array with bus-hold function (14-pin)
+  // 74x1071: 10 bit bus termination array with bus hold function (14-pin)
   '74x1071': {
     name: '74x1071',
-    simpleName: '10 bit Bus Termination with Bus-Hold',
-    description: '10 bit bus termination array with bus-hold function (14-pin)',
+    simpleName: '10 bit Bus Termination with Bus Hold',
+    description: '10 bit bus termination array with bus hold function (14-pin)',
     pins: 14, vcc: 14, gnd: 7,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74act1071.pdf',
     tags: ['termination', 'bus-hold', 'passive', 'bus', 'stub'],
-    guideOverview: 'The 74x1071 is a ten-line bus-conditioning device with a bus-hold, or keeper, function. A bus-hold circuit weakly remembers the last valid HIGH or LOW level on a line so the signal does not drift when every active driver lets go. This is useful on bidirectional buses where floating inputs can waste power or randomly toggle, but you still do not want a strong pull up or pull down fighting the next driver.',
+    guideOverview: 'The 74x1071 is a ten line bus conditioning device with a bus hold, or keeper, function. A bus hold circuit weakly remembers the last valid HIGH or LOW level on a line so the signal does not drift when every active driver lets go. This is useful on bidirectional buses where floating inputs can waste power or randomly toggle, but you still do not want a strong pull up or pull down fighting the next driver.',
     guidePinDescriptions: {
-      'I0': 'Bus-hold channel 0. Connect one shared signal line here so the keeper can weakly maintain its last state.',
-      'I1': 'Bus-hold channel 1. It behaves like I0 for another bus line.',
-      'I2': 'Bus-hold channel 2. Use it on a bidirectional or occasionally floating signal.',
-      'I3': 'Bus-hold channel 3. This line gets the same weak keeper action as the others.',
-      'I4': 'Bus-hold channel 4. Connect another shared trace here if you want it held when undriven.',
+      'I0': 'Bus hold channel 0. Connect one shared signal line here so the keeper can weakly maintain its last state.',
+      'I1': 'Bus hold channel 1. It behaves like I0 for another bus line.',
+      'I2': 'Bus hold channel 2. Use it on a bidirectional or occasionally floating signal.',
+      'I3': 'Bus hold channel 3. This line gets the same weak keeper action as the others.',
+      'I4': 'Bus hold channel 4. Connect another shared trace here if you want it held when undriven.',
       'NC': 'No internal connection. Leave this pin unconnected.',
       'GND': 'Ground reference for the device.',
-      'I5': 'Bus-hold channel 5. The circuit weakly maintains the last logic state on this line when it is released.',
-      'I6': 'Bus-hold channel 6. Use it for another floating-prone bus signal.',
-      'I7': 'Bus-hold channel 7. This is another independent keeper channel.',
-      'I8': 'Bus-hold channel 8. It helps prevent this line from drifting when no driver is active.',
-      'I9': 'Bus-hold channel 9. This is the tenth and final conditioned bus line.',
+      'I5': 'Bus hold channel 5. The circuit weakly maintains the last logic state on this line when it is released.',
+      'I6': 'Bus hold channel 6. Use it for another floating prone bus signal.',
+      'I7': 'Bus hold channel 7. This is another independent keeper channel.',
+      'I8': 'Bus hold channel 8. It helps prevent this line from drifting when no driver is active.',
+      'I9': 'Bus hold channel 9. This is the tenth and final conditioned bus line.',
       'NC2': 'No internal connection. Leave this pin unconnected.',
       'VCC': 'Positive supply for the keeper circuits.',
     },
     guideSections: [
       {
-        title: 'What Bus-Hold Means',
+        title: 'What Bus Hold Means',
         paragraphs: [
-          'A bus-hold circuit is a very weak latch on each line. When a driver releases the bus, the keeper feeds back the last valid state just strongly enough to prevent the line from floating, but weakly enough that the next real driver can override it.',
+          'A bus hold circuit is a very weak latch on each line. When a driver releases the bus, the keeper feeds back the last valid state just strongly enough to prevent the line from floating, but weakly enough that the next real driver can override it.',
           'This avoids the need for large pull up or pull down resistor networks on every line and reduces the risk of undefined inputs causing oscillation or excess current.',
         ],
       },
       {
         title: 'Where It Helps',
         paragraphs: [
-          'Bus-hold parts are especially useful on bidirectional data buses, connector interfaces, and microprocessor-style expansion buses where ownership of a line changes frequently. They keep the idle state well behaved without turning the bus into a fight between strong drivers.',
+          'Bus hold parts are especially useful on bidirectional data buses, connector interfaces, and microprocessor style expansion buses where ownership of a line changes frequently. They keep the idle state well behaved without turning the bus into a fight between strong drivers.',
         ],
-        note: 'The simulator treats this device as a placeholder/documentation model. It records the bus-hold role, but it does not emulate the analog strength of the weak keeper circuit.',
+        note: 'The simulator treats this device as a placeholder/documentation model. It records the bus hold role, but it does not emulate the analog strength of the weak keeper circuit.',
       },
     ],
     pinout: [

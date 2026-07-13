@@ -4,14 +4,14 @@
 export const CHIPS_BLOCK_43 = {
 
   // 74877: 8 bit universal transceiver port controller (24-pin)
-  '74877': {
+  '74x877': {
     name: '74x877',
     simpleName: '8 bit Universal Transceiver Port Controller',
     description: '8 bit universal transceiver port controller (24-pin)',
     pins: 24, vcc: 24, gnd: 12,
     datasheet: '',
-    tags: ['transceiver', '8 bit', 'tri-state', 'stub'],
-    guideOverview: 'The 74x877 is an 8 bit universal transceiver port controller with 3-state outputs. Mode select inputs S0 and S1 choose among pass-through, registered, and hold modes for transferring data between the bidirectional A and B buses. OEn (active LOW) enables the output drivers. CLK clocks the internal pipeline register and CLRn (active LOW) asynchronously clears it. This chip is a later enhanced-process variant in the 74x852/856/877 family and is used in high-speed bus interfaces requiring configurable data-flow direction.',
+    tags: ['transceiver', '8 bit', 'tri state', 'stub'],
+    guideOverview: 'The 74x877 is an 8 bit universal transceiver port controller with 3-state outputs. Mode select inputs S0 and S1 choose among pass through, registered, and hold modes for transferring data between the bidirectional A and B buses. OEn (active LOW) enables the output drivers. CLK clocks the internal pipeline register and CLRn (active LOW) asynchronously clears it. This chip is a later enhanced process variant in the 74x852/856/877 family and is used in high speed bus interfaces requiring configurable data-flow direction.',
     pinout: [
       { pin:  1, name: 'S0',   type: 'input'  },
       { pin:  2, name: 'S1',   type: 'input'  },
@@ -43,96 +43,124 @@ export const CHIPS_BLOCK_43 = {
     ],
   },
 
-  // 74878: Dual 4 bit D-FF, synchronous clear, non-inverting outputs, TRI (24-pin)
-  '74878': {
+  // 74878: Dual 4 bit D-FF, synchronous clear, non inverting outputs, TRI (24-pin)
+  '74x878': {
     name: '74x878',
-    simpleName: 'Dual 4 bit D-FF (Sync CLR, Non-Inv, TRI)',
-    description: 'Dual 4 bit D-type flip-flop with synchronous clear and non-inverting three-state outputs (24-pin)',
+    simpleName: 'Dual 4 bit D-FF (Sync CLR, Non Inv, TRI)',
+    description: 'Dual 4-bit D flip-flops, sync clear, non-inverting 3-state (24-pin)',
     pins: 24, vcc: 24, gnd: 12,
     datasheet: '',
-    tags: ['flip-flop', 'D-type', 'dual', '4 bit', 'tri-state', 'stub'],
+    tags: ['flip flop', 'D type', 'dual', '4 bit', 'tri state'],
     sequential: true,
-    guideOverview: 'The 74x878 contains two independent 4 bit banks of positive-edge-triggered D flip-flops with synchronous clear and non-inverting 3-state outputs. Each bank captures its four D inputs on the rising CLK edge and drives the Q outputs non-inverted when OEn (active LOW) is asserted. CLRn (active LOW) clears the register synchronously on the next rising clock edge, preventing glitches. The synchronous clear makes this chip preferable to the 74x873/874 in high-speed pipelined designs.',
+    guideOverview: 'The 74x878 holds two independent 4 bit registers of positive edge triggered D flip flops with non inverting 3-state outputs. Each register (bank 1 uses CLK1/CLR1n/OE1n, bank 2 uses CLK2/CLR2n/OE2n) captures its four D inputs on the rising edge of its clock and passes them unchanged to the Q outputs. The clear is synchronous: pulling CLRn LOW does nothing on its own, and the register only clears to 0 on the next rising clock edge. OEn (active LOW) switches the Q outputs between driving and high impedance without changing the stored value, so a bank can be read onto a shared bus and then disconnected without losing its contents. The 74x879 is the same part with inverting outputs.',
     pinout: [
-      { pin:  1, name: 'OE1n', type: 'input'  },
-      { pin:  2, name: 'CLR1n',type: 'input'  },
-      { pin:  3, name: 'CLK1', type: 'input'  },
-      { pin:  4, name: 'D10',  type: 'input'  },
-      { pin:  5, name: 'D11',  type: 'input'  },
-      { pin:  6, name: 'D12',  type: 'input'  },
-      { pin:  7, name: 'D13',  type: 'input'  },
-      { pin:  8, name: 'Q10',  type: 'output' },
-      { pin:  9, name: 'Q11',  type: 'output' },
-      { pin: 10, name: 'Q12',  type: 'output' },
-      { pin: 11, name: 'Q13',  type: 'output' },
+      { pin:  1, name: 'CLR1n',type: 'input'  },
+      { pin:  2, name: 'OE1n', type: 'input'  },
+      { pin:  3, name: 'D10',  type: 'input'  },
+      { pin:  4, name: 'D11',  type: 'input'  },
+      { pin:  5, name: 'D12',  type: 'input'  },
+      { pin:  6, name: 'D13',  type: 'input'  },
+      { pin:  7, name: 'D20',  type: 'input'  },
+      { pin:  8, name: 'D21',  type: 'input'  },
+      { pin:  9, name: 'D22',  type: 'input'  },
+      { pin: 10, name: 'D23',  type: 'input'  },
+      { pin: 11, name: 'OE2n', type: 'input'  },
       { pin: 12, name: 'GND',  type: 'power'  },
-      { pin: 13, name: 'Q23',  type: 'output' },
-      { pin: 14, name: 'Q22',  type: 'output' },
-      { pin: 15, name: 'Q21',  type: 'output' },
-      { pin: 16, name: 'Q20',  type: 'output' },
-      { pin: 17, name: 'D23',  type: 'input'  },
-      { pin: 18, name: 'D22',  type: 'input'  },
-      { pin: 19, name: 'D21',  type: 'input'  },
-      { pin: 20, name: 'D20',  type: 'input'  },
-      { pin: 21, name: 'CLK2', type: 'input'  },
-      { pin: 22, name: 'CLR2n',type: 'input'  },
-      { pin: 23, name: 'OE2n', type: 'input'  },
+      { pin: 13, name: 'CLR2n',type: 'input'  },
+      { pin: 14, name: 'CLK2', type: 'input'  },
+      { pin: 15, name: 'Q23',  type: 'output' },
+      { pin: 16, name: 'Q22',  type: 'output' },
+      { pin: 17, name: 'Q21',  type: 'output' },
+      { pin: 18, name: 'Q20',  type: 'output' },
+      { pin: 19, name: 'Q13',  type: 'output' },
+      { pin: 20, name: 'Q12',  type: 'output' },
+      { pin: 21, name: 'Q11',  type: 'output' },
+      { pin: 22, name: 'Q10',  type: 'output' },
+      { pin: 23, name: 'CLK1', type: 'input'  },
       { pin: 24, name: 'VCC',  type: 'power'  },
     ],
     gates: [
-      { type: 'GENERIC_STUB', inputs: ['OE1n','CLR1n','CLK1','D10','D11','D12','D13','OE2n','CLR2n','CLK2','D20','D21','D22','D23'], outputs: ['Q10','Q11','Q12','Q13','Q20','Q21','Q22','Q23'] },
+      { type: 'D_FF_REG_SYNC_CLR_TRI', inputs: ['D10','D11','D12','D13','CLK1','CLR1n','OE1n'], outputs: ['Q10','Q11','Q12','Q13'] },
+      { type: 'D_FF_REG_SYNC_CLR_TRI', inputs: ['D20','D21','D22','D23','CLK2','CLR2n','OE2n'], outputs: ['Q20','Q21','Q22','Q23'] },
     ],
   },
 
   // 74879: Dual 4 bit D-FF, synchronous clear, inverting outputs, TRI (24-pin)
-  '74879': {
+  //
+  // Source: Texas Instruments, "SN54ALS873B, SN74ALS873B, SN54AS873A,
+  //   SN74AS873A Dual 4-Bit D-Type Latches With 3-State Outputs", SDAS036D
+  //   (Apr. 1982, rev. Aug. 1995). [Online]. Available:
+  //   https://www.ti.com/lit/ds/symlink/sn74als873b.pdf. Verified: 24-pin DW/NT
+  //   terminal assignment and latch function table, page 1, read as 200-dpi PDF
+  //   page images.
+  // Source: Texas Instruments, "SN54ALS874B, SN74ALS874B, SN74AS874,
+  //   SN74ALS876A, SN74AS876 Dual 4-Bit D-Type Edge-Triggered Flip-Flops",
+  //   SDAS061C (Apr. 1982, rev. Jan. 1995). [Online]. Available:
+  //   https://www.ti.com/lit/ds/symlink/sn74als874b.pdf. Verified: 24-pin DW/NT
+  //   terminal assignment (identical across this bus-interface family) plus the
+  //   edge-triggered FF function table ('874) and the inverting-output function
+  //   table ('876, OUTPUT column = Q̄), pages 1-2, read as 200-dpi PDF page
+  //   images.
+  // The SN74ALS879's own datasheet is not hosted by TI (obsolete part) and no
+  //   trustworthy full copy was located after a real search (TI lit 404s;
+  //   alldatasheet/datasheetarchive mirrors unreachable/blocked). Pinout and
+  //   behavior are therefore reconciled from the pin-compatible '873/'874/'876
+  //   members of the same family above: the '879 is the '878 with inverting Q̄
+  //   outputs, and the '878 is the '874 with its asynchronous clear replaced by
+  //   a synchronous (clock-edge) clear. Hence on a rising CLK edge: CLRn=0 loads
+  //   0 into the register so Q̄=HIGH; CLRn=1 loads D so Q̄=NOT D. CLRn has no
+  //   effect between clock edges. The hand-entered stub pinout was wrong (it
+  //   interleaved D/Q per bank and mislabeled pins 1-3); it is corrected here to
+  //   the verified family layout (the C2 / CD4082 lesson).
+  '74x879': {
     name: '74x879',
     simpleName: 'Dual 4 bit D-FF (Sync CLR, Inv, TRI)',
-    description: 'Dual 4 bit D-type flip-flop with synchronous clear and inverting three-state outputs (24-pin)',
+    description: 'Dual 4-bit D flip-flops, sync clear, inverting 3-state (24-pin)',
     pins: 24, vcc: 24, gnd: 12,
     datasheet: '',
-    tags: ['flip-flop', 'D-type', 'dual', '4 bit', 'inverting', 'tri-state', 'stub'],
+    tags: ['flip flop', 'D type', 'dual', '4 bit', 'inverting', 'tri state'],
     sequential: true,
-    guideOverview: 'The 74x879 is identical to the 74x878 but provides inverting 3-state outputs. Data captured on the rising CLK edge appears inverted at the Q̄ outputs when OEn (active LOW) is asserted. CLRn (active LOW) clears the internal registers synchronously on the next rising clock edge. Use when the system bus requires active LOW data levels with registered driving and synchronous clear.',
+    guideOverview: 'The 74x879 holds two independent 4 bit registers of positive edge triggered D flip flops with inverting 3-state outputs. Each register (bank 1 uses CLK1/CLR1n/OE1n, bank 2 uses CLK2/CLR2n/OE2n) captures its four D inputs on the rising edge of its clock and drives the complement onto the Q̄ outputs, so a stored 1 reads LOW and a stored 0 reads HIGH. The clear is synchronous: pulling CLRn LOW does nothing on its own, and the register only clears on the next rising clock edge, which drives every Q̄ output of that bank HIGH. OEn (active LOW) switches the Q̄ outputs between driving and high impedance without changing the stored value, so a bank can be read onto a shared bus and then disconnected without losing its contents. The 74x879 is the same part as the 74x878 with the outputs inverted, useful where the bus expects active LOW data.',
     pinout: [
-      { pin:  1, name: 'OE1n', type: 'input'  },
-      { pin:  2, name: 'CLR1n',type: 'input'  },
-      { pin:  3, name: 'CLK1', type: 'input'  },
-      { pin:  4, name: 'D10',  type: 'input'  },
-      { pin:  5, name: 'D11',  type: 'input'  },
-      { pin:  6, name: 'D12',  type: 'input'  },
-      { pin:  7, name: 'D13',  type: 'input'  },
-      { pin:  8, name: 'Q10n', type: 'output' },
-      { pin:  9, name: 'Q11n', type: 'output' },
-      { pin: 10, name: 'Q12n', type: 'output' },
-      { pin: 11, name: 'Q13n', type: 'output' },
+      { pin:  1, name: 'CLR1n',type: 'input'  },
+      { pin:  2, name: 'OE1n', type: 'input'  },
+      { pin:  3, name: 'D10',  type: 'input'  },
+      { pin:  4, name: 'D11',  type: 'input'  },
+      { pin:  5, name: 'D12',  type: 'input'  },
+      { pin:  6, name: 'D13',  type: 'input'  },
+      { pin:  7, name: 'D20',  type: 'input'  },
+      { pin:  8, name: 'D21',  type: 'input'  },
+      { pin:  9, name: 'D22',  type: 'input'  },
+      { pin: 10, name: 'D23',  type: 'input'  },
+      { pin: 11, name: 'OE2n', type: 'input'  },
       { pin: 12, name: 'GND',  type: 'power'  },
-      { pin: 13, name: 'Q23n', type: 'output' },
-      { pin: 14, name: 'Q22n', type: 'output' },
-      { pin: 15, name: 'Q21n', type: 'output' },
-      { pin: 16, name: 'Q20n', type: 'output' },
-      { pin: 17, name: 'D23',  type: 'input'  },
-      { pin: 18, name: 'D22',  type: 'input'  },
-      { pin: 19, name: 'D21',  type: 'input'  },
-      { pin: 20, name: 'D20',  type: 'input'  },
-      { pin: 21, name: 'CLK2', type: 'input'  },
-      { pin: 22, name: 'CLR2n',type: 'input'  },
-      { pin: 23, name: 'OE2n', type: 'input'  },
+      { pin: 13, name: 'CLR2n',type: 'input'  },
+      { pin: 14, name: 'CLK2', type: 'input'  },
+      { pin: 15, name: 'Q23n', type: 'output' },
+      { pin: 16, name: 'Q22n', type: 'output' },
+      { pin: 17, name: 'Q21n', type: 'output' },
+      { pin: 18, name: 'Q20n', type: 'output' },
+      { pin: 19, name: 'Q13n', type: 'output' },
+      { pin: 20, name: 'Q12n', type: 'output' },
+      { pin: 21, name: 'Q11n', type: 'output' },
+      { pin: 22, name: 'Q10n', type: 'output' },
+      { pin: 23, name: 'CLK1', type: 'input'  },
       { pin: 24, name: 'VCC',  type: 'power'  },
     ],
     gates: [
-      { type: 'GENERIC_STUB', inputs: ['OE1n','CLR1n','CLK1','D10','D11','D12','D13','OE2n','CLR2n','CLK2','D20','D21','D22','D23'], outputs: ['Q10n','Q11n','Q12n','Q13n','Q20n','Q21n','Q22n','Q23n'] },
+      { type: 'D_FF_REG_SYNC_CLR_TRI', invert: true, inputs: ['D10','D11','D12','D13','CLK1','CLR1n','OE1n'], outputs: ['Q10n','Q11n','Q12n','Q13n'] },
+      { type: 'D_FF_REG_SYNC_CLR_TRI', invert: true, inputs: ['D20','D21','D22','D23','CLK2','CLR2n','OE2n'], outputs: ['Q20n','Q21n','Q22n','Q23n'] },
     ],
   },
 
   // 74880: Dual 4 bit transparent latch with clear, inverting outputs, TRI (24-pin)
-  '74880': {
+  '74x880': {
     name: '74x880',
     simpleName: 'Dual 4 bit Transparent Latch w/ Clear (Inv, TRI)',
-    description: 'Dual 4 bit transparent latch with clear and inverting three-state outputs (24-pin)',
+    description: 'Dual 4-bit transparent latch, clear, inverting 3-state (24-pin)',
     pins: 24, vcc: 24, gnd: 12,
     datasheet: '',
-    tags: ['latch', 'dual', '4 bit', 'transparent', 'inverting', 'tri-state', 'stub'],
+    tags: ['latch', 'dual', '4 bit', 'transparent', 'inverting', 'tri state', 'stub'],
     sequential: true,
     guideOverview: 'The 74x880 contains two independent 4 bit transparent latches with active LOW clear and inverting 3-state outputs. When the latch enable LE is HIGH, the D inputs pass through to the inverted Q̄ outputs in real time (transparent mode). When LE goes LOW the last state is captured and held. CLRn (active LOW) asynchronously forces all Q̄ outputs LOW (Q=1) regardless of LE. OEn (active LOW) enables the 3-state output drivers. Use in address or data latching circuits where inverted bus levels are required.',
     pinout: [
@@ -167,14 +195,14 @@ export const CHIPS_BLOCK_43 = {
   },
 
   // 74881: 4 bit arithmetic logic unit (24-pin)
-  '74881': {
+  '74x881': {
     name: '74x881',
     simpleName: '4 bit ALU',
     description: '4 bit arithmetic logic unit (24-pin)',
     pins: 24, vcc: 24, gnd: 12,
     datasheet: '',
     tags: ['alu', 'arithmetic', 'logic', '4 bit', 'combinational'],
-    guideOverview: 'The 74x881 is a 4 bit arithmetic logic unit (ALU). Four function-select inputs S0–S3 and the mode pin M choose from 16 arithmetic operations (M=LOW, with carry Cn) or 16 logic operations (M=HIGH) on the two 4 bit input words A and B. Results appear on F0–F3; Cn4 is the carry out; P (propagate) and G (generate) feed a lookahead carry unit for cascading into wider adders; AeqB indicates equality. This is the 24-pin package equivalent of the 74x181 and is used wherever a full-function ALU is needed in a standard DIP form factor.',
+    guideOverview: 'The 74x881 is a 4 bit arithmetic logic unit (ALU). Four function select inputs S0 S3 and the mode pin M choose from 16 arithmetic operations (M=LOW, with carry Cn) or 16 logic operations (M=HIGH) on the two 4 bit input words A and B. Results appear on F0 F3; Cn4 is the carry out; P (propagate) and G (generate) feed a lookahead carry unit for cascading into wider adders; AeqB indicates equality. This is the 24-pin package equivalent of the 74x181 and is used wherever a full function ALU is needed in a standard DIP form factor.',
     pinout: [
       { pin:  1, name: 'B0',   type: 'input'  },
       { pin:  2, name: 'A0',   type: 'input'  },
@@ -207,57 +235,123 @@ export const CHIPS_BLOCK_43 = {
   },
 
   // 74882: 32 bit lookahead carry generator (24-pin)
-  '74882': {
+  // Source: Texas Instruments, "SN54AS882, SN74AS882A 32-Bit Look-Ahead Carry
+  //   Generators", SDAS-series data sheet (Rev. — as mirrored by AllDataSheet
+  //   item 116797 "SN74AS882ADW" and item 466590 "SN74AS882A"). [Online].
+  //   Available: https://www.alldatasheet.com/datasheet-pdf/pdf/116797/TI/SN74AS882ADW.html
+  //   Verified: full-resolution page images read as PNGs. Package pinout page:
+  //   inputs are ACTIVE-LOW carry propagate/generate (P̄0–P̄7, Ḡ0–Ḡ7) plus a HIGH
+  //   carry-in Cn; there are exactly FOUR carry outputs Cn+8, Cn+16, Cn+24, Cn+32
+  //   (confirmed on the FN/PLCC diagram: top edge P̄0,Ḡ0,Cn,NC,VCC,NC,Cn+32;
+  //   bottom edge P̄3,Cn+16,GND,NC,Ḡ4,P̄4,Ḡ5). There is NO group-generate ("GG")
+  //   output — the pre-existing stub invented it; removed here.
+  // Function reconciled with the SN74S182/74x182 look-ahead generator it scales up
+  //   (TI SN74S182, https://www.ti.com/lit/ds/symlink/sn74s182.pdf) and this repo's
+  //   verified 74x182 model in js/specificChipsSim.js (_evaluateCarryLookahead).
+  // Two caveats, both documented in issues.md:
+  //   1. Input polarity: real device P/G are active-low; this model uses ACTIVE-HIGH
+  //      P/G to match the in-sim 74x181 (ALU_4BIT emits active-high P/G) and 74x182
+  //      convention, so the 882 chains directly off the sim's ALUs.
+  //   2. DIP pin NUMBERS: every obtainable copy of this data sheet renders the 'N'
+  //      (DIP) pinout diagram with its pin-number labels stripped (vector text lost
+  //      in the mirror; TI's own /lit/ PDF 404s), so the exact DIP terminal numbers
+  //      could not be read. The signal SET and FUNCTION below are datasheet-verified;
+  //      the DIP numbering follows the 74x182-family layout (P before G, VCC=24,
+  //      GND=12, Cn+32 adjacent to VCC) and remains a best-effort reconstruction.
+  '74x882': {
     name: '74x882',
     simpleName: '32 bit Lookahead Carry Generator',
     description: '32 bit lookahead carry generator (24-pin)',
     pins: 24, vcc: 24, gnd: 12,
-    datasheet: '',
-    tags: ['carry', 'lookahead', 'arithmetic', 'stub'],
-    guideOverview: 'The 74x882 is a 32 bit lookahead carry generator. It accepts generate (G0–G7) and propagate (P0–P7) signals from up to eight 4 bit ALU or adder stages and computes inter-group carry outputs at 8 bit boundaries: Cn8, Cn16, Cn24, and Cn32. The group generate output GG indicates when the entire 32 bit block will generate a carry regardless of carry-in. Using a 74x882 with eight 74x181 or 74x881 ALUs enables full 32 bit parallel addition with near-constant carry propagation delay instead of a slow ripple-carry chain.',
+    datasheet: 'https://www.alldatasheet.com/datasheet-pdf/pdf/466590/TI1/SN74AS882A.html',
+    tags: ['carry', 'lookahead', 'arithmetic', 'alu', 'combinational'],
+    guideOverview: 'The 74x882 is a 32 bit lookahead carry generator. It takes the carry propagate (P0 P7) and carry generate (G0 G7) signals from eight 4 bit ALU stages, such as eight 74x181 or 74x881, and works out the carry into each 8 bit boundary at once: Cn8, Cn16, Cn24, and Cn32. Feeding those carries back to the ALUs replaces the slow ripple, where each stage waits on the one below it, so a full 32 bit add settles in a few gate delays instead of rippling across all 32 bits.',
+    guidePinDescriptions: {
+      P0: 'Carry propagate from ALU stage 0 (bits 0 to 3); HIGH means a carry entering this stage passes through it.',
+      G0: 'Carry generate from ALU stage 0; HIGH means this stage makes a carry on its own, whatever the carry in.',
+      P1: 'Carry propagate from ALU stage 1 (bits 4 to 7).',
+      G1: 'Carry generate from ALU stage 1.',
+      P2: 'Carry propagate from ALU stage 2 (bits 8 to 11).',
+      G2: 'Carry generate from ALU stage 2.',
+      P3: 'Carry propagate from ALU stage 3 (bits 12 to 15).',
+      G3: 'Carry generate from ALU stage 3.',
+      P4: 'Carry propagate from ALU stage 4 (bits 16 to 19).',
+      G4: 'Carry generate from ALU stage 4.',
+      P5: 'Carry propagate from ALU stage 5 (bits 20 to 23).',
+      G5: 'Carry generate from ALU stage 5.',
+      P6: 'Carry propagate from ALU stage 6 (bits 24 to 27).',
+      G6: 'Carry generate from ALU stage 6.',
+      P7: 'Carry propagate from ALU stage 7 (bits 28 to 31).',
+      G7: 'Carry generate from ALU stage 7.',
+      Cn: 'Carry into the whole 32 bit block, at the bottom of stage 0.',
+      Cn8: 'Carry out of the first 8 bits (stages 0 and 1); feeds the carry in of stage 2.',
+      Cn16: 'Carry out of the first 16 bits (stages 0 to 3); feeds the carry in of stage 4.',
+      Cn24: 'Carry out of the first 24 bits (stages 0 to 5); feeds the carry in of stage 6.',
+      Cn32: 'Carry out of the full 32 bits (stages 0 to 7); the block carry out.',
+      NC: 'Not connected.',
+      GND: 'Ground reference for the device at pin 12.',
+      VCC: 'Positive 5 V supply at pin 24.',
+    },
+    guideSections: [
+      {
+        title: 'Lookahead Instead of Ripple',
+        paragraphs: [
+          'Each 4 bit ALU stage reports two things about carries: whether it generates a carry on its own (G), and whether a carry coming in would pass straight through it (P). From those the 882 computes the carry out of a run of stages directly, without waiting for the carry to ripple through each one.',
+          'The chip produces a carry every 8 bits rather than every 4. You wire Cn8, Cn16, and Cn24 back to the carry inputs of stages 2, 4, and 6, and Cn32 is the carry out of the whole 32 bit block.',
+        ],
+        formulas: [
+          'Cn8  = G1 + P1*G0 + P1*P0*Cn',
+          'Cn16 = G3 + P3*G2 + P3*P2*G1 + P3*P2*P1*G0 + P3*P2*P1*P0*Cn',
+          'Cn24 = carry out of stages 0 to 5',
+          'Cn32 = carry out of stages 0 to 7',
+        ],
+      },
+    ],
     pinout: [
-      { pin:  1, name: 'G0',   type: 'input'  },
-      { pin:  2, name: 'P0',   type: 'input'  },
-      { pin:  3, name: 'G1',   type: 'input'  },
-      { pin:  4, name: 'P1',   type: 'input'  },
-      { pin:  5, name: 'G2',   type: 'input'  },
-      { pin:  6, name: 'P2',   type: 'input'  },
-      { pin:  7, name: 'G3',   type: 'input'  },
-      { pin:  8, name: 'P3',   type: 'input'  },
-      { pin:  9, name: 'G4',   type: 'input'  },
-      { pin: 10, name: 'P4',   type: 'input'  },
-      { pin: 11, name: 'G5',   type: 'input'  },
+      { pin:  1, name: 'P0',   type: 'input'  },
+      { pin:  2, name: 'G0',   type: 'input'  },
+      { pin:  3, name: 'P1',   type: 'input'  },
+      { pin:  4, name: 'G1',   type: 'input'  },
+      { pin:  5, name: 'P2',   type: 'input'  },
+      { pin:  6, name: 'G2',   type: 'input'  },
+      { pin:  7, name: 'P3',   type: 'input'  },
+      { pin:  8, name: 'G3',   type: 'input'  },
+      { pin:  9, name: 'P4',   type: 'input'  },
+      { pin: 10, name: 'G4',   type: 'input'  },
+      { pin: 11, name: 'P5',   type: 'input'  },
       { pin: 12, name: 'GND',  type: 'power'  },
-      { pin: 13, name: 'P5',   type: 'input'  },
-      { pin: 14, name: 'G6',   type: 'input'  },
-      { pin: 15, name: 'P6',   type: 'input'  },
-      { pin: 16, name: 'G7',   type: 'input'  },
-      { pin: 17, name: 'P7',   type: 'input'  },
+      { pin: 13, name: 'G5',   type: 'input'  },
+      { pin: 14, name: 'P6',   type: 'input'  },
+      { pin: 15, name: 'G6',   type: 'input'  },
+      { pin: 16, name: 'P7',   type: 'input'  },
+      { pin: 17, name: 'G7',   type: 'input'  },
       { pin: 18, name: 'Cn',   type: 'input'  },
       { pin: 19, name: 'Cn8',  type: 'output' },
       { pin: 20, name: 'Cn16', type: 'output' },
       { pin: 21, name: 'Cn24', type: 'output' },
-      { pin: 22, name: 'Cn32', type: 'output' },
-      { pin: 23, name: 'GG',   type: 'output' },
+      { pin: 22, name: 'NC',   type: 'nc'     },
+      { pin: 23, name: 'Cn32', type: 'output' },
       { pin: 24, name: 'VCC',  type: 'power'  },
     ],
     gates: [
-      { type: 'GENERIC_STUB', inputs: ['G0','P0','G1','P1','G2','P2','G3','P3','G4','P4','G5','P5','G6','P6','G7','P7','Cn'], outputs: ['Cn8','Cn16','Cn24','Cn32','GG'] },
+      { type: 'CARRY_LOOKAHEAD_32',
+        inputs: ['P0','G0','P1','G1','P2','G2','P3','G3','P4','G4','P5','G5','P6','G6','P7','G7','Cn'],
+        outputs: ['Cn8','Cn16','Cn24','Cn32'] },
     ],
   },
 
   // 74885: 8 bit magnitude comparator (24-pin)
-  '74885': {
+  '74x885': {
     name: '74x885',
     simpleName: '8 bit Magnitude Comparator',
     description: '8 bit magnitude comparator (24-pin)',
     pins: 24, vcc: 24, gnd: 12,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74as885.pdf',
-    tags: ['comparator', '8 bit', 'stub'],
+    tags: ['comparator', '8 bit', 'cascade'],
     guideOverview: 'The 74x885 is an 8 bit magnitude comparator. A magnitude comparator tells you whether one binary number is greater than, equal to, or less than another by checking the most significant differing bit first. On a breadboard it is useful for address decoding, threshold decisions, and for building wider comparators by cascading several packages together.',
     guidePinDescriptions: {
-      'A0': 'Least-significant bit of the A input word.',
-      'B0': 'Least-significant bit of the B input word.',
+      'A0': 'Least significant bit of the A input word.',
+      'B0': 'Least significant bit of the B input word.',
       'A1': 'A input bit 1.',
       'B1': 'B input bit 1.',
       'A2': 'A input bit 2.',
@@ -269,16 +363,16 @@ export const CHIPS_BLOCK_43 = {
       'AEQB': 'Output that indicates A equals B.',
       'GND': 'Ground reference for the device at pin 12.',
       'AGTB': 'Output that indicates A is greater than B.',
-      'A7': 'Most-significant bit of the A input word.',
-      'B7': 'Most-significant bit of the B input word.',
+      'A7': 'Most significant bit of the A input word.',
+      'B7': 'Most significant bit of the B input word.',
       'A6': 'A input bit 6.',
       'B6': 'B input bit 6.',
       'A5': 'A input bit 5.',
       'B5': 'B input bit 5.',
       'A4': 'A input bit 4.',
       'B4': 'B input bit 4.',
-      'ALTBI': 'Cascade input used when chaining comparators so a lower-order stage can report that A is already less than B. When the chip is used alone, set cascade inputs to the standalone state described in the datasheet.',
-      'AEQBI': 'Cascade input used when chaining comparators so lower-order equality information can feed into this stage. Set it to the standalone default when no lower-order stage is present.',
+      'ALTBI': 'Cascade input used when chaining comparators so a lower order stage can report that A is already less than B. When the chip is used alone, set cascade inputs to the standalone state described in the datasheet.',
+      'AEQBI': 'Cascade input used when chaining comparators so lower order equality information can feed into this stage. Set it to the standalone default when no lower order stage is present.',
       'VCC': 'Positive 5 V supply at pin 24.',
     },
     guideSections: [
@@ -286,20 +380,20 @@ export const CHIPS_BLOCK_43 = {
         title: 'How Magnitude Comparison Works',
         paragraphs: [
           'Binary magnitude comparison starts at the most significant bit. If the top bits differ, the larger bit wins immediately; only when the higher bits match does the circuit continue downward to the next bit.',
-          'That is why comparators are useful in digital control logic: they turn two multi-bit words into simple decision outputs such as greater-than, equal, or less-than.',
+          'That is why comparators are useful in digital control logic: they turn two multi bit words into simple decision outputs such as greater than, equal, or less than.',
         ],
       },
       {
         title: 'Cascading Wider Comparators',
         paragraphs: [
-          'Two or more comparator packages can be chained together to compare 16 bit or wider values. Lower-order comparison results feed the cascade inputs, while the upper-order device produces the final decision outputs.',
+          'Two or more comparator packages can be chained together to compare 16 bit or wider values. Lower order comparison results feed the cascade inputs, while the upper order device produces the final decision outputs.',
         ],
         list: [
           'Compare addresses against a range boundary.',
           'Decide whether one binary counter has passed another value.',
           'Chain multiple packages for larger word widths.',
         ],
-        note: 'The simulator currently treats this comparator as a generic stub rather than a full cascaded compare model.',
+        note: 'Cascaded compare is fully implemented: ALTBI/AEQBI act per the SN74AS885 truth table. At A=B with AEQBI=H and ALTBI=L the chip reports equality; the cascade inputs let multi-chip chains for 16+ bit comparisons resolve correctly.',
       },
     ],
     pinout: [
@@ -329,19 +423,21 @@ export const CHIPS_BLOCK_43 = {
       { pin: 24, name: 'VCC',  type: 'power'  },
     ],
     gates: [
-      { type: 'GENERIC_STUB', inputs: ['A0','B0','A1','B1','A2','B2','A3','B3','A4','B4','A5','B5','A6','B6','A7','B7','ALTBI','AEQBI'], outputs: ['AGEB','ALTB','AEQB','AGTB'] },
+      { type: 'COMPARATOR_8BIT_CASCADE',
+        inputs: ['A0','B0','A1','B1','A2','B2','A3','B3','A4','B4','A5','B5','A6','B6','A7','B7','ALTBI','AEQBI'],
+        outputs: ['AGEB','ALTB','AEQB','AGTB'] },
     ],
   },
 
   // 74900: Quad 2 input NAND driver (14-pin)
-  '74900': {
+  '74x900': {
     name: '74x900',
     simpleName: 'Quad 2 Input NAND Driver',
     description: 'Quad 2 input NAND gate (driver) (14-pin)',
     pins: 14, vcc: 14, gnd: 7,
     datasheet: '',
     tags: ['nand', 'gate', 'logic', 'quad', 'driver'],
-    guideOverview: 'The 74x900 is a quad 2-input NAND gate with high-current output drivers. Four independent NAND gates each produce a LOW output only when both inputs are HIGH; otherwise the output is HIGH. The driver-grade outputs can sink and source more current than standard-logic NAND gates, making this chip suitable for driving bus lines, long PCB traces, or multiple downstream inputs.',
+    guideOverview: 'The 74x900 is a quad 2-input NAND gate with high current output drivers. Four independent NAND gates each produce a LOW output only when both inputs are HIGH; otherwise the output is HIGH. The driver grade outputs can sink and source more current than standard logic NAND gates, making this chip suitable for driving bus lines, long PCB traces, or multiple downstream inputs.',
     pinout: [
       { pin:  1, name: '1A',  type: 'input'  },
       { pin:  2, name: '1B',  type: 'input'  },
@@ -367,14 +463,14 @@ export const CHIPS_BLOCK_43 = {
   },
 
   // 74901: Hex inverting TTL buffer (14-pin)
-  '74901': {
+  '74x901': {
     name: '74x901',
     simpleName: 'Hex Inverting TTL Buffer',
     description: 'Hex inverting TTL buffer (14-pin)',
     pins: 14, vcc: 14, gnd: 7,
     datasheet: '',
     tags: ['buffer', 'inverter', 'hex', 'ttl'],
-    guideOverview: 'The 74x901 is a hex inverting TTL buffer. Six independent NOT gates each drive a TTL-compatible output that is the logical complement of the input, with higher current capability than standard logic inverters. Use it as a signal driver, line driver, or inverting buffer to fan out a signal to many destinations or to restore degraded logic levels.',
+    guideOverview: 'The 74x901 is a hex inverting TTL buffer. Six independent NOT gates each drive a TTL compatible output that is the logical complement of the input, with higher current capability than standard logic inverters. Use it as a signal driver, line driver, or inverting buffer to fan out a signal to many destinations or to restore degraded logic levels.',
     pinout: [
       { pin:  1, name: '1A',  type: 'input'  },
       { pin:  2, name: '1Y',  type: 'output' },
@@ -401,15 +497,15 @@ export const CHIPS_BLOCK_43 = {
     ],
   },
 
-  // 74C902: Hex non-inverting TTL buffer (14-pin)
+  // 74C902: Hex non inverting TTL buffer (14-pin)
   '74C902': {
     name: '74x902',
-    simpleName: 'Hex Non-Inverting TTL Buffer',
-    description: 'Hex non-inverting TTL buffer (14-pin)',
+    simpleName: 'Hex Non Inverting TTL Buffer',
+    description: 'Hex non inverting TTL buffer (14-pin)',
     pins: 14, vcc: 14, gnd: 7,
     datasheet: '',
     tags: ['buffer', 'hex', 'ttl'],
-    guideOverview: 'The 74C902 is a hex non-inverting TTL buffer. Six independent BUFFER channels each pass their input directly to the output without inversion, providing higher current drive than standard CMOS logic. Use as a bus driver or level restorer when six signals need to be buffered simultaneously without changing their logic polarity.',
+    guideOverview: 'The 74C902 is a hex non inverting TTL buffer. Six independent BUFFER channels each pass their input directly to the output without inversion, providing higher current drive than standard CMOS logic. Use as a bus driver or level restorer when six signals need to be buffered simultaneously without changing their logic polarity.',
     pinout: [
       { pin:  1, name: '1A',  type: 'input'  },
       { pin:  2, name: '1Y',  type: 'output' },
@@ -444,7 +540,7 @@ export const CHIPS_BLOCK_43 = {
     pins: 14, vcc: 14, gnd: 7,
     datasheet: '',
     tags: ['nor', 'gate', 'logic', 'quad', 'driver'],
-    guideOverview: 'The 74x902 is a quad 2-input NOR gate with high-current output drivers. Four independent NOR gates each produce a HIGH output only when both inputs are LOW; if either input is HIGH the output is LOW. The driver-grade outputs can sink and source more current than standard-logic NOR gates, making this chip suitable for driving bus lines, long PCB traces, or multiple downstream inputs directly.',
+    guideOverview: 'The 74x902 is a quad 2-input NOR gate with high current output drivers. Four independent NOR gates each produce a HIGH output only when both inputs are LOW; if either input is HIGH the output is LOW. The driver grade outputs can sink and source more current than standard logic NOR gates, making this chip suitable for driving bus lines, long PCB traces, or multiple downstream inputs directly.',
     pinout: [
       { pin:  1, name: '1Y',  type: 'output' },
       { pin:  2, name: '1A',  type: 'input'  },
@@ -477,7 +573,7 @@ export const CHIPS_BLOCK_43 = {
     pins: 14, vcc: 14, gnd: 7,
     datasheet: 'https://www.fairchildsemi.com/datasheets/MM/MM74C903.pdf',
     tags: ['buffer', 'inverter', 'hex', 'pmos'],
-    guideOverview: 'The 74C903 is a hex inverting PMOS buffer. Six independent NOT gates each drive a PMOS-compatible output that is the logical complement of the input with higher current capability than standard logic inverters. Use when interfacing TTL or CMOS logic to PMOS circuits that require inverted signal polarity, or as a general-purpose hex inverting driver.',
+    guideOverview: 'The 74C903 is a hex inverting PMOS buffer. Six independent NOT gates each drive a PMOS compatible output that is the logical complement of the input with higher current capability than standard logic inverters. Use when interfacing TTL or CMOS logic to PMOS circuits that require inverted signal polarity, or as a general purpose hex inverting driver.',
     pinout: [
       { pin:  1, name: '1A',  type: 'input'  },
       { pin:  2, name: '1Y',  type: 'output' },
@@ -504,16 +600,16 @@ export const CHIPS_BLOCK_43 = {
     ],
   },
 
-  // 74x903: Quad 2 input NAND, open-collector driver (14-pin)
+  // 74x903: Quad 2 input NAND, open collector driver (14-pin)
   '74x903': {
     name: '74x903',
     simpleName: 'Quad 2 Input NAND Driver (OC)',
-    description: 'Quad 2 input NAND gate (open-collector driver) (14-pin)',
+    description: 'Quad 2 input NAND gate (open collector driver) (14-pin)',
     pins: 14, vcc: 14, gnd: 7,
     openCollector: true,
     datasheet: '',
     tags: ['nand', 'gate', 'logic', 'quad', 'driver', 'open collector'],
-    guideOverview: 'The 74x903 is a quad 2-input NAND gate with open-collector outputs for driving large loads. Four independent NAND gates each produce a LOW output only when both inputs are HIGH; otherwise the output is open-collector (requires an external pull up resistor to pull it HIGH). Multiple open-collector outputs can share a wired AND bus line where any gate asserting LOW pulls the shared line LOW.',
+    guideOverview: 'The 74x903 is a quad 2-input NAND gate with open collector outputs for driving large loads. Four independent NAND gates each produce a LOW output only when both inputs are HIGH; otherwise the output is open collector (requires an external pull up resistor to pull it HIGH). Multiple open collector outputs can share a wired AND bus line where any gate asserting LOW pulls the shared line LOW.',
     pinout: [
       { pin:  1, name: '1A',  type: 'input'  },
       { pin:  2, name: '1B',  type: 'input'  },
@@ -538,15 +634,15 @@ export const CHIPS_BLOCK_43 = {
     ],
   },
 
-  // 74x904: Hex non-inverting PMOS buffer (14-pin)
-  '74904': {
+  // 74x904: Hex non inverting PMOS buffer (14-pin)
+  '74x904': {
     name: '74x904',
-    simpleName: 'Hex Non-Inverting PMOS Buffer',
-    description: 'Hex non-inverting PMOS buffer (14-pin)',
+    simpleName: 'Hex Non Inverting PMOS Buffer',
+    description: 'Hex non inverting PMOS buffer (14-pin)',
     pins: 14, vcc: 14, gnd: 7,
     datasheet: '',
     tags: ['buffer', 'hex', 'pmos'],
-    guideOverview: 'The 74x904 is a hex non-inverting PMOS buffer. Six independent BUFFER channels each pass their input directly to the output without inversion, providing PMOS-compatible drive levels. Use to interface TTL logic to PMOS circuits or to increase the current drive capacity for six independent signals simultaneously.',
+    guideOverview: 'The 74x904 is a hex non inverting PMOS buffer. Six independent BUFFER channels each pass their input directly to the output without inversion, providing PMOS compatible drive levels. Use to interface TTL logic to PMOS circuits or to increase the current drive capacity for six independent signals simultaneously.',
     pinout: [
       { pin:  1, name: '1A',  type: 'input'  },
       { pin:  2, name: '1Y',  type: 'output' },
@@ -573,49 +669,8 @@ export const CHIPS_BLOCK_43 = {
     ],
   },
 
-  // 74x905: 12 bit successive approximation register (24-pin)
-  '74905': {
-    name: '74x905',
-    simpleName: '12 bit Successive Approximation Register',
-    description: '12 bit successive approximation register (24-pin)',
-    pins: 24, vcc: 24, gnd: 12,
-    datasheet: '',
-    tags: ['register', '12 bit', 'adc', 'sar', 'stub'],
-    sequential: true,
-    guideOverview: 'The 74x905 is a 12 bit successive approximation register (SAR) used to control analog-to-digital conversion. Asserting SOC starts conversion. Over 12 clock cycles the SAR asserts each output bit D0–D11 one at a time from MSB to LSB; the external comparator result fed back via the MSB pin tells the SAR whether to keep or clear each bit. EOC goes HIGH when conversion is complete and the full 12 bit result is stable. The SC pin coordinates the external DAC and comparator; OE enables the output drivers. The simulator represents this device as a generic stub.',
-    pinout: [
-      { pin:  1, name: 'SOC',  type: 'input'  },
-      { pin:  2, name: 'CLK',  type: 'input'  },
-      { pin:  3, name: 'SC',   type: 'output' },
-      { pin:  4, name: 'MSB',  type: 'input'  },
-      { pin:  5, name: 'D0',   type: 'output' },
-      { pin:  6, name: 'D1',   type: 'output' },
-      { pin:  7, name: 'D2',   type: 'output' },
-      { pin:  8, name: 'D3',   type: 'output' },
-      { pin:  9, name: 'D4',   type: 'output' },
-      { pin: 10, name: 'D5',   type: 'output' },
-      { pin: 11, name: 'D6',   type: 'output' },
-      { pin: 12, name: 'GND',  type: 'power'  },
-      { pin: 13, name: 'D7',   type: 'output' },
-      { pin: 14, name: 'D8',   type: 'output' },
-      { pin: 15, name: 'D9',   type: 'output' },
-      { pin: 16, name: 'D10',  type: 'output' },
-      { pin: 17, name: 'D11',  type: 'output' },
-      { pin: 18, name: 'EOC',  type: 'output' },
-      { pin: 19, name: 'SER',  type: 'input'  },
-      { pin: 20, name: 'OE',   type: 'input'  },
-      { pin: 21, name: 'NC',   type: 'nc'     },
-      { pin: 22, name: 'NC',   type: 'nc'     },
-      { pin: 23, name: 'NC',   type: 'nc'     },
-      { pin: 24, name: 'VCC',  type: 'power'  },
-    ],
-    gates: [
-      { type: 'GENERIC_STUB', inputs: ['SOC','CLK','MSB','SER','OE'], outputs: ['SC','D0','D1','D2','D3','D4','D5','D6','D7','D8','D9','D10','D11','EOC'] },
-    ],
-  },
-
   // 74x906: Hex open drain n-channel buffers (14-pin)
-  '74906': {
+  '74x906': {
     name: '74x906',
     simpleName: 'Hex Open Drain N-Channel Buffer',
     description: 'Hex open drain n-channel buffers (14-pin)',
@@ -623,7 +678,7 @@ export const CHIPS_BLOCK_43 = {
     openCollector: true,
     datasheet: '',
     tags: ['buffer', 'hex', 'open drain', 'open collector'],
-    guideOverview: 'The 74x906 is a hex open-drain n-channel buffer. Six BUFFER channels pass their input without inversion, but each output is an open-drain transistor — it can only pull the output LOW, not drive it HIGH. An external pull up resistor is required to bring the output HIGH when the input is LOW. Open-drain outputs allow multiple devices to share a wired OR bus line: any device asserting LOW pulls the shared line LOW regardless of what the others output.',
+    guideOverview: 'The 74x906 is a hex open drain n-channel buffer. Six BUFFER channels pass their input without inversion, but each output is an open drain transistor it can only pull the output LOW, not drive it HIGH. An external pull up resistor is required to bring the output HIGH when the input is LOW. Open drain outputs allow multiple devices to share a wired OR bus line: any device asserting LOW pulls the shared line LOW regardless of what the others output.',
     pinout: [
       { pin:  1, name: '1A',  type: 'input'  },
       { pin:  2, name: '1Y',  type: 'output' },

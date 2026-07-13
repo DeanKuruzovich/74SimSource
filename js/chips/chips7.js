@@ -3,9 +3,9 @@
 //
 // Review notes for this block:
 // - Most parts here are straightforward combinational TTL devices.
-// - Schmitt-trigger variants are modeled with the correct Boolean function, but
+// - Schmitt trigger variants are modeled with the correct Boolean function, but
 //   input hysteresis itself is not simulated.
-// - Open-collector parts behave as sinking outputs in the simulator, but their
+// - Open collector parts behave as sinking outputs in the simulator, but their
 //   higher voltage/current ratings are not separately enforced.
 // - 7431 delay differentiation is not timed; it is documented as a buffer-style
 //   functional model rather than as a nanosecond-accurate delay line.
@@ -14,18 +14,18 @@ export const CHIPS_BLOCK_7 = {
   // ── 74x18: Dual 4 input NAND (Schmitt trigger) ──────────────────────────
   /* Primary source: Texas Instruments, SN74LS18 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls18.pdf */
   // Functionally this is two independent 4 input NAND gates.
-  // The simulator models the NAND truth table directly; Schmitt-trigger input
+  // The simulator models the NAND truth table directly; Schmitt trigger input
   // hysteresis is noted in the guide but not represented as analog thresholds.
-  '7418': {
+  '74x18': {
     name: '74x18',
     simpleName: 'Dual 4-in NAND (Schmitt)',
-    description: 'Two independent 4 input NAND gates with Schmitt-trigger inputs. (14-pin)',
+    description: 'Two independent 4 input NAND gates with Schmitt trigger inputs. (14-pin)',
     pins: 14,
     vcc: 14,
     gnd: 7,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls18.pdf',
     tags: ['nand', 'gate', 'logic', 'dual', '4 input', 'schmitt', 'schmitt trigger'],
-    guideOverview: 'The 7418 contains two 4 input NAND gates with Schmitt-trigger inputs. In 74Sim the logic function is correct for ordinary digital use, but the analog hysteresis behavior that real Schmitt inputs use for noise cleanup is not separately modeled.',
+    guideOverview: 'The 74x18 contains two 4 input NAND gates with Schmitt trigger inputs. In 74Sim the logic function is correct for ordinary digital use, but the analog hysteresis behavior that real Schmitt inputs use for noise cleanup is not separately modeled.',
     guidePinDescriptions: {
       '1A':  'Input A for gate 1.',
       '1B':  'Input B for gate 1.',
@@ -45,8 +45,8 @@ export const CHIPS_BLOCK_7 = {
     guideSections: [
       {
         title: '4 Input NAND',
-        paragraphs: ['Output is LOW only when ALL four inputs are simultaneously HIGH. This makes it useful for AND-like decoding of 4 bit conditions without needing an inverter.'],
-        note: 'Schmitt inputs improve noise immunity on slow or noisy input signals but are not analog-simulated in 74Sim.',
+        paragraphs: ['Output is LOW only when ALL four inputs are simultaneously HIGH. This makes it useful for AND like decoding of 4 bit conditions without needing an inverter.'],
+        note: 'Schmitt inputs improve noise immunity on slow or noisy input signals but are not analog simulated in 74Sim.',
       },
     ],
     pinout: [
@@ -75,17 +75,17 @@ export const CHIPS_BLOCK_7 = {
   /* Primary source: Texas Instruments, SN74LS19 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls19.pdf */
   // Six independent inverters share power and ground only.
   // The simulated behavior is the normal NOT function; the real part's extra
-  // value is input hysteresis, which is documented but not analog-modeled here.
-  '7419': {
+  // value is input hysteresis, which is documented but not analog modeled here.
+  '74x19': {
     name: '74x19',
     simpleName: 'Hex Inverter (ST)',
-    description: 'Six independent inverters (NOT gates) with Schmitt-trigger inputs. (14-pin)',
+    description: 'Six independent inverters (NOT gates) with Schmitt trigger inputs. (14-pin)',
     pins: 14,
     vcc: 14,
     gnd: 7,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls19.pdf',
     tags: ['not', 'inverter', 'gate', 'logic', 'hex', 'schmitt', 'schmitt trigger'],
-    guideOverview: 'The 7419 is six independent inverters with Schmitt-trigger inputs. In the simulator each channel inverts correctly, while the Schmitt hysteresis itself is treated as a documentation caveat rather than a separate analog effect.',
+    guideOverview: 'The 74x19 is six independent inverters with Schmitt trigger inputs. In the simulator each channel inverts correctly, while the Schmitt hysteresis itself is treated as a documentation caveat rather than a separate analog effect.',
     guidePinDescriptions: {
       '1A':  'Input for inverter 1.',
       '1Y':  'Output of inverter 1. HIGH when 1A is LOW.',
@@ -105,7 +105,7 @@ export const CHIPS_BLOCK_7 = {
     guideSections: [
       {
         title: 'Hex Inverter with Schmitt Inputs',
-        paragraphs: ['Each gate inverts its input. Schmitt-trigger inputs allow the chip to clean up slowly-rising or noisy signals.'],
+        paragraphs: ['Each gate inverts its input. Schmitt trigger inputs allow the chip to clean up slowly-rising or noisy signals.'],
       },
     ],
     pinout: [
@@ -137,9 +137,9 @@ export const CHIPS_BLOCK_7 = {
   // ── 74x23: Dual 4 input NOR with strobe ──────────────────────────────────
   /* Primary source: Texas Instruments, SN7423 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn7423.pdf */
   // Each section behaves like a 4 input NOR gated by a strobe input.
-  // G is an active HIGH inhibit: when G is high, the output is forced high;
-  // when G is low, the output is the NOR of the four data inputs.
-  '7423': {
+  // Per the TI datasheet (SDLS082): Y = NOT(G AND (A+B+C+D)). G HIGH enables
+  // normal NOR operation; G LOW forces the output HIGH.
+  '74x23': {
     name: '74x23',
     simpleName: 'Dual 4-in NOR+Strobe',
     description: 'Dual 4 input NOR gate with strobe (one gate expandable) (16-pin)',
@@ -148,20 +148,20 @@ export const CHIPS_BLOCK_7 = {
     gnd: 8,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn7423.pdf',
     tags: ['nor', 'gate', 'logic', 'dual', '4 input', 'strobe', 'enable'],
-    guideOverview: 'The 7423 is a dual 4 input NOR where each gate also has a strobe input. The strobe acts like an active HIGH disable that forces the output HIGH regardless of the other four inputs.',
+    guideOverview: 'The 74x23 is a dual 4 input NOR where each gate also has a strobe input. The function is Y = NOT(G AND (A OR B OR C OR D)): with the strobe HIGH the gate works as a normal NOR, and pulling the strobe LOW forces the output HIGH regardless of the data inputs.',
     guidePinDescriptions: {
       '1A':  'Input A for gate 1.',
       '1B':  'Input B for gate 1.',
       'NC1': 'No connection.',
-      '1Y':  'NOR+strobe output for gate 1. HIGH only when 1G=LOW and all data inputs are LOW.',
+      '1Y':  'NOR+strobe output for gate 1. LOW when 1G=HIGH and any data input is HIGH; otherwise HIGH.',
       '1C':  'Input C for gate 1.',
       '1D':  'Input D for gate 1.',
-      '1G':  'Gate 1 strobe or inhibit input (active HIGH). HIGH forces 1Y HIGH; LOW enables normal NOR operation.',
+      '1G':  'Gate 1 strobe (active HIGH enable). HIGH = normal NOR operation; LOW forces 1Y HIGH.',
       'GND': 'Ground reference (pin 8).',
-      '2G':  'Gate 2 strobe or inhibit input (active HIGH). HIGH forces 2Y HIGH; LOW enables normal NOR operation.',
+      '2G':  'Gate 2 strobe (active HIGH enable). HIGH = normal NOR operation; LOW forces 2Y HIGH.',
       '2D':  'Input D for gate 2.',
       '2C':  'Input C for gate 2.',
-      '2Y':  'NOR+strobe output for gate 2. HIGH only when 2G=LOW and all data inputs are LOW.',
+      '2Y':  'NOR+strobe output for gate 2. LOW when 2G=HIGH and any data input is HIGH; otherwise HIGH.',
       'NC2': 'No connection.',
       '2B':  'Input B for gate 2.',
       '2A':  'Input A for gate 2.',
@@ -170,7 +170,7 @@ export const CHIPS_BLOCK_7 = {
     guideSections: [
       {
         title: '4 Input NOR with Strobe',
-        paragraphs: ['The strobe G acts as an active HIGH disable overriding all other inputs. With G=LOW, the gate outputs the NOR of all four data inputs.'],
+        paragraphs: ['The strobe G is an active HIGH enable: Y = NOT(G AND (A OR B OR C OR D)). With G=HIGH the gate outputs the NOR of all four data inputs; with G=LOW the output is forced HIGH.'],
       },
     ],
     pinout: [
@@ -200,18 +200,18 @@ export const CHIPS_BLOCK_7 = {
   // ── 74x24: Quad 2 input NAND (Schmitt trigger) ───────────────────────────
   /* Primary source: Texas Instruments, SN74LS24 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls24.pdf */
   // Four standard 2 input NAND channels are present.
-  // As with the other Schmitt-marked devices in this block, the logic function
+  // As with the other Schmitt marked devices in this block, the logic function
   // is simulated directly while hysteresis is only documented as a caveat.
-  '7424': {
+  '74x24': {
     name: '74x24',
     simpleName: 'Quad NAND (Schmitt)',
-    description: 'Four 2 input NAND gates with Schmitt-trigger inputs. (14-pin)',
+    description: 'Four 2 input NAND gates with Schmitt trigger inputs. (14-pin)',
     pins: 14,
     vcc: 14,
     gnd: 7,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls24.pdf',
     tags: ['nand', 'gate', 'logic', 'quad', 'schmitt', 'schmitt trigger'],
-    guideOverview: 'The 7424 is four 2 input NAND gates with Schmitt-trigger inputs. It is useful for logic cleanup and gating, though 74Sim models it as an ordinary digital NAND with the hysteresis behavior noted but not analog-simulated.',
+    guideOverview: 'The 74x24 is four 2 input NAND gates with Schmitt trigger inputs. It is useful for logic cleanup and gating, though 74Sim models it as an ordinary digital NAND with the hysteresis behavior noted but not analog simulated.',
     guidePinDescriptions: {
       '1A':  'Input A for gate 1.',
       '1B':  'Input B for gate 1.',
@@ -258,35 +258,35 @@ export const CHIPS_BLOCK_7 = {
     ],
   },
 
-  // ── 74x26: Quad 2 input NAND (open-collector 15V) ────────────────────────
+  // ── 74x26: Quad 2 input NAND (open collector 15V) ────────────────────────
   /* Primary source: Texas Instruments, SN74LS26 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls26.pdf
-     Open-collector output technology: https://en.wikipedia.org/wiki/Open_collector */
-  // Each NAND output is open-collector, so it actively pulls low but relies on
-  // pull up behavior for the high state. The simulator models the sink-only
+     Open collector output technology: https://en.wikipedia.org/wiki/Open_collector */
+  // Each NAND output is open collector, so it actively pulls low but relies on
+  // pull up behavior for the high state. The simulator models the sink only
   // behavior but not the external 15 V rating that some real uses exploit.
-  '7426': {
+  '74x26': {
     name: '74x26',
     simpleName: 'Quad NAND (OC 15V)',
-    description: 'Four 2 input NAND gates with open-collector outputs rated up to 15 V. (14-pin)',
+    description: 'Quad 2-input NAND, open-collector outputs rated to 15 V (14-pin)',
     pins: 14,
     vcc: 14,
     gnd: 7,
     openCollector: true,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls26.pdf',
     tags: ['nand', 'gate', 'logic', 'quad', 'open collector'],
-    guideOverview: 'The 7426 is a quad 2 input NAND with open-collector outputs. That means each output can pull low strongly, but its HIGH state depends on pull up action instead of an internal push-pull driver.',
+    guideOverview: 'The 74x26 is a quad 2 input NAND with open collector outputs. That means each output can pull low strongly, but its HIGH state depends on pull up action instead of an internal push pull driver.',
     guidePinDescriptions: {
       '1A':  'Input A for gate 1.',
       '1B':  'Input B for gate 1.',
-      '1Y':  'Open-collector NAND output 1. Pulls LOW when 1A=HIGH and 1B=HIGH; high-Z otherwise.',
+      '1Y':  'Open collector NAND output 1. Pulls LOW when 1A=HIGH and 1B=HIGH; high Z otherwise.',
       '2A':  'Input A for gate 2.',
       '2B':  'Input B for gate 2.',
-      '2Y':  'Open-collector NAND output 2. Pulls LOW when 2A=HIGH and 2B=HIGH; high-Z otherwise.',
+      '2Y':  'Open collector NAND output 2. Pulls LOW when 2A=HIGH and 2B=HIGH; high Z otherwise.',
       'GND': 'Ground reference (pin 7).',
-      '3Y':  'Open-collector NAND output 3. Pulls LOW when 3A=HIGH and 3B=HIGH; high-Z otherwise.',
+      '3Y':  'Open collector NAND output 3. Pulls LOW when 3A=HIGH and 3B=HIGH; high Z otherwise.',
       '3A':  'Input A for gate 3.',
       '3B':  'Input B for gate 3.',
-      '4Y':  'Open-collector NAND output 4. Pulls LOW when 4A=HIGH and 4B=HIGH; high-Z otherwise.',
+      '4Y':  'Open collector NAND output 4. Pulls LOW when 4A=HIGH and 4B=HIGH; high Z otherwise.',
       '4A':  'Input A for gate 4.',
       '4B':  'Input B for gate 4.',
       'VCC': 'Positive supply (+5 V) at pin 14.',
@@ -294,7 +294,7 @@ export const CHIPS_BLOCK_7 = {
     guideSections: [
       {
         title: 'Open Collector NAND',
-        paragraphs: ['Output pulls LOW when both inputs are HIGH. For the output to reach HIGH, an external pull up resistor is required. This allows wired AND configurations and level-shifting to voltages up to 15 V.'],
+        paragraphs: ['Output pulls LOW when both inputs are HIGH. For the output to reach HIGH, an external pull up resistor is required. This allows wired AND configurations and level shifting to voltages up to 15 V.'],
       },
     ],
     pinout: [
@@ -324,9 +324,9 @@ export const CHIPS_BLOCK_7 = {
   // ── 74x28: Quad 2 input NOR (driver) ─────────────────────────────────────
   /* Primary source: Texas Instruments, SN74LS28 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls28.pdf */
   // This is a quad NOR family member intended for stronger line-driving use.
-  // 74Sim models the correct NOR logic behavior; any special drive-strength
+  // 74Sim models the correct NOR logic behavior; any special drive strength
   // advantage over simpler NOR parts is treated as outside the digital model.
-  '7428': {
+  '74x28': {
     name: '74x28',
     simpleName: 'Quad NOR (buffered)',
     description: 'Four 2 input NOR gates with buffered outputs. (14-pin)',
@@ -335,7 +335,7 @@ export const CHIPS_BLOCK_7 = {
     gnd: 7,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls28.pdf',
     tags: ['nor', 'gate', 'logic', 'quad', 'driver'],
-    guideOverview: 'The 7428 is four 2 input NOR gates sold as a driver-oriented variant. In 74Sim it behaves as a normal quad NOR gate, which is the important functional behavior for logic design.',
+    guideOverview: 'The 74x28 is four 2 input NOR gates sold as a driver-oriented variant. In 74Sim it behaves as a normal quad NOR gate, which is the important functional behavior for logic design.',
     guidePinDescriptions: {
       '1Y':  'NOR output for gate 1. HIGH only when both 1A and 1B are LOW.',
       '1A':  'Input A for gate 1.',
@@ -385,9 +385,9 @@ export const CHIPS_BLOCK_7 = {
   // ── 74x29: Dual 4 input NOR ───────────────────────────────────────────────
   /* Primary source: Texas Instruments, US7429A datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/us7429a.pdf */
   // Two independent 4 input NOR gates are provided.
-  // The NC pins are real no-connect positions in the package and are not part
+  // The NC pins are real no connect positions in the package and are not part
   // of the simulated logic network.
-  '7429': {
+  '74x29': {
     name: '74x29',
     simpleName: 'Dual 4-in NOR',
     description: 'Dual 4 input NOR gate (14-pin)',
@@ -396,7 +396,7 @@ export const CHIPS_BLOCK_7 = {
     gnd: 7,
     datasheet: 'https://www.ti.com/lit/ds/symlink/us7429a.pdf',
     tags: ['nor', 'gate', 'logic', 'dual', '4 input'],
-    guideOverview: 'The 7429 is a straightforward dual 4 input NOR. It is most useful when a design needs wider NOR terms without building them from smaller gates.',
+    guideOverview: 'The 74x29 is a straightforward dual 4 input NOR. It is most useful when a design needs wider NOR terms without building them from smaller gates.',
     guidePinDescriptions: {
       '1A':  'Input A for gate 1.',
       '1B':  'Input B for gate 1.',
@@ -442,58 +442,58 @@ export const CHIPS_BLOCK_7 = {
   },
 
 
-  // ── 74x33: Quad 2 input NOR (open-collector) ──────────────────────────────
+  // ── 74x33: Quad 2 input NOR (open collector) ──────────────────────────────
   /* Primary source: Texas Instruments, SN74LS33 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls33.pdf
-     Open-collector output technology: https://en.wikipedia.org/wiki/Open_collector */
-  // Each output uses an open-collector pull down stage rather than a push-pull
+     Open collector output technology: https://en.wikipedia.org/wiki/Open_collector */
+  // Each output uses an open collector pull down stage rather than a push pull
   // driver, so wired OR style behavior and pull up dependence apply.
-  '7433': {
+  '74x33': {
     name: '74x33',
     simpleName: 'Quad 2 input NOR (OC)',
-    description: 'Four 2 input NOR gates with open-collector outputs. (14-pin)',
+    description: 'Four 2 input NOR gates with open collector outputs. (14-pin)',
     pins: 14,
     vcc: 14,
     gnd: 7,
     openCollector: true,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls33.pdf',
-    tags: ['nor', 'gate', 'logic', 'quad', 'open collector', 'open-collector', '2 input'],
-    guideOverview: 'The 74x33 is a quad 2 input NOR with open-collector outputs. Because it can only sink current (not source it), you must add an external pull up resistor to each output. This also lets you tie multiple outputs together for a wired AND configuration, or level-shift to a different voltage by choosing the pull up supply.',
+    tags: ['nor', 'gate', 'logic', 'quad', 'open collector', 'open collector', '2 input'],
+    guideOverview: 'The 74x33 is a quad 2 input NOR with open collector outputs. Because it can only sink current (not source it), you must add an external pull up resistor to each output. This also lets you tie multiple outputs together for a wired AND configuration, or level-shift to a different voltage by choosing the pull up supply.',
     guidePinDescriptions: {
-      '1Y':  'Open-collector NOR output 1. Pulls LOW when 1A or 1B is HIGH; high-Z otherwise requires external pull up.',
+      '1Y':  'Open collector NOR output 1. Pulls LOW when 1A or 1B is HIGH; high Z otherwise requires external pull up.',
       '1A':  'Input A for gate 1.',
       '1B':  'Input B for gate 1.',
-      '2Y':  'Open-collector NOR output 2.',
+      '2Y':  'Open collector NOR output 2.',
       '2A':  'Input A for gate 2.',
       '2B':  'Input B for gate 2.',
       'GND': 'Ground reference (pin 7).',
       '3A':  'Input A for gate 3.',
       '3B':  'Input B for gate 3.',
-      '3Y':  'Open-collector NOR output 3.',
+      '3Y':  'Open collector NOR output 3.',
       '4A':  'Input A for gate 4.',
       '4B':  'Input B for gate 4.',
-      '4Y':  'Open-collector NOR output 4.',
+      '4Y':  'Open collector NOR output 4.',
       'VCC': 'Positive supply (+5 V) at pin 14.',
     },
     guideSections: [
       {
         title: 'Open Collector NOR',
-        paragraphs: ['Output pulls LOW when either input is HIGH. Outputs float (high-Z) when the NOR result would be HIGH, requiring an external pull up resistor to actually reach HIGH.'],
+        paragraphs: ['Output pulls LOW when either input is HIGH. Outputs float (high Z) when the NOR result would be HIGH, requiring an external pull up resistor to actually reach HIGH.'],
       },
     ],
     pinout: [
-      { pin: 1,  name: '1Y',  type: 'output', description: 'Gate 1 open-collector output (LOW when 1A or 1B is HIGH; high-Z otherwise needs external pull up)' },
+      { pin: 1,  name: '1Y',  type: 'output', description: 'Gate 1 open collector output (LOW when 1A or 1B is HIGH; high Z otherwise needs external pull up)' },
       { pin: 2,  name: '1A',  type: 'input',  description: 'Gate 1 input A' },
       { pin: 3,  name: '1B',  type: 'input',  description: 'Gate 1 input B' },
-      { pin: 4,  name: '2Y',  type: 'output', description: 'Gate 2 open-collector output (LOW when 2A or 2B is HIGH; high-Z otherwise needs external pull up)' },
+      { pin: 4,  name: '2Y',  type: 'output', description: 'Gate 2 open collector output (LOW when 2A or 2B is HIGH; high Z otherwise needs external pull up)' },
       { pin: 5,  name: '2A',  type: 'input',  description: 'Gate 2 input A' },
       { pin: 6,  name: '2B',  type: 'input',  description: 'Gate 2 input B' },
       { pin: 7,  name: 'GND', type: 'power',  description: 'Ground (0 V)' },
       { pin: 8,  name: '3A',  type: 'input',  description: 'Gate 3 input A' },
       { pin: 9,  name: '3B',  type: 'input',  description: 'Gate 3 input B' },
-      { pin: 10, name: '3Y',  type: 'output', description: 'Gate 3 open-collector output (LOW when 3A or 3B is HIGH; high-Z otherwise needs external pull up)' },
+      { pin: 10, name: '3Y',  type: 'output', description: 'Gate 3 open collector output (LOW when 3A or 3B is HIGH; high Z otherwise needs external pull up)' },
       { pin: 11, name: '4A',  type: 'input',  description: 'Gate 4 input A' },
       { pin: 12, name: '4B',  type: 'input',  description: 'Gate 4 input B' },
-      { pin: 13, name: '4Y',  type: 'output', description: 'Gate 4 open-collector output (LOW when 4A or 4B is HIGH; high-Z otherwise needs external pull up)' },
+      { pin: 13, name: '4Y',  type: 'output', description: 'Gate 4 open collector output (LOW when 4A or 4B is HIGH; high Z otherwise needs external pull up)' },
       { pin: 14, name: 'VCC', type: 'power',  description: 'Positive supply (+5 V)' },
     ],
     gates: [
@@ -506,10 +506,10 @@ export const CHIPS_BLOCK_7 = {
 
   // ── 74x34: Hex Buffer ─────────────────────────────────────────────────────
   /* Primary source: Texas Instruments, MM74HC34 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/mm74hc34.pdf */
-  // Six independent non-inverting buffers are present.
+  // Six independent non inverting buffers are present.
   // There are no enables or storage elements here: each output simply follows
   // its corresponding input.
-  '7434': {
+  '74x34': {
     name: '74x34',
     simpleName: 'Hex Buffer',
     description: 'Hex buffer gate (14-pin)',
@@ -518,10 +518,10 @@ export const CHIPS_BLOCK_7 = {
     gnd: 7,
     datasheet: 'https://www.ti.com/lit/ds/symlink/mm74hc34.pdf',
     tags: ['buffer', 'gate', 'logic', 'hex'],
-    guideOverview: 'The 7434 is a plain hex non-inverting buffer. Use it for fan-out, signal cleanup, or to occupy a real package footprint when a simple buffer stage is required.',
+    guideOverview: 'The 74x34 is a plain hex non inverting buffer. Use it for fan out, signal cleanup, or to occupy a real package footprint when a simple buffer stage is required.',
     guidePinDescriptions: {
       '1A':  'Input for buffer 1.',
-      '1Y':  'Non-inverting output for buffer 1. Equals 1A.',
+      '1Y':  'Non inverting output for buffer 1. Equals 1A.',
       '2A':  'Input for buffer 2.',
       '2Y':  'Output for buffer 2.',
       '3A':  'Input for buffer 3.',
@@ -537,8 +537,8 @@ export const CHIPS_BLOCK_7 = {
     },
     guideSections: [
       {
-        title: 'Hex Non-Inverting Buffer',
-        paragraphs: ['Each output follows its input exactly. Use for fan-out expansion or driving longer wire runs.'],
+        title: 'Hex Non Inverting Buffer',
+        paragraphs: ['Each output follows its input exactly. Use for fan out expansion or driving longer wire runs.'],
       },
     ],
     pinout: [
@@ -567,43 +567,43 @@ export const CHIPS_BLOCK_7 = {
     ],
   },
 
-  // ── 74x35: Hex Buffer (open-collector) ───────────────────────────────────
+  // ── 74x35: Hex Buffer (open collector) ───────────────────────────────────
   /* Primary source: Texas Instruments, SN74ALS35 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74als35.pdf
-     Open-collector output technology: https://en.wikipedia.org/wiki/Open_collector */
-  // This is the open-collector version of a hex buffer.
+     Open collector output technology: https://en.wikipedia.org/wiki/Open_collector */
+  // This is the open collector version of a hex buffer.
   // Outputs actively pull low and otherwise rely on pull up behavior, making
-  // them appropriate for sink-only or shared-line applications.
-  '7435': {
+  // them appropriate for sink only or shared line applications.
+  '74x35': {
     name: '74x35',
     simpleName: 'Hex Buffer (OC)',
-    description: 'Hex buffer gate (open-collector) (14-pin)',
+    description: 'Hex buffer gate (open collector) (14-pin)',
     pins: 14,
     vcc: 14,
     gnd: 7,
     openCollector: true,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74als35.pdf',
     tags: ['buffer', 'gate', 'logic', 'hex', 'open collector'],
-    guideOverview: 'The 7435 is a hex non-inverting buffer with open-collector outputs. It is useful when you want buffer logic but need the output stage to sink only instead of driving both HIGH and LOW.',
+    guideOverview: 'The 74x35 is a hex non inverting buffer with open collector outputs. It is useful when you want buffer logic but need the output stage to sink only instead of driving both HIGH and LOW.',
     guidePinDescriptions: {
       '1A':  'Input for buffer 1.',
-      '1Y':  'Open-collector output for buffer 1. Follows input when LOW; high-Z when HIGH requires external pull up.',
+      '1Y':  'Open collector output for buffer 1. Follows input when LOW; high Z when HIGH requires external pull up.',
       '2A':  'Input for buffer 2.',
-      '2Y':  'Open-collector output for buffer 2.',
+      '2Y':  'Open collector output for buffer 2.',
       '3A':  'Input for buffer 3.',
-      '3Y':  'Open-collector output for buffer 3.',
+      '3Y':  'Open collector output for buffer 3.',
       'GND': 'Ground reference (pin 7).',
-      '4Y':  'Open-collector output for buffer 4.',
+      '4Y':  'Open collector output for buffer 4.',
       '4A':  'Input for buffer 4.',
-      '5Y':  'Open-collector output for buffer 5.',
+      '5Y':  'Open collector output for buffer 5.',
       '5A':  'Input for buffer 5.',
-      '6Y':  'Open-collector output for buffer 6.',
+      '6Y':  'Open collector output for buffer 6.',
       '6A':  'Input for buffer 6.',
       'VCC': 'Positive supply (+5 V) at pin 14.',
     },
     guideSections: [
       {
         title: 'Open Collector Hex Buffer',
-        paragraphs: ['Each output passes the input level through but with an open-collector output stage. An external pull up is required for HIGH output.'],
+        paragraphs: ['Each output passes the input level through but with an open collector output stage. An external pull up is required for HIGH output.'],
       },
     ],
     pinout: [
@@ -636,7 +636,7 @@ export const CHIPS_BLOCK_7 = {
   /* Primary source: Texas Instruments, SN74HC36 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74hc36.pdf */
   // Logic behavior matches other quad 2 input NOR parts; the main distinction
   // is package pin arrangement rather than function.
-  '7436': {
+  '74x36': {
     name: '74x36',
     simpleName: 'Quad 2-in NOR',
     description: 'Quad 2 input NOR gate (different pinout than 7402) (14-pin)',
@@ -645,7 +645,7 @@ export const CHIPS_BLOCK_7 = {
     gnd: 7,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74hc36.pdf',
     tags: ['nor', 'gate', 'logic', 'quad'],
-    guideOverview: 'The 7436 is a quad 2 input NOR with a package layout different from the familiar 7402 family. In functional terms it behaves as an ordinary quad NOR.',
+    guideOverview: 'The 74x36 is a quad 2 input NOR with a package layout different from the familiar 74x02 family. In functional terms it behaves as an ordinary quad NOR.',
     guidePinDescriptions: {
       '1A':  'Input A for gate 1.',
       '1B':  'Input B for gate 1.',
@@ -665,7 +665,9 @@ export const CHIPS_BLOCK_7 = {
     guideSections: [
       {
         title: 'Quad NOR (Alternate Pinout)',
-        paragraphs: ['Identical NOR logic to the 7402 but with a different pin layout that may suit certain PCB routing configurations.'],
+        paragraphs: [
+          'Identical NOR logic to the 74x02 but with a different pin layout that may suit certain PCB routing configurations.',
+        ],
       },
     ],
     pinout: [
@@ -692,43 +694,43 @@ export const CHIPS_BLOCK_7 = {
     ],
   },
 
-  // ── 74x39: Quad 2 input NAND (open-collector, 60mA) ──────────────────────
+  // ── 74x39: Quad 2 input NAND (open collector, 60mA) ──────────────────────
   /* Primary source: Texas Instruments, SN7439 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn7439.pdf
-     Open-collector output technology: https://en.wikipedia.org/wiki/Open_collector */
-  // Each gate is a 2 input NAND with an open-collector output stage.
-  // The simulator honors the sink-only logic behavior but does not separately
+     Open collector output technology: https://en.wikipedia.org/wiki/Open_collector */
+  // Each gate is a 2 input NAND with an open collector output stage.
+  // The simulator honors the sink only logic behavior but does not separately
   // enforce the higher current rating advertised for the physical device.
-  '7439': {
+  '74x39': {
     name: '74x39',
     simpleName: 'Quad 2-in NAND (OC)',
-    description: 'Quad 2 input NAND gate (open-collector, 60mA; different pinout than 7438) (14-pin)',
+    description: 'Quad 2-input NAND, open-collector 60mA; pinout differs from 7438 (14-pin)',
     pins: 14,
     vcc: 14,
     gnd: 7,
     openCollector: true,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn7439.pdf',
     tags: ['nand', 'gate', 'logic', 'quad', 'open collector'],
-    guideOverview: 'The 7439 is a quad 2 input NAND with open-collector outputs and a different pin order than some related parts. In 74Sim its important behavior is the NAND function plus sink-only output style.',
+    guideOverview: 'The 74x39 is a quad 2 input NAND with open collector outputs and a different pin order than some related parts. In 74Sim its important behavior is the NAND function plus sink only output style.',
     guidePinDescriptions: {
-      '1Y':  'Open-collector NAND output 1. Pulls LOW when 1A=HIGH and 1B=HIGH; high-Z otherwise.',
+      '1Y':  'Open collector NAND output 1. Pulls LOW when 1A=HIGH and 1B=HIGH; high Z otherwise.',
       '1A':  'Input A for gate 1.',
       '1B':  'Input B for gate 1.',
-      '2Y':  'Open-collector NAND output 2.',
+      '2Y':  'Open collector NAND output 2.',
       '2A':  'Input A for gate 2.',
       '2B':  'Input B for gate 2.',
       'GND': 'Ground reference (pin 7).',
       '3A':  'Input A for gate 3.',
       '3B':  'Input B for gate 3.',
-      '3Y':  'Open-collector NAND output 3.',
+      '3Y':  'Open collector NAND output 3.',
       '4A':  'Input A for gate 4.',
       '4B':  'Input B for gate 4.',
-      '4Y':  'Open-collector NAND output 4.',
+      '4Y':  'Open collector NAND output 4.',
       'VCC': 'Positive supply (+5 V) at pin 14.',
     },
     guideSections: [
       {
         title: 'Open Collector NAND (60 mA)',
-        paragraphs: ['NAND logic with a sink-only output stage rated for 60 mA sink current. External pull up required. Can drive higher-current loads like LEDs or relays.'],
+        paragraphs: ['NAND logic with a sink only output stage rated for 60 mA sink current. External pull up required. Can drive higher current loads like LEDs or relays.'],
       },
     ],
     pinout: [
@@ -762,7 +764,7 @@ export const CHIPS_BLOCK_7 = {
   // This decoder expects the input word to represent decimal digits encoded in
   // excess-3 form, meaning binary 0011 corresponds to 0 and 1100 corresponds
   // to 9. Valid codes activate one decimal output low.
-  '7443': {
+  '74x43': {
     name: '74x43',
     simpleName: 'XS3 to Decimal',
     description: 'Excess-3 to decimal decoder (16-pin)',
@@ -771,7 +773,7 @@ export const CHIPS_BLOCK_7 = {
     gnd: 8,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn7443a.pdf',
     tags: ['decoder', 'excess-3', 'xs3', 'decimal', '10-line'],
-    guideOverview: 'The 7443 converts a 4 bit excess-3 code into one of ten decimal outputs. It is useful when a preceding arithmetic or display stage already represents digits in XS-3 instead of ordinary BCD.',
+    guideOverview: 'The 74x43 converts a 4 bit excess-3 code into one of ten decimal outputs. It is useful when a preceding arithmetic or display stage already represents digits in XS-3 instead of ordinary BCD.',
     guidePinDescriptions: {
       'Y0':  'Decimal output 0, active LOW. Asserted when input is XS-3 code 0011.',
       'Y1':  'Decimal output 1.',
@@ -831,8 +833,8 @@ export const CHIPS_BLOCK_7 = {
      Decoder/demultiplexer concept: https://en.wikipedia.org/wiki/Multiplexer */
   // Inputs are interpreted as 4 bit reflected Gray code, then decoded to one
   // active decimal output. The value of this part is not Boolean gating but the
-  // code conversion from a Gray-encoded source into decimal selection.
-  '7444': {
+  // code conversion from a Gray encoded source into decimal selection.
+  '74x44': {
     name: '74x44',
     simpleName: 'Gray to Decimal',
     description: 'Gray code to decimal decoder (16-pin)',
@@ -841,7 +843,7 @@ export const CHIPS_BLOCK_7 = {
     gnd: 8,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn7444a.pdf',
     tags: ['decoder', 'gray code', 'gray', 'decimal', '10-line'],
-    guideOverview: 'The 7444 converts a 4 bit Gray code input into one of ten decimal outputs. It is intended for systems where only one input bit changes between adjacent values and a decimal indicator or selector still needs to be driven.',
+    guideOverview: 'The 74x44 converts a 4 bit Gray code input into one of ten decimal outputs. It is intended for systems where only one input bit changes between adjacent values and a decimal indicator or selector still needs to be driven.',
     guidePinDescriptions: {
       'Y0':  'Decimal output 0, active LOW.',
       'Y1':  'Decimal output 1.',
@@ -865,7 +867,7 @@ export const CHIPS_BLOCK_7 = {
         title: 'Gray Code Inputs',
         paragraphs: [
           'Gray code changes only one bit at a time between neighboring values, which reduces transient ambiguity in mechanical or sequential position encoding systems.',
-          'The 7444 accepts that Gray-coded word and activates the corresponding decimal output, leaving invalid patterns inactive.',
+          'The 74x44 accepts that Gray-coded word and activates the corresponding decimal output, leaving invalid patterns inactive.',
         ],
       },
     ],

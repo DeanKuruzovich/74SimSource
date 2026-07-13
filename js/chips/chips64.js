@@ -1,24 +1,24 @@
-// chips64.js Block 64: 74x8244 .. 74x9134 (16 chips)
+// chips64.js Block 64: 74x8244 .. 74x9134 (15 chips)
 // Implemented:   74x9014, 74x9015, 74x9034, 74x9035, 74x9114, 74x9115, 74x9134,
-//                74x8244, 74x8245, 74x8373, 74x8374, 74x8541, 74x8996, 74x9046
+//                74x8244, 74x8245, 74x8373, 74x8374, 74x8541, 74x8996
 // Stubs:         74x8980, 74x9000
 
 export const CHIPS_BLOCK_64 = {
 
-  // ── 74x8244 Octal Non-Inverting Buffer with JTAG Port, 24-pin ─────────
+  // ── 74x8244 Octal Non Inverting Buffer with JTAG Port, 24-pin ─────────
   /* Primary source: Texas Instruments, 74x8244 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74bct8244a.pdf */
   '74x8244': {
     name: '74x8244',
     simpleName: 'Octal Buffer + JTAG',
-    description: 'Octal non-inverting buffer with JTAG boundary scan test port (24-pin)',
+    description: 'Octal non inverting buffer with JTAG boundary scan test port (24-pin)',
     pins: 24,
     vcc: 24,
     gnd: 12,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74bct8244a.pdf',
-    tags: ['buffer', 'octal', 'jtag', 'boundary scan', 'tri-state'],
-    guideOverview: 'The 74x8244 is an octal non-inverting tri-state buffer with built in JTAG boundary scan support. At the ordinary logic level it behaves like a 244-style octal driver, but the extra JTAG pins let production test systems observe and control the device through a boundary scan chain. The TI datasheet is live and exact, but the local simulator entry still treats the device as a structural stub instead of modelling its true buffer and test behavior.',
+    tags: ['buffer', 'octal', 'jtag', 'boundary scan', 'tri state'],
+    guideOverview: 'The 74x8244 is an octal non inverting tri state buffer with built in JTAG boundary scan support. At the ordinary logic level it behaves like a 244-style octal driver, but the extra JTAG pins let production test systems observe and control the device through a boundary scan chain. The TI datasheet is live and exact, but the local simulator entry still treats the device as a structural stub instead of modelling its true buffer and test behavior.',
     guidePinDescriptions: {
-      'TDO': 'JTAG test-data output.',
+      'TDO': 'JTAG test data output.',
       '1OE': 'Enable control for bank 1 outputs.',
       '1A1': 'Input bit 1 of bank 1.',
       '2Y4': 'Output bit 4 of bank 2.',
@@ -28,7 +28,7 @@ export const CHIPS_BLOCK_64 = {
       '2Y2': 'Output bit 2 of bank 2.',
       '1A4': 'Input bit 4 of bank 1.',
       '2Y1': 'Output bit 1 of bank 2.',
-      'TMS': 'JTAG test-mode select input.',
+      'TMS': 'JTAG test mode select input.',
       'GND': 'Ground reference for the device.',
       '2A1': 'Input bit 1 of bank 2.',
       '1Y4': 'Output bit 4 of bank 1.',
@@ -40,14 +40,14 @@ export const CHIPS_BLOCK_64 = {
       '1Y1': 'Output bit 1 of bank 1.',
       '2OE': 'Enable control for bank 2 outputs.',
       'TCK': 'JTAG test clock input.',
-      'TDI': 'JTAG test-data input.',
+      'TDI': 'JTAG test data input.',
       'VCC': 'Positive supply for the device.',
     },
     guideSections: [
       {
         title: '244-Style Buffer With Boundary Scan',
         paragraphs: [
-          'The basic logic role of this part is still that of an octal tri-state buffer. The JTAG pins add a test interface used for manufacturing and board-level verification rather than for normal logic flow.',
+          'The basic logic role of this part is still that of an octal tri state buffer. The JTAG pins add a test interface used for manufacturing and board level verification rather than for normal logic flow.',
         ],
       },
       {
@@ -108,10 +108,10 @@ export const CHIPS_BLOCK_64 = {
     vcc: 24,
     gnd: 12,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74abt8245.pdf',
-    tags: ['transceiver', 'octal', 'jtag', 'boundary scan', 'tri-state'],
+    tags: ['transceiver', 'octal', 'jtag', 'boundary scan', 'tri state'],
     guideOverview: 'The 74x8245 is an octal bidirectional bus transceiver with JTAG boundary scan support. In normal logic use it acts like an 8 bit reversible bus transceiver in the 245 family, while the JTAG pins expose the device to test equipment and boundary scan chains. The exact TI datasheet is live, but the simulator still represents the chip only as a structural stub.',
     guidePinDescriptions: {
-      'TDO': 'JTAG test-data output.',
+      'TDO': 'JTAG test data output.',
       'DIR': 'Direction control for the A and B buses.',
       'A1': 'Bit 1 on the A-side bus.',
       'A2': 'Bit 2 on the A-side bus.',
@@ -121,7 +121,7 @@ export const CHIPS_BLOCK_64 = {
       'A6': 'Bit 6 on the A-side bus.',
       'A7': 'Bit 7 on the A-side bus.',
       'A8': 'Bit 8 on the A-side bus.',
-      'TMS': 'JTAG test-mode select input.',
+      'TMS': 'JTAG test mode select input.',
       'GND': 'Ground reference for the package.',
       'OE': 'Output enable for the transceiver.',
       'B8': 'Bit 8 on the B-side bus.',
@@ -133,20 +133,20 @@ export const CHIPS_BLOCK_64 = {
       'B2': 'Bit 2 on the B-side bus.',
       'B1': 'Bit 1 on the B-side bus.',
       'TCK': 'JTAG test clock input.',
-      'TDI': 'JTAG test-data input.',
+      'TDI': 'JTAG test data input.',
       'VCC': 'Positive supply for the device.',
     },
     guideSections: [
       {
         title: '245-Style Transceiver Plus JTAG',
         paragraphs: [
-          'At the digital-logic level this device is a reversible byte-wide transceiver. Boundary scan adds a test interface so board-level tools can inspect and drive the I/O pins without normal system firmware running.',
+          'At the digital logic level this device is a reversible byte wide transceiver. Boundary scan adds a test interface so board level tools can inspect and drive the I/O pins without normal system firmware running.',
         ],
       },
       {
         title: 'Current Simulator Limitation',
         paragraphs: [
-          'The source is exact and current, but the local model is still just a placeholder. It does not implement real transceiver behavior or the JTAG test-access path.',
+          'The source is exact and current, but the local model is still just a placeholder. It does not implement real transceiver behavior or the JTAG test access path.',
         ],
         note: 'Keep this part marked as a simulation code issue until both behaviors are modeled.',
       },
@@ -189,22 +189,22 @@ export const CHIPS_BLOCK_64 = {
     ],
   },
 
-  // ── 74x8373 Octal D-type Latch with JTAG Port, 24-pin ────────────────
+  // ── 74x8373 Octal D type Latch with JTAG Port, 24-pin ────────────────
   /* Primary source: Texas Instruments, 74x8373 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74bct8373a.pdf
      https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
   '74x8373': {
     name: '74x8373',
     simpleName: 'Octal Latch + JTAG',
-    description: 'Octal D-type transparent latch with JTAG boundary scan test port (24-pin)',
+    description: 'Octal D type transparent latch with JTAG boundary scan test port (24-pin)',
     pins: 24,
     vcc: 24,
     gnd: 12,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74bct8373a.pdf',
-    tags: ['latch', 'octal', 'jtag', 'boundary scan', 'tri-state'],
-    guideOverview: 'The 74x8373 is an octal transparent latch with three-state outputs and JTAG boundary scan support. In ordinary logic designs it behaves like a 373-family latch, while the JTAG interface makes the pins visible to test equipment and scan chains. The exact TI source is live, but the local simulator entry is still only a structural stub.',
+    tags: ['latch', 'octal', 'jtag', 'boundary scan', 'tri state'],
+    guideOverview: 'The 74x8373 is an octal transparent latch with three state outputs and JTAG boundary scan support. In ordinary logic designs it behaves like a 373-family latch, while the JTAG interface makes the pins visible to test equipment and scan chains. The exact TI source is live, but the local simulator entry is still only a structural stub.',
     guidePinDescriptions: {
-      'TDO': 'JTAG test-data output.',
-      'OE': 'Output enable for the three-state outputs.',
+      'TDO': 'JTAG test data output.',
+      'OE': 'Output enable for the three state outputs.',
       'D1': 'Data input bit 1.',
       'D2': 'Data input bit 2.',
       'D3': 'Data input bit 3.',
@@ -213,7 +213,7 @@ export const CHIPS_BLOCK_64 = {
       'D6': 'Data input bit 6.',
       'D7': 'Data input bit 7.',
       'D8': 'Data input bit 8.',
-      'TMS': 'JTAG test-mode select input.',
+      'TMS': 'JTAG test mode select input.',
       'GND': 'Ground reference for the package.',
       'LE': 'Latch enable. When active, the latch is transparent.',
       'Q8': 'Latched output bit 8.',
@@ -225,7 +225,7 @@ export const CHIPS_BLOCK_64 = {
       'Q2': 'Latched output bit 2.',
       'Q1': 'Latched output bit 1.',
       'TCK': 'JTAG test clock input.',
-      'TDI': 'JTAG test-data input.',
+      'TDI': 'JTAG test data input.',
       'VCC': 'Positive supply for the device.',
     },
     guideSections: [
@@ -280,22 +280,22 @@ export const CHIPS_BLOCK_64 = {
     sequential: true,
   },
 
-  // ── 74x8374 Octal D-type FF with JTAG Port, 24-pin ───────────────────
+  // ── 74x8374 Octal D type FF with JTAG Port, 24-pin ───────────────────
   /* Primary source: Texas Instruments, 74x8374 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74bct8374a.pdf
      https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
   '74x8374': {
     name: '74x8374',
     simpleName: 'Octal DFF + JTAG',
-    description: 'Octal D-type edge-triggered flip-flop with JTAG boundary scan test port (24-pin)',
+    description: 'Octal D type edge triggered flip flop, JTAG boundary scan (24-pin)',
     pins: 24,
     vcc: 24,
     gnd: 12,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74bct8374a.pdf',
-    tags: ['flip-flop', 'register', 'octal', 'jtag', 'boundary scan', 'tri-state'],
-    guideOverview: 'The 74x8374 is an octal edge-triggered register with three-state outputs and JTAG boundary scan support. In ordinary logic use it is a close relative of the 374 family, capturing a full byte on the clock edge and holding it until the next clock. The exact TI source is live, but the local simulator still treats it as a structural stub instead of a real register with test access.',
+    tags: ['flip flop', 'register', 'octal', 'jtag', 'boundary scan', 'tri state'],
+    guideOverview: 'The 74x8374 is an octal edge triggered register with three state outputs and JTAG boundary scan support. In ordinary logic use it is a close relative of the 374 family, capturing a full byte on the clock edge and holding it until the next clock. The exact TI source is live, but the local simulator still treats it as a structural stub instead of a real register with test access.',
     guidePinDescriptions: {
-      'TDO': 'JTAG test-data output.',
-      'OE': 'Output enable for the three-state outputs.',
+      'TDO': 'JTAG test data output.',
+      'OE': 'Output enable for the three state outputs.',
       'D1': 'Data input bit 1.',
       'D2': 'Data input bit 2.',
       'D3': 'Data input bit 3.',
@@ -304,7 +304,7 @@ export const CHIPS_BLOCK_64 = {
       'D6': 'Data input bit 6.',
       'D7': 'Data input bit 7.',
       'D8': 'Data input bit 8.',
-      'TMS': 'JTAG test-mode select input.',
+      'TMS': 'JTAG test mode select input.',
       'GND': 'Ground reference for the package.',
       'CLK': 'Clock input. The register captures the input byte on the active edge.',
       'Q8': 'Registered output bit 8.',
@@ -316,14 +316,14 @@ export const CHIPS_BLOCK_64 = {
       'Q2': 'Registered output bit 2.',
       'Q1': 'Registered output bit 1.',
       'TCK': 'JTAG test clock input.',
-      'TDI': 'JTAG test-data input.',
+      'TDI': 'JTAG test data input.',
       'VCC': 'Positive supply for the device.',
     },
     guideSections: [
       {
         title: '374-Style Registered Output',
         paragraphs: [
-          'An edge-triggered register captures all its inputs together on a clock edge and then holds them steady. That makes it ideal for synchronous bus timing and staged data movement.',
+          'An edge triggered register captures all its inputs together on a clock edge and then holds them steady. That makes it ideal for synchronous bus timing and staged data movement.',
         ],
       },
       {
@@ -371,18 +371,18 @@ export const CHIPS_BLOCK_64 = {
     sequential: true,
   },
 
-  // ── 74x8541 8 bit Selectable Inv/Non-inv Buffer, 20-pin ──────────────
+  // ── 74x8541 8 bit Selectable Inv/Non inv Buffer, 20-pin ──────────────
   /* Primary source: Texas Instruments, 74x8541 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ahc8541.pdf */
   '74x8541': {
     name: '74x8541',
     simpleName: '8 bit Sel Inv Buffer',
-    description: '8 bit buffer/line driver, selectable inverting/non-inverting, Schmitt-trigger inputs (20-pin)',
+    description: '8 bit buffer/line driver, sel inv/non-inv, Schmitt inputs (20-pin)',
     pins: 20,
     vcc: 20,
     gnd: 10,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ahc8541.pdf',
-    tags: ['buffer', 'driver', 'octal', 'tri-state', 'selectable', 'schmitt'],
-    guideOverview: 'The 74x8541 is an octal buffer and line driver with selectable inversion and Schmitt-trigger inputs. One control pin selects whether the outputs follow the inputs directly or provide the inverted polarity, which can save a separate inverter package when a design needs both forms. The exact TI source is live, but the local simulator entry is still only a generic stub.',
+    tags: ['buffer', 'driver', 'octal', 'tri state', 'selectable', 'schmitt'],
+    guideOverview: 'The 74x8541 is an octal buffer and line driver with selectable inversion and Schmitt trigger inputs. One control pin selects whether the outputs follow the inputs directly or provide the inverted polarity, which can save a separate inverter package when a design needs both forms. The exact TI source is live, but the local simulator entry is still only a generic stub.',
     guidePinDescriptions: {
       'OE1': 'Output enable for the buffer stage.',
       'A1': 'Input channel 1.',
@@ -394,7 +394,7 @@ export const CHIPS_BLOCK_64 = {
       'A7': 'Input channel 7.',
       'A8': 'Input channel 8.',
       'GND': 'Ground reference for the device.',
-      'INV': 'Inversion-select control. It chooses whether outputs are inverted or non-inverted relative to the inputs.',
+      'INV': 'Inversion select control. It chooses whether outputs are inverted or non inverted relative to the inputs.',
       'Y8': 'Output channel 8.',
       'Y7': 'Output channel 7.',
       'Y6': 'Output channel 6.',
@@ -409,13 +409,13 @@ export const CHIPS_BLOCK_64 = {
       {
         title: 'Selectable Polarity',
         paragraphs: [
-          'The inversion-select input lets one package provide either non-inverting or inverting line-driver behavior. That can simplify bus and control-signal designs where polarity requirements change from one board revision or subsystem to another.',
+          'The inversion select input lets one package provide either non inverting or inverting line-driver behavior. That can simplify bus and control signal designs where polarity requirements change from one board revision or subsystem to another.',
         ],
       },
       {
         title: 'Current Simulator Limitation',
         paragraphs: [
-          'The exact TI datasheet is verified, but the local entry is still a generic stub rather than a faithful per-channel buffer implementation. It does not yet model the selectable inversion logic or the output-enable details.',
+          'The exact TI datasheet is verified, but the local entry is still a generic stub rather than a faithful per channel buffer implementation. It does not yet model the selectable inversion logic or the output-enable details.',
         ],
         note: 'This part should remain a simulation code issue until the selectable buffer behavior is implemented.',
       },
@@ -510,51 +510,51 @@ export const CHIPS_BLOCK_64 = {
     gnd: 12,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74abt8996.pdf',
     tags: ['jtag', 'transceiver', 'boundary scan', 'addressable', 'tap'],
-    guideOverview: 'The SN74ABT8996 is a 10 bit Addressable Scan Port (ASP) that acts as a switch between a primary (multidrop backplane) JTAG TAP and a secondary (module-level) JTAG TAP. It allows one IEEE 1149.1 test controller to address and connect to one of many independent scan chains without rewiring. In normal operation the connection is established via a serial shadow protocol received on PTDI; the BYP pin provides an asynchronous hardware bypass that forces a direct connection for board-level ATE use. The simulator models the BYP-controlled routing: BYP=LOW connects primary to secondary and asserts CON; BYP=HIGH leaves secondary isolated (STDO and PTDO tri-stated, STMS held HIGH).',
+    guideOverview: 'The SN74ABT8996 is a 10 bit Addressable Scan Port (ASP) that acts as a switch between a primary (multidrop backplane) JTAG TAP and a secondary (module level) JTAG TAP. It allows one IEEE 1149.1 test controller to address and connect to one of many independent scan chains without rewiring. In normal operation the connection is established via a serial shadow protocol received on PTDI; the BYP pin provides an asynchronous hardware bypass that forces a direct connection for board level ATE use. The simulator models the BYP controlled routing: BYP=LOW connects primary to secondary and asserts CON; BYP=HIGH leaves secondary isolated (STDO and PTDO tri stated, STMS held HIGH).',
     guidePinDescriptions: {
-      'A0':   'Address input bit 0. Internal pull up holds HIGH if unconnected. The ASP matches the 10 bit A9 A0 value against the address received via shadow protocol to determine connection.',
-      'A1':   'Address input bit 1.',
-      'A2':   'Address input bit 2.',
-      'A3':   'Address input bit 3.',
-      'A4':   'Address input bit 4.',
-      'A5':   'Address input bit 5.',
-      'A6':   'Address input bit 6.',
-      'A7':   'Address input bit 7.',
-      'A8':   'Address input bit 8.',
-      'A9':   'Address input bit 9 (most significant).',
-      'BYP':  'Bypass input (active LOW). Pulling BYP LOW forces an immediate hardware connection between the primary and secondary TAPs, independent of shadow-protocol state. While BYP is LOW, shadow protocols are ignored. Internal pull up holds HIGH if unconnected.',
-      'GND':  'Ground reference.',
-      'STDI': 'Secondary test-data input. Receives TDI from the secondary scan chain. Buffered to PTDO when connected.',
-      'STCK': 'Secondary test-clock output. Always driven from PTCK regardless of connection state.',
-      'STMS': 'Secondary test-mode select output. Driven from PTMS when connected; held HIGH (Test-Logic-Reset direction) when disconnected.',
-      'STDO': 'Secondary test-data output. Driven from PTDI when connected; tri-stated when disconnected.',
-      'STRST':'Secondary test-reset output. Always driven from PTRST regardless of connection state.',
-      'CON':  'Connect indicator output (active LOW). LOW when primary and secondary TAPs are connected (BYP=LOW or valid address match); HIGH when disconnected.',
-      'PTDO': 'Primary test-data output. Driven from STDI when connected; tri-stated when disconnected. Transmits the shadow-protocol acknowledgement during address matching.',
-      'PTDI': 'Primary test-data input. Buffered to STDO when connected. Also monitored for incoming shadow protocols. Internal pull up holds HIGH if unconnected.',
-      'PTRST':'Primary test-reset input. Always buffered to STRST. Also resets the internal ASP state asynchronously. Internal pull up holds HIGH if unconnected.',
-      'PTMS': 'Primary test-mode select input. Buffered to STMS when connected; determines TAP-controller state for shadow-protocol gating. Internal pull up holds HIGH if unconnected.',
-      'PTCK': 'Primary test-clock input. Always buffered to STCK. Shadow protocols are synchronous to PTCK.',
-      'VCC':  'Positive supply voltage.',
+      'A0': 'Address input bit 0. Internal pull up holds HIGH if unconnected. The ASP matches the 10 bit A9 A0 value against the address received via shadow protocol to determine connection.',
+      'A1': 'Address input bit 1.',
+      'A2': 'Address input bit 2.',
+      'A3': 'Address input bit 3.',
+      'A4': 'Address input bit 4.',
+      'A5': 'Address input bit 5.',
+      'A6': 'Address input bit 6.',
+      'A7': 'Address input bit 7.',
+      'A8': 'Address input bit 8.',
+      'A9': 'Address input bit 9 (most significant).',
+      'BYP': 'Bypass input (active LOW). Pulling BYP LOW forces an immediate hardware connection between the primary and secondary TAPs, independent of shadow-protocol state. While BYP is LOW, shadow protocols are ignored. Internal pull up holds HIGH if unconnected.',
+      'GND': 'Ground reference.',
+      'STDI': 'Secondary test data input. Receives TDI from the secondary scan chain. Buffered to PTDO when connected.',
+      'STCK': 'Secondary test clock output. Always driven from PTCK regardless of connection state.',
+      'STMS': 'Secondary test mode select output. Driven from PTMS when connected; held HIGH (Test Logic Reset direction) when disconnected.',
+      'STDO': 'Secondary test data output. Driven from PTDI when connected; tri stated when disconnected.',
+      'STRST': 'Secondary test reset output. Always driven from PTRST regardless of connection state.',
+      'CON': 'Connect indicator output (active LOW). LOW when primary and secondary TAPs are connected (BYP=LOW or valid address match); HIGH when disconnected.',
+      'PTDO': 'Primary test data output. Driven from STDI when connected; tri stated when disconnected. Transmits the shadow-protocol acknowledgement during address matching.',
+      'PTDI': 'Primary test data input. Buffered to STDO when connected. Also monitored for incoming shadow protocols. Internal pull up holds HIGH if unconnected.',
+      'PTRST': 'Primary test reset input. Always buffered to STRST. Also resets the internal ASP state asynchronously. Internal pull up holds HIGH if unconnected.',
+      'PTMS': 'Primary test mode select input. Buffered to STMS when connected; determines TAP controller state for shadow-protocol gating. Internal pull up holds HIGH if unconnected.',
+      'PTCK': 'Primary test clock input. Always buffered to STCK. Shadow protocols are synchronous to PTCK.',
+      'VCC': 'Positive supply voltage.',
     },
     guideSections: [
       {
-        title: 'Switch-Based TAP Transceiver',
+        title: 'Switch Based TAP Transceiver',
         paragraphs: [
-          'Conceptually the ASP is a bank of five switches connecting PTCK→STCK, PTRST→STRST, PTDI→STDO, STDI→PTDO, and PTMS→STMS. The clock and reset paths are always closed; the data and mode-select paths open or close based on connection state.',
+          'Conceptually the ASP is a bank of five switches connecting PTCK→STCK, PTRST→STRST, PTDI→STDO, STDI→PTDO, and PTMS→STMS. The clock and reset paths are always closed; the data and mode select paths open or close based on connection state.',
           'This architecture allows all five IEEE 1149.1 signals to share a single multidrop backplane bus. Each module on the backplane has its own ASP assigned a unique address. The bus master sends a serial shadow protocol on PTDI to select one module; all other modules remain isolated.',
         ],
       },
       {
         title: 'BYP Hardware Bypass',
         paragraphs: [
-          'Pulling BYP LOW forces an immediate connection regardless of address state. This is particularly useful in ATE environments where the board-level test equipment needs direct access to a scan chain without executing shadow protocols. Releasing BYP HIGH restores the connection state that was established (or not) by the last shadow protocol.',
+          'Pulling BYP LOW forces an immediate connection regardless of address state. This is particularly useful in ATE environments where the board level test equipment needs direct access to a scan chain without executing shadow protocols. Releasing BYP HIGH restores the connection state that was established (or not) by the last shadow protocol.',
         ],
       },
       {
         title: 'Simulator Model',
         paragraphs: [
-          'The full shadow-protocol addressing (serial bit-pair signaling over PTDI/PTDO) cannot be modelled in a purely combinational simulator. The simulator therefore uses BYP as the sole connection control: BYP=0 → connected (PTDI buffered to STDO, STDI buffered to PTDO, PTMS buffered to STMS, CON asserted LOW); BYP=1 → disconnected (STDO and PTDO tri-stated, STMS driven HIGH, CON deasserted HIGH). STCK always follows PTCK and STRST always follows PTRST.',
+          'The full shadow-protocol addressing (serial bit pair signaling over PTDI/PTDO) cannot be modelled in a purely combinational simulator. The simulator therefore uses BYP as the sole connection control: BYP=0 → connected (PTDI buffered to STDO, STDI buffered to PTDO, PTMS buffered to STMS, CON asserted LOW); BYP=1 → disconnected (STDO and PTDO tri stated, STMS driven HIGH, CON deasserted HIGH). STCK always follows PTCK and STRST always follows PTRST.',
         ],
         note: 'Connect BYP to GND or a switch to LOW to enable the TAP path in simulation.',
       },
@@ -633,14 +633,14 @@ export const CHIPS_BLOCK_64 = {
     ],
   },
 
-  // ── 74x9014 Nine-Wide Inverting Buffer/Line Driver (Schmitt), 20-pin ──
+  // ── 74x9014 Nine Wide Inverting Buffer/Line Driver (Schmitt), 20-pin ──
   /* Primary source: 74x9014 datasheet   URL not yet verified.
      https://en.wikipedia.org/wiki/Three-state_logic */
   // Pins 1-9 = A1-A9 inputs, Pin 10 = GND, Pins 11-19 = Y9-Y1 (reversed), Pin 20 = VCC
   '74x9014': {
     name: '74x9014',
     simpleName: '9× NOT (ST)',
-    description: 'Nine-wide inverting buffer/line driver, Schmitt-trigger inputs (20-pin)',
+    description: 'Nine wide inverting buffer/line driver, Schmitt trigger inputs (20-pin)',
     pins: 20,
     vcc: 20,
     gnd: 10,
@@ -681,13 +681,13 @@ export const CHIPS_BLOCK_64 = {
     ],
   },
 
-  // ── 74x9015 Nine-Wide Non-Inverting Buffer/Line Driver (Schmitt), 20-pin
+  // ── 74x9015 Nine Wide Non Inverting Buffer/Line Driver (Schmitt), 20-pin
   /* Primary source: 74x9015 datasheet   URL not yet verified.
      https://en.wikipedia.org/wiki/Three-state_logic */
   '74x9015': {
     name: '74x9015',
     simpleName: '9× BUF (ST)',
-    description: 'Nine-wide non-inverting buffer/line driver, Schmitt-trigger inputs (20-pin)',
+    description: 'Nine wide non inverting buffer/line driver, Schmitt trigger inputs (20-pin)',
     pins: 20,
     vcc: 20,
     gnd: 10,
@@ -728,12 +728,12 @@ export const CHIPS_BLOCK_64 = {
     ],
   },
 
-  // ── 74x9034 Nine-Wide Inverting Buffer, 20-pin ────────────────────────
+  // ── 74x9034 Nine Wide Inverting Buffer, 20-pin ────────────────────────
   /* Primary source: 74x9034 datasheet   URL not yet verified. */
   '74x9034': {
     name: '74x9034',
     simpleName: '9× NOT',
-    description: 'Nine-wide inverting buffer (20-pin)',
+    description: 'Nine wide inverting buffer (20-pin)',
     pins: 20,
     vcc: 20,
     gnd: 10,
@@ -774,12 +774,12 @@ export const CHIPS_BLOCK_64 = {
     ],
   },
 
-  // ── 74x9035 Nine-Wide Non-Inverting Buffer, 20-pin ────────────────────
+  // ── 74x9035 Nine Wide Non Inverting Buffer, 20-pin ────────────────────
   /* Primary source: 74x9035 datasheet   URL not yet verified. */
   '74x9035': {
     name: '74x9035',
     simpleName: '9× BUF',
-    description: 'Nine-wide non-inverting buffer (20-pin)',
+    description: 'Nine wide non inverting buffer (20-pin)',
     pins: 20,
     vcc: 20,
     gnd: 10,
@@ -820,94 +820,18 @@ export const CHIPS_BLOCK_64 = {
     ],
   },
 
-  // ── 74x9046 PLL with Band Gap Controlled VCO, 16-pin ─────────────────
-  /* Primary source: Texas Instruments, 74x9046 datasheet. [Online]. Available: https://www.ti.com/lit/gpn/cd74hc7046a
-     https://en.wikipedia.org/wiki/Electronic_oscillator */
-  '74x9046': {
-    name: '74x9046',
-    simpleName: 'PLL (VCO)',
-    description: 'Phase-locked loop with band gap controlled voltage-controlled oscillator (16-pin)',
-    pins: 16,
-    vcc: 16,
-    gnd: 8,
-    datasheet: 'https://www.ti.com/lit/gpn/cd74hc7046a',
-    tags: ['pll', 'vco', 'oscillator', 'phase-locked-loop'],
-    guideOverview: 'The 74x9046 is a phase-locked loop with a band-gap controlled voltage-controlled oscillator. Using TI\'s CD74HC7046A as the family reference, the device provides two phase comparators and a VCO. Phase comparator 1 (PC1) is an XOR detector; phase comparator 2 (PC2) is an edge-triggered frequency-and-phase detector that drives the loop toward lock. VCOout follows the SIGin path when the INH pin is low. LD goes high when the loop is locked (SIGin equals COMPin).',
-    guidePinDescriptions: {
-      'PC1out': 'Phase comparator 1 output.',
-      'PC2out': 'Phase comparator 2 output.',
-      'COMPin': 'Comparator or loop-related input for the PLL section.',
-      'VCOout': 'Voltage-controlled oscillator output.',
-      'INH': 'Inhibit control that disables or stops the oscillator path.',
-      'C1A': 'Timing-capacitor connection for the VCO network.',
-      'C1B': 'Second timing-capacitor connection for the VCO network.',
-      'GND': 'Ground reference for the device.',
-      'VCOin': 'Control-voltage input for the VCO frequency.',
-      'DEMin': 'Demodulator or loop-related input/output node as represented in this local definition.',
-      'R1': 'External timing resistor connection.',
-      'R2': 'Second external timing resistor connection.',
-      'PC3out': 'Additional comparator or lock-related output in this family.',
-      'SIGin': 'Signal input for the PLL comparison path.',
-      'LD': 'Lock-detect or lock-related output.',
-      'VCC': 'Positive supply for the PLL circuitry.',
-    },
-    guideSections: [
-      {
-        title: 'PLL And VCO Basics',
-        paragraphs: [
-          'A PLL uses phase comparison to steer an oscillator until it follows an incoming signal. The VCO and external RC components determine the tuning range and loop dynamics, so this kind of part is much more mixed-signal than a normal logic gate.',
-        ],
-      },
-      {
-        title: 'Phase Comparators',
-        paragraphs: [
-          'PC1 is an XOR detector: its output is high whenever SIGin and COMPin differ. PC2 is an edge-triggered detector sensitive to both frequency and phase: it goes high when SIGin rises first, low when COMPin rises first, and returns to zero once both signals agree. PC3out is the complement of PC1 (XNOR).',
-        ],
-      },
-      {
-        title: 'Lock Detect And Inhibit',
-        paragraphs: [
-          'LD goes high when SIGin and COMPin are in phase, indicating a locked loop. Asserting INH high stops the VCO output (VCOout goes low), which is useful for power-down or gating the oscillator path.',
-        ],
-      },
-    ],
-    pinout: [
-      { pin:  1, name: 'PC1out', type: 'output' },
-      { pin:  2, name: 'PC2out', type: 'output' },
-      { pin:  3, name: 'COMPin', type: 'input'  },
-      { pin:  4, name: 'VCOout', type: 'output' },
-      { pin:  5, name: 'INH',    type: 'input'  },
-      { pin:  6, name: 'C1A',    type: 'input'  },
-      { pin:  7, name: 'C1B',    type: 'input'  },
-      { pin:  8, name: 'GND',    type: 'power'  },
-      { pin:  9, name: 'VCOin',  type: 'input'  },
-      { pin: 10, name: 'DEMin',  type: 'input'  },
-      { pin: 11, name: 'R1',     type: 'input'  },
-      { pin: 12, name: 'R2',     type: 'input'  },
-      { pin: 13, name: 'PC3out', type: 'output' },
-      { pin: 14, name: 'SIGin',  type: 'input'  },
-      { pin: 15, name: 'LD',     type: 'output' },
-      { pin: 16, name: 'VCC',    type: 'power'  },
-    ],
-    gates: [
-      { type: 'PLL_9046',
-        inputs:  ['COMPin','INH','C1A','C1B','VCOin','DEMin','R1','R2','SIGin'],
-        outputs: ['PC1out','PC2out','VCOout','PC3out','LD'] },
-    ],
-  },
-
-  // ── 74x9114 Nine-Wide Inverter, Schmitt, OC, 20-pin ──────────────────
+  // ── 74x9114 Nine Wide Inverter, Schmitt, OC, 20-pin ──────────────────
   /* Primary source: 74x9114 datasheet   URL not yet verified. */
   '74x9114': {
     name: '74x9114',
     simpleName: '9× NOT (ST, OC)',
-    description: 'Nine-wide inverter, Schmitt-trigger inputs, open-collector outputs (20-pin)',
+    description: 'Nine wide inverter, Schmitt trigger inputs, open collector outputs (20-pin)',
     pins: 20,
     vcc: 20,
     gnd: 10,
     openCollector: true,
     datasheet: '',
-    tags: ['not', 'inverter', 'nine-wide', 'schmitt', 'open-collector'],
+    tags: ['not', 'inverter', 'nine-wide', 'schmitt', 'open collector'],
     pinout: [
       { pin:  1, name: 'A1', type: 'input'  },
       { pin:  2, name: 'A2', type: 'input'  },
@@ -943,18 +867,18 @@ export const CHIPS_BLOCK_64 = {
     ],
   },
 
-  // ── 74x9115 Nine-Wide Buffer, Schmitt, OC, 20-pin ────────────────────
+  // ── 74x9115 Nine Wide Buffer, Schmitt, OC, 20-pin ────────────────────
   /* Primary source: 74x9115 datasheet   URL not yet verified. */
   '74x9115': {
     name: '74x9115',
     simpleName: '9× BUF (ST, OC)',
-    description: 'Nine-wide non-inverting buffer, Schmitt-trigger inputs, open-collector outputs (20-pin)',
+    description: '9 wide non-inverting buffer, Schmitt inputs, open collector out (20-pin)',
     pins: 20,
     vcc: 20,
     gnd: 10,
     openCollector: true,
     datasheet: '',
-    tags: ['buffer', 'nine-wide', 'schmitt', 'open-collector'],
+    tags: ['buffer', 'nine-wide', 'schmitt', 'open collector'],
     pinout: [
       { pin:  1, name: 'A1', type: 'input'  },
       { pin:  2, name: 'A2', type: 'input'  },
@@ -990,18 +914,18 @@ export const CHIPS_BLOCK_64 = {
     ],
   },
 
-  // ── 74x9134 Nine-Wide Inverting Buffer, OC, 20-pin ───────────────────
+  // ── 74x9134 Nine Wide Inverting Buffer, OC, 20-pin ───────────────────
   /* Primary source: 74x9134 datasheet   URL not yet verified. */
   '74x9134': {
     name: '74x9134',
     simpleName: '9× NOT (OC)',
-    description: 'Nine-wide inverting buffer, open-collector outputs (20-pin)',
+    description: 'Nine wide inverting buffer, open collector outputs (20-pin)',
     pins: 20,
     vcc: 20,
     gnd: 10,
     openCollector: true,
     datasheet: '',
-    tags: ['not', 'inverter', 'buffer', 'nine-wide', 'open-collector'],
+    tags: ['not', 'inverter', 'buffer', 'nine-wide', 'open collector'],
     pinout: [
       { pin:  1, name: 'A1', type: 'input'  },
       { pin:  2, name: 'A2', type: 'input'  },

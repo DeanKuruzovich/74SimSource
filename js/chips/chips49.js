@@ -4,11 +4,11 @@
 
 export const CHIPS_BLOCK_49 = {
 
-  // 74x1622: Octal bus transceiver, inverting, open-collector (20-pin)
+  // 74x1622: Octal bus transceiver, inverting, open collector (20-pin)
   '74x1622': {
     name: '74x1622',
     simpleName: 'Octal Bus Transceiver Inverting (OC)',
-    description: 'Octal bus transceiver, inverting, open-collector (20-pin)',
+    description: 'Octal bus transceiver, inverting, open collector (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
     datasheet: '',
     tags: ['transceiver', 'octal', 'inverting', 'open collector', 'bidir', 'stub'],
@@ -39,14 +39,14 @@ export const CHIPS_BLOCK_49 = {
     ],
   },
 
-  // 74x1623: Octal bus transceiver, non-inverting, TRI-STATE (20-pin)
+  // 74x1623: Octal bus transceiver, non inverting, TRI STATE (20-pin)
   '74x1623': {
     name: '74x1623',
-    simpleName: 'Octal Bus Transceiver Non-Inverting',
-    description: 'Octal bus transceiver, non-inverting, TRI-STATE (20-pin)',
+    simpleName: 'Octal Bus Transceiver Non Inverting',
+    description: 'Octal bus transceiver, non inverting, TRI STATE (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
     datasheet: '',
-    tags: ['transceiver', 'octal', 'non-inverting', 'tri-state', 'bidir', 'stub'],
+    tags: ['transceiver', 'octal', 'non inverting', 'tri state', 'bidir', 'stub'],
     pinout: [
       { pin:  1, name: 'GABn', type: 'input'  },
       { pin:  2, name: 'GBAn', type: 'input'  },
@@ -74,14 +74,14 @@ export const CHIPS_BLOCK_49 = {
     ],
   },
 
-  // 74x1631: Quad bus driver with complementary outputs, TRI-STATE (16-pin)
+  // 74x1631: Quad bus driver with complementary outputs, TRI STATE (16-pin)
   '74x1631': {
     name: '74x1631',
     simpleName: 'Quad Bus Driver with Complementary Outputs',
-    description: 'Quad bus driver with complementary outputs, TRI-STATE (16-pin)',
+    description: 'Quad bus driver with complementary outputs, TRI STATE (16-pin)',
     pins: 16, vcc: 16, gnd: 8,
     datasheet: '',
-    tags: ['driver', 'quad', 'complementary', 'tri-state', 'stub'],
+    tags: ['driver', 'quad', 'complementary', 'tri state', 'stub'],
     pinout: [
       { pin:  1, name: 'OEn',  type: 'input'  },
       { pin:  2, name: 'A0',   type: 'input'  },
@@ -105,14 +105,14 @@ export const CHIPS_BLOCK_49 = {
     ],
   },
 
-  // 74x1638: Octal bus transceiver, inverting, TRI-STATE+OC (20-pin)
+  // 74x1638: Octal bus transceiver, inverting, TRI STATE+OC (20-pin)
   '74x1638': {
     name: '74x1638',
-    simpleName: 'Octal Bus Transceiver Inverting (low power, TRI-STATE/OC)',
-    description: 'Octal bus transceiver, inverting, TRI-STATE and open-collector (lower-power version of 74x638) (20-pin)',
+    simpleName: 'Octal Bus Transceiver Inverting (low power, TRI STATE/OC)',
+    description: 'Octal bus transceiver, inverting, 3-state+OC, low-power 638 (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
     datasheet: '',
-    tags: ['transceiver', 'octal', 'inverting', 'tri-state', 'open collector', 'bidir', 'stub'],
+    tags: ['transceiver', 'octal', 'inverting', 'tri state', 'open collector', 'bidir', 'stub'],
     pinout: [
       { pin:  1, name: 'GABn', type: 'input'  },
       { pin:  2, name: 'GBAn', type: 'input'  },
@@ -140,14 +140,14 @@ export const CHIPS_BLOCK_49 = {
     ],
   },
 
-  // 74x1639: Octal bus transceiver, non-inverting, TRI-STATE+OC (20-pin)
+  // 74x1639: Octal bus transceiver, non inverting, TRI STATE+OC (20-pin)
   '74x1639': {
     name: '74x1639',
-    simpleName: 'Octal Bus Transceiver Non-Inverting (low power, TRI-STATE/OC)',
-    description: 'Octal bus transceiver, non-inverting, TRI-STATE and open-collector (lower-power version of 74x639) (20-pin)',
+    simpleName: 'Octal Bus Transceiver Non Inverting (low power, TRI STATE/OC)',
+    description: 'Octal bus transceiver, non-inverting, 3-state+OC, low-power 639 (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
     datasheet: '',
-    tags: ['transceiver', 'octal', 'non-inverting', 'tri-state', 'open collector', 'bidir', 'stub'],
+    tags: ['transceiver', 'octal', 'non inverting', 'tri state', 'open collector', 'bidir', 'stub'],
     pinout: [
       { pin:  1, name: 'GABn', type: 'input'  },
       { pin:  2, name: 'GBAn', type: 'input'  },
@@ -175,14 +175,14 @@ export const CHIPS_BLOCK_49 = {
     ],
   },
 
-  // 74x1640: Octal bus transceiver, inverting, TRI-STATE (20-pin)
+  // 74x1640: Octal bus transceiver, inverting, TRI STATE (20-pin)
   '74x1640': {
     name: '74x1640',
     simpleName: 'Octal Bus Transceiver Inverting (low power)',
-    description: 'Octal bus transceiver, inverting, TRI-STATE (lower-power version of 74x640) (20-pin)',
+    description: 'Octal bus transceiver, inverting, 3-state, low-power 640 (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
     datasheet: '',
-    tags: ['transceiver', 'octal', 'inverting', 'tri-state', 'bidir', 'stub'],
+    tags: ['transceiver', 'octal', 'inverting', 'tri state', 'bidir', 'stub'],
     pinout: [
       { pin:  1, name: 'GABn', type: 'input'  },
       { pin:  2, name: 'GBAn', type: 'input'  },
@@ -210,14 +210,14 @@ export const CHIPS_BLOCK_49 = {
     ],
   },
 
-  // 74x1641: Octal bus transceiver, non-inverting, OC (20-pin)
+  // 74x1641: Octal bus transceiver, non inverting, OC (20-pin)
   '74x1641': {
     name: '74x1641',
-    simpleName: 'Octal Bus Transceiver Non-Inverting (low power, OC)',
-    description: 'Octal bus transceiver, non-inverting, open-collector (lower-power version of 74x641) (20-pin)',
+    simpleName: 'Octal Bus Transceiver Non Inverting (low power, OC)',
+    description: 'Octal bus transceiver, non-inverting, OC, low-power 641 (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
     datasheet: '',
-    tags: ['transceiver', 'octal', 'non-inverting', 'open collector', 'bidir', 'stub'],
+    tags: ['transceiver', 'octal', 'non inverting', 'open collector', 'bidir', 'stub'],
     pinout: [
       { pin:  1, name: 'GABn', type: 'input'  },
       { pin:  2, name: 'GBAn', type: 'input'  },
@@ -249,7 +249,7 @@ export const CHIPS_BLOCK_49 = {
   '74x1642': {
     name: '74x1642',
     simpleName: 'Octal Bus Transceiver Inverting (low power, OC)',
-    description: 'Octal bus transceiver, inverting, open-collector (lower-power version of 74x642) (20-pin)',
+    description: 'Octal bus transceiver, inverting, OC, low-power 642 (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
     datasheet: '',
     tags: ['transceiver', 'octal', 'inverting', 'open collector', 'bidir', 'stub'],
@@ -280,14 +280,14 @@ export const CHIPS_BLOCK_49 = {
     ],
   },
 
-  // 74x1643: Octal bus transceiver, inverting and non-inverting, TRI-STATE (20-pin)
+  // 74x1643: Octal bus transceiver, inverting and non inverting, TRI STATE (20-pin)
   '74x1643': {
     name: '74x1643',
-    simpleName: 'Octal Bus Transceiver Inv/Non-Inv (low power)',
-    description: 'Octal bus transceiver, inverting and non-inverting, TRI-STATE (lower-power version of 74x643) (20-pin)',
+    simpleName: 'Octal Bus Transceiver Inv/Non Inv (low power)',
+    description: 'Octal bus transceiver, inv+non-inv, 3-state, low-power 643 (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
     datasheet: '',
-    tags: ['transceiver', 'octal', 'tri-state', 'bidir', 'stub'],
+    tags: ['transceiver', 'octal', 'tri state', 'bidir', 'stub'],
     pinout: [
       { pin:  1, name: 'T',    type: 'input'  },
       { pin:  2, name: 'GABn', type: 'input'  },
@@ -315,11 +315,11 @@ export const CHIPS_BLOCK_49 = {
     ],
   },
 
-  // 74x1644: Octal bus transceiver, inverting and non-inverting, OC (20-pin)
+  // 74x1644: Octal bus transceiver, inverting and non inverting, OC (20-pin)
   '74x1644': {
     name: '74x1644',
-    simpleName: 'Octal Bus Transceiver Inv/Non-Inv (low power, OC)',
-    description: 'Octal bus transceiver, inverting and non-inverting, open-collector (lower-power version of 74x644) (20-pin)',
+    simpleName: 'Octal Bus Transceiver Inv/Non Inv (low power, OC)',
+    description: 'Octal bus transceiver, inv+non-inv, OC, low-power 644 (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
     datasheet: '',
     tags: ['transceiver', 'octal', 'open collector', 'bidir', 'stub'],
@@ -350,17 +350,17 @@ export const CHIPS_BLOCK_49 = {
     ],
   },
 
-  // 74x1645: Octal bus transceiver, non-inverting, TRI-STATE (20-pin)
+  // 74x1645: Octal bus transceiver, non inverting, TRI STATE (20-pin)
   '74x1645': {
     name: '74x1645',
-    simpleName: 'Octal Bus Transceiver Non-Inverting (low power)',
-    description: 'Octal bus transceiver, non-inverting, TRI-STATE (lower-power version of 74x645) (20-pin)',
+    simpleName: 'Octal Bus Transceiver Non Inverting (low power)',
+    description: 'Octal bus transceiver, non-inverting, 3-state, low-power 645 (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74als1645a.pdf',
-    tags: ['transceiver', 'octal', 'non-inverting', 'tri-state', 'bidir', 'stub'],
+    tags: ['transceiver', 'octal', 'non inverting', 'tri state', 'bidir', 'stub'],
     guideOverview: 'The 74ALS1645 is a low power octal bus transceiver in the same family as the classic 74x645. It bridges two 8 bit buses, lets system logic choose the direction of data flow, and can disconnect itself completely through an active LOW enable pin so shared buses do not fight. This is the kind of part you reach for when two digital subsystems need to exchange bytes over a common backplane or data bus with controlled loading.',
     guidePinDescriptions: {
-      'DIR': 'Direction control input. Set this pin according to the datasheet truth table to choose A-to-B or B-to-A transfer.',
+      'DIR': 'Direction control input. Set this pin according to the datasheet truth table to choose A-to B or B-to A transfer.',
       'A0': 'Bus line A0. It becomes an input or output depending on DIR and OEn.',
       'A1': 'Bus line A1. Use it as the second bit of the A-side bus.',
       'A2': 'Bus line A2. This is another A-side transceiver channel.',
@@ -368,17 +368,17 @@ export const CHIPS_BLOCK_49 = {
       'A4': 'Bus line A4. Another A-side data bit.',
       'A5': 'Bus line A5. It switches direction with the rest of the channels.',
       'A6': 'Bus line A6. Use it for another A-side bus bit.',
-      'A7': 'Bus line A7. This is the highest-numbered A-side channel.',
+      'A7': 'Bus line A7. This is the highest numbered A-side channel.',
       'GND': 'Ground reference for the transceiver.',
-      'B7': 'Bus line B7. This is the highest-numbered B-side data bit.',
+      'B7': 'Bus line B7. This is the highest numbered B-side data bit.',
       'B6': 'Bus line B6. It pairs with A6 through the transceiver.',
       'B5': 'Bus line B5. Another B-side channel.',
       'B4': 'Bus line B4. It is part of the controlled bus bridge.',
       'B3': 'Bus line B3. Use it as the B-side mate for A3.',
       'B2': 'Bus line B2. Another B-side data line.',
       'B1': 'Bus line B1. This line changes direction with the rest of the bus.',
-      'B0': 'Bus line B0. This is the lowest-numbered B-side channel.',
-      'OEn': 'Output enable, active LOW. Pull LOW to enable the transceiver; drive HIGH to place the bus interface in high-impedance.',
+      'B0': 'Bus line B0. This is the lowest numbered B-side channel.',
+      'OEn': 'Output enable, active LOW. Pull LOW to enable the transceiver; drive HIGH to place the bus interface in high impedance.',
       'VCC': 'Positive supply for the device, typically +5 V.',
     },
     guideSections: [
@@ -392,16 +392,16 @@ export const CHIPS_BLOCK_49 = {
       {
         title: 'Why There Is an Enable Pin',
         paragraphs: [
-          'The output enable (OE, active LOW) controls whether both bus sides are connected. This high-impedance state when inactive prevents contention and lets multiple transceivers share a common backplane safely.',
+          'The output enable (OE, active LOW) controls whether both bus sides are connected. This high impedance state when inactive prevents contention and lets multiple transceivers share a common backplane safely.',
         ],
-        note: 'This simulator entry is kept as a documentation-oriented stub. The guide explains the bus role and controls, but the simulator does not model full directional data transfer for this placeholder.',
+        note: 'This simulator entry is kept as a documentation oriented stub. The guide explains the bus role and controls, but the simulator does not model full directional data transfer for this placeholder.',
       },
       {
         title: 'Common Uses',
         list: [
           'Buffering an 8 bit processor or microcontroller data bus.',
           'Isolating one board section from another to reduce loading.',
-          'Building shared-bus systems where several devices take turns driving the same lines.',
+          'Building shared bus systems where several devices take turns driving the same lines.',
         ],
       },
     ],
@@ -432,34 +432,114 @@ export const CHIPS_BLOCK_49 = {
     ],
   },
 
-  // 74x1779: 8 bit bidirectional binary counter, TRI-STATE (16-pin)
+  // 74x1779: 8-bit bidirectional binary counter with multiplexed 3-state I/O (16-pin)
+  //
+  // The 74F1779 is the high-speed (145 MHz) Signetics/Philips bin of the 74F779:
+  // a fully synchronous 8-bit up/down counter whose eight 3-state I/O pins are
+  // shared between parallel-load data in and count read-out. Two mode pins S0/S1
+  // select load / count-up / count-down / hold; CET (active-LOW) gates counting;
+  // OE (active-LOW) puts the count on the I/O bus; TC (active-LOW) flags terminal
+  // count for look-ahead cascading.
+  //
+  // The original hand-entered stub was WRONG: it modelled a U_Dn/ENn part with
+  // VCC=16/GND=8 and D0..D7 data pins. The real device has VCC=13, GND=4,
+  // multiplexed I/O0..I/O7, S0/S1 mode pins, CET, CP and TC (issues.md C2 — never
+  // trust a hand-entered pinout). Pinout + function table replaced below.
+  //
+  // Source: Signetics (Philips), "FAST 74F779 — 8-Bit Bidirectional Binary Counter
+  //   (3-State)," 853-0385 80218, in 1986 IC15 Philips FAST TTL Logic data handbook
+  //   (datasheet dated Aug 26 1985). [Online]. Available:
+  //   http://www.bitsavers.org/components/philips/_dataBooks/1986_IC15_Philips_FAST_TTL_Logic.pdf
+  //   Verified: pin configuration (Vcc=Pin 13, GND=Pin 4), FUNCTION TABLE and
+  //   145 MHz spec, read from pdftotext extraction of the databook PDF. The 'F1779
+  //   is documented as the same part/function/pinout as the 'F779, differing only
+  //   in speed bin (145 MHz typ vs 100 MHz) — confirmed by the NXP/Philips 74F1779
+  //   product description.
+  // Source: Fairchild Semiconductor, "74F779 — 8-Bit Bidirectional Binary Counter
+  //   with 3-STATE Outputs," DS009593 (Apr 1988, rev. Feb 2004). [Online].
+  //   Available: https://media.digikey.com/pdf/Data%20Sheets/Fairchild%20PDFs/74F779.pdf
+  //   Verified: Connection Diagram, Function Table and Logic Diagram, read as
+  //   rendered PDF page images (issues.md C4) — used to fix the terminal
+  //   assignment and to confirm the mode/CET/OE/TC behaviour:
+  //     pin 1=I/O1, 2=I/O2, 3=I/O3, 4=GND, 5=I/O4, 6=I/O5, 7=I/O6, 8=I/O7,
+  //     9=OE(L), 10=S1, 11=S0, 12=TC(L), 13=Vcc, 14=CET(L), 15=CP, 16=I/O0.
+  //   FUNCTION TABLE (rising CP): OE H → I/O Hi-Z; OE L → count appears on I/O;
+  //     S1S0=LL → parallel load from I/O; (not LL) & CET H → hold (TC held HIGH);
+  //     S1S0=HL & CET L → count up; S1S0=LH & CET L → count down. TC active-LOW at
+  //     terminal count (FF up / 00 down) while counting.
+  // Both manufacturers second-source the same Signetics original; pinouts agree.
+  // Engine: reuses COUNTER_UPDOWN_TRI_779 (added for the 74x779, the identical
+  //   silicon — see issues.md C46), so no new primitive is needed here.
   '74x1779': {
     name: '74x1779',
     simpleName: '8 bit Bidirectional Binary Counter',
-    description: '8 bit bidirectional binary counter, TRI-STATE (16-pin)',
-    pins: 16, vcc: 16, gnd: 8,
-    datasheet: '',
-    tags: ['counter', '8 bit', 'bidirectional', 'tri-state', 'stub'],
+    description: '8-bit sync up/down binary counter, muxed 3-state I/O bus (16-pin)',
+    pins: 16, vcc: 13, gnd: 4,
+    datasheet: 'https://media.digikey.com/pdf/Data%20Sheets/Fairchild%20PDFs/74F779.pdf',
+    tags: ['counter', 'binary', '8 bit', 'bidirectional', 'up down', 'tri state'],
+    sequential: true,
+    guideOverview: 'The 74x1779 is an 8 bit synchronous up/down counter that shares one set of pins for both loading a start value and reading the count back. The eight I/O pins are three state: drive OE LOW and the current count appears on them, drive OE HIGH and they go high impedance so an outside source can put a number on them. Two mode pins S0 and S1 pick what the next clock edge does: load, count up, count down, or hold. CET enables counting, and TC flags when the count has hit the end of its range so several of these can be chained into a wider counter.',
+    guidePinDescriptions: {
+      'I/O0': 'Count bit 0 (LSB). Output when OE is LOW, load input when OE is HIGH.',
+      'I/O1': 'Count bit 1, shared 3-state I/O.',
+      'I/O2': 'Count bit 2, shared 3-state I/O.',
+      'I/O3': 'Count bit 3, shared 3-state I/O.',
+      'I/O4': 'Count bit 4, shared 3-state I/O.',
+      'I/O5': 'Count bit 5, shared 3-state I/O.',
+      'I/O6': 'Count bit 6, shared 3-state I/O.',
+      'I/O7': 'Count bit 7 (MSB), shared 3-state I/O.',
+      'S0':  'Mode select bit 0. With S1: 00=load, 01=down, 10=up, 11=hold.',
+      'S1':  'Mode select bit 1. With S0: 00=load, 01=down, 10=up, 11=hold.',
+      'CETn': 'Count enable (active LOW). LOW lets the counter step; HIGH holds.',
+      'OEn':  'Output enable (active LOW). LOW drives the count onto the I/O bus; HIGH releases it to high impedance.',
+      'CP':   'Clock. All loading and counting happen on the rising edge.',
+      'TCn':  'Terminal count (active LOW). Goes LOW at the top (255 counting up) or bottom (0 counting down) so the next stage can be clocked.',
+      'GND':  'Ground (pin 4).',
+      'VCC':  'Positive supply, +5 V (pin 13).',
+    },
+    guideSections: [
+      {
+        title: 'Sharing pins for load and read',
+        paragraphs: [
+          'Most counters keep their load inputs and count outputs on separate pins. This one multiplexes them onto a single 8-bit bus to save package pins, which is why it suits designs where the counter hangs directly on a shared data bus.',
+          'To preset a value, drive OE HIGH so the chip stops driving the bus, put the number on the I/O pins from outside, set S0 and S1 both LOW, and clock once. To read the count, drive OE LOW and the latched value comes back out on the same pins.',
+        ],
+      },
+      {
+        title: 'Counting and cascading',
+        paragraphs: [
+          'With CET LOW, S1=1/S0=0 counts up and S1=0/S0=1 counts down on each rising clock edge; both modes wrap around (255 back to 0, or 0 back to 255). Holding CET HIGH, or selecting mode 11, freezes the count.',
+          'TC is the look-ahead carry. It pulses LOW when an enabled counter reaches the end of its range, which you feed into the CET of the next chip so a chain advances one stage only when the stage below it rolls over.',
+        ],
+        note: 'TC is decoded from the count, so it can glitch briefly around a clock edge; the datasheet warns against using it directly as a clock or reset.',
+      },
+    ],
     pinout: [
-      { pin:  1, name: 'U_Dn', type: 'input'  },
-      { pin:  2, name: 'ENn',  type: 'input'  },
-      { pin:  3, name: 'CLK',  type: 'input'  },
-      { pin:  4, name: 'OEn',  type: 'input'  },
-      { pin:  5, name: 'D0',   type: 'bidir'  },
-      { pin:  6, name: 'D1',   type: 'bidir'  },
-      { pin:  7, name: 'D2',   type: 'bidir'  },
-      { pin:  8, name: 'GND',  type: 'power'  },
-      { pin:  9, name: 'D3',   type: 'bidir'  },
-      { pin: 10, name: 'D4',   type: 'bidir'  },
-      { pin: 11, name: 'D5',   type: 'bidir'  },
-      { pin: 12, name: 'D6',   type: 'bidir'  },
-      { pin: 13, name: 'D7',   type: 'bidir'  },
-      { pin: 14, name: 'RCon', type: 'output' },
-      { pin: 15, name: 'TCon', type: 'output' },
-      { pin: 16, name: 'VCC',  type: 'power'  },
+      { pin:  1, name: 'I/O1', type: 'bidir'  },
+      { pin:  2, name: 'I/O2', type: 'bidir'  },
+      { pin:  3, name: 'I/O3', type: 'bidir'  },
+      { pin:  4, name: 'GND',  type: 'power'  },
+      { pin:  5, name: 'I/O4', type: 'bidir'  },
+      { pin:  6, name: 'I/O5', type: 'bidir'  },
+      { pin:  7, name: 'I/O6', type: 'bidir'  },
+      { pin:  8, name: 'I/O7', type: 'bidir'  },
+      { pin:  9, name: 'OEn',  type: 'input'  },
+      { pin: 10, name: 'S1',   type: 'input'  },
+      { pin: 11, name: 'S0',   type: 'input'  },
+      { pin: 12, name: 'TCn',  type: 'output' },
+      { pin: 13, name: 'VCC',  type: 'power'  },
+      { pin: 14, name: 'CETn', type: 'input'  },
+      { pin: 15, name: 'CP',   type: 'input'  },
+      { pin: 16, name: 'I/O0', type: 'bidir'  },
     ],
     gates: [
-      { type: 'GENERIC_STUB', inputs: ['U_Dn','ENn','CLK','OEn'], outputs: [] },
+      // Reuses the COUNTER_UPDOWN_TRI_779 engine primitive (added for the sibling
+      // 74x779, the same Signetics part — see issues.md C46). Contract:
+      //   inputs:  [CP, S1, S0, CETn, OEn, I/O0..I/O7]  (I/O read as load inputs)
+      //   outputs: [I/O0..I/O7 (LSB..MSB), TCn]         (I/O driven when OE LOW)
+      { type: 'COUNTER_UPDOWN_TRI_779',
+        inputs: ['CP','S1','S0','CETn','OEn','I/O0','I/O1','I/O2','I/O3','I/O4','I/O5','I/O6','I/O7'],
+        outputs: ['I/O0','I/O1','I/O2','I/O3','I/O4','I/O5','I/O6','I/O7','TCn'] },
     ],
   },
 
@@ -535,7 +615,7 @@ export const CHIPS_BLOCK_49 = {
   '74x1804': {
     name: '74x1804',
     simpleName: 'Hex 2 Input NAND Driver',
-    description: 'Hex 2 input NAND gate with high-drive outputs (20-pin)',
+    description: 'Hex 2 input NAND gate with high drive outputs (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
     datasheet: '',
     tags: ['nand', 'hex', 'driver', 'stub'],
@@ -570,7 +650,7 @@ export const CHIPS_BLOCK_49 = {
   '74x1805': {
     name: '74x1805',
     simpleName: 'Hex 2 Input NOR Driver',
-    description: 'Hex 2 input NOR gate with high-drive outputs (20-pin)',
+    description: 'Hex 2 input NOR gate with high drive outputs (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
     datasheet: '',
     tags: ['nor', 'hex', 'driver', 'stub'],

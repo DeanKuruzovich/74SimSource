@@ -10,7 +10,7 @@ export const CHIPS_BLOCK_63 = {
   '74x7404': {
     name: '74x7404',
     simpleName: 'FIFO 64×5',
-    description: '320 bit FIFO memory (64 words × 5 bits), tri-state outputs (18-pin)',
+    description: '320 bit FIFO memory (64 words × 5 bits), tri state outputs (18-pin)',
     pins: 18,
     vcc: 18,
     gnd: 9,
@@ -44,36 +44,36 @@ export const CHIPS_BLOCK_63 = {
 
   // ── 74x7540 Octal Inv Buffer (Schmitt), 20-pin ───────────────────────
   /* Primary source: Texas Instruments, 74x7540 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls240.pdf */
-  // Same as 74x240 but with Schmitt-trigger inputs
+  // Same as 74x240 but with Schmitt trigger inputs
   '74x7540': {
     name: '74x7540',
     simpleName: 'Octal Inv Buffer (ST)',
-    description: 'Octal inverting buffer/line driver, Schmitt-trigger inputs, tri-state (20-pin)',
+    description: 'Octal inverting buffer/line driver, Schmitt inputs, 3-state (20-pin)',
     pins: 20,
     vcc: 20,
     gnd: 10,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls240.pdf',
-    tags: ['buffer', 'driver', 'octal', 'tri-state', 'inverting', 'schmitt'],
-    guideOverview: 'The 74x7540 is an octal inverting buffer and line driver with three-state outputs, functionally aligned with the 240 family. The distinguishing feature of the 7540 family is Schmitt-trigger input conditioning, which improves noise tolerance and makes the device better behaved with slow or imperfect input edges. In the simulator, the standard 240-style inverting tri-state behavior is the right digital model.',
+    tags: ['buffer', 'driver', 'octal', 'tri state', 'inverting', 'schmitt'],
+    guideOverview: 'The 74x7540 is an octal inverting buffer and line driver with three state outputs, functionally aligned with the 240 family. The distinguishing feature of the 7540 family is Schmitt trigger input conditioning, which improves noise tolerance and makes the device better behaved with slow or imperfect input edges. In the simulator, the standard 240-style inverting tri state behavior is the right digital model.',
     guidePinDescriptions: {
       '1OE': 'Active LOW enable for bank 1.',
       '1A1': 'Input bit 1 of bank 1.',
-      '2Y4': 'Inverting three-state output bit 4 of bank 2.',
+      '2Y4': 'Inverting three state output bit 4 of bank 2.',
       '1A2': 'Input bit 2 of bank 1.',
-      '2Y3': 'Inverting three-state output bit 3 of bank 2.',
+      '2Y3': 'Inverting three state output bit 3 of bank 2.',
       '1A3': 'Input bit 3 of bank 1.',
-      '2Y2': 'Inverting three-state output bit 2 of bank 2.',
+      '2Y2': 'Inverting three state output bit 2 of bank 2.',
       '1A4': 'Input bit 4 of bank 1.',
-      '2Y1': 'Inverting three-state output bit 1 of bank 2.',
+      '2Y1': 'Inverting three state output bit 1 of bank 2.',
       'GND': 'Ground reference for the package.',
       '2A1': 'Input bit 1 of bank 2.',
-      '1Y4': 'Inverting three-state output bit 4 of bank 1.',
+      '1Y4': 'Inverting three state output bit 4 of bank 1.',
       '2A2': 'Input bit 2 of bank 2.',
-      '1Y3': 'Inverting three-state output bit 3 of bank 1.',
+      '1Y3': 'Inverting three state output bit 3 of bank 1.',
       '2A3': 'Input bit 3 of bank 2.',
-      '1Y2': 'Inverting three-state output bit 2 of bank 1.',
+      '1Y2': 'Inverting three state output bit 2 of bank 1.',
       '2A4': 'Input bit 4 of bank 2.',
-      '1Y1': 'Inverting three-state output bit 1 of bank 1.',
+      '1Y1': 'Inverting three state output bit 1 of bank 1.',
       '2OE': 'Active LOW enable for bank 2.',
       'VCC': 'Positive supply for the device.',
     },
@@ -81,13 +81,13 @@ export const CHIPS_BLOCK_63 = {
       {
         title: '240-Style Inverting Driver',
         paragraphs: [
-          'Each channel outputs the logical inverse of its input when enabled. The two bank-enable pins let you control two groups of four outputs independently, which is useful in bus-oriented designs.',
+          'Each channel outputs the logical inverse of its input when enabled. The two bank enable pins let you control two groups of four outputs independently, which is useful in bus oriented designs.',
         ],
       },
       {
         title: 'Schmitt Input Advantage',
         paragraphs: [
-          'Schmitt-trigger inputs reduce chatter on slow, noisy, or bouncing signals. That does not change the truth table of the part, but it makes the hardware more tolerant of imperfect edges.',
+          'Schmitt trigger inputs reduce chatter on slow, noisy, or bouncing signals. That does not change the truth table of the part, but it makes the hardware more tolerant of imperfect edges.',
         ],
       },
     ],
@@ -127,17 +127,17 @@ export const CHIPS_BLOCK_63 = {
 
   // ── 74x7541 Octal Buffer (Schmitt), dual OE, 20-pin ──────────────────
   /* Primary source: Texas Instruments, 74x7541 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls541.pdf */
-  // Same as 74x541 but with Schmitt-trigger inputs
+  // Same as 74x541 but with Schmitt trigger inputs
   '74x7541': {
     name: '74x7541',
     simpleName: 'Octal Buffer (ST)',
-    description: 'Octal non-inverting buffer/line driver, Schmitt-trigger inputs, tri-state (20-pin)',
+    description: 'Octal non inverting buffer/line driver, Schmitt inputs, 3-state (20-pin)',
     pins: 20,
     vcc: 20,
     gnd: 10,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls541.pdf',
-    tags: ['buffer', 'driver', 'octal', 'tri-state', 'schmitt'],
-    guideOverview: 'The 74x7541 is an octal non-inverting buffer and line driver organized like a 541-family device. It uses two enables to control all eight outputs and adds Schmitt-trigger inputs for improved noise rejection. In the simulator, plain 541-style digital behavior is the correct reference because the Schmitt input detail affects input conditioning rather than logic function.',
+    tags: ['buffer', 'driver', 'octal', 'tri state', 'schmitt'],
+    guideOverview: 'The 74x7541 is an octal non inverting buffer and line driver organized like a 541-family device. It uses two enables to control all eight outputs and adds Schmitt trigger inputs for improved noise rejection. In the simulator, plain 541-style digital behavior is the correct reference because the Schmitt input detail affects input conditioning rather than logic function.',
     guidePinDescriptions: {
       'OE1': 'Enable input 1 for the output stage. In the 541 family both enables must be in their active states before outputs drive.',
       'A1': 'Input bit 1.',
@@ -164,13 +164,13 @@ export const CHIPS_BLOCK_63 = {
       {
         title: '541-Style Buffering',
         paragraphs: [
-          'A non-inverting line driver reproduces the input logic state at the output when enabled. This is useful for improving fan-out, isolating a source from bus loading, and controlling when a byte-wide signal may drive a shared bus.',
+          'A non inverting line driver reproduces the input logic state at the output when enabled. This is useful for improving fan out, isolating a source from bus loading, and controlling when a byte wide signal may drive a shared bus.',
         ],
       },
       {
         title: 'Dual Enable Logic',
         paragraphs: [
-          'The two-enable arrangement is common in 541-family devices and lets system logic decide exactly when the outputs are allowed onto a bus. It is especially useful in microprocessor and peripheral interfaces.',
+          'The two enable arrangement is common in 541-family devices and lets system logic decide exactly when the outputs are allowed onto a bus. It is especially useful in microprocessor and peripheral interfaces.',
         ],
       },
     ],
@@ -244,20 +244,20 @@ export const CHIPS_BLOCK_63 = {
     ],
   },
 
-  // ── 74x7623 Octal Bus Transceiver (non-inv, TS), 20-pin ──────────────
+  // ── 74x7623 Octal Bus Transceiver (non inv, TS), 20-pin ──────────────
   /* Primary source: Texas Instruments, 74x7623 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls623.pdf
      https://en.wikipedia.org/wiki/Bus_transceiver */
   // Same as 74x245 transceiver
   '74x7623': {
     name: '74x7623',
     simpleName: 'Octal Xcvr (TS)',
-    description: 'Octal bus transceiver, non-inverting, tri-state outputs (20-pin)',
+    description: 'Octal bus transceiver, non inverting, tri state outputs (20-pin)',
     pins: 20,
     vcc: 20,
     gnd: 10,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls623.pdf',
-    tags: ['transceiver', 'bus', 'octal', 'tri-state', 'bidirectional'],
-    guideOverview: 'The 74x7623 is an octal bidirectional bus transceiver in the same functional class as the 623 and 245 families. It lets one 8 bit bus drive another in either direction, while the enable input disconnects the buses when needed. For simulator purposes, ordinary non-inverting octal transceiver behavior is the right abstraction for this family.',
+    tags: ['transceiver', 'bus', 'octal', 'tri state', 'bidirectional'],
+    guideOverview: 'The 74x7623 is an octal bidirectional bus transceiver in the same functional class as the 623 and 245 families. It lets one 8 bit bus drive another in either direction, while the enable input disconnects the buses when needed. For simulator purposes, ordinary non inverting octal transceiver behavior is the right abstraction for this family.',
     guidePinDescriptions: {
       'DIR': 'Direction control. It selects whether the A-side or the B-side is currently driving.',
       'A1': 'Bit 1 on the A-side bus.',
@@ -284,7 +284,7 @@ export const CHIPS_BLOCK_63 = {
       {
         title: 'Bidirectional Bus Control',
         paragraphs: [
-          'A bus transceiver lets two byte-wide signal groups share hardware without always being directly tied together. The direction control chooses which side is the source, and the enable control decides whether the connection is active at all.',
+          'A bus transceiver lets two byte wide signal groups share hardware without always being directly tied together. The direction control chooses which side is the source, and the enable control decides whether the connection is active at all.',
         ],
       },
       {
@@ -334,13 +334,13 @@ export const CHIPS_BLOCK_63 = {
   '74x7640': {
     name: '74x7640',
     simpleName: 'Octal Xcvr Inv (ST)',
-    description: 'Octal inverting bus transceiver, Schmitt-trigger inputs, tri-state (20-pin)',
+    description: 'Octal inverting bus transceiver, Schmitt trigger inputs, tri state (20-pin)',
     pins: 20,
     vcc: 20,
     gnd: 10,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls640.pdf',
-    tags: ['transceiver', 'bus', 'octal', 'tri-state', 'inverting', 'schmitt'],
-    guideOverview: 'The 74x7640 is an octal inverting bus transceiver functionally aligned with the 640 family. It transfers data between two 8 bit buses while inverting the logic state, and it adds Schmitt-trigger inputs to improve hardware tolerance of slow or noisy signals. In the simulator, the correct model is an inverting octal transceiver with three-state control.',
+    tags: ['transceiver', 'bus', 'octal', 'tri state', 'inverting', 'schmitt'],
+    guideOverview: 'The 74x7640 is an octal inverting bus transceiver functionally aligned with the 640 family. It transfers data between two 8 bit buses while inverting the logic state, and it adds Schmitt trigger inputs to improve hardware tolerance of slow or noisy signals. In the simulator, the correct model is an inverting octal transceiver with three state control.',
     guidePinDescriptions: {
       'DIR': 'Direction control. It selects which bus side is currently the source.',
       'A1': 'Bit 1 on the A-side bus.',
@@ -367,13 +367,13 @@ export const CHIPS_BLOCK_63 = {
       {
         title: 'Inverting Transceiver Behavior',
         paragraphs: [
-          'Unlike a non-inverting transceiver, this family outputs the complement of the input data while transferring between the buses. That makes it useful in systems that already use active LOW signaling conventions or need inversion at the bus boundary.',
+          'Unlike a non inverting transceiver, this family outputs the complement of the input data while transferring between the buses. That makes it useful in systems that already use active LOW signaling conventions or need inversion at the bus boundary.',
         ],
       },
       {
         title: 'Schmitt Inputs',
         paragraphs: [
-          'Schmitt-trigger inputs do not change the logical role of the part, but they do make it more tolerant of noisy or slowly changing source signals. The simulator therefore models the inversion and transceiver function, not the analog edge conditioning.',
+          'Schmitt trigger inputs do not change the logical role of the part, but they do make it more tolerant of noisy or slowly changing source signals. The simulator therefore models the inversion and transceiver function, not the analog edge conditioning.',
         ],
       },
     ],
@@ -408,18 +408,18 @@ export const CHIPS_BLOCK_63 = {
     ],
   },
 
-  // ── 74x7643 Octal Bus Transceiver (non-inv/inv, Schmitt, TS), 20-pin ─
+  // ── 74x7643 Octal Bus Transceiver (non inv/inv, Schmitt, TS), 20-pin ─
   /* Primary source: 74x7643 datasheet   URL not yet verified.
      https://en.wikipedia.org/wiki/Bus_transceiver */
   '74x7643': {
     name: '74x7643',
     simpleName: 'Octal Xcvr NI/Inv (ST)',
-    description: 'Octal bus transceiver, non-inverting/inverting, Schmitt, tri-state (20-pin)',
+    description: 'Octal bus transceiver, non inverting/inverting, Schmitt, tri state (20-pin)',
     pins: 20,
     vcc: 20,
     gnd: 10,
     datasheet: '',
-    tags: ['transceiver', 'bus', 'octal', 'tri-state', 'mixed', 'schmitt'],
+    tags: ['transceiver', 'bus', 'octal', 'tri state', 'mixed', 'schmitt'],
     pinout: [
       { pin:  1, name: 'DIR', type: 'input' },
       { pin:  2, name: 'A1',  type: 'io'    },
@@ -451,20 +451,20 @@ export const CHIPS_BLOCK_63 = {
     ],
   },
 
-  // ── 74x7645 Octal Bus Transceiver (non-inv, Schmitt, TS), 20-pin ─────
+  // ── 74x7645 Octal Bus Transceiver (non inv, Schmitt, TS), 20-pin ─────
   /* Primary source: Texas Instruments, 74x7645 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls645.pdf
      https://en.wikipedia.org/wiki/Bus_transceiver */
-  // Same as 74x245 but with Schmitt-trigger inputs
+  // Same as 74x245 but with Schmitt trigger inputs
   '74x7645': {
     name: '74x7645',
     simpleName: 'Octal Xcvr (ST)',
-    description: 'Octal non-inverting bus transceiver, Schmitt-trigger inputs, tri-state (20-pin)',
+    description: 'Octal non inverting bus transceiver, Schmitt inputs, 3-state (20-pin)',
     pins: 20,
     vcc: 20,
     gnd: 10,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls645.pdf',
-    tags: ['transceiver', 'bus', 'octal', 'tri-state', 'schmitt'],
-    guideOverview: 'The 74x7645 is an octal non-inverting bus transceiver aligned with the 645 family. It connects two 8 bit buses and allows data to flow either direction under the control of the direction pin, with three-state outputs preventing contention when the device is disabled. The Schmitt-trigger detail improves hardware robustness, while the simulator models the standard non-inverting transceiver behavior.',
+    tags: ['transceiver', 'bus', 'octal', 'tri state', 'schmitt'],
+    guideOverview: 'The 74x7645 is an octal non inverting bus transceiver aligned with the 645 family. It connects two 8 bit buses and allows data to flow either direction under the control of the direction pin, with three state outputs preventing contention when the device is disabled. The Schmitt trigger detail improves hardware robustness, while the simulator models the standard non inverting transceiver behavior.',
     guidePinDescriptions: {
       'DIR': 'Direction control. It determines whether data flows from A to B or from B to A.',
       'A1': 'Bit 1 on the A-side bus.',
@@ -491,7 +491,7 @@ export const CHIPS_BLOCK_63 = {
       {
         title: '645-Style Transceiver',
         paragraphs: [
-          'This family is a straightforward reversible byte-wide buffer. One side of the bus drives the other, and the direction input decides which side currently has control.',
+          'This family is a straightforward reversible byte wide buffer. One side of the bus drives the other, and the direction input decides which side currently has control.',
         ],
       },
       {
@@ -575,15 +575,15 @@ export const CHIPS_BLOCK_63 = {
   '74x7793': {
     name: '74x7793',
     simpleName: 'Octal D Latch (RB)',
-    description: '8 bit non-inverting transparent latch with readback, tri-state (20-pin)',
+    description: '8 bit non inverting transparent latch with readback, tri state (20-pin)',
     pins: 20,
     vcc: 20,
     gnd: 10,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls373.pdf',
-    tags: ['latch', 'd', 'octal', 'tri-state', 'transparent', 'readback'],
-    guideOverview: 'The 74x7793 is an octal transparent latch with three-state outputs and readback-oriented family behavior. In practical digital use it behaves like a 373-style byte-wide latch: while latch enable is active the outputs follow the inputs, and when the latch closes the last state is held. This is useful for bus interfacing, temporary data storage, and output staging.',
+    tags: ['latch', 'd', 'octal', 'tri state', 'transparent', 'readback'],
+    guideOverview: 'The 74x7793 is an octal transparent latch with three state outputs and readback oriented family behavior. In practical digital use it behaves like a 373-style byte wide latch: while latch enable is active the outputs follow the inputs, and when the latch closes the last state is held. This is useful for bus interfacing, temporary data storage, and output staging.',
     guidePinDescriptions: {
-      'OE': 'Output enable for the three-state outputs. Disable it to disconnect the latch from the bus.',
+      'OE': 'Output enable for the three state outputs. Disable it to disconnect the latch from the bus.',
       '1Q': 'Latched output bit 1.',
       '1D': 'Data input bit 1.',
       '2D': 'Data input bit 2.',
@@ -612,9 +612,9 @@ export const CHIPS_BLOCK_63 = {
         ],
       },
       {
-        title: 'Why Three-State Helps',
+        title: 'Why Three State Helps',
         paragraphs: [
-          'Three-state outputs let the stored byte disconnect from a shared bus when another device needs to drive the same lines. That is why octal latches are common in bused digital designs.',
+          'Three state outputs let the stored byte disconnect from a shared bus when another device needs to drive the same lines. That is why octal latches are common in bused digital designs.',
         ],
       },
     ],
@@ -659,7 +659,7 @@ export const CHIPS_BLOCK_63 = {
     gnd: 4,
     datasheet: 'https://www.ti.com/lit/gpn/sn74lvc2g00',
     tags: ['nand', 'gate', 'dual'],
-    guideOverview: 'The 74x8003 is a simple dual 2 input NAND gate in an 8-pin package. A NAND gate outputs LOW only when both inputs are HIGH, which makes it one of the most flexible building blocks in digital logic. Small dual-gate packages like this are useful when you only need one or two NAND functions and do not want a larger 14-pin logic package on the breadboard.',
+    guideOverview: 'The 74x8003 is a simple dual 2 input NAND gate in an 8-pin package. A NAND gate outputs LOW only when both inputs are HIGH, which makes it one of the most flexible building blocks in digital logic. Small dual gate packages like this are useful when you only need one or two NAND functions and do not want a larger 14-pin logic package on the breadboard.',
     guidePinDescriptions: {
       '1A': 'Input A of NAND gate 1.',
       '1B': 'Input B of NAND gate 1.',
@@ -680,7 +680,7 @@ export const CHIPS_BLOCK_63 = {
       {
         title: 'Small Package Use',
         paragraphs: [
-          'Dual-gate packages are convenient when you only need a little glue logic. They save space and power compared with using a full four-gate package for one small task.',
+          'Dual gate packages are convenient when you only need a little glue logic. They save space and power compared with using a full four gate package for one small task.',
         ],
       },
     ],
@@ -705,13 +705,13 @@ export const CHIPS_BLOCK_63 = {
   '74x8151': {
     name: '74x8151',
     simpleName: '10 bit Buffer (ST)',
-    description: '10 bit inverting/non-inverting buffer, Schmitt-trigger, tri-state (24-pin)',
+    description: '10 bit inverting/non inverting buffer, Schmitt trigger, tri state (24-pin)',
     pins: 24,
     vcc: 24,
     gnd: 12,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74lv8151.pdf',
-    tags: ['buffer', '10 bit', 'tri-state', 'schmitt'],
-    guideOverview: 'The 74x8151 is a 10 bit tri-state buffer with mixed inverting and non-inverting outputs controlled by a single active LOW output enable. Channels 1, 2, 8, 9, and 10 produce inverted outputs, while channels 3 through 7 produce non-inverting outputs. When OE is LOW, all ten buffers drive their respective outputs; when OE is HIGH, all outputs go to high impedance. The Schmitt-trigger inputs give the device noise immunity on slowly changing input signals.',
+    tags: ['buffer', '10 bit', 'tri state', 'schmitt'],
+    guideOverview: 'The 74x8151 is a 10 bit tri state buffer with mixed inverting and non inverting outputs controlled by a single active LOW output enable. Channels 1, 2, 8, 9, and 10 produce inverted outputs, while channels 3 through 7 produce non inverting outputs. When OE is LOW, all ten buffers drive their respective outputs; when OE is HIGH, all outputs go to high impedance. The Schmitt trigger inputs give the device noise immunity on slowly changing input signals.',
     guidePinDescriptions: {
       'OE': 'Output enable for the 10 bit buffer. Use it to connect or disconnect the outputs from the bus.',
       '1A': 'Input channel 1.',
@@ -719,16 +719,16 @@ export const CHIPS_BLOCK_63 = {
       '2A': 'Input channel 2.',
       '2nY': 'Inverting output for channel 2.',
       '3A': 'Input channel 3.',
-      '3Y': 'Non-inverting output for channel 3.',
+      '3Y': 'Non inverting output for channel 3.',
       '4A': 'Input channel 4.',
-      '4Y': 'Non-inverting output for channel 4.',
+      '4Y': 'Non inverting output for channel 4.',
       '5A': 'Input channel 5.',
-      '5Y': 'Non-inverting output for channel 5.',
+      '5Y': 'Non inverting output for channel 5.',
       'GND': 'Ground reference for the device.',
       '6A': 'Input channel 6.',
-      '6Y': 'Non-inverting output for channel 6.',
+      '6Y': 'Non inverting output for channel 6.',
       '7A': 'Input channel 7.',
-      '7Y': 'Non-inverting output for channel 7.',
+      '7Y': 'Non inverting output for channel 7.',
       '8A': 'Input channel 8.',
       '8nY': 'Inverting output for channel 8.',
       '9A': 'Input channel 9.',
@@ -742,8 +742,8 @@ export const CHIPS_BLOCK_63 = {
       {
         title: 'Mixed Polarity Buffering',
         paragraphs: [
-          'This family combines inverting and non-inverting outputs in one package, which can reduce part count when a bus needs both polarities available. That is especially useful in hardware with active LOW control lines mixed with active HIGH data paths.',
-          'Channels 1 and 2 (1A→1nY, 2A→2nY) and channels 8 through 10 (8A→8nY, 9A→9nY, 10A→10nY) produce inverted outputs. Channels 3 through 7 (3A→3Y through 7A→7Y) produce non-inverting outputs.',
+          'This family combines inverting and non inverting outputs in one package, which can reduce part count when a bus needs both polarities available. That is especially useful in hardware with active LOW control lines mixed with active HIGH data paths.',
+          'Channels 1 and 2 (1A→1nY, 2A→2nY) and channels 8 through 10 (8A→8nY, 9A→9nY, 10A→10nY) produce inverted outputs. Channels 3 through 7 (3A→3Y through 7A→7Y) produce non inverting outputs.',
         ],
       },
       {
@@ -793,161 +793,216 @@ export const CHIPS_BLOCK_63 = {
     ],
   },
 
-  // ── 74x8153 8 bit Serial-to-Parallel Interface, 20-pin ───────────────
-  /* Primary source: Texas Instruments, 74x8153 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74lv8153.pdf */
+  // ── 74x8153 Serial-to-Parallel Interface, 20-pin ────────────────────
+  // Source: Texas Instruments, "SN74LV8153 Serial-To-Parallel Interface",
+  //   SCLS555 (June 2004). [Online]. Available:
+  //   https://www.ti.com/lit/ds/symlink/sn74lv8153.pdf. Verified: Description +
+  //   Features (p.1), N/PW package Terminal Assignment (top view, p.1), Function
+  //   Table per buffer (p.1), Pin Description table (p.2), data-transmission
+  //   protocol + Serial-Data Format / Timing Chart (p.3), and Logic Diagram
+  //   (p.4), read as 300-dpi PDF page images (issues.md C4).
+  //
+  // PINOUT FIXED (issues.md C2 / CD4082 lesson): the previous hand-entered stub
+  //   was wrong on essentially every pin. It invented a CLK/CSn/OEn/DIN clocked-
+  //   shift-register interface with Qn7 + five NC pins and a single VCC/GND, and
+  //   pointed `gates` at a NON-EXISTENT engine type (SHIFT_REG_8BIT_CS_OE) — the
+  //   unregistered-gate-type bug that used to freeze the simulator when this part
+  //   was placed (see js/debug/scenarios/all-chips-evaluate.mjs). The real
+  //   SN74LV8153 has NO clock pin. Per SCLS555: 1=VCC1, 2-4=A0/A1/A2 (device
+  //   address), 5=D (serial data in), 6=OUTSEL, 7=RESET, 8=OE (active LOW),
+  //   9=SOUT, 10/11=GND (two ground pins), 12-19=Y7..Y0, 20=VCC2.
+  //
+  // LEFT AS A STUB ON PURPOSE (effort policy — not meaningfully simulatable here).
+  //   The defining function is UART-format reception with AUTOMATIC DATA-RATE
+  //   (baud) DETECTION and no external clock: the chip recovers its bit clock by
+  //   measuring the analog time between the two start bits (frame = 2START-
+  //   3ADDRESS-4DATA-1STOP, two frames per byte, LSB first; the three address
+  //   bits must match the A0-A2 pins or the byte is dropped). This digital,
+  //   settle-to-steady engine has no real-time axis and no clock pin to sample
+  //   on, so that self-timed reception cannot be driven faithfully. Modeling only
+  //   the output stage would leave the data register stuck at its reset value
+  //   (Y0-Y7 could never respond to serial data), which would misrepresent the
+  //   part; inventing a clock/load pin would falsify the real 20-pin device. So
+  //   the gate stays GENERIC_STUB and the 'stub' tag is kept (hidden from the
+  //   picker, browsable in docs). The pinout and docs are corrected to the real
+  //   part regardless. See issues.md "74x8153".
   '74x8153': {
     name: '74x8153',
-    simpleName: '8 bit Ser-to-Par',
-    description: '8 bit serial-to-parallel interface, tri-state or open-collector (20-pin)',
+    simpleName: '8 bit Ser to Par',
+    description: 'UART serial-to-parallel: 8 outputs, push-pull/open-collector (20-pin)',
     pins: 20,
     vcc: 20,
     gnd: 10,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74lv8153.pdf',
-    tags: ['serial', 'parallel', 'interface', '8 bit'],
-    guideOverview: 'The 74x8153 is an 8 bit serial-to-parallel interface device. Serial data on DIN is shifted into an 8-stage register on the rising edge of CLK whenever CSn is LOW. The parallel outputs Q0 Q7 reflect the register contents and are enabled by the active LOW OEn pin; when OEn is HIGH the outputs float to high impedance. Qn7 is the complement of the last register stage and is always active for cascading multiple devices.',
+    tags: ['serial', 'parallel', 'interface', '8 bit', 'uart', 'stub'],
+    guideOverview: 'The 74x8153 turns a single serial data wire into 8 parallel output lines, a common way to add outputs to a controller that is short on pins. A byte arrives on D as two UART-style frames: each frame carries two start bits, the chip address, four data bits and a stop bit. The chip reads its own address from the A0, A1 and A2 pins, so up to eight of these devices can share one D wire and each responds only to frames carrying its address. There is no clock pin   the chip works out the data rate on its own by timing the start bits. Once a full byte is received it appears on Y0 to Y7 and SOUT pulses to acknowledge. OUTSEL picks the output type (push-pull or open-collector for driving LEDs), OE forces the outputs to high impedance, and RESET clears them.',
     guidePinDescriptions: {
-      'Qn7': 'Serial cascade or inverted serial output associated with the internal shift chain.',
-      'Q0': 'Parallel output bit 0.',
-      'Q1': 'Parallel output bit 1.',
-      'Q2': 'Parallel output bit 2.',
-      'Q3': 'Parallel output bit 3.',
-      'Q4': 'Parallel output bit 4.',
-      'Q5': 'Parallel output bit 5.',
-      'Q6': 'Parallel output bit 6.',
-      'Q7': 'Parallel output bit 7.',
-      'GND': 'Ground reference for the device.',
-      'CLK': 'Shift clock input.',
-      'CSn': 'Active LOW chip select or enable input.',
-      'OEn': 'Active LOW output enable for the parallel outputs.',
-      'DIN': 'Serial data input.',
-      'NC1': 'No internal connection. Leave unconnected.',
-      'NC2': 'No internal connection. Leave unconnected.',
-      'NC3': 'No internal connection. Leave unconnected.',
-      'NC4': 'No internal connection. Leave unconnected.',
-      'NC5': 'No internal connection. Leave unconnected.',
-      'VCC': 'Positive supply for the chip.',
+      'VCC1': 'Logic supply (3 to 5.5 V). Powers everything except the Y outputs.',
+      'A0': 'Address pin 0. Sets one bit of this device address so several chips can share the D line.',
+      'A1': 'Address pin 1.',
+      'A2': 'Address pin 2.',
+      'D': 'Serial data input. Receives the UART-format frames, least significant bit first.',
+      'OUTSEL': 'Output type select. LOW = open-collector (outputs inverted, good for LEDs); HIGH = push-pull.',
+      'RESET': 'Clears the output register, driving the outputs to their reset state.',
+      'OE': 'Output enable (active LOW). HIGH forces Y0 to Y7 to high impedance.',
+      'SOUT': 'Status output. Pulses when the latched output data changes. Powered from VCC1.',
+      'GND': 'Ground (pin 10).',
+      'GND2': 'Ground (pin 11). Both ground pins should be tied to ground.',
+      'Y0': 'Parallel output bit 0 (LSB). Powered from VCC2.',
+      'Y1': 'Parallel output bit 1.',
+      'Y2': 'Parallel output bit 2.',
+      'Y3': 'Parallel output bit 3.',
+      'Y4': 'Parallel output bit 4.',
+      'Y5': 'Parallel output bit 5.',
+      'Y6': 'Parallel output bit 6.',
+      'Y7': 'Parallel output bit 7 (MSB).',
+      'VCC2': 'Output supply for Y0 to Y7. Can range from 3 to 12 V, set separately from VCC1.',
     },
     guideSections: [
       {
-        title: 'Serial-To-Parallel Conversion',
+        title: 'One wire in, eight lines out',
         paragraphs: [
-          'A serial-to-parallel interface takes one bit at a time on a serial input and eventually turns that stream into a full output byte. This is a common way to reduce wiring when a controller needs many output lines.',
-          'Data is shifted in with DIN entering at Q0; after eight clocks the most recently received bit occupies Q0 and the earliest bit is at Q7. Qn7, the complement of Q7, provides the cascade output for chaining multiple devices.',
+          'A serial to parallel interface takes data one bit at a time on a single input and rebuilds it into a full output byte. It trades speed for wires: a controller drives one line instead of eight, which matters when pins or board space are tight.',
+          'A byte is sent as two frames on D, lower four bits then upper four. Each frame is two start bits, three address bits, four data bits and a stop bit, sent least significant bit first. The address bits in the frame must match this chip address (set on A0, A1, A2) or the byte is ignored, which is how one D wire can feed up to eight chips independently.',
         ],
       },
       {
-        title: 'Chip Select and Output Enable',
+        title: 'No clock pin',
         paragraphs: [
-          'CSn gates the shift clock: when CSn is HIGH no shifting occurs, so the register is frozen. OEn independently controls the output drivers, allowing the outputs to be disconnected from a shared bus without disturbing the register contents.',
+          'Most serial parts need a separate clock line to mark where each bit begins. This one does not. It measures the time between the two start bits at the front of every frame, uses that to work out the incoming data rate, then samples the rest of the frame at that rate. That is what the start-bit pattern, a 0 then a 1, is for.',
         ],
+      },
+      {
+        title: 'Output type and enable',
+        paragraphs: [
+          'OUTSEL chooses how the outputs drive. In push-pull mode each output actively drives HIGH or LOW. In open-collector mode the output only pulls LOW, and inverts the data, which suits driving LEDs to ground from an external supply on VCC2 up to 12 V. Holding OE HIGH disconnects the outputs to high impedance so the chip can share a bus, and RESET clears the stored byte.',
+        ],
+        note: 'The UART-style reception here is self-timed with no clock pin, which this digital simulator cannot drive faithfully, so the 74x8153 is shown as a documentation reference rather than an interactive part.',
       },
     ],
     pinout: [
-      { pin:  1, name: 'Qn7',  type: 'output' },
-      { pin:  2, name: 'Q0',   type: 'output' },
-      { pin:  3, name: 'Q1',   type: 'output' },
-      { pin:  4, name: 'Q2',   type: 'output' },
-      { pin:  5, name: 'Q3',   type: 'output' },
-      { pin:  6, name: 'Q4',   type: 'output' },
-      { pin:  7, name: 'Q5',   type: 'output' },
-      { pin:  8, name: 'Q6',   type: 'output' },
-      { pin:  9, name: 'Q7',   type: 'output' },
-      { pin: 10, name: 'GND',  type: 'power'  },
-      { pin: 11, name: 'CLK',  type: 'input'  },
-      { pin: 12, name: 'CSn',  type: 'input'  },
-      { pin: 13, name: 'OEn',  type: 'input'  },
-      { pin: 14, name: 'DIN',  type: 'input'  },
-      { pin: 15, name: 'NC1',  type: 'nc'     },
-      { pin: 16, name: 'NC2',  type: 'nc'     },
-      { pin: 17, name: 'NC3',  type: 'nc'     },
-      { pin: 18, name: 'NC4',  type: 'nc'     },
-      { pin: 19, name: 'NC5',  type: 'nc'     },
-      { pin: 20, name: 'VCC',  type: 'power'  },
+      { pin:  1, name: 'VCC1',   type: 'power'  },
+      { pin:  2, name: 'A0',     type: 'input'  },
+      { pin:  3, name: 'A1',     type: 'input'  },
+      { pin:  4, name: 'A2',     type: 'input'  },
+      { pin:  5, name: 'D',      type: 'input'  },
+      { pin:  6, name: 'OUTSEL', type: 'input'  },
+      { pin:  7, name: 'RESET',  type: 'input'  },
+      { pin:  8, name: 'OE',     type: 'input'  },
+      { pin:  9, name: 'SOUT',   type: 'output' },
+      { pin: 10, name: 'GND',    type: 'power'  },
+      { pin: 11, name: 'GND2',   type: 'power'  },
+      { pin: 12, name: 'Y7',     type: 'output' },
+      { pin: 13, name: 'Y6',     type: 'output' },
+      { pin: 14, name: 'Y5',     type: 'output' },
+      { pin: 15, name: 'Y4',     type: 'output' },
+      { pin: 16, name: 'Y3',     type: 'output' },
+      { pin: 17, name: 'Y2',     type: 'output' },
+      { pin: 18, name: 'Y1',     type: 'output' },
+      { pin: 19, name: 'Y0',     type: 'output' },
+      { pin: 20, name: 'VCC2',   type: 'power'  },
     ],
     gates: [
-      { type: 'SHIFT_REG_8BIT_CS_OE',
-        inputs:  ['DIN', 'CLK', 'CSn', 'OEn'],
-        outputs: ['Q0', 'Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q7', 'Qn7'] },
+      // Documentation stub: UART auto-baud reception has no clock pin and is not
+      // faithfully drivable in this engine (see header comment + issues.md).
+      { type: 'GENERIC_STUB',
+        inputs:  ['A0', 'A1', 'A2', 'D', 'OUTSEL', 'RESET', 'OE'],
+        outputs: ['Y0', 'Y1', 'Y2', 'Y3', 'Y4', 'Y5', 'Y6', 'Y7', 'SOUT'] },
     ],
     sequential: true,
   },
 
   // ── 74x8154 Dual 16 bit Counters w/ Output Registers, 20-pin ─────────
-  /* Primary source: Texas Instruments, 74x8154 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74lv8154.pdf
-     https://en.wikipedia.org/wiki/Counter_(digital) */
+  // Source: Texas Instruments, "SN74LV8154 Dual 16-Bit Binary Counters With
+  //   3-State Output Registers", SCLS589B (Aug. 2004, rev. May 2020).
+  //   [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74lv8154.pdf.
+  //   Verified: Pin Configuration + Pin Functions (Table 1, p.3), Function
+  //   Table (Table 2, p.10), Functional Block Diagram (8.2, p.9) and Detailed
+  //   Description (8.1/8.3, p.9), read as 200-dpi PDF page images (issues.md C4).
+  // NOTE: the previous hand-entered stub pinout was wrong (it modeled the part
+  //   as two 8-bit counters with RCO1/RCO2/CLR1/CLR2/OEn). The real device is
+  //   dual 16-bit with four active-LOW byte gates GAL/GAU/GBL/GBU, one active-LOW
+  //   clock enable CLKBEN, one async clear CCLR, and one carry RCOA. Rebuilt
+  //   from the datasheet, not from a sibling (issues.md C2).
   '74x8154': {
     name: '74x8154',
     simpleName: 'Dual 16 bit Ctr',
-    description: 'Dual 16 bit counters with output registers, tri-state (20-pin)',
+    description: 'Dual 16 bit binary counters with a 3-state output register (20-pin)',
     pins: 20,
     vcc: 20,
     gnd: 10,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74lv8154.pdf',
     tags: ['counter', '16 bit', 'dual', 'register'],
-    guideOverview: 'The 74x8154 combines two independent 8 bit binary counters (A and B) with a shared 8 bit output register. Counter A is clocked by CLKA and counter B by CLKB. Both counters can be cascaded RCO1 is the terminal-count output of counter A and can be connected to CLKB to form a 16 bit ripple counter. An active LOW CLR1 asynchronously clears counter A and CLR2 clears counter B. A rising edge on RCLK simultaneously latches both counter values into the output register. GAL=HIGH selects the lower byte (counter A) and GAH=HIGH selects the upper byte (counter B) for output on Y0 Y7; the active LOW OEn enables those drivers.',
+    guideOverview: 'The 74x8154 holds two independent 16 bit binary counters, A and B, that share an 8 bit output bus. Counter A counts up on each rising edge of CLKA; counter B counts up on each rising edge of CLKB, but only while CLKBEN is LOW. A LOW on CCLR clears both counters to zero at once. A rising edge on RCLK copies both counters into a 32 bit storage register, so the outside world reads a frozen snapshot while the counters keep running. The bus only carries one byte at a time: four active LOW gates pick which byte appears on Y0 Y7   GAL for counter A low byte, GAU for A high byte, GBL for B low byte, GBU for B high byte. With all four gates HIGH the bus is high impedance. RCOA goes LOW when counter A is at full count (FFFF) and about to roll over; wire RCOA to CLKBEN to chain the two halves into one 32 bit counter.',
     guidePinDescriptions: {
-      'RCO1': 'Ripple-carry or terminal-count output for counter section 1.',
-      'CLKA': 'Clock input for counter section 1.',
-      'GAL': 'Gate or enable control associated with section 1 in the local definition.',
-      'CLR1': 'Clear input for counter section 1.',
-      'Y0': 'Output register bit 0.',
-      'Y1': 'Output register bit 1.',
-      'Y2': 'Output register bit 2.',
-      'Y3': 'Output register bit 3.',
-      'Y4': 'Output register bit 4.',
+      'CLKA': 'Clock for counter A. Counter A counts up on the rising edge.',
+      'CLKB': 'Clock for counter B. Counter B counts up on the rising edge while CLKBEN is LOW.',
+      'CLKBEN': 'Active LOW clock enable for counter B. LOW lets CLKB clock counter B; HIGH freezes it.',
+      'CCLR': 'Active LOW clear. A LOW resets both counters to zero immediately, independent of any clock.',
+      'RCLK': 'Register clock. A rising edge copies both counters into the storage register.',
+      'GAL': 'Active LOW gate. A LOW puts the low byte of counter A onto Y0 Y7.',
+      'GAU': 'Active LOW gate. A LOW puts the high byte of counter A onto Y0 Y7.',
+      'GBL': 'Active LOW gate. A LOW puts the low byte of counter B onto Y0 Y7.',
+      'GBU': 'Active LOW gate. A LOW puts the high byte of counter B onto Y0 Y7.',
+      'RCOA': 'Active LOW carry. Goes LOW when counter A reaches full count (FFFF). Connect to CLKBEN to cascade.',
+      'Y0': 'Output bus bit 0 (LSB of the selected byte), 3-state.',
+      'Y1': 'Output bus bit 1, 3-state.',
+      'Y2': 'Output bus bit 2, 3-state.',
+      'Y3': 'Output bus bit 3, 3-state.',
+      'Y4': 'Output bus bit 4, 3-state.',
+      'Y5': 'Output bus bit 5, 3-state.',
+      'Y6': 'Output bus bit 6, 3-state.',
+      'Y7': 'Output bus bit 7 (MSB of the selected byte), 3-state.',
       'GND': 'Ground reference for the package.',
-      'Y5': 'Output register bit 5.',
-      'Y6': 'Output register bit 6.',
-      'Y7': 'Output register bit 7.',
-      'CLR2': 'Clear input for counter section 2.',
-      'GAH': 'Gate or enable control associated with section 2 in the local definition.',
-      'CLKB': 'Clock input for counter section 2.',
-      'RCO2': 'Ripple-carry or terminal-count output for counter section 2.',
-      'OEn': 'Active LOW output enable for the registered outputs.',
-      'RCLK': 'Register clock input used to capture counter data into the outputs.',
       'VCC': 'Positive supply for the device.',
     },
     guideSections: [
       {
-        title: 'Counter Plus Output Register',
+        title: 'Counter plus storage register',
         paragraphs: [
-          'Separating the live counter state from the visible output register lets the chip keep counting while presenting a stable snapshot to the outside world. That is valuable in measurement and interface circuits where a bus should not see constantly changing count bits.',
-          'A rising edge on RCLK freezes both counters into the output register simultaneously. GAL then selects counter A\'s byte and GAH selects counter B\'s byte for reading via the Y0 Y7 bus.',
+          'Each counter has 32 bits of state to read but only 8 wires to read it on, so the chip splits the job. The counters never stop. RCLK takes a snapshot: on its rising edge both 16 bit counts are copied into a storage register and held there until the next RCLK edge. You read the snapshot at your leisure while the counters move on underneath.',
+          'This is what makes the part useful as a frequency or event counter. A signal drives CLKA, you pulse RCLK once per measurement window, then read four bytes off the bus without ever racing a changing count.',
         ],
       },
       {
-        title: 'Cascading',
+        title: 'Reading one byte at a time',
         paragraphs: [
-          'RCO1 goes HIGH when counter A reaches 255. Connecting RCO1 to CLKB creates a 16 bit ripple counter. RCO2 serves the same role for counter B when cascading further.',
+          'The 32 bit snapshot is four bytes: A low, A high, B low, B high. Only one reaches the Y0 Y7 bus at a time, chosen by the four gates GAL, GAU, GBL, GBU. The gates are active LOW   pull exactly one LOW to read its byte. With all four HIGH the bus is high impedance, so several chips can share the same eight wires.',
+        ],
+      },
+      {
+        title: 'Cascading to 32 bits',
+        paragraphs: [
+          'RCOA goes LOW when counter A is full (FFFF) and would roll over on the next CLKA edge. CLKBEN is an active LOW enable on counter B. Tie RCOA to CLKBEN and drive both clocks together, and counter B advances exactly once each time counter A wraps   the two 16 bit halves act as one 32 bit counter.',
         ],
       },
     ],
     pinout: [
-      { pin:  1, name: 'RCO1',  type: 'output' },
-      { pin:  2, name: 'CLKA',  type: 'input'  },
-      { pin:  3, name: 'GAL',   type: 'input'  },
-      { pin:  4, name: 'CLR1',  type: 'input'  },
-      { pin:  5, name: 'Y0',    type: 'output' },
-      { pin:  6, name: 'Y1',    type: 'output' },
-      { pin:  7, name: 'Y2',    type: 'output' },
-      { pin:  8, name: 'Y3',    type: 'output' },
-      { pin:  9, name: 'Y4',    type: 'output' },
-      { pin: 10, name: 'GND',   type: 'power'  },
-      { pin: 11, name: 'Y5',    type: 'output' },
-      { pin: 12, name: 'Y6',    type: 'output' },
-      { pin: 13, name: 'Y7',    type: 'output' },
-      { pin: 14, name: 'CLR2',  type: 'input'  },
-      { pin: 15, name: 'GAH',   type: 'input'  },
-      { pin: 16, name: 'CLKB',  type: 'input'  },
-      { pin: 17, name: 'RCO2',  type: 'output' },
-      { pin: 18, name: 'OEn',   type: 'input'  },
-      { pin: 19, name: 'RCLK',  type: 'input'  },
-      { pin: 20, name: 'VCC',   type: 'power'  },
+      { pin:  1, name: 'CLKA',   type: 'input'  },
+      { pin:  2, name: 'CLKB',   type: 'input'  },
+      { pin:  3, name: 'GAL',    type: 'input'  },
+      { pin:  4, name: 'GAU',    type: 'input'  },
+      { pin:  5, name: 'GBL',    type: 'input'  },
+      { pin:  6, name: 'GBU',    type: 'input'  },
+      { pin:  7, name: 'RCLK',   type: 'input'  },
+      { pin:  8, name: 'RCOA',   type: 'output' },
+      { pin:  9, name: 'CLKBEN', type: 'input'  },
+      { pin: 10, name: 'GND',    type: 'power'  },
+      { pin: 11, name: 'CCLR',   type: 'input'  },
+      { pin: 12, name: 'Y7',     type: 'output' },
+      { pin: 13, name: 'Y6',     type: 'output' },
+      { pin: 14, name: 'Y5',     type: 'output' },
+      { pin: 15, name: 'Y4',     type: 'output' },
+      { pin: 16, name: 'Y3',     type: 'output' },
+      { pin: 17, name: 'Y2',     type: 'output' },
+      { pin: 18, name: 'Y1',     type: 'output' },
+      { pin: 19, name: 'Y0',     type: 'output' },
+      { pin: 20, name: 'VCC',    type: 'power'  },
     ],
     gates: [
-      { type: 'DUAL_CTR_8BIT_REG',
-        inputs:  ['CLKA', 'CLKB', 'GAL', 'GAH', 'CLR1', 'CLR2', 'OEn', 'RCLK'],
-        outputs: ['Y0', 'Y1', 'Y2', 'Y3', 'Y4', 'Y5', 'Y6', 'Y7', 'RCO1', 'RCO2'] },
+      { type: 'DUAL_CTR16_REG_TRI',
+        inputs:  ['CLKA', 'CLKB', 'CLKBEN', 'CCLR', 'RCLK', 'GAL', 'GAU', 'GBL', 'GBU'],
+        outputs: ['Y0', 'Y1', 'Y2', 'Y3', 'Y4', 'Y5', 'Y6', 'Y7', 'RCOA'] },
     ],
     sequential: true,
   },
@@ -1002,36 +1057,36 @@ export const CHIPS_BLOCK_63 = {
   '74x8240': {
     name: '74x8240',
     simpleName: 'Octal Inv Buffer (JTAG)',
-    description: 'Octal inverting buffer/line driver with JTAG boundary scan, tri-state (24-pin)',
+    description: 'Octal inverting buffer/line driver, JTAG boundary scan, 3-state (24-pin)',
     pins: 24,
     vcc: 24,
     gnd: 12,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74bct8240a.pdf',
-    tags: ['buffer', 'driver', 'octal', 'tri-state', 'inverting', 'jtag'],
-    guideOverview: 'The 74x8240 is an octal inverting tri-state buffer with boundary scan support. At the ordinary logic level it behaves exactly like a 74x240 inverting line driver: each 4 bit bank has its own active LOW output-enable, and every enabled output is the logical inverse of its input. The extra JTAG pins (TDI, TDO, TMS, TCK) support boundary scan test access in larger systems but do not affect normal logic operation. The simulator models the inverting buffer function; the JTAG TAP state machine is not simulated.',
+    tags: ['buffer', 'driver', 'octal', 'tri state', 'inverting', 'jtag'],
+    guideOverview: 'The 74x8240 is an octal inverting tri state buffer with boundary scan support. At the ordinary logic level it behaves exactly like a 74x240 inverting line driver: each 4 bit bank has its own active LOW output-enable, and every enabled output is the logical inverse of its input. The extra JTAG pins (TDI, TDO, TMS, TCK) support boundary scan test access in larger systems but do not affect normal logic operation. The simulator models the inverting buffer function; the JTAG TAP state machine is not simulated.',
     guidePinDescriptions: {
-      'TDO': 'JTAG test-data output.',
+      'TDO': 'JTAG test data output.',
       '1OE': 'Enable control for bank 1 of the buffer outputs.',
       '1A1': 'Input bit 1 of bank 1.',
-      '2Y4': 'Inverting tri-state output bit 4 of bank 2.',
+      '2Y4': 'Inverting tri state output bit 4 of bank 2.',
       '1A2': 'Input bit 2 of bank 1.',
-      '2Y3': 'Inverting tri-state output bit 3 of bank 2.',
+      '2Y3': 'Inverting tri state output bit 3 of bank 2.',
       '1A3': 'Input bit 3 of bank 1.',
-      '2Y2': 'Inverting tri-state output bit 2 of bank 2.',
+      '2Y2': 'Inverting tri state output bit 2 of bank 2.',
       '1A4': 'Input bit 4 of bank 1.',
-      '2Y1': 'Inverting tri-state output bit 1 of bank 2.',
-      'TDI': 'JTAG test-data input.',
+      '2Y1': 'Inverting tri state output bit 1 of bank 2.',
+      'TDI': 'JTAG test data input.',
       'GND': 'Ground reference for the device.',
       '2A1': 'Input bit 1 of bank 2.',
-      '1Y4': 'Inverting tri-state output bit 4 of bank 1.',
+      '1Y4': 'Inverting tri state output bit 4 of bank 1.',
       '2A2': 'Input bit 2 of bank 2.',
-      '1Y3': 'Inverting tri-state output bit 3 of bank 1.',
+      '1Y3': 'Inverting tri state output bit 3 of bank 1.',
       '2A3': 'Input bit 3 of bank 2.',
-      '1Y2': 'Inverting tri-state output bit 2 of bank 1.',
+      '1Y2': 'Inverting tri state output bit 2 of bank 1.',
       '2A4': 'Input bit 4 of bank 2.',
-      '1Y1': 'Inverting tri-state output bit 1 of bank 1.',
+      '1Y1': 'Inverting tri state output bit 1 of bank 1.',
       '2OE': 'Enable control for bank 2 of the buffer outputs.',
-      'TMS': 'JTAG test-mode select input.',
+      'TMS': 'JTAG test mode select input.',
       'TCK': 'JTAG test clock input.',
       'VCC': 'Positive supply for the device.',
     },
@@ -1039,7 +1094,7 @@ export const CHIPS_BLOCK_63 = {
       {
         title: '240-Style Driver With Boundary Scan',
         paragraphs: [
-          'At its core, the device is an octal inverting tri-state line driver. Pull 1OE LOW to enable the 1A→1Y inverting bank; pull 2OE LOW to enable the 2A→2Y bank. When an enable is HIGH the corresponding outputs float to high impedance.',
+          'At its core, the device is an octal inverting tri state line driver. Pull 1OE LOW to enable the 1A→1Y inverting bank; pull 2OE LOW to enable the 2A→2Y bank. When an enable is HIGH the corresponding outputs float to high impedance.',
           'The JTAG pins (TDI, TDO, TMS, TCK) are present for manufacturing test and boundary scan chains. They do not affect normal logic operation. The simulator models the buffer function only; the JTAG TAP state machine is not simulated.',
         ],
       },

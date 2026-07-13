@@ -1,7 +1,7 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  font-family: 'SF Mono', 'Menlo', 'Monaco', 'Consolas', monospace;
+  font-family: var(--font-body);
   background: var(--bg);
   color: var(--text-dim);
   min-height: 100vh;

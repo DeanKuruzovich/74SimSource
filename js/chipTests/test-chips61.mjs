@@ -1,21 +1,20 @@
 // test-chips61.mjs - Tests for all chips defined in js/chips/chips61.js
 // Chips under test:
-//   74x6311  : DRAM Access Detector (GENERIC_STUB, 20-pin)
-//   74x6323  : Ripple Counter/Osc (GENERIC_STUB, 8-pin)
-//   74x6800  : 10 bit Bus Switch (GENERIC_STUB, 24-pin)
-//   74x6845  : 8 bit Bus Switch (GENERIC_STUB, 20-pin)
-//   74x7001  : Quad AND Schmitt (AND, 14-pin)
-//   74x7002  : Quad NOR Schmitt (NOR, 14-pin)
-//   74x7003  : Quad NAND Schmitt OC (NAND, 14-pin)
-//   74x7006  : Mixed Gate (NOT/NAND3/NAND4/NOR3/NOR4/NOT, 24-pin)
-//   74x7007  : Hex Buffer (BUFFER, 14-pin)
-//   74x7008  : Mixed Gate (NOT/NAND/NAND/NAND/NOR/NOR/NOR/NOT, 24-pin)
-//   74x7014  : Hex Buffer Schmitt (BUFFER, 14-pin)
-//   74x7022  : ÷8 Johnson Counter (GENERIC_STUB, 14-pin)
-//   74x7032  : Quad OR Schmitt (OR, 14-pin)
-//   74x7038  : 9 bit Transceiver/Latch (GENERIC_STUB, 24-pin)
-//   74x7046  : PLL/VCO (PLL_7046, 16-pin)
-//   74x7060  : 14-stage Counter/Osc (GENERIC_STUB, 20-pin)
+//   74x6311  : DRAM Access Detector (GENERIC_STUB, 20 pin)
+//   74x6323  : Ripple Counter/Osc (GENERIC_STUB, 8 pin)
+//   74x6800  : 10 bit Bus Switch (GENERIC_STUB, 24 pin)
+//   74x6845  : 8 bit Bus Switch (GENERIC_STUB, 20 pin)
+//   74x7001  : Quad AND Schmitt (AND, 14 pin)
+//   74x7002  : Quad NOR Schmitt (NOR, 14 pin)
+//   74x7003  : Quad NAND Schmitt OC (NAND, 14 pin)
+//   74x7006  : Mixed Gate (NOT/NAND3/NAND4/NOR3/NOR4/NOT, 24 pin)
+//   74x7007  : Hex Buffer (BUFFER, 14 pin)
+//   74x7008  : Mixed Gate (NOT/NAND/NAND/NAND/NOR/NOR/NOR/NOT, 24 pin)
+//   74x7014  : Hex Buffer Schmitt (BUFFER, 14 pin)
+//   74x7022  : ÷8 Johnson Counter (GENERIC_STUB, 14 pin)
+//   74x7032  : Quad OR Schmitt (OR, 14 pin)
+//   74x7038  : 9 bit Transceiver/Latch (GENERIC_STUB, 24 pin)
+//   74x7060  : 14-stage Counter/Osc (GENERIC_STUB, 20 pin)
 
 import { CHIPS_BLOCK_61 } from '../chips/chips61.js';
 import { BreadboardWorld, holeId } from '../breadboard.js';
@@ -108,7 +107,7 @@ function simulate(world, wm, chips) {
 const EXPECTED_IDS = [
   '74x6311', '74x6323', '74x6800', '74x6845', '74x7001', '74x7002',
   '74x7003', '74x7006', '74x7007', '74x7008', '74x7014', '74x7022',
-  '74x7032', '74x7038', '74x7046', '74x7060',
+  '74x7032', '74x7038', '74x7060',
 ];
 
 const EXPECTED_SPECS = {
@@ -126,16 +125,15 @@ const EXPECTED_SPECS = {
   '74x7022': { pins: 14, gnd:  7, vcc: 14 },
   '74x7032': { pins: 14, gnd:  7, vcc: 14 },
   '74x7038': { pins: 24, gnd: 12, vcc: 24 },
-  '74x7046': { pins: 16, gnd:  8, vcc: 16 },
   '74x7060': { pins: 20, gnd: 10, vcc: 20 },
 };
 
 console.log('\n=== SECTION S: Structure ===');
 
-// S1 - Block has exactly 16 entries
+// S1 - Block has exactly 15 entries
 {
   const keys = Object.keys(CHIPS_BLOCK_61);
-  assert(keys.length === 16, `S1: block has ${keys.length} entries, expected 16`);
+  assert(keys.length === 15, `S1: block has ${keys.length} entries, expected 15`);
 }
 
 // S2 - Every expected chip ID resolves
@@ -260,7 +258,7 @@ console.log('\n=== SECTION B: 74x7002 (Quad NOR Schmitt) ===');
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SECTION C: 74x7003 - Quad 2 input NAND (Schmitt trigger, open-collector)
+// SECTION C: 74x7003 - Quad 2 input NAND (Schmitt trigger, open collector)
 // Same logic as 74x03/74x00
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -519,7 +517,7 @@ console.log('\n=== SECTION F: 74x7008 (Mixed Gate) ===');
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SECTION G: 74x7014 - Hex Schmitt-trigger buffer (non-inverting)
+// SECTION G: 74x7014 - Hex Schmitt trigger buffer (non inverting)
 // Same logic as 74x7007 / 74x07
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -598,104 +596,6 @@ for (const id of STUB_IDS) {
     assert(true, `T: ${id} simulates without error`);
   } catch (e) {
     fail++; console.error(`  ✗ T: ${id} simulation error: ${e.message}`);
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// SECTION P - 74x7046 PLL
-// ─────────────────────────────────────────────────────────────────────────────
-
-console.log('\n=== SECTION P: 74x7046 PLL ===');
-
-{
-  const chipId = '74x7046';
-
-  // P1 - gate structure: one PLL_7046 gate
-  {
-    const def = CHIPS_BLOCK_61[chipId];
-    assert(def.gates.length === 1, 'P1: 74x7046 has 1 gate');
-    assert(def.gates[0].type === 'PLL_7046', 'P1: gate type is PLL_7046');
-  }
-
-  // P2 - PC1 = SIGi XOR COMPi; PC2 = XNOR
-  {
-    const { world, chip, wm } = setupChipWithPower(chipId);
-    connectHigh(wm, chip, 'SIGi'); connectLow(wm, chip, 'COMPi');
-    connectLow(wm, chip, 'INH');
-    const sim = simulate(world, wm, chip);
-    assertPinHigh(sim, chip, 'PC1', 'P2a: SIG=H COMPi=L → PC1=H');
-    assertPinLow(sim,  chip, 'PC2', 'P2a: SIG=H COMPi=L → PC2=L');
-  }
-  {
-    const { world, chip, wm } = setupChipWithPower(chipId);
-    connectHigh(wm, chip, 'SIGi'); connectHigh(wm, chip, 'COMPi');
-    connectLow(wm, chip, 'INH');
-    const sim = simulate(world, wm, chip);
-    assertPinLow(sim,  chip, 'PC1', 'P2b: SIG=H COMPi=H → PC1=L');
-    assertPinHigh(sim, chip, 'PC2', 'P2b: SIG=H COMPi=H → PC2=H');
-  }
-  {
-    const { world, chip, wm } = setupChipWithPower(chipId);
-    connectLow(wm, chip, 'SIGi'); connectLow(wm, chip, 'COMPi');
-    connectLow(wm, chip, 'INH');
-    const sim = simulate(world, wm, chip);
-    assertPinLow(sim,  chip, 'PC1', 'P2c: SIG=L COMPi=L → PC1=L');
-    assertPinHigh(sim, chip, 'PC2', 'P2c: SIG=L COMPi=L → PC2=H');
-  }
-
-  // P3 - PC3 (lock detect): high when SIGi === COMPi
-  {
-    const { world, chip, wm } = setupChipWithPower(chipId);
-    connectLow(wm, chip, 'SIGi'); connectLow(wm, chip, 'COMPi');
-    connectLow(wm, chip, 'INH');
-    const sim = simulate(world, wm, chip);
-    assertPinHigh(sim, chip, 'PC3', 'P3a: SIG=L COMPi=L → PC3=H (locked)');
-  }
-  {
-    const { world, chip, wm } = setupChipWithPower(chipId);
-    connectHigh(wm, chip, 'SIGi'); connectHigh(wm, chip, 'COMPi');
-    connectLow(wm, chip, 'INH');
-    const sim = simulate(world, wm, chip);
-    assertPinHigh(sim, chip, 'PC3', 'P3b: SIG=H COMPi=H → PC3=H (locked)');
-  }
-  {
-    const { world, chip, wm } = setupChipWithPower(chipId);
-    connectHigh(wm, chip, 'SIGi'); connectLow(wm, chip, 'COMPi');
-    connectLow(wm, chip, 'INH');
-    const sim = simulate(world, wm, chip);
-    assertPinLow(sim, chip, 'PC3', 'P3c: SIG=H COMPi=L → PC3=L (unlocked)');
-  }
-
-  // P4 - VCOo and DEMo: follow SIGi when INH=L; LOW when INH=H
-  {
-    const { world, chip, wm } = setupChipWithPower(chipId);
-    connectHigh(wm, chip, 'SIGi'); connectLow(wm, chip, 'COMPi');
-    connectLow(wm, chip, 'INH');
-    const sim = simulate(world, wm, chip);
-    assertPinHigh(sim, chip, 'VCOo', 'P4a: INH=L, SIG=H → VCOo=H');
-    assertPinHigh(sim, chip, 'DEMo', 'P4a: INH=L, SIG=H → DEMo=H');
-  }
-  {
-    const { world, chip, wm } = setupChipWithPower(chipId);
-    connectLow(wm, chip, 'SIGi'); connectLow(wm, chip, 'COMPi');
-    connectLow(wm, chip, 'INH');
-    const sim = simulate(world, wm, chip);
-    assertPinLow(sim, chip, 'VCOo', 'P4b: INH=L, SIG=L → VCOo=L');
-    assertPinLow(sim, chip, 'DEMo', 'P4b: INH=L, SIG=L → DEMo=L');
-  }
-  {
-    const { world, chip, wm } = setupChipWithPower(chipId);
-    connectHigh(wm, chip, 'SIGi'); connectLow(wm, chip, 'COMPi');
-    connectHigh(wm, chip, 'INH');
-    const sim = simulate(world, wm, chip);
-    assertPinLow(sim, chip, 'VCOo', 'P4c: INH=H, SIG=H → VCOo=L (inhibited)');
-    assertPinLow(sim, chip, 'DEMo', 'P4c: INH=H, SIG=H → DEMo=L (inhibited)');
-  }
-
-  // P5 - tags include 'pll'
-  {
-    const def = CHIPS_BLOCK_61[chipId];
-    assert(def.tags.includes('pll'), 'P5: 74x7046 has pll tag');
   }
 }
 

@@ -105,11 +105,15 @@ export const COMP = {
   PUSH_BUTTON: 'push_button',
   SWITCH: 'switch',
   SLIDE_SWITCH: 'slide_switch',
+  DIP_SWITCH: 'dip_switch',
   RESISTOR: 'resistor',
   CAPACITOR: 'capacitor',
   POLARIZED_CAPACITOR: 'polarized_capacitor',
+  INDUCTOR: 'inductor',
   DIODE: 'diode',
   CLOCK: 'clock',
+  CRYSTAL: 'crystal',
+  TESTPOINT: 'testpoint',
 };
 
 // Interaction modes
@@ -128,11 +132,13 @@ export const MODE = {
   MOVE_COMP: 'move_comp',
   // Drag one endpoint of an existing wire to a new hole
   MOVE_WIRE_EP: 'move_wire_ep',
-  // Drag one pin of a wire-like 2-pin component to a new hole
+  // Drag one pin of a wire-like 2 pin component to a new hole
   MOVE_COMP_EP: 'move_comp_ep',
+  // Multi-item paste: ghost cluster follows the cursor; click to commit
+  PASTE_PREVIEW: 'paste_preview',
 };
 
-// Max distance (in grid squares) for wire-like 2-pin components
+// Max distance (in grid squares) for wire-like 2 pin components
 export const COMP_MAX_DIST = {
   [COMP.RESISTOR]: 17,
   [COMP.BUTTON]: 5,
@@ -141,16 +147,19 @@ export const COMP_MAX_DIST = {
   [COMP.LED]: 8,
   [COMP.CAPACITOR]: 17,
   [COMP.POLARIZED_CAPACITOR]: 17,
+  [COMP.INDUCTOR]: 17,
   [COMP.DIODE]: 8,
+  [COMP.CRYSTAL]: 14,
 };
 
 // ── Drive-strength model for chip output pins ──────────────────────────────
 // Used by the simulator to properly model floating nodes, pull up/pull down
-// resistors, tri-state outputs, and open-collector outputs.
+// resistors, tri state outputs, and open collector outputs.
 export const DRIVE = {
-  PUSH_PULL: 'push_pull',   // Normal totem-pole output: drives HIGH or LOW
-  HIGH_Z:    'high_z',      // High-impedance: pin disconnected (tri-state off, OC off)
-  SINK_ONLY: 'sink_only',   // Open-collector active: can only sink current to GND
+  PUSH_PULL:      'push_pull',      // Normal totem pole output: drives HIGH or LOW
+  HIGH_Z:         'high_z',         // High-impedance: pin disconnected (tri state off, OC off)
+  SINK_ONLY:      'sink_only',      // Open collector active: can only sink current to GND
+  CURRENT_SOURCE: 'current_source', // Ideal current source: injects a fixed current (constant-I drivers like 74x143)
 };
 
 // Chip output impedance (Ω) limits max source/sink current to ~7 mA (5 V / 714 Ω)
@@ -163,28 +172,47 @@ export const TTL_INPUT_R_PULLUP = 100000; // 100kΩ
 
 // ── 74 series family specs ─────────────────────────────────────────────────
 // Each family defines the input thresholds, output impedance, floating input
-// behavior, fan-out limit, and max clock frequency used by the simulator and
+// behavior, fan out limit, and max clock frequency used by the simulator and
 // warnings builder. VTH is the internal HIGH/LOW switching threshold.
+// VT_PLUS / VT_MINUS are Schmitt-trigger thresholds (only the Schmitt-input
+// chips use them, e.g. 74x14). TPD_NS is the family's typical simple-gate
+// propagation delay, used by the timing-analysis engine (js/timing.js) when a
+// chip def carries no explicit `tpd`. Datasheet typicals at VCC = 5 V.
 export const FAMILY_SPEC = {
-  LS:  { label: '74LS',  VIH: 2.0, VIL: 0.8, VTH: 1.4, R_OUT: 714, TTL_PULLUP: 100000, MAX_FREQ_HZ: 35e6, MAX_FANOUT: 10, FLOAT_HIGH: true  },
-  HC:  { label: '74HC',  VIH: 3.5, VIL: 1.5, VTH: 2.5, R_OUT: 150, TTL_PULLUP: null,   MAX_FREQ_HZ: 25e6, MAX_FANOUT: 50, FLOAT_HIGH: false },
-  HCT: { label: '74HCT', VIH: 2.0, VIL: 0.8, VTH: 1.4, R_OUT: 150, TTL_PULLUP: null,   MAX_FREQ_HZ: 25e6, MAX_FANOUT: 50, FLOAT_HIGH: false },
+  LS:  { label: '74LS',  VIH: 2.0, VIL: 0.8, VTH: 1.4, VT_PLUS: 1.6, VT_MINUS: 0.8, R_OUT: 714, TTL_PULLUP: 100000, MAX_FREQ_HZ: 35e6,  MAX_FANOUT: 10, FLOAT_HIGH: true,  TPD_NS: 12 },
+  HC:  { label: '74HC',  VIH: 3.5, VIL: 1.5, VTH: 2.5, VT_PLUS: 2.7, VT_MINUS: 1.8, R_OUT: 150, TTL_PULLUP: null,   MAX_FREQ_HZ: 25e6,  MAX_FANOUT: 50, FLOAT_HIGH: false, TPD_NS: 9  },
+  HCT: { label: '74HCT', VIH: 2.0, VIL: 0.8, VTH: 1.4, VT_PLUS: 1.6, VT_MINUS: 0.9, R_OUT: 150, TTL_PULLUP: null,   MAX_FREQ_HZ: 25e6,  MAX_FANOUT: 50, FLOAT_HIGH: false, TPD_NS: 10 },
+  LVC: { label: '74LVC', VIH: 2.0, VIL: 0.8, VTH: 1.4, VT_PLUS: 1.6, VT_MINUS: 0.8, R_OUT: 50,  TTL_PULLUP: null,   MAX_FREQ_HZ: 100e6, MAX_FANOUT: 50, FLOAT_HIGH: false, TPD_NS: 4  },
 };
 export const DEFAULT_FAMILY = 'LS';
 export const getFamilySpec = (key) => FAMILY_SPEC[key] || FAMILY_SPEC.LS;
+
+// CMOS 4000-series typical propagation delay at VCC = 5 V (ns). The 4000
+// series doesn't ride the 74-family dial above — at 5 V these parts are
+// several times slower than any 74 family, which the timing-analysis mode
+// deliberately shows off. Used for CD-prefix chips without an explicit `tpd`.
+export const CMOS4000_TPD_NS = 60;
+
+// Colors auto-cycled onto Test Point board flags at placement. The timing
+// diagram itself draws its lanes in grayscale (see TP_GRAYS in timingDiagram.js).
+export const TESTPOINT_COLORS = [
+  '#f39c12', '#3498db', '#2ecc71', '#e84393',
+  '#9b59b6', '#00cec9', '#ff7675', '#74b9ff',
+];
 
 // Snap tolerance (px) for clicking on a hole
 export const SNAP_RADIUS = 12;
 
 // Random wire colors for endpoint circles (dark-board / normal mode)
+// Yellows removed (#fdcb6e, #ffeaa7) — hard to read the net number on them
 export const WIRE_COLORS = [
   '#3498db', '#2ecc71', '#f39c12', '#9b59b6',
-  '#1abc9c', '#e84393', '#00cec9', '#fdcb6e',
-  '#6c5ce7', '#ff7675', '#74b9ff', '#55efc4', '#ffeaa7',
+  '#1abc9c', '#e84393', '#00cec9',
+  '#6c5ce7', '#ff7675', '#74b9ff', '#55efc4',
 ];
 
 // Wire colors for realistic mode all deep/saturated so they read clearly
-// against the cream (#f5f0e8) breadboard surface. Light yellows and pastels excluded.
+// against the cream (#f5f0e8) breadboard surface. Yellows excluded.
 export const REALISTIC_WIRE_COLORS = [
   '#c62828', // deep red
   '#1565c0', // deep blue
@@ -194,7 +222,6 @@ export const REALISTIC_WIRE_COLORS = [
   '#00695c', // dark teal
   '#ad1457', // dark pink/magenta
   '#283593', // indigo
-  '#827717', // dark olive/yellow saturated enough to distinguish from cream
   '#00838f', // dark cyan
   '#558b2f', // dark lime green
   '#5d4037', // brown

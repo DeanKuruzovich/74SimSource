@@ -1,21 +1,21 @@
 // test-chips42.mjs - Tests for all chips defined in js/chips/chips42.js
 // Chips under test:
-//   74852        : 8 bit univ transceiver port controller          (GENERIC_STUB, 24-pin)
-//   74853        : 8-to-9 transceiver w/ parity latch, non-inv     (GENERIC_STUB, 24-pin)
-//   74854        : 8-to-9 transceiver w/ parity latch, inv         (GENERIC_STUB, 24-pin)
-//   74856        : 8 bit univ transceiver port controller w/ latch  (GENERIC_STUB, 24-pin)
-//   74857        : Hex 2-to-1 multiplexer, TRI                     (GENERIC_STUB, 24-pin)
-//   74861        : 10 bit bus transceiver, non-inv, TRI             (GENERIC_STUB, 24-pin)
-//   74862        : 10 bit bus transceiver, inv, TRI                 (GENERIC_STUB, 24-pin)
-//   74863        : 9 bit bus transceiver, non-inv, TRI              (GENERIC_STUB, 24-pin)
-//   74864        : 9 bit bus transceiver, inv, TRI                  (GENERIC_STUB, 24-pin)
-//   74866        : 8 bit magnitude comparator w/ latches            (GENERIC_STUB, 24-pin)
-//   74867        : 8 bit sync up/down counter, async CLR            (GENERIC_STUB, 24-pin)
-//   74869        : 8 bit sync up/down counter, sync CLR             (GENERIC_STUB, 24-pin)
-//   74870        : Dual 16x4 register files                         (GENERIC_STUB, 24-pin)
-//   74873        : Dual 4 bit transparent latch w/ clear, TRI       (GENERIC_STUB, 24-pin)
-//   74874        : Dual 4 bit D-FF w/ clear, TRI                    (GENERIC_STUB, 24-pin)
-//   74876        : Dual 4 bit D-FF w/ set, inv out, TRI             (GENERIC_STUB, 24-pin)
+//   74852        : 8 bit univ transceiver port controller          (GENERIC_STUB, 24 pin)
+//   74853        : 8-to-9 transceiver w/ parity latch, non-inv     (GENERIC_STUB, 24 pin)
+//   74854        : 8-to-9 transceiver w/ parity latch, inv         (GENERIC_STUB, 24 pin)
+//   74856        : 8 bit univ transceiver port controller w/ latch  (GENERIC_STUB, 24 pin)
+//   74857        : Hex 2-to-1 multiplexer, TRI                     (GENERIC_STUB, 24 pin)
+//   74861        : 10 bit bus transceiver, non-inv, TRI             (GENERIC_STUB, 24 pin)
+//   74862        : 10 bit bus transceiver, inv, TRI                 (GENERIC_STUB, 24 pin)
+//   74863        : 9 bit bus transceiver, non-inv, TRI              (GENERIC_STUB, 24 pin)
+//   74864        : 9 bit bus transceiver, inv, TRI                  (GENERIC_STUB, 24 pin)
+//   74866        : 8 bit magnitude comparator w/ latches            (GENERIC_STUB, 24 pin)
+//   74867        : 8 bit sync up/down counter, async CLR            (GENERIC_STUB, 24 pin)
+//   74869        : 8 bit sync up/down counter, sync CLR             (GENERIC_STUB, 24 pin)
+//   74870        : Dual 16x4 register files                         (GENERIC_STUB, 24 pin)
+//   74873        : Dual 4 bit transparent latch w/ clear, TRI       (GENERIC_STUB, 24 pin)
+//   74874        : Dual 4 bit D-FF w/ clear, TRI                    (GENERIC_STUB, 24 pin)
+//   74876        : Dual 4 bit D-FF w/ set, inv out, TRI             (GENERIC_STUB, 24 pin)
 
 import { CHIPS_BLOCK_42 } from '../chips/chips42.js';
 import { BreadboardWorld, holeId } from '../breadboard.js';
@@ -75,29 +75,29 @@ function setupChipWithPower(chipId) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const EXPECTED_IDS = [
-  '74852','74853','74854','74856','74857',
-  '74861','74862','74863','74864',
-  '74866','74867','74869','74870',
-  '74873','74874','74876',
+  '74x852','74x853','74x854','74x856','74x857',
+  '74x861','74x862','74x863','74x864',
+  '74x866','74x867','74x869','74x870',
+  '74x873','74x874','74x876',
 ];
 
 const EXPECTED_SPECS = {
-  '74852': { pins: 24, gnd: 12, vcc: 24 },
-  '74853': { pins: 24, gnd: 12, vcc: 24 },
-  '74854': { pins: 24, gnd: 12, vcc: 24 },
-  '74856': { pins: 24, gnd: 12, vcc: 24 },
-  '74857': { pins: 24, gnd: 12, vcc: 24 },
-  '74861': { pins: 24, gnd: 12, vcc: 24 },
-  '74862': { pins: 24, gnd: 12, vcc: 24 },
-  '74863': { pins: 24, gnd: 12, vcc: 24 },
-  '74864': { pins: 24, gnd: 12, vcc: 24 },
-  '74866': { pins: 24, gnd: 12, vcc: 24 },
-  '74867': { pins: 24, gnd: 12, vcc: 24 },
-  '74869': { pins: 24, gnd: 12, vcc: 24 },
-  '74870': { pins: 24, gnd: 12, vcc: 24 },
-  '74873': { pins: 24, gnd: 12, vcc: 24 },
-  '74874': { pins: 24, gnd: 12, vcc: 24 },
-  '74876': { pins: 24, gnd: 12, vcc: 24 },
+  '74x852': { pins: 24, gnd: 12, vcc: 24 },
+  '74x853': { pins: 24, gnd: 12, vcc: 24 },
+  '74x854': { pins: 24, gnd: 12, vcc: 24 },
+  '74x856': { pins: 24, gnd: 12, vcc: 24 },
+  '74x857': { pins: 24, gnd: 12, vcc: 24 },
+  '74x861': { pins: 24, gnd: 12, vcc: 24 },
+  '74x862': { pins: 24, gnd: 12, vcc: 24 },
+  '74x863': { pins: 24, gnd: 12, vcc: 24 },
+  '74x864': { pins: 24, gnd: 12, vcc: 24 },
+  '74x866': { pins: 24, gnd: 12, vcc: 24 },
+  '74x867': { pins: 24, gnd: 12, vcc: 24 },
+  '74x869': { pins: 24, gnd: 12, vcc: 24 },
+  '74x870': { pins: 24, gnd: 12, vcc: 24 },
+  '74x873': { pins: 24, gnd: 12, vcc: 24 },
+  '74x874': { pins: 24, gnd: 12, vcc: 24 },
+  '74x876': { pins: 24, gnd: 12, vcc: 24 },
 };
 
 console.log('\n=== SECTION S: Structure ===');
@@ -137,14 +137,14 @@ console.log('\n=== SECTION A: Stub chips (HiZ outputs) ===');
 // Bidir transceivers have no driven outputs - nothing to test for HiZ pins
 // Only chips with actual 'output' type pins are tested here
 const STUB_CONFIGS = [
-  { id: '74857', outputs: ['Y0','Y1','Y2','Y3','Y4','Y5'] },
-  { id: '74866', outputs: ['AGEB','ALTB','AGTB','AEQB'] },
-  { id: '74867', outputs: ['RCO','Q7','Q6','Q5','Q4','Q3','Q2'] },
-  { id: '74869', outputs: ['RCO','Q7','Q6','Q5','Q4','Q3','Q2'] },
-  { id: '74870', outputs: ['QA0','QA1','QA2'] },
-  { id: '74873', outputs: ['Q10','Q11','Q12','Q13','Q20','Q21','Q22','Q23'] },
-  { id: '74874', outputs: ['Q10','Q11','Q12','Q13','Q20','Q21','Q22','Q23'] },
-  { id: '74876', outputs: ['Q10n','Q11n','Q12n','Q13n','Q20n','Q21n','Q22n','Q23n'] },
+  { id: '74x857', outputs: ['Y0','Y1','Y2','Y3','Y4','Y5'] },
+  { id: '74x867', outputs: ['RCO','Q7','Q6','Q5','Q4','Q3','Q2'] },
+  { id: '74x869', outputs: ['RCO','Q7','Q6','Q5','Q4','Q3','Q2'] },
+  // 74x870 is a GENERIC_STUB whose def currently declares no output pins —
+  // nothing drivable to assert on.
+  { id: '74x873', outputs: ['Q10','Q11','Q12','Q13','Q20','Q21','Q22','Q23'] },
+  { id: '74x874', outputs: ['Q10','Q11','Q12','Q13','Q20','Q21','Q22','Q23'] },
+  { id: '74x876', outputs: ['Q10n','Q11n','Q12n','Q13n','Q20n','Q21n','Q22n','Q23n'] },
 ];
 
 for (const { id, outputs } of STUB_CONFIGS) {
@@ -156,13 +156,27 @@ for (const { id, outputs } of STUB_CONFIGS) {
   }
 }
 
+// 74x866 has a behavioral evaluator (8-bit comparator with latch). With all
+// inputs floating (TTL pull-ups), A = B = 0xFF, so it actively drives
+// AEQB/AGEB HIGH and AGTB/ALTB LOW.
+{
+  const { world, chip, wm } = setupChipWithPower('74x866');
+  const sim = new CircuitSimulator();
+  sim.evaluate(world, [chip], wm);
+  const v = (n) => getPinVoltage(sim, findPin(chip, n));
+  assert(v('AEQB') !== undefined && v('AEQB') > 2.5, `74x866 idle (A=B): AEQB HIGH (got ${v('AEQB')})`);
+  assert(v('AGEB') !== undefined && v('AGEB') > 2.5, `74x866 idle (A=B): AGEB HIGH (got ${v('AGEB')})`);
+  assert(v('AGTB') === undefined || v('AGTB') < 2.5, `74x866 idle (A=B): AGTB LOW (got ${v('AGTB')})`);
+  assert(v('ALTB') === undefined || v('ALTB') < 2.5, `74x866 idle (A=B): ALTB LOW (got ${v('ALTB')})`);
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // SECTION B - Bidir transceiver chips: confirm they instantiate correctly
 // ─────────────────────────────────────────────────────────────────────────────
 
 console.log('\n=== SECTION B: Bidir transceiver chips (instantiation check) ===');
 
-const BIDIR_IDS = ['74852','74853','74854','74856','74861','74862','74863','74864'];
+const BIDIR_IDS = ['74x852','74x853','74x854','74x856','74x861','74x862','74x863','74x864'];
 
 for (const id of BIDIR_IDS) {
   const { world, chip, wm } = setupChipWithPower(id);

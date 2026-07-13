@@ -81,9 +81,9 @@ function clockEdge(world, chip, clkPinName, otherPins) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const EXPECTED_CHIP_IDS = [
-  '74137', '74140', '74143', '74144',
-  '74145', '74146', '74147', '74149', '74152', '74155',
-  '74156', '74158', '74159', '74162',
+  '74x137', '74x140', '74x143', '74x144',
+  '74x145', '74x146', '74x147', '74x149', '74x152', '74x155',
+  '74x156', '74x158', '74x159', '74x162',
 ];
 
 console.log('\nS1: All chip IDs present in CHIPS_BLOCK_12');
@@ -128,11 +128,11 @@ for (const [id, def] of Object.entries(CHIPS_BLOCK_12)) {
 // SECTION G - Gate Logic Tests
 // ─────────────────────────────────────────────────────────────────────────────
 
-// G1: 74137 - 3-to-8 decoder with address latch
-console.log('\nG1: 74137 - 3-to-8 Decoder with Address Latch');
+// G1: 74137 - 3 to 8 decoder with address latch
+console.log('\nG1: 74137 - 3 to 8 Decoder with Address Latch');
 {
   // Transparent mode: G1n=0, G2=1, LE=1, A0=1 (addr=1) → Y1=LOW, others=HIGH
-  const { world, chip, wm } = setupChipWithPower('74137');
+  const { world, chip, wm } = setupChipWithPower('74x137');
   applyInputs(wm, chip, { A0: 1, A1: 0, A2: 0, G1n: 0, G2: 1, LE: 1 });
   const sim = simulate(world, chip, wm);
   assert(isHigh(getPinVoltage(sim, findPin(chip, 'Y0'))), '74137: Y0=HIGH when addr=1');
@@ -142,7 +142,7 @@ console.log('\nG1: 74137 - 3-to-8 Decoder with Address Latch');
 }
 {
   // Disabled: G1n=1 → all outputs HIGH
-  const { world, chip, wm } = setupChipWithPower('74137');
+  const { world, chip, wm } = setupChipWithPower('74x137');
   applyInputs(wm, chip, { A0: 0, A1: 0, A2: 0, G1n: 1, G2: 1, LE: 1 });
   const sim = simulate(world, chip, wm);
   for (let i = 0; i < 8; i++) {
@@ -151,14 +151,14 @@ console.log('\nG1: 74137 - 3-to-8 Decoder with Address Latch');
 }
 {
   // Disabled: G2=0 → all outputs HIGH
-  const { world, chip, wm } = setupChipWithPower('74137');
+  const { world, chip, wm } = setupChipWithPower('74x137');
   applyInputs(wm, chip, { A0: 1, A1: 0, A2: 0, G1n: 0, G2: 0, LE: 1 });
   const sim = simulate(world, chip, wm);
   assert(isHigh(getPinVoltage(sim, findPin(chip, 'Y1'))), '74137: Y1=HIGH when G2=0');
 }
 {
   // Latch: LE=1→transparent (addr=2), then LE=0 with addr change → still outputs Y2
-  const { world: w1, chip: c1, wm: wm1 } = setupChipWithPower('74137');
+  const { world: w1, chip: c1, wm: wm1 } = setupChipWithPower('74x137');
   applyInputs(wm1, c1, { A0: 0, A1: 1, A2: 0, G1n: 0, G2: 1, LE: 1 }); // addr=2
   simulate(w1, c1, wm1);
   const wm2 = new WireManager(); resetWireCounter();
@@ -171,7 +171,7 @@ console.log('\nG1: 74137 - 3-to-8 Decoder with Address Latch');
 }
 {
   // addr=5: Y5=LOW
-  const { world, chip, wm } = setupChipWithPower('74137');
+  const { world, chip, wm } = setupChipWithPower('74x137');
   applyInputs(wm, chip, { A0: 1, A1: 0, A2: 1, G1n: 0, G2: 1, LE: 1 }); // 101=5
   const sim = simulate(world, chip, wm);
   assert(isLow(getPinVoltage(sim, findPin(chip, 'Y5'))),  '74137: Y5=LOW when addr=5');
@@ -182,7 +182,7 @@ console.log('\nG1: 74137 - 3-to-8 Decoder with Address Latch');
 console.log('\nG2: 74140 - Dual 4 input NAND (50Ω driver)');
 {
   // All inputs HIGH → output LOW
-  const { world, chip, wm } = setupChipWithPower('74140');
+  const { world, chip, wm } = setupChipWithPower('74x140');
   applyInputs(wm, chip, { '1A': 1, '1B': 1, '1C': 1, '1D': 1, '2A': 1, '2B': 1, '2C': 1, '2D': 1 });
   const sim = simulate(world, chip, wm);
   assert(isLow(getPinVoltage(sim, findPin(chip, '1Y'))), '74140: gate1 all-HIGH → 1Y=LOW');
@@ -190,7 +190,7 @@ console.log('\nG2: 74140 - Dual 4 input NAND (50Ω driver)');
 }
 {
   // One input LOW → output HIGH
-  const { world, chip, wm } = setupChipWithPower('74140');
+  const { world, chip, wm } = setupChipWithPower('74x140');
   applyInputs(wm, chip, { '1A': 0, '1B': 1, '1C': 1, '1D': 1, '2A': 1, '2B': 0, '2C': 1, '2D': 1 });
   const sim = simulate(world, chip, wm);
   assert(isHigh(getPinVoltage(sim, findPin(chip, '1Y'))), '74140: gate1 A=0 → 1Y=HIGH');
@@ -201,7 +201,7 @@ console.log('\nG5: 74143 - Decade Counter/7-Seg Driver (CC)');
 {
   // CLR=1 → count=0, STROBE=1, ENP=1, ENT=1 → segments for digit '0'
   // '0' segments: a=1,b=1,c=1,d=1,e=1,f=1,g=0
-  const { world, chip, wm } = setupChipWithPower('74143');
+  const { world, chip, wm } = setupChipWithPower('74x143');
   applyInputs(wm, chip, { CLK: 0, CLR: 1, STROBE: 1, ENP: 1, ENT: 1 });
   const sim = simulate(world, chip, wm);
   assert(isHigh(getPinVoltage(sim, findPin(chip, 'a'))), '74143: digit 0 → seg-a=HIGH');
@@ -213,7 +213,7 @@ console.log('\nG5: 74143 - Decade Counter/7-Seg Driver (CC)');
 }
 {
   // Count to 7: segments a=1,b=1,c=1,d=0,e=0,f=0,g=0
-  const { world, chip } = setupChipWithPower('74143');
+  const { world, chip } = setupChipWithPower('74x143');
   const wm0 = new WireManager(); resetWireCounter();
   wirePinToVcc(wm0, findPin(chip, 'VCC')); wirePinToGnd(wm0, findPin(chip, 'GND'));
   applyInputs(wm0, chip, { CLK: 0, CLR: 1, STROBE: 1, ENP: 1, ENT: 1 });
@@ -235,7 +235,7 @@ console.log('\nG5: 74143 - Decade Counter/7-Seg Driver (CC)');
 }
 {
   // ENP=0 → count halted
-  const { world, chip } = setupChipWithPower('74143');
+  const { world, chip } = setupChipWithPower('74x143');
   const wm0 = new WireManager(); resetWireCounter();
   wirePinToVcc(wm0, findPin(chip, 'VCC')); wirePinToGnd(wm0, findPin(chip, 'GND'));
   applyInputs(wm0, chip, { CLK: 0, CLR: 1, STROBE: 1, ENP: 1, ENT: 1 });
@@ -247,7 +247,7 @@ console.log('\nG5: 74143 - Decade Counter/7-Seg Driver (CC)');
 }
 {
   // RCO: ENT=1, count=9 → RCO=HIGH
-  const { world, chip } = setupChipWithPower('74143');
+  const { world, chip } = setupChipWithPower('74x143');
   const wm0 = new WireManager(); resetWireCounter();
   wirePinToVcc(wm0, findPin(chip, 'VCC')); wirePinToGnd(wm0, findPin(chip, 'GND'));
   applyInputs(wm0, chip, { CLK: 0, CLR: 1, STROBE: 1, ENP: 1, ENT: 1 });
@@ -261,7 +261,7 @@ console.log('\nG5: 74143 - Decade Counter/7-Seg Driver (CC)');
 console.log('\nG6: 74144 - Decade Counter/7-Seg Driver (OC)');
 {
   // CLR=1 → count=0 → seg-g=LOW (OC), seg-a=HIGH (OC pulled up)
-  const { world, chip, wm } = setupChipWithPower('74144');
+  const { world, chip, wm } = setupChipWithPower('74x144');
   applyInputs(wm, chip, { CLK: 0, CLR: 1, STROBE: 1, ENP: 1, ENT: 1 });
   const sim = simulate(world, chip, wm);
   assert(isHigh(getPinVoltage(sim, findPin(chip, 'a'))), '74144: digit 0 → seg-a=HIGH (OC pulled)');
@@ -273,7 +273,7 @@ console.log('\nG6: 74144 - Decade Counter/7-Seg Driver (OC)');
 console.log('\nG7: 74145 - BCD to Decimal (OC driver)');
 {
   // Input=3 (0011)
-  const { world, chip, wm } = setupChipWithPower('74145');
+  const { world, chip, wm } = setupChipWithPower('74x145');
   applyInputs(wm, chip, { A: 1, B: 1, C: 0, D: 0 });
   const sim = simulate(world, chip, wm);
   assert(isLow(getPinVoltage(sim, findPin(chip, 'Y3'))),  '74145: BCD=3 → Y3=LOW');
@@ -282,18 +282,18 @@ console.log('\nG7: 74145 - BCD to Decimal (OC driver)');
 }
 {
   // Input=9 (1001)
-  const { world, chip, wm } = setupChipWithPower('74145');
+  const { world, chip, wm } = setupChipWithPower('74x145');
   applyInputs(wm, chip, { A: 1, B: 0, C: 0, D: 1 });
   const sim = simulate(world, chip, wm);
   assert(isLow(getPinVoltage(sim, findPin(chip, 'Y9'))),  '74145: BCD=9 → Y9=LOW');
   assert(isHigh(getPinVoltage(sim, findPin(chip, 'Y8'))), '74145: BCD=9 → Y8=HIGH');
 }
 
-// G8: 74146 - 3-to-8 line decoder
-console.log('\nG8: 74146 - 3-to-8 Line Decoder');
+// G8: 74146 - 3 to 8 line decoder
+console.log('\nG8: 74146 - 3 to 8 Line Decoder');
 {
   // G1=1, G2A=0, G2B=0, addr=4 (100) → Y4=LOW
-  const { world, chip, wm } = setupChipWithPower('74146');
+  const { world, chip, wm } = setupChipWithPower('74x146');
   applyInputs(wm, chip, { A: 0, B: 0, C: 1, G1: 1, G2A: 0, G2B: 0 }); // A=LSB, C=MSB, sel=4
   const sim = simulate(world, chip, wm);
   assert(isLow(getPinVoltage(sim, findPin(chip, 'Y4'))),  '74146: addr=4,enabled → Y4=LOW');
@@ -302,14 +302,14 @@ console.log('\nG8: 74146 - 3-to-8 Line Decoder');
 }
 {
   // G1=0 → all HIGH (disabled)
-  const { world, chip, wm } = setupChipWithPower('74146');
+  const { world, chip, wm } = setupChipWithPower('74x146');
   applyInputs(wm, chip, { A: 0, B: 0, C: 0, G1: 0, G2A: 0, G2B: 0 });
   const sim = simulate(world, chip, wm);
   assert(isHigh(getPinVoltage(sim, findPin(chip, 'Y0'))), '74146: G1=0 → Y0=HIGH');
 }
 {
   // G2A=1 → all HIGH (disabled)
-  const { world, chip, wm } = setupChipWithPower('74146');
+  const { world, chip, wm } = setupChipWithPower('74x146');
   applyInputs(wm, chip, { A: 0, B: 0, C: 0, G1: 1, G2A: 1, G2B: 0 });
   const sim = simulate(world, chip, wm);
   assert(isHigh(getPinVoltage(sim, findPin(chip, 'Y0'))), '74146: G2A=1 → Y0=HIGH');
@@ -319,7 +319,7 @@ console.log('\nG8: 74146 - 3-to-8 Line Decoder');
 console.log('\nG9: 74147 - 10-to-4 Priority Encoder');
 {
   // All inputs HIGH (inactive) → output all HIGH (active LOW BCD=0 → A3n=1,A2n=1,A1n=1,A0n=1)
-  const { world, chip, wm } = setupChipWithPower('74147');
+  const { world, chip, wm } = setupChipWithPower('74x147');
   applyInputs(wm, chip, { I1: 1, I2: 1, I3: 1, I4: 1, I5: 1, I6: 1, I7: 1, I8: 1, I9: 1 });
   const sim = simulate(world, chip, wm);
   assert(isHigh(getPinVoltage(sim, findPin(chip, 'A0n'))), '74147: all inactive → A0n=HIGH');
@@ -329,7 +329,7 @@ console.log('\nG9: 74147 - 10-to-4 Priority Encoder');
 }
 {
   // I9=LOW (active, highest priority 9) → BCD 9=1001 → active LOW → A3n=0,A2n=1,A1n=1,A0n=0
-  const { world, chip, wm } = setupChipWithPower('74147');
+  const { world, chip, wm } = setupChipWithPower('74x147');
   applyInputs(wm, chip, { I1: 1, I2: 1, I3: 1, I4: 1, I5: 1, I6: 1, I7: 1, I8: 1, I9: 0 });
   const sim = simulate(world, chip, wm);
   assert(isLow(getPinVoltage(sim, findPin(chip, 'A0n'))),  '74147: I9 active → A0n=0 (BCD9,bit0=1→inv→0)');
@@ -339,7 +339,7 @@ console.log('\nG9: 74147 - 10-to-4 Priority Encoder');
 }
 {
   // I5=LOW, I9=HIGH → priority=5; BCD5=0101 → A3n=1,A2n=0,A1n=1,A0n=0
-  const { world, chip, wm } = setupChipWithPower('74147');
+  const { world, chip, wm } = setupChipWithPower('74x147');
   applyInputs(wm, chip, { I1: 1, I2: 1, I3: 1, I4: 1, I5: 0, I6: 1, I7: 1, I8: 1, I9: 1 });
   const sim = simulate(world, chip, wm);
   assert(isLow(getPinVoltage(sim, findPin(chip, 'A0n'))),  '74147: I5 active → A0n=0');
@@ -350,7 +350,7 @@ console.log('\nG9: 74147 - 10-to-4 Priority Encoder');
 {
   // I5 and I8 both active → I8 wins (higher priority)
   // BCD 8=1000 → A3n=0,A2n=1,A1n=1,A0n=1
-  const { world, chip, wm } = setupChipWithPower('74147');
+  const { world, chip, wm } = setupChipWithPower('74x147');
   applyInputs(wm, chip, { I1: 1, I2: 1, I3: 1, I4: 1, I5: 0, I6: 1, I7: 1, I8: 0, I9: 1 });
   const sim = simulate(world, chip, wm);
   assert(isHigh(getPinVoltage(sim, findPin(chip, 'A0n'))), '74147: I8>I5 → A0n=1');
@@ -359,11 +359,11 @@ console.log('\nG9: 74147 - 10-to-4 Priority Encoder');
   assert(isLow(getPinVoltage(sim, findPin(chip, 'A3n'))),  '74147: I8>I5 → A3n=0');
 }
 
-// G10: 74149 - 8-line cascadable priority encoder
-console.log('\nG10: 74149 - 8-line Priority Encoder');
+// G10: 74149 - 8 line cascadable priority encoder
+console.log('\nG10: 74149 - 8 line Priority Encoder');
 {
   // EI=1 → disabled: all Y=HIGH, EO=LOW
-  const { world, chip, wm } = setupChipWithPower('74149');
+  const { world, chip, wm } = setupChipWithPower('74x149');
   applyInputs(wm, chip, { X0: 0, X1: 0, X2: 0, X3: 0, X4: 0, X5: 0, X6: 0, X7: 0, EI: 1 });
   const sim = simulate(world, chip, wm);
   for (let i = 0; i < 8; i++) {
@@ -373,7 +373,7 @@ console.log('\nG10: 74149 - 8-line Priority Encoder');
 }
 {
   // EI=0, no active input → all Y=HIGH, EO=0
-  const { world, chip, wm } = setupChipWithPower('74149');
+  const { world, chip, wm } = setupChipWithPower('74x149');
   applyInputs(wm, chip, { X0: 0, X1: 0, X2: 0, X3: 0, X4: 0, X5: 0, X6: 0, X7: 0, EI: 0 });
   const sim = simulate(world, chip, wm);
   for (let i = 0; i < 8; i++) {
@@ -383,7 +383,7 @@ console.log('\nG10: 74149 - 8-line Priority Encoder');
 }
 {
   // EI=0, X3=1 (highest active) → Y3=LOW, others=HIGH, EO=HIGH
-  const { world, chip, wm } = setupChipWithPower('74149');
+  const { world, chip, wm } = setupChipWithPower('74x149');
   applyInputs(wm, chip, { X0: 1, X1: 0, X2: 0, X3: 1, X4: 0, X5: 0, X6: 0, X7: 0, EI: 0 });
   const sim = simulate(world, chip, wm);
   assert(isLow(getPinVoltage(sim, findPin(chip, 'Y3'))),  '74149: X3=highest → Y3=LOW');
@@ -392,7 +392,7 @@ console.log('\nG10: 74149 - 8-line Priority Encoder');
 }
 {
   // X7=1 → Y7=LOW (highest priority)
-  const { world, chip, wm } = setupChipWithPower('74149');
+  const { world, chip, wm } = setupChipWithPower('74x149');
   applyInputs(wm, chip, { X0: 1, X1: 1, X2: 1, X3: 1, X4: 1, X5: 1, X6: 1, X7: 1, EI: 0 });
   const sim = simulate(world, chip, wm);
   assert(isLow(getPinVoltage(sim, findPin(chip, 'Y7'))),  '74149: X7 highest → Y7=LOW');
@@ -404,28 +404,28 @@ console.log('\nG10: 74149 - 8-line Priority Encoder');
 console.log('\nG11: 74152 - 8-to-1 MUX (inverted output)');
 {
   // A=0,B=0,C=0 → select D0; D0=1 → W=LOW (inverted)
-  const { world, chip, wm } = setupChipWithPower('74152');
+  const { world, chip, wm } = setupChipWithPower('74x152');
   applyInputs(wm, chip, { D0: 1, D1: 0, D2: 0, D3: 0, D4: 0, D5: 0, D6: 0, D7: 0, A: 0, B: 0, C: 0 });
   const sim = simulate(world, chip, wm);
   assert(isLow(getPinVoltage(sim, findPin(chip, 'W'))), '74152: sel=0,D0=1 → W=LOW');
 }
 {
   // A=0,B=0,C=0 → D0=0 → W=HIGH
-  const { world, chip, wm } = setupChipWithPower('74152');
+  const { world, chip, wm } = setupChipWithPower('74x152');
   applyInputs(wm, chip, { D0: 0, D1: 1, D2: 1, D3: 1, D4: 1, D5: 1, D6: 1, D7: 1, A: 0, B: 0, C: 0 });
   const sim = simulate(world, chip, wm);
   assert(isHigh(getPinVoltage(sim, findPin(chip, 'W'))), '74152: sel=0,D0=0 → W=HIGH');
 }
 {
   // A=1,B=1,C=0 → sel=3 → D3
-  const { world, chip, wm } = setupChipWithPower('74152');
+  const { world, chip, wm } = setupChipWithPower('74x152');
   applyInputs(wm, chip, { D0: 1, D1: 1, D2: 1, D3: 0, D4: 1, D5: 1, D6: 1, D7: 1, A: 1, B: 1, C: 0 });
   const sim = simulate(world, chip, wm);
   assert(isHigh(getPinVoltage(sim, findPin(chip, 'W'))), '74152: sel=3,D3=0 → W=HIGH');
 }
 {
   // A=1,B=0,C=1 → sel=5 → D5=1 → W=LOW
-  const { world, chip, wm } = setupChipWithPower('74152');
+  const { world, chip, wm } = setupChipWithPower('74x152');
   applyInputs(wm, chip, { D0: 0, D1: 0, D2: 0, D3: 0, D4: 0, D5: 1, D6: 0, D7: 0, A: 1, B: 0, C: 1 });
   const sim = simulate(world, chip, wm);
   assert(isLow(getPinVoltage(sim, findPin(chip, 'W'))), '74152: sel=5,D5=1 → W=LOW');
@@ -435,7 +435,7 @@ console.log('\nG11: 74152 - 8-to-1 MUX (inverted output)');
 console.log('\nG12: 74155 - Dual 2-to-4 Decoder');
 {
   // Section 1: 1G=0, 1C=0, A=0, B=0 → 1Y0=LOW, others=HIGH
-  const { world, chip, wm } = setupChipWithPower('74155');
+  const { world, chip, wm } = setupChipWithPower('74x155');
   applyInputs(wm, chip, { '1G': 0, '1C': 0, A: 0, B: 0, '2G': 1, '2Cn': 0 });
   const sim = simulate(world, chip, wm);
   assert(isLow(getPinVoltage(sim, findPin(chip, '1Y0'))),  '74155: s1 G=0,C=0,AB=00 → 1Y0=LOW');
@@ -445,21 +445,21 @@ console.log('\nG12: 74155 - Dual 2-to-4 Decoder');
 }
 {
   // Section 1: 1C=1 (data inactive) → all 1Y=HIGH
-  const { world, chip, wm } = setupChipWithPower('74155');
+  const { world, chip, wm } = setupChipWithPower('74x155');
   applyInputs(wm, chip, { '1G': 0, '1C': 1, A: 0, B: 0, '2G': 1, '2Cn': 0 });
   const sim = simulate(world, chip, wm);
   assert(isHigh(getPinVoltage(sim, findPin(chip, '1Y0'))), '74155: s1 1C=1 → 1Y0=HIGH');
 }
 {
   // Section 1: 1G=1 (disabled) → all HIGH
-  const { world, chip, wm } = setupChipWithPower('74155');
+  const { world, chip, wm } = setupChipWithPower('74x155');
   applyInputs(wm, chip, { '1G': 1, '1C': 0, A: 0, B: 0, '2G': 1, '2Cn': 0 });
   const sim = simulate(world, chip, wm);
   assert(isHigh(getPinVoltage(sim, findPin(chip, '1Y0'))), '74155: s1 1G=1 → 1Y0=HIGH');
 }
 {
   // Section 2: 2G=0, 2Cn=1 (C=NOT(1)=0 → ACTIVE), A=1, B=0 → 2Y1=LOW
-  const { world, chip, wm } = setupChipWithPower('74155');
+  const { world, chip, wm } = setupChipWithPower('74x155');
   applyInputs(wm, chip, { '1G': 1, '1C': 0, A: 1, B: 0, '2G': 0, '2Cn': 1 });
   const sim = simulate(world, chip, wm);
   assert(isLow(getPinVoltage(sim, findPin(chip, '2Y1'))),  '74155: s2 G=0,Cn=1,AB=01 → 2Y1=LOW');
@@ -467,14 +467,14 @@ console.log('\nG12: 74155 - Dual 2-to-4 Decoder');
 }
 {
   // Section 2: 2Cn=0 (inverted → C=1 → disabled) → all HIGH
-  const { world, chip, wm } = setupChipWithPower('74155');
+  const { world, chip, wm } = setupChipWithPower('74x155');
   applyInputs(wm, chip, { '1G': 1, '1C': 0, A: 0, B: 0, '2G': 0, '2Cn': 0 });
   const sim = simulate(world, chip, wm);
   assert(isHigh(getPinVoltage(sim, findPin(chip, '2Y0'))), '74155: s2 Cn=0 → 2Y0=HIGH');
 }
 {
   // AB=11 → Y3 selected; both sections
-  const { world, chip, wm } = setupChipWithPower('74155');
+  const { world, chip, wm } = setupChipWithPower('74x155');
   applyInputs(wm, chip, { '1G': 0, '1C': 0, A: 1, B: 1, '2G': 0, '2Cn': 1 });
   const sim = simulate(world, chip, wm);
   assert(isLow(getPinVoltage(sim, findPin(chip, '1Y3'))), '74155: s1 AB=11 → 1Y3=LOW');
@@ -485,7 +485,7 @@ console.log('\nG12: 74155 - Dual 2-to-4 Decoder');
 console.log('\nG13: 74156 - Dual 2-to-4 Decoder (OC)');
 {
   // Section 1: OC, selected=LOW (sunk), non-selected=HIGH (pulled up)
-  const { world, chip, wm } = setupChipWithPower('74156');
+  const { world, chip, wm } = setupChipWithPower('74x156');
   applyInputs(wm, chip, { '1G': 0, '1C': 0, A: 0, B: 1, '2G': 1, '2Cn': 0 }); // AB=10 → Y2
   const sim = simulate(world, chip, wm);
   assert(isLow(getPinVoltage(sim, findPin(chip, '1Y2'))),  '74156: OC,AB=10 → 1Y2=LOW');
@@ -495,7 +495,7 @@ console.log('\nG13: 74156 - Dual 2-to-4 Decoder (OC)');
 }
 {
   // Section 2: 2Cn=1 → active, A=1,B=1 → 2Y3=LOW
-  const { world, chip, wm } = setupChipWithPower('74156');
+  const { world, chip, wm } = setupChipWithPower('74x156');
   applyInputs(wm, chip, { '1G': 1, '1C': 0, A: 1, B: 1, '2G': 0, '2Cn': 1 });
   const sim = simulate(world, chip, wm);
   assert(isLow(getPinVoltage(sim, findPin(chip, '2Y3'))),  '74156: OC s2 Cn=1,AB=11 → 2Y3=LOW');
@@ -506,7 +506,7 @@ console.log('\nG13: 74156 - Dual 2-to-4 Decoder (OC)');
 console.log('\nG14: 74158 - Quad 2-to-1 MUX (inverting)');
 {
   // G=1 → all outputs LOW
-  const { world, chip, wm } = setupChipWithPower('74158');
+  const { world, chip, wm } = setupChipWithPower('74x158');
   applyInputs(wm, chip, { SEL: 0, '1A': 1, '1B': 1, '2A': 1, '2B': 1, '3A': 1, '3B': 1, '4A': 1, '4B': 1, G: 1 });
   const sim = simulate(world, chip, wm);
   assert(isLow(getPinVoltage(sim, findPin(chip, '1Y'))), '74158: G=1 → 1Y=LOW');
@@ -516,7 +516,7 @@ console.log('\nG14: 74158 - Quad 2-to-1 MUX (inverting)');
 }
 {
   // G=0, SEL=0 → Y=NOT(A)
-  const { world, chip, wm } = setupChipWithPower('74158');
+  const { world, chip, wm } = setupChipWithPower('74x158');
   applyInputs(wm, chip, { SEL: 0, '1A': 1, '1B': 0, '2A': 0, '2B': 1, '3A': 1, '3B': 0, '4A': 0, '4B': 1, G: 0 });
   const sim = simulate(world, chip, wm);
   assert(isLow(getPinVoltage(sim, findPin(chip, '1Y'))),  '74158: SEL=0,1A=1 → 1Y=LOW (NOT 1A)');
@@ -526,7 +526,7 @@ console.log('\nG14: 74158 - Quad 2-to-1 MUX (inverting)');
 }
 {
   // G=0, SEL=1 → Y=NOT(B)
-  const { world, chip, wm } = setupChipWithPower('74158');
+  const { world, chip, wm } = setupChipWithPower('74x158');
   applyInputs(wm, chip, { SEL: 1, '1A': 0, '1B': 1, '2A': 1, '2B': 0, '3A': 0, '3B': 1, '4A': 1, '4B': 0, G: 0 });
   const sim = simulate(world, chip, wm);
   assert(isLow(getPinVoltage(sim, findPin(chip, '1Y'))),  '74158: SEL=1,1B=1 → 1Y=LOW (NOT 1B)');
@@ -537,7 +537,7 @@ console.log('\nG14: 74158 - Quad 2-to-1 MUX (inverting)');
 console.log('\nG15: 74159 - 4-to-16 Decoder (OC)');
 {
   // G1n=0, G2n=0, addr=7 (0111) → Y7=LOW, others=HIGH
-  const { world, chip, wm } = setupChipWithPower('74159');
+  const { world, chip, wm } = setupChipWithPower('74x159');
   applyInputs(wm, chip, { A0: 1, A1: 1, A2: 1, A3: 0, G1n: 0, G2n: 0 }); // 0111=7
   const sim = simulate(world, chip, wm);
   assert(isLow(getPinVoltage(sim, findPin(chip, 'Y7'))),   '74159: addr=7,enabled → Y7=LOW');
@@ -546,14 +546,14 @@ console.log('\nG15: 74159 - 4-to-16 Decoder (OC)');
 }
 {
   // G1n=1 → disabled → all HIGH
-  const { world, chip, wm } = setupChipWithPower('74159');
+  const { world, chip, wm } = setupChipWithPower('74x159');
   applyInputs(wm, chip, { A0: 0, A1: 0, A2: 0, A3: 0, G1n: 1, G2n: 0 });
   const sim = simulate(world, chip, wm);
   assert(isHigh(getPinVoltage(sim, findPin(chip, 'Y0'))), '74159: G1n=1 → Y0=HIGH');
 }
 {
   // addr=12 (1100) → Y12=LOW
-  const { world, chip, wm } = setupChipWithPower('74159');
+  const { world, chip, wm } = setupChipWithPower('74x159');
   applyInputs(wm, chip, { A0: 0, A1: 0, A2: 1, A3: 1, G1n: 0, G2n: 0 }); // 1100=12
   const sim = simulate(world, chip, wm);
   assert(isLow(getPinVoltage(sim, findPin(chip, 'Y12'))),  '74159: addr=12 → Y12=LOW');
@@ -564,7 +564,7 @@ console.log('\nG15: 74159 - 4-to-16 Decoder (OC)');
 console.log('\nG16: 74162 - Sync BCD Counter (sync CLR)');
 {
   // CLR=0 on rising CLK → clears to 0
-  const { world, chip } = setupChipWithPower('74162');
+  const { world, chip } = setupChipWithPower('74x162');
   // First prime with some state (count=5 via LOAD)
   const wmLoad = new WireManager(); resetWireCounter();
   wirePinToVcc(wmLoad, findPin(chip, 'VCC'));
@@ -583,7 +583,7 @@ console.log('\nG16: 74162 - Sync BCD Counter (sync CLR)');
 }
 {
   // ENP=1, ENT=1 → count on rising CLK
-  const { world, chip } = setupChipWithPower('74162');
+  const { world, chip } = setupChipWithPower('74x162');
   // Clear first
   const wm0 = new WireManager(); resetWireCounter();
   wirePinToVcc(wm0, findPin(chip, 'VCC')); wirePinToGnd(wm0, findPin(chip, 'GND'));
@@ -601,7 +601,7 @@ console.log('\nG16: 74162 - Sync BCD Counter (sync CLR)');
 }
 {
   // Count wraps at 9→0 (decade)
-  const { world, chip } = setupChipWithPower('74162');
+  const { world, chip } = setupChipWithPower('74x162');
   const wm0 = new WireManager(); resetWireCounter();
   wirePinToVcc(wm0, findPin(chip, 'VCC')); wirePinToGnd(wm0, findPin(chip, 'GND'));
   applyInputs(wm0, chip, { CLK: 0, CLR: 0, LOAD: 1, ENP: 1, ENT: 1, A: 0, B: 0, C: 0, D: 0 });
@@ -622,7 +622,7 @@ console.log('\nG16: 74162 - Sync BCD Counter (sync CLR)');
 }
 {
   // ENP=0 → count halted
-  const { world, chip } = setupChipWithPower('74162');
+  const { world, chip } = setupChipWithPower('74x162');
   // Clear
   const wm0 = new WireManager(); resetWireCounter();
   wirePinToVcc(wm0, findPin(chip, 'VCC')); wirePinToGnd(wm0, findPin(chip, 'GND'));

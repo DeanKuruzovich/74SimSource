@@ -66,9 +66,9 @@ function applyInputs(wm, chip, inputMap) {
 const EXPECTED_CHIP_IDS = [
   '74L68','74LS68','74L69','74LS69',
   '74H71','74L71',
-  '7477',
+  '74x77',
   '74H78','74L78','74LS78',
-  '7479','7480','7481','7482','7484','7487',
+  '74x79','74x80','74x81','74x82','74x84','74x87',
 ];
 
 console.log('\nS1: All chip IDs present in CHIPS_BLOCK_9');
@@ -165,7 +165,7 @@ console.log('\nG4: 74LS69 - Dual binary counters');
 }
 
 // G5: 74H71 - JK FF with preset only
-console.log('\nG5: 74H71 - JK FF (AND-OR-gated, preset only)');
+console.log('\nG5: 74H71 - JK FF (AND OR-gated, preset only)');
 {
   const { world, chip, wm } = setupChipWithPower('74H71');
   applyInputs(wm, chip, { J1:0, J2:0, J3:0, K1:0, K2:0, K3:0, CLK:0, PRE:0 });
@@ -179,7 +179,7 @@ console.log('\nG5: 74H71 - JK FF (AND-OR-gated, preset only)');
 }
 
 // G6: 74L71 - RS FF
-console.log('\nG6: 74L71 - AND-gated RS controller-device FF');
+console.log('\nG6: 74L71 - AND gated RS controller device FF');
 {
   const { world, chip, wm } = setupChipWithPower('74L71');
   applyInputs(wm, chip, { S1:0, S2:0, S3:0, R1:0, R2:0, R3:0, CLK:0, PRE:0, CLR:1 });
@@ -194,14 +194,14 @@ console.log('\nG6: 74L71 - AND-gated RS controller-device FF');
 // G7: 74x77 - 4 bit bistable latch
 console.log('\nG7: 74x77 - 4 bit latch');
 {
-  const { world, chip, wm } = setupChipWithPower('7477');
+  const { world, chip, wm } = setupChipWithPower('74x77');
   applyInputs(wm, chip, { '1D':1, '2D':0, '3D':1, '4D':0, E:1 });
   const sim = simulate(world, chip, wm);
   assert(isHigh(getPinVoltage(sim, findPin(chip, '1Q'))), '7477 E=1, D1=1 → Q1=1');
   assert(isLow(getPinVoltage(sim, findPin(chip, '2Q'))), '7477 E=1, D2=0 → Q2=0');
   assert(isHigh(getPinVoltage(sim, findPin(chip, '3Q'))), '7477 E=1, D3=1 → Q3=1');
   assert(isLow(getPinVoltage(sim, findPin(chip, '4Q'))), '7477 E=1, D4=0 → Q4=0');
-  const { world: w2, chip: c2, wm: wm2 } = setupChipWithPower('7477');
+  const { world: w2, chip: c2, wm: wm2 } = setupChipWithPower('74x77');
   applyInputs(wm2, c2, { '1D':0, '2D':0, '3D':0, '4D':0, E:0 });
   const sim2 = simulate(w2, c2, wm2);
   assert(isLow(getPinVoltage(sim2, findPin(c2, '1Q'))), '7477 E=0 → Q holds at 0');
@@ -225,7 +225,7 @@ console.log('\nG8: 74H78/74L78/74LS78 - Dual JK FF (shared CLK/CLR)');
     assert(isHigh(getPinVoltage(sim3, findPin(c3, '2Q'))), `${id} 2PRE=LOW → 2Q=1`);
   }
 
-  // 74LS78 is the negative-edge member of the family.
+  // 74LS78 is the negative edge member of the family.
   {
     const world = new BreadboardWorld(1, 1);
     const chip = new ChipComponent('74LS78');
@@ -259,15 +259,15 @@ console.log('\nG8: 74H78/74L78/74LS78 - Dual JK FF (shared CLK/CLR)');
 // G9: 74x79 - Dual D FF
 console.log('\nG9: 74x79 - Dual D FF');
 {
-  const { world, chip, wm } = setupChipWithPower('7479');
+  const { world, chip, wm } = setupChipWithPower('74x79');
   applyInputs(wm, chip, { '1D':0, '1CLK':0, '1PRE':0, '1CLR':1 });
   const sim = simulate(world, chip, wm);
   assert(isHigh(getPinVoltage(sim, findPin(chip, '1Q'))), '7479 1PRE=LOW → 1Q=1');
-  const { world: w2, chip: c2, wm: wm2 } = setupChipWithPower('7479');
+  const { world: w2, chip: c2, wm: wm2 } = setupChipWithPower('74x79');
   applyInputs(wm2, c2, { '1D':0, '1CLK':0, '1PRE':1, '1CLR':0 });
   const sim2 = simulate(w2, c2, wm2);
   assert(isLow(getPinVoltage(sim2, findPin(c2, '1Q'))), '7479 1CLR=LOW → 1Q=0');
-  const { world: w3, chip: c3, wm: wm3 } = setupChipWithPower('7479');
+  const { world: w3, chip: c3, wm: wm3 } = setupChipWithPower('74x79');
   applyInputs(wm3, c3, { '2D':0, '2CLK':0, '2PRE':0, '2CLR':1 });
   const sim3 = simulate(w3, c3, wm3);
   assert(isHigh(getPinVoltage(sim3, findPin(c3, '2Q'))), '7479 2PRE=LOW → 2Q=1');
@@ -276,22 +276,22 @@ console.log('\nG9: 74x79 - Dual D FF');
 // G10: 74x80 - Gated full adder
 console.log('\nG10: 74x80 - Gated full adder');
 {
-  const { world: w1, chip: c1, wm: wm1 } = setupChipWithPower('7480');
+  const { world: w1, chip: c1, wm: wm1 } = setupChipWithPower('74x80');
   applyInputs(wm1, c1, { A:0, B:0, CIN:0 });
   const sim1 = simulate(w1, c1, wm1);
   assert(isLow(getPinVoltage(sim1, findPin(c1, 'SUM'))), '7480 0+0+0: SUM=0');
   assert(isLow(getPinVoltage(sim1, findPin(c1, 'COUT'))), '7480 0+0+0: COUT=0');
-  const { world: w2, chip: c2, wm: wm2 } = setupChipWithPower('7480');
+  const { world: w2, chip: c2, wm: wm2 } = setupChipWithPower('74x80');
   applyInputs(wm2, c2, { A:1, B:0, CIN:0 });
   const sim2 = simulate(w2, c2, wm2);
   assert(isHigh(getPinVoltage(sim2, findPin(c2, 'SUM'))), '7480 1+0+0: SUM=1');
   assert(isLow(getPinVoltage(sim2, findPin(c2, 'COUT'))), '7480 1+0+0: COUT=0');
-  const { world: w3, chip: c3, wm: wm3 } = setupChipWithPower('7480');
+  const { world: w3, chip: c3, wm: wm3 } = setupChipWithPower('74x80');
   applyInputs(wm3, c3, { A:1, B:1, CIN:0 });
   const sim3 = simulate(w3, c3, wm3);
   assert(isLow(getPinVoltage(sim3, findPin(c3, 'SUM'))), '7480 1+1+0: SUM=0');
   assert(isHigh(getPinVoltage(sim3, findPin(c3, 'COUT'))), '7480 1+1+0: COUT=1');
-  const { world: w4, chip: c4, wm: wm4 } = setupChipWithPower('7480');
+  const { world: w4, chip: c4, wm: wm4 } = setupChipWithPower('74x80');
   applyInputs(wm4, c4, { A:1, B:1, CIN:1 });
   const sim4 = simulate(w4, c4, wm4);
   assert(isHigh(getPinVoltage(sim4, findPin(c4, 'SUM'))), '7480 1+1+1: SUM=1');
@@ -303,7 +303,7 @@ console.log('\nG11: 74x81 - 16x1 bit RAM');
 {
   // Write 1 to address 3, then read it back using fresh WireManagers
   const world = new BreadboardWorld(1, 1);
-  const chip = new ChipComponent('7481');
+  const chip = new ChipComponent('74x81');
   chip.place(0, 0, 10, 4);
   // Write cycle
   {
@@ -327,7 +327,7 @@ console.log('\nG11: 74x81 - 16x1 bit RAM');
     assert(isHigh(getPinVoltage(sim2, findPin(chip, 'Q'))), '7481 write 1 to addr 3, read back Q=1');
   }
   // CE=0 → output disabled
-  const { world: w3, chip: c3, wm: wm3 } = setupChipWithPower('7481');
+  const { world: w3, chip: c3, wm: wm3 } = setupChipWithPower('74x81');
   applyInputs(wm3, c3, { A0:0, A1:0, A2:0, A3:0, DIN:1, CE:0, WE:0 });
   const sim3 = simulate(w3, c3, wm3);
   assert(isLow(getPinVoltage(sim3, findPin(c3, 'Q'))), '7481 CE=0 → Q=0');
@@ -336,13 +336,13 @@ console.log('\nG11: 74x81 - 16x1 bit RAM');
 // G12: 74x82 - 2 bit full adder
 console.log('\nG12: 74x82 - 2 bit full adder');
 {
-  const { world: w1, chip: c1, wm: wm1 } = setupChipWithPower('7482');
+  const { world: w1, chip: c1, wm: wm1 } = setupChipWithPower('74x82');
   applyInputs(wm1, c1, { A1:1, A2:0, B1:0, B2:0, CIN:0 });
   const sim1 = simulate(w1, c1, wm1);
   assert(isHigh(getPinVoltage(sim1, findPin(c1, 'SUM1'))), '7482 A=01+B=00: SUM1=1');
   assert(isLow(getPinVoltage(sim1, findPin(c1, 'SUM2'))), '7482 A=01+B=00: SUM2=0');
   assert(isLow(getPinVoltage(sim1, findPin(c1, 'COUT'))), '7482 A=01+B=00: COUT=0');
-  const { world: w2, chip: c2, wm: wm2 } = setupChipWithPower('7482');
+  const { world: w2, chip: c2, wm: wm2 } = setupChipWithPower('74x82');
   applyInputs(wm2, c2, { A1:1, A2:1, B1:1, B2:0, CIN:0 });
   const sim2 = simulate(w2, c2, wm2);
   assert(isLow(getPinVoltage(sim2, findPin(c2, 'SUM1'))), '7482 A=11+B=01: SUM1=0');
@@ -350,11 +350,11 @@ console.log('\nG12: 74x82 - 2 bit full adder');
   assert(isHigh(getPinVoltage(sim2, findPin(c2, 'COUT'))), '7482 A=11+B=01: COUT=1');
 }
 
-// G13: 74x84 - 16x1 RAM (16-pin)
-console.log('\nG13: 74x84 - 16x1 bit RAM (16-pin)');
+// G13: 74x84 - 16x1 RAM (16 pin)
+console.log('\nG13: 74x84 - 16x1 bit RAM (16 pin)');
 {
   const world = new BreadboardWorld(1, 1);
-  const chip = new ChipComponent('7484');
+  const chip = new ChipComponent('74x84');
   chip.place(0, 0, 10, 4);
   // Write 1 to address 2
   {
@@ -378,7 +378,7 @@ console.log('\nG13: 74x84 - 16x1 bit RAM (16-pin)');
     assert(isHigh(getPinVoltage(sim2, findPin(chip, 'Q'))), '7484 write 1 to addr 2, read back Q=1');
   }
   // CE=0 → output disabled
-  const { world: w2, chip: c2, wm: wm2 } = setupChipWithPower('7484');
+  const { world: w2, chip: c2, wm: wm2 } = setupChipWithPower('74x84');
   applyInputs(wm2, c2, { A0:0, A1:0, A2:0, A3:0, DIN:0, CE:0, WE:0 });
   const sim2 = simulate(w2, c2, wm2);
   assert(isLow(getPinVoltage(sim2, findPin(c2, 'Q'))), '7484 CE=0 → Q=0');
@@ -387,22 +387,22 @@ console.log('\nG13: 74x84 - 16x1 bit RAM (16-pin)');
 // G14: 74x87 - 4 bit TRUE/COMP/ZERO/ONE
 console.log('\nG14: 74x87 - True/Complement/Zero/One element');
 {
-  const { world: w1, chip: c1, wm: wm1 } = setupChipWithPower('7487');
+  const { world: w1, chip: c1, wm: wm1 } = setupChipWithPower('74x87');
   applyInputs(wm1, c1, { S0:0, S1:0, A:1, B:1, C:1, D:1 });
   const sim1 = simulate(w1, c1, wm1);
   assert(isLow(getPinVoltage(sim1, findPin(c1, 'QA'))), '7487 S=00, A=1 → QA=0 (zero)');
   assert(isLow(getPinVoltage(sim1, findPin(c1, 'QB'))), '7487 S=00, B=1 → QB=0 (zero)');
-  const { world: w2, chip: c2, wm: wm2 } = setupChipWithPower('7487');
+  const { world: w2, chip: c2, wm: wm2 } = setupChipWithPower('74x87');
   applyInputs(wm2, c2, { S0:1, S1:0, A:1, B:0, C:1, D:0 });
   const sim2 = simulate(w2, c2, wm2);
   assert(isHigh(getPinVoltage(sim2, findPin(c2, 'QA'))), '7487 S=01, A=1 → QA=1 (true)');
   assert(isLow(getPinVoltage(sim2, findPin(c2, 'QB'))), '7487 S=01, B=0 → QB=0 (true)');
-  const { world: w3, chip: c3, wm: wm3 } = setupChipWithPower('7487');
+  const { world: w3, chip: c3, wm: wm3 } = setupChipWithPower('74x87');
   applyInputs(wm3, c3, { S0:0, S1:1, A:1, B:0, C:1, D:0 });
   const sim3 = simulate(w3, c3, wm3);
   assert(isLow(getPinVoltage(sim3, findPin(c3, 'QA'))), '7487 S=10, A=1 → QA=0 (comp)');
   assert(isHigh(getPinVoltage(sim3, findPin(c3, 'QB'))), '7487 S=10, B=0 → QB=1 (comp)');
-  const { world: w4, chip: c4, wm: wm4 } = setupChipWithPower('7487');
+  const { world: w4, chip: c4, wm: wm4 } = setupChipWithPower('74x87');
   applyInputs(wm4, c4, { S0:1, S1:1, A:0, B:0, C:0, D:0 });
   const sim4 = simulate(w4, c4, wm4);
   assert(isHigh(getPinVoltage(sim4, findPin(c4, 'QA'))), '7487 S=11, A=0 → QA=1 (one)');

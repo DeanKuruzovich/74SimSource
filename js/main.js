@@ -1,4 +1,4 @@
-// ── 74SIM Main Entry Point ───────────────────────────────────────────────────
+// ── 74Sim Main Entry Point ───────────────────────────────────────────────────
 
 import { COMP, MODE, getFamilySpec, DEFAULT_FAMILY } from './constants.js';
 import { createComponent } from './components.js';
@@ -9,31 +9,28 @@ import { WireManager } from './wire.js';
 import { LogicAnalyzer, exprToString, exprToProgramming, exprToMath, exprToStatement, renameInputs, evalExpr } from './logic.js';
 import { CircuitSimulator } from './simulator.js';
 import { getAllChipIds, searchChips, getChipDef, CHIP_DB } from './chips.js';
+import { t } from './i18n.js';
 import {
   serializeState, saveToLocalStorage, loadFromLocalStorage,
   deserializeState, importFromFile, exportToFile,
   suggestCircuitName, generateProjectId, getCurrentProjectId, setCurrentProjectId,
-  isTauri, saveStateToFile, openStateFromFile,
-  getCurrentFilePath, setCurrentFilePath, basenameOf,
-  isAutosaveEnabled, setAutosaveEnabled,
-  scheduleFsAutosave, loadFsAutosave,
-  onAutosaveStatus, emitAutosaveStatus,
+  saveProjectSnapshot, getProjectCache, loadProjectById, deleteProjectFromCache,
+  getStoredFilename, setStoredFilename, clearStoredFilename
 } from './storage.js';
 
 import { TextBoxManager } from './textbox.js';
+import { ImageBoxManager } from './imagebox.js';
+import { analyze555Timing, fmtFreq, fmtTime, fmtRes, fmtCapVal } from './timer555.js';
 import { loadExamples } from './examples.js';
+import { TimingDiagram } from './timingDiagram.js';
 
 // ── Debounced localStorage save ───────────────────────────────────────────────
 // Circuit topology doesn't change during rapid interactions (dragging, etc.)
 // so we defer the JSON.stringify to avoid blocking the main thread.
 let _saveTimer = null;
-function debouncedSave(state, fsTargetPath = null) {
+function debouncedSave(state) {
   clearTimeout(_saveTimer);
   _saveTimer = setTimeout(() => saveToLocalStorage(state), 400);
-  // In Tauri, also debounce-write to the bound file path (the user's opened
-  // file). If no file is bound, scheduleFsAutosave falls back to a recovery
-  // autosave.json in the OS app data dir.
-  scheduleFsAutosave(state, fsTargetPath);
 }
 
 // ── Logic Analyzer helpers (K-Map + Truth Table) ─────────────────────────────
@@ -50,7 +47,7 @@ function collectInputs(node) {
   return [...set].sort();
 }
 
-// 2-bit gray code sequence
+// 2 bit gray code sequence
 const GRAY2 = [0, 1, 3, 2];
 
 function evalAt(expr, inputs, bits) {
@@ -91,7 +88,7 @@ function renderKMap(expr, inputs) {
     return `<div class="la-kmap-empty">Constant: ${v}</div>`;
   }
   if (n > 4) {
-    return `<div class="la-kmap-empty">K-Map only supported for 2–4 inputs (this output uses ${n}).</div>`;
+    return `<div class="la-kmap-empty">K-Map only supported for 2 4 inputs (this output uses ${n}).</div>`;
   }
   if (n === 1) {
     const a = inputs[0];
@@ -140,17 +137,25 @@ class App {
     this.canvas = document.getElementById('board-canvas');
     this.world = new BreadboardWorld(2, 2);
     this.renderer = new Renderer(this.canvas, this.world);
+    // Repaint right after the canvas is resized so the freshly-cleared backing
+    // store doesn't briefly show the dark page background (e.g. when DevTools
+    // docks/undocks and the canvas grows, or the side panel animates its width
+    // when a chip is clicked). This must repaint SYNCHRONOUSLY, not just set the
+    // dirty flag: ResizeObserver callbacks fire after requestAnimationFrame but
+    // before paint, so a resize that only defers to the next RAF would paint the
+    // just-cleared (blank) canvas this frame — flashing for the whole transition.
+    this.renderer.onResize = () => { this._composeAndDraw(); };
     this.interaction = new Interaction(this);
     this.analyzer = new LogicAnalyzer();
     this.simulator = new CircuitSimulator();
 
     this.undoStack = [];
     this.clipboard = null;
-    this.chipPopularityMap = {};
-    this.chipPopularityLoaded = false;
     this.currentInfoComp = null;
+    this.currentProbe = null; // right-click voltage/current readout for a wire or LED
     this.lastInteractionTime = Date.now();
     this._currentProjectId = getCurrentProjectId();
+    this._lastStructuralHash = '';
 
     this.state = {
       components: [],
@@ -164,14 +169,15 @@ class App {
       lastUsedChips: [],
       showLogicView: false,
       showCircuitInfo: false,
+      showTiming: false,
       showNetPower: false,
       showSimpleChipNames: false,
       showValues: false,
       showRealisticBoard: false,
-      pureDigital: false,
       chipFamily: DEFAULT_FAMILY,
       extraTiles: [],
       textBoxes: [],
+      imageBoxes: [],
       logicLabels: null,   // Map<compId, label> when logic analyzer is open
       logicFormat: 'programming', // 'programming' | 'math' | 'statement'
       overcurrentIds: new Set(), // Set<compId> of components with error-level overcurrent
@@ -183,34 +189,28 @@ class App {
       () => {
         this.state.textBoxes = this.textBoxManager.serialize();
         saveToLocalStorage(this.state);
-      }
+      },
+      () => { this.pushUndo(); }
     );
 
-    // Track which file (if any) the current circuit lives in on disk.
-    this._currentFilePath = isTauri() ? getCurrentFilePath() : null;
+    // Image box manager (overlay on top of the canvas, below text boxes)
+    this.imageBoxManager = new ImageBoxManager(
+      document.getElementById('imagebox-layer'),
+      () => {
+        this.state.imageBoxes = this.imageBoxManager.serialize();
+        saveToLocalStorage(this.state);
+      },
+      () => { this.pushUndo(); }
+    );
 
-    // Try to restore from localStorage. In Tauri, prefer the on-disk autosave
-    // when it is newer or when localStorage is empty (loaded async, applied
-    // only if the user hasn't started editing yet).
+    // Try to restore from localStorage
     const saved = loadFromLocalStorage();
     if (saved) {
       deserializeState(saved, this.state, this.world);
       this._rebuildWorldTiles();
       this.textBoxManager.deserialize(this.state.textBoxes);
+      this.imageBoxManager.deserialize(this.state.imageBoxes);
       this._resetTransientRefs();
-    }
-    if (isTauri()) {
-      loadFsAutosave().then(fsState => {
-        if (!fsState) return;
-        if (this._dirty || this._hasWork()) return; // user already started editing
-        if (deserializeState(fsState, this.state, this.world)) {
-          this._rebuildWorldTiles();
-          this.textBoxManager.deserialize(this.state.textBoxes ?? []);
-          this._resetTransientRefs();
-          this.onCircuitChanged();
-          this._renderDirty = true;
-        }
-      }).catch(() => {});
     }
 
     // Push the restored (or default) chip family into the simulator before
@@ -230,6 +230,7 @@ class App {
         if (match && deserializeState(match.state, this.state, this.world)) {
           this._rebuildWorldTiles();
           this.textBoxManager.deserialize(this.state.textBoxes ?? []);
+          this.imageBoxManager.deserialize(this.state.imageBoxes ?? []);
           this._resetTransientRefs();
           this.onCircuitChanged();
           this._renderDirty = true;
@@ -248,10 +249,6 @@ class App {
     this.onCircuitChanged();
     this._renderDirty = true;
     this._startRenderLoop();
-
-    // Warm up chip popularity in the background so the first dropdown open
-    // is instant (no extra round-trip to /api/chips/popularity).
-    this._loadChipPopularity();
 
     // Mark clean after initial load, then track unsaved changes
     this._dirty = false;
@@ -294,7 +291,7 @@ class App {
 
     document.getElementById('welcome-examples-btn').addEventListener('click', () => {
       dismiss();
-      window.location.href = 'docs.html#examples';
+      window.open('/docs#examples', '_blank');
     });
 
     // Clicking the backdrop (outside the modal card) also dismisses
@@ -320,6 +317,27 @@ class App {
     window.addEventListener('resize', () => { this._renderDirty = true; });
 
     const loop = () => {
+      // Timing-analysis playback: advance sim time at the selected rate.
+      // Wall-clock dt only paces playback — event times stay ps-exact.
+      const nowMs = performance.now();
+      // Another view can take over the shared side panel without knowing
+      // about timing mode — detect the missing canvas and exit cleanly so
+      // the engine never keeps intercepting a sim the user believes is live.
+      if (this.state.showTiming && !document.getElementById('timing-canvas')) {
+        this._teardownTimingMode();
+      }
+      const tEng = this.simulator.timing;
+      if (this.state.showTiming && tEng && tEng.active) {
+        if (tEng.running) {
+          const dtSec = Math.min(0.1, Math.max(0, (nowMs - (this._lastTimingFrameMs ?? nowMs)) / 1000));
+          if (dtSec > 0) tEng.advanceByPs(tEng.rateNsPerSec * dtSec * 1000);
+          this._renderDirty = true; // wires/LEDs animate as events commit
+        }
+        if (this.timingDiagram) this.timingDiagram.render();
+        this._updateTimingReadout();
+      }
+      this._lastTimingFrameMs = nowMs;
+
       const m = this.interaction.mode;
       // Always render during active interactions or when state has changed.
       // Also keep rendering every frame when showNetPower is on because the
@@ -330,34 +348,48 @@ class App {
                           this.state.showNetPower;
 
       if (needsRedraw) {
-        // Merge interaction state into draw state
-        // Show ghost for DIP placement modes AND drag-to-move (all component types)
-        this.state.ghost = (m === MODE.PLACE_CHIP || m === MODE.PLACE_OUTPUT || m === MODE.MOVE_COMP)
-          ? this.interaction.ghost : null;
-        this.state.ghosts = (m === MODE.MOVE_COMP) ? this.interaction.ghosts : [];
-        this.state.wireStart = this.interaction.wireStart || this.interaction.compStart;
-        if (m === MODE.WIRE_END || m === MODE.COMP_END || m === MODE.MOVE_WIRE_EP || m === MODE.MOVE_COMP_EP) {
-          this.state.mouseWorld = this.interaction.mouseWorld;
-        }
-        this.state.draggingWireEp = m === MODE.MOVE_WIRE_EP ? this.interaction._moveWireEp : null;
-        this.state.draggingCompEp = m === MODE.MOVE_COMP_EP ? this.interaction._moveCompEp : null;
-        this.state.movingComp = m === MODE.MOVE_COMP ? this.interaction._movingComp : null;
-        this.state.movingCompItems = m === MODE.MOVE_COMP ? this.interaction._movingComps : [];
-        this.state.movingWires = m === MODE.MOVE_COMP ? this.interaction._movingWires : [];
-        this.state.partialEndpointMoves = m === MODE.MOVE_COMP ? this.interaction._partialEndpointMoves : [];
-        this.state.dragPixelOffset = m === MODE.MOVE_COMP ? this.interaction._dragPixelOffset : null;
-
-        this.renderer.draw(this.state);
-        this._renderDirty = false;
+        this._composeAndDraw();
       }
       // Always sync textbox DOM positions to the current viewport this must run
       // every frame (not just when needsRedraw) so boxes track pan/zoom instantly.
       this.textBoxManager.updateViewport(
         this.renderer.offsetX, this.renderer.offsetY, this.renderer.zoom
       );
+      this.imageBoxManager.updateViewport(
+        this.renderer.offsetX, this.renderer.offsetY, this.renderer.zoom
+      );
       requestAnimationFrame(loop);
     };
     requestAnimationFrame(loop);
+  }
+
+  // Merge the current interaction state into the draw state and paint one frame.
+  // Called from the RAF loop and, synchronously, from renderer.onResize so a
+  // resize-cleared canvas is refilled before the browser paints (see onResize).
+  _composeAndDraw() {
+    const m = this.interaction.mode;
+    // Show ghost for DIP placement modes AND drag-to-move (all component types)
+    this.state.ghost = (m === MODE.PLACE_CHIP || m === MODE.PLACE_OUTPUT || m === MODE.MOVE_COMP)
+      ? this.interaction.ghost : null;
+    this.state.ghosts = (m === MODE.MOVE_COMP || m === MODE.PASTE_PREVIEW)
+      ? this.interaction.ghosts : [];
+    // Ghost wires for multi-item paste preview (rendered as semi-transparent wires)
+    this.state.ghostWires = (m === MODE.PASTE_PREVIEW)
+      ? this.interaction._pasteWireHoles : [];
+    this.state.wireStart = this.interaction.wireStart || this.interaction.compStart;
+    if (m === MODE.WIRE_END || m === MODE.COMP_END || m === MODE.MOVE_WIRE_EP || m === MODE.MOVE_COMP_EP) {
+      this.state.mouseWorld = this.interaction.mouseWorld;
+    }
+    this.state.draggingWireEp = m === MODE.MOVE_WIRE_EP ? this.interaction._moveWireEp : null;
+    this.state.draggingCompEp = m === MODE.MOVE_COMP_EP ? this.interaction._moveCompEp : null;
+    this.state.movingComp = m === MODE.MOVE_COMP ? this.interaction._movingComp : null;
+    this.state.movingCompItems = m === MODE.MOVE_COMP ? this.interaction._movingComps : [];
+    this.state.movingWires = m === MODE.MOVE_COMP ? this.interaction._movingWires : [];
+    this.state.partialEndpointMoves = m === MODE.MOVE_COMP ? this.interaction._partialEndpointMoves : [];
+    this.state.dragPixelOffset = m === MODE.MOVE_COMP ? this.interaction._dragPixelOffset : null;
+
+    this.renderer.draw(this.state);
+    this._renderDirty = false;
   }
 
   // ── Toolbar ────────────────────────────────────────────────────────────────
@@ -379,7 +411,7 @@ class App {
       dropChip.classList.toggle('show');
       if (dropChip.classList.contains('show')) {
         chipSearch.focus();
-        this._loadChipPopularity().then(() => this._renderChipList(chipSearch.value));
+        this._renderChipList(chipSearch.value);
         this._renderLastUsed();
       }
     });
@@ -449,7 +481,25 @@ class App {
       dropInput.classList.toggle('show');
     });
 
-    dropInput.querySelectorAll('.dropdown-item').forEach(item => {
+    // DIP switch submenu
+    const dipToggle = document.getElementById('input-dip-toggle');
+    const dipSizesList = document.getElementById('dip-sizes-list');
+    dipToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = dipSizesList.style.display !== 'none';
+      dipSizesList.style.display = isOpen ? 'none' : 'block';
+      dipToggle.querySelector('.dropdown-item-name').textContent = isOpen ? 'DIP Switch ▸' : 'DIP Switch ▾';
+    });
+    dipSizesList.querySelectorAll('.dropdown-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const count = parseInt(item.dataset.count, 10);
+        this._closeAllDropdowns();
+        this.interaction.startPlacement(COMP.DIP_SWITCH, count);
+        this._setActiveBtn(btnInput);
+      });
+    });
+
+    dropInput.querySelectorAll('.dropdown-item[data-type]:not([data-type="dip_switch"])').forEach(item => {
       item.addEventListener('click', () => {
         const type = item.dataset.type;
         this._closeAllDropdowns();
@@ -502,6 +552,12 @@ class App {
       this._setActiveBtn(btnAnalog);
     });
 
+    document.getElementById('analog-inductor').addEventListener('click', () => {
+      this._closeAllDropdowns();
+      this.interaction.startPlacement(COMP.INDUCTOR);
+      this._setActiveBtn(btnAnalog);
+    });
+
     // More dropdown
     const btnMore = document.getElementById('btn-more');
     const dropMore = document.getElementById('dropdown-more');
@@ -538,16 +594,9 @@ class App {
       saveToLocalStorage(this.state);
     });
 
-    const itemPureDigital = document.getElementById('more-pure-digital');
-    itemPureDigital.classList.toggle('active', this.state.pureDigital);
-    itemPureDigital.addEventListener('click', () => this._togglePureDigital());
-    const pdBadge = document.getElementById('pure-digital-badge');
-    if (pdBadge) pdBadge.style.display = this.state.pureDigital ? '' : 'none';
-
     itemHelp.addEventListener('click', () => {
       this._closeAllDropdowns();
-      // Navigate in same window so Tauri doesn't need extra window permissions.
-      window.location.href = 'docs.html';
+      window.open('/docs', '_blank');
     });
 
     const itemExamples = document.getElementById('more-examples');
@@ -563,6 +612,7 @@ class App {
           if (deserializeState(ex.state, this.state, this.world)) {
             this._rebuildWorldTiles();
             this.textBoxManager.deserialize(this.state.textBoxes ?? []);
+            this.imageBoxManager.deserialize(this.state.imageBoxes ?? []);
             this._resetTransientRefs();
             saveToLocalStorage(this.state);
             this.onCircuitChanged();
@@ -585,10 +635,37 @@ class App {
       this.textBoxManager.addBox();
     });
 
+    const itemAddImagebox = document.getElementById('more-add-imagebox');
+    itemAddImagebox.addEventListener('click', () => {
+      this._closeAllDropdowns();
+      this.imageBoxManager.addBox();
+    });
+
     const itemSimpleClock = document.getElementById('more-simple-clock');
     itemSimpleClock.addEventListener('click', () => {
       this._closeAllDropdowns();
       this.interaction.startPlacement(COMP.CLOCK);
+      this._setActiveBtn(btnMore);
+    });
+
+    const itemTestPoint = document.getElementById('more-test-point');
+    itemTestPoint.addEventListener('click', () => {
+      this._closeAllDropdowns();
+      this.interaction.startPlacement(COMP.TESTPOINT);
+      this._setActiveBtn(btnMore);
+    });
+
+    const itemCrystal = document.getElementById('more-crystal');
+    itemCrystal.addEventListener('click', () => {
+      this._closeAllDropdowns();
+      this.interaction.startPlacement(COMP.CRYSTAL);
+      this._setActiveBtn(btnMore);
+    });
+
+    const itemCrystalCan = document.getElementById('more-crystal-can');
+    itemCrystalCan.addEventListener('click', () => {
+      this._closeAllDropdowns();
+      this.interaction.startPlacement(COMP.CHIP, 'XO');
       this._setActiveBtn(btnMore);
     });
 
@@ -599,6 +676,17 @@ class App {
         this._closeInfoPanel();
       } else {
         this._showCircuitInfo();
+      }
+    });
+
+    // Timing Analysis
+    const itemTiming = document.getElementById('more-timing');
+    itemTiming.addEventListener('click', () => {
+      this._closeAllDropdowns();
+      if (this.state.showTiming) {
+        this._closeInfoPanel();
+      } else {
+        this._showTimingAnalyzer();
       }
     });
 
@@ -646,59 +734,34 @@ class App {
 
     btnFile.addEventListener('click', () => {
       this._closeAllDropdowns();
+      this._renderCachedProjects();
       dropFile.classList.toggle('show');
     });
 
-    // Reveal desktop-only File / Settings menu items when running in Tauri.
-    if (isTauri()) {
-      document.querySelectorAll('.desktop-only').forEach(el => {
-        el.style.display = '';
-      });
-      this._refreshSaveLabel();
-    }
-
-    // Tauri-only filesystem Save / Save As / Open.
-    const elSave   = document.getElementById('file-save-fs');
-    const elSaveAs = document.getElementById('file-save-as');
-    const elOpen   = document.getElementById('file-open');
-    if (elSave) elSave.addEventListener('click', async () => {
+    document.getElementById('file-save').addEventListener('click', () => {
       this._closeAllDropdowns();
-      await this._fsSave({ saveAs: false });
-    });
-    if (elSaveAs) elSaveAs.addEventListener('click', async () => {
-      this._closeAllDropdowns();
-      await this._fsSave({ saveAs: true });
-    });
-    if (elOpen) elOpen.addEventListener('click', async () => {
-      this._closeAllDropdowns();
-      await this._fsOpen();
+      exportToFile(this.state);
+      this._dirty = false;
     });
 
-    // Autosave toggle (desktop-only).
-    const elAutosave = document.getElementById('more-autosave');
-    if (elAutosave) {
-      elAutosave.classList.toggle('active', isAutosaveEnabled());
-      this._applyAutosaveUi(isAutosaveEnabled());
-      elAutosave.addEventListener('click', () => {
-        const next = !isAutosaveEnabled();
-        setAutosaveEnabled(next);
-        elAutosave.classList.toggle('active', next);
-        this._applyAutosaveUi(next);
-        if (next) {
-          // Kick off an immediate write so the indicator confirms the file
-          // is current — and so a freshly-toggled-on autosave doesn't sit
-          // silent until the user makes the next change.
-          scheduleFsAutosave(this.state, this._currentFilePath || null);
+    document.getElementById('file-load').addEventListener('click', () => {
+      this._closeAllDropdowns();
+      importFromFile((data, filename) => {
+        if (deserializeState(data, this.state, this.world)) {
+          this._rebuildWorldTiles();
+          this.textBoxManager.deserialize(this.state.textBoxes);
+          this.imageBoxManager.deserialize(this.state.imageBoxes);
+          this._resetTransientRefs();
+          // Loaded file becomes a new project session
+          this._currentProjectId = generateProjectId();
+          setCurrentProjectId(this._currentProjectId);
+          this._lastStructuralHash = '';
+          // Sticky filename: subsequent saves suggest the loaded file's name.
+          if (filename) setStoredFilename(filename);
+          this.onCircuitChanged();
         }
       });
-    }
-
-    // Subscribe to autosave status events to drive the toolbar indicator.
-    if (isTauri()) {
-      onAutosaveStatus((status) => this._renderAutosaveStatus(status));
-      // Initial state: nothing pending yet, file is current.
-      this._renderAutosaveStatus('saved');
-    }
+    });
 
     document.getElementById('file-clear').addEventListener('click', () => {
       this._closeAllDropdowns();
@@ -709,12 +772,16 @@ class App {
       this.state.extraTiles = [];
       this.state.textBoxes = [];
       this.textBoxManager.clear();
+      this.state.imageBoxes = [];
+      this.imageBoxManager.clear();
       this._rebuildWorldTiles();
       this._resetTransientRefs();
-      this._resetPureDigital();
       this.interaction.cancelMode();
+      // Start a fresh project session so the old circuit stays in cache
       this._currentProjectId = generateProjectId();
       setCurrentProjectId(this._currentProjectId);
+      this._lastStructuralHash = '';
+      clearStoredFilename();
       this.onCircuitChanged();
       this._dirty = false;
     });
@@ -746,108 +813,12 @@ class App {
       const key = e.key.toLowerCase();
       if (key === 's') {
         e.preventDefault();
-        // Cmd/Ctrl+Shift+S → Save As, plain Cmd/Ctrl+S → Save (or first-time prompt)
-        if (isTauri()) this._fsSave({ saveAs: e.shiftKey });
-      } else if (key === 'o') {
-        e.preventDefault();
-        if (isTauri()) this._fsOpen();
+        document.getElementById('file-save').click();
       } else if (key === 'l') {
-        // Legacy shortcut from the old "Load from local" item.
         e.preventDefault();
-        if (isTauri()) this._fsOpen();
+        document.getElementById('file-load').click();
       }
     });
-  }
-
-  // ── Tauri filesystem Save / Open helpers ────────────────────────────────────
-  async _fsSave({ saveAs = false } = {}) {
-    if (!isTauri()) return;
-    try {
-      const target = saveAs ? null : this._currentFilePath;
-      const path = await saveStateToFile(this.state, target);
-      if (!path) return; // cancelled
-      this._currentFilePath = path;
-      setCurrentFilePath(path);
-      this._refreshSaveLabel();
-      this._dirty = false;
-      // Keep the autosave indicator in sync with an explicit save.
-      emitAutosaveStatus('saved');
-    } catch (e) {
-      console.error('Save failed:', e);
-      emitAutosaveStatus('error', e);
-      alert('Save failed: ' + (e?.message || e));
-    }
-  }
-
-  async _fsOpen() {
-    if (!isTauri()) return;
-    try {
-      const result = await openStateFromFile();
-      if (!result) return; // cancelled
-      const { path, data } = result;
-      if (deserializeState(data, this.state, this.world)) {
-        this._rebuildWorldTiles();
-        this.textBoxManager.deserialize(this.state.textBoxes ?? []);
-        this._resetTransientRefs();
-        this._currentFilePath = path;
-        setCurrentFilePath(path);
-        this._refreshSaveLabel();
-        this._currentProjectId = generateProjectId();
-        setCurrentProjectId(this._currentProjectId);
-        this.onCircuitChanged();
-        this._renderDirty = true;
-        this._dirty = false;
-      }
-    } catch (e) {
-      console.error('Open failed:', e);
-      alert('Open failed: ' + (e?.message || e));
-    }
-  }
-
-  async _refreshSaveLabel() {
-    const desc = document.getElementById('file-save-fs-desc');
-    if (!desc) return;
-    if (this._currentFilePath) {
-      const name = await basenameOf(this._currentFilePath);
-      desc.textContent = `Save to ${name}`;
-    } else {
-      desc.textContent = 'Save...';
-    }
-  }
-
-  // Hide the manual "Save" item (and its divider) when autosave is on —
-  // every change is already being written. Show the toolbar status indicator
-  // so the user can see autosave activity.
-  _applyAutosaveUi(autosaveOn) {
-    if (!isTauri()) return;
-    const elSave = document.getElementById('file-save-fs');
-    const elDivider = document.getElementById('file-divider-1');
-    const elStatus = document.getElementById('autosave-status');
-    if (elSave) elSave.style.display = autosaveOn ? 'none' : '';
-    if (elDivider) elDivider.style.display = autosaveOn ? 'none' : '';
-    if (elStatus) elStatus.style.display = autosaveOn ? '' : 'none';
-  }
-
-  _renderAutosaveStatus(status) {
-    const el = document.getElementById('autosave-status');
-    if (!el) return;
-    el.classList.remove('is-pending', 'is-saving', 'is-saved', 'is-error');
-    switch (status) {
-      case 'pending':
-      case 'saving':
-        el.textContent = 'Saving...';
-        el.classList.add('is-saving');
-        break;
-      case 'error':
-        el.textContent = 'Save failed';
-        el.classList.add('is-error');
-        break;
-      case 'saved':
-      default:
-        el.textContent = 'Saved';
-        el.classList.add('is-saved');
-        break;
-    }
   }
 
   _closeAllDropdowns() {
@@ -857,6 +828,11 @@ class App {
     if (el) el.style.display = 'none';
     const toggle = document.getElementById('more-examples');
     if (toggle) toggle.querySelector('.dropdown-item-name').textContent = 'Example Projects ▸';
+    // Collapse DIP switch sizes submenu
+    const dipList = document.getElementById('dip-sizes-list');
+    if (dipList) dipList.style.display = 'none';
+    const dipTgl = document.getElementById('input-dip-toggle');
+    if (dipTgl) dipTgl.querySelector('.dropdown-item-name').textContent = 'DIP Switch ▸';
     // Collapse LED colors submenu
     const ledList = document.getElementById('led-colors-list');
     if (ledList) ledList.style.display = 'none';
@@ -898,38 +874,102 @@ class App {
     return item;
   }
 
+  // Non-chip placeable components (inputs, outputs, analog, wire, text, clocks).
+  // Built once and cached. Each entry is searchable by name + keywords and
+  // carries a `place` callback that mirrors its normal toolbar menu action.
+  _getComponentCatalog() {
+    if (this._componentCatalog) return this._componentCatalog;
+    const place = (compType, subtype) => () => this.interaction.startPlacement(compType, subtype);
+    this._componentCatalog = [
+      // Inputs
+      { name: '4-pin Push Button', desc: 'Momentary 4-pin tactile push button', keywords: 'input button push tactile momentary', place: place(COMP.BUTTON) },
+      { name: '2-pin Push Button', desc: 'Momentary 2-pin push button', keywords: 'input button push momentary', place: place(COMP.PUSH_BUTTON) },
+      { name: '2-pin SPST Slide Switch', desc: 'Single-pole single-throw slide switch', keywords: 'input switch spst slide toggle', place: place(COMP.SWITCH) },
+      { name: '3-pin SPDT Slide Switch', desc: 'Single-pole double-throw slide switch', keywords: 'input switch spdt slide toggle', place: place(COMP.SLIDE_SWITCH) },
+      { name: '2-Switch DIP Switch', desc: '2-position DIP switch', keywords: 'input dip switch', place: place(COMP.DIP_SWITCH, 2) },
+      { name: '4-Switch DIP Switch', desc: '4-position DIP switch', keywords: 'input dip switch', place: place(COMP.DIP_SWITCH, 4) },
+      { name: '6-Switch DIP Switch', desc: '6-position DIP switch', keywords: 'input dip switch', place: place(COMP.DIP_SWITCH, 6) },
+      { name: '8-Switch DIP Switch', desc: '8-position DIP switch', keywords: 'input dip switch', place: place(COMP.DIP_SWITCH, 8) },
+      { name: '10-Switch DIP Switch', desc: '10-position DIP switch', keywords: 'input dip switch', place: place(COMP.DIP_SWITCH, 10) },
+      // Outputs
+      { name: 'Red LED', desc: 'Light emitting diode (red)', keywords: 'output led light indicator', place: place(COMP.LED, 'red') },
+      { name: 'Green LED', desc: 'Light emitting diode (green)', keywords: 'output led light indicator', place: place(COMP.LED, 'green') },
+      { name: 'Blue LED', desc: 'Light emitting diode (blue)', keywords: 'output led light indicator', place: place(COMP.LED, 'blue') },
+      { name: 'Yellow LED', desc: 'Light emitting diode (yellow)', keywords: 'output led light indicator', place: place(COMP.LED, 'yellow') },
+      { name: 'White LED', desc: 'Light emitting diode (white)', keywords: 'output led light indicator', place: place(COMP.LED, 'white') },
+      { name: '7 Segment Display (Common Cathode)', desc: 'Common-cathode 7-segment display', keywords: 'output 7 seven segment display digit', place: place(COMP.SEVEN_SEG, '5161as') },
+      { name: '7 Segment Display (Common Anode)', desc: 'Common-anode 7-segment display', keywords: 'output 7 seven segment display digit', place: place(COMP.SEVEN_SEG) },
+      // Analog
+      { name: 'Resistor', desc: 'Fixed resistor', keywords: 'analog resistor passive ohm', place: place(COMP.RESISTOR) },
+      { name: 'Capacitor', desc: 'Non-polarized capacitor', keywords: 'analog capacitor passive farad', place: place(COMP.CAPACITOR) },
+      { name: 'Polarized Capacitor', desc: 'Polarized (electrolytic) capacitor', keywords: 'analog capacitor electrolytic passive farad', place: place(COMP.POLARIZED_CAPACITOR) },
+      { name: 'Diode', desc: 'Signal diode', keywords: 'analog diode passive rectifier', place: place(COMP.DIODE) },
+      // -1.2push- hidden from search catalog for release; uncomment to re-enable
+      // { name: 'Inductor', desc: 'Inductor (coil)', keywords: 'analog inductor coil passive henry choke', place: place(COMP.INDUCTOR) },
+      // Wire / misc
+      { name: 'Wire', desc: 'Draw a wire between holes', keywords: 'wire connection net jumper', place: () => this.interaction.startWireMode() },
+      { name: 'Text box', desc: 'Add a floating text label', keywords: 'text box label note annotation', place: () => this.textBoxManager.addBox() },
+      { name: 'Image box', desc: 'Add a floating picture', keywords: 'image picture photo box figure annotation screenshot', place: () => this.imageBoxManager.addBox() },
+      { name: 'Simple Clock', desc: 'Adjustable square-wave clock source', keywords: 'clock oscillator square wave timing', place: place(COMP.CLOCK) },
+      // -1.2push- hidden from search catalog for release; uncomment to re-enable
+      // { name: 'Crystal', desc: '2-pin crystal clock source — right-click to set frequency', keywords: 'clock crystal oscillator timing frequency xtal quartz', place: place(COMP.CRYSTAL) },
+      { name: 'Test Point', desc: 'Voltage probe & timing-diagram lane', keywords: 'test point probe scope waveform timing analysis tp', place: place(COMP.TESTPOINT) },
+    ];
+    // Stable, locale-independent key for each entry (derived from the English
+    // name) so t() can look up translated name/desc at render/search time.
+    for (const e of this._componentCatalog) {
+      e._slug = e.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    }
+    return this._componentCatalog;
+  }
+
+  // Localized name/desc for a catalog entry (falls back to English).
+  _compName(e) { return t(`comp.${e._slug}.name`, { def: e.name }); }
+  _compDesc(e) { return t(`comp.${e._slug}.desc`, { def: e.desc }); }
+
+  _searchComponents(query) {
+    const q = (query || '').toLowerCase().trim();
+    if (!q) return [];
+    return this._getComponentCatalog().filter(c =>
+      this._compName(c).toLowerCase().includes(q) || c.name.toLowerCase().includes(q) || c.keywords.includes(q)
+    );
+  }
+
+  _makeComponentListItem(entry) {
+    const item = document.createElement('div');
+    item.className = 'dropdown-item dropdown-item--component';
+    item.innerHTML = `
+      <span class="dropdown-item-name">${this._compName(entry)}</span>
+      <span class="dropdown-item-desc">${this._compDesc(entry)}</span>
+    `;
+    item.addEventListener('click', () => {
+      this._closeAllDropdowns();
+      entry.place();
+      this._setActiveBtn(document.getElementById('btn-chip'));
+    });
+    return item;
+  }
+
   _renderChipList(query) {
     const chipList = document.getElementById('chip-list');
     const sortByNumber = !document.getElementById('chip-sort-by-number').checked;
-    const opts = { popularityMap: this.chipPopularityMap, sortByNumber };
     chipList.innerHTML = '';
 
-    const ids = searchChips(query, opts);
-    if (ids.length === 0) {
-      chipList.innerHTML = '<div class="empty-state">No chips found</div>';
+    const components = this._searchComponents(query);
+    const ids = searchChips(query, { sortByNumber });
+    if (ids.length === 0 && components.length === 0) {
+      chipList.innerHTML = `<div class="empty-state">${t('sim.noMatches', { def: 'No matches found' })}</div>`;
       return;
     }
     const frag = document.createDocumentFragment();
+    // Matching components surface at the top, styled distinctly from chips.
+    for (const entry of components) {
+      frag.appendChild(this._makeComponentListItem(entry));
+    }
     for (const id of ids) {
       frag.appendChild(this._makeChipListItem(id));
     }
     chipList.appendChild(frag);
-  }
-
-  async _loadChipPopularity() {
-    if (this.chipPopularityLoaded) return;
-    // Best-effort fetch from the live website. Fails silently in the desktop
-    // app when offline or when the WebView can't reach 74sim.com.
-    try {
-      const res = await fetch('https://74sim.com/api/chips/popularity');
-      if (res.ok) {
-        const data = await res.json();
-        for (const { chip_id, total_count } of data) {
-          this.chipPopularityMap[chip_id] = total_count;
-        }
-      }
-    } catch (_) { /* non-critical, silently ignore */ }
-    this.chipPopularityLoaded = true;
   }
 
   _renderLastUsed() {
@@ -944,6 +984,8 @@ class App {
     for (const id of this.state.lastUsedChips) {
       const def = getChipDef(id);
       if (!def) continue;
+      // Skip stub-only parts (info sheet in docs but not implemented).
+      if (def.tags?.includes('stub')) continue;
       const item = document.createElement('div');
       item.className = 'dropdown-item';
       const familyCode = this.state.chipFamily;
@@ -1029,7 +1071,7 @@ class App {
       html += '</tbody></table>';
     }
 
-    html += `<div class="sim-note">Note: simulation is not perfect and can have errors be careful with real circuits.</div>`;
+    html += `<div class="sim-note">${t('sim.note', { def: 'Note: simulation is not perfect and can have errors be careful with real circuits.' })}</div>`;
 
     container.innerHTML = html;
   }
@@ -1037,6 +1079,10 @@ class App {
   // ── Chip / 7-Seg Info Panel ───────────────────────────────────────────────
   showChipInfo(comp) {
     this.currentInfoComp = comp;
+    this.currentProbe = null;
+    // Take over the side panel from Circuit Analyzer / Logic Analyzer so their
+    // time-step refresh loop doesn't repaint over the component panel.
+    this.state.showCircuitInfo = false;
     this.state.showLogicView = false;
     this.state.logicLabels = null;
     document.getElementById('btn-logic').classList.remove('active');
@@ -1049,259 +1095,13 @@ class App {
     this.renderer._resize();
     this._renderDirty = true;
 
-    // ── Push Button ───────────────────────────────────────────────────────
-    if (comp.type === COMP.BUTTON) {
-      title.textContent = 'Push Button';
-      const sim = this.simulator;
-      const nl  = sim.netlist;
-      const pinVoltage = (pin) => {
-        const net = nl.findNetByHole(pin.holeId);
-        if (!net) return undefined;
-        return sim.netVoltages.get(net.id);
-      };
-      const fmtV = (v) => {
-        if (v === undefined) return '<span class="pin-v-float">?</span>';
-        if (v >= 4.5)        return '<span class="pin-v-hi">H</span>';
-        if (v <= 0.5)        return '<span class="pin-v-lo">L</span>';
-        return `<span class="pin-v-mid">${v.toFixed(1)}</span>`;
-      };
-
-      const stateBadge = comp.pressed
-        ? '<div class="comp-state-badge comp-state-active">▶ PRESSED</div>'
-        : '<div class="comp-state-badge comp-state-inactive">○ RELEASED</div>';
-
-      const pinDefs = [
-        { name: 'TL', label: 'Top Left'  },
-        { name: 'TR', label: 'Top Right' },
-        { name: 'BL', label: 'Bot Left'  },
-        { name: 'BR', label: 'Bot Right' },
-      ];
-      let pinRows = '';
-      for (const pd of pinDefs) {
-        const cp = comp.pins.find(p => p.name === pd.name);
-        const v  = cp ? pinVoltage(cp) : undefined;
-        pinRows += `<tr>
-          <td class="pin-num">${pd.name}</td>
-          <td class="pin-name pin-passive">${pd.label}</td>
-          <td>${fmtV(v)}</td>
-        </tr>`;
-      }
-
-      // SVG pinout diagram: 2×2 grid resembles a 6×6 mm tactile switch
-      const svgBtn = `
-        <svg class="btn-pinout-svg" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
-          <!-- body -->
-          <rect x="10" y="10" width="60" height="60" rx="6" fill="#1a1a1a" stroke="#555" stroke-width="2"/>
-          <!-- button cap -->
-          <circle cx="40" cy="40" r="16" fill="${comp.pressed ? '#555' : '#333'}" stroke="#777" stroke-width="1.5"/>
-          <circle cx="40" cy="40" r="10" fill="${comp.pressed ? '#888' : '#444'}" stroke="#999" stroke-width="1"/>
-          <!-- pins -->
-          <rect x="4"  y="20" width="8" height="4" rx="1" fill="#aaa"/><text x="2" y="17" fill="#ffffff" font-size="7" font-family="monospace">TL</text>
-          <rect x="68" y="20" width="8" height="4" rx="1" fill="#aaa"/><text x="64" y="17" fill="#ffffff" font-size="7" font-family="monospace">TR</text>
-          <rect x="4"  y="56" width="8" height="4" rx="1" fill="#aaa"/><text x="2" y="68" fill="#ffffff" font-size="7" font-family="monospace">BL</text>
-          <rect x="68" y="56" width="8" height="4" rx="1" fill="#aaa"/><text x="64" y="68" fill="#ffffff" font-size="7" font-family="monospace">BR</text>
-          <!-- internal connections (left pair + right pair always joined) -->
-          <line x1="8" y1="22" x2="8" y2="58" stroke="${comp.pressed ? '#4f4' : '#484'}" stroke-width="1" stroke-dasharray="3,2"/>
-          <line x1="72" y1="22" x2="72" y2="58" stroke="${comp.pressed ? '#4f4' : '#484'}" stroke-width="1" stroke-dasharray="3,2"/>
-          ${comp.pressed ? '<line x1="8" y1="40" x2="72" y2="40" stroke="#4f4" stroke-width="1" stroke-dasharray="3,2"/>' : ''}
-        </svg>`;
-
-      container.innerHTML = `
-        <div class="comp-state-wrap">${stateBadge}</div>
-        <div class="chip-info-desc">Momentary 4-pin tactile push button (6×6 mm). Click to press/release.</div>
-        <div class="btn-pinout-wrap">${svgBtn}</div>
-        <table class="chip-pinout-table">
-          <thead><tr><th class="pin-num">Pin</th><th class="pin-name">Name</th><th>State</th></tr></thead>
-          <tbody>${pinRows}</tbody>
-        </table>
-        <div class="chip-pinout-legend">
-          <span style="color:#888">TL/BL always joined &nbsp;·&nbsp; TR/BR always joined &nbsp;·&nbsp; Press bridges both pairs</span>
-        </div>
-        <a class="chip-datasheet-link" href="https://components101.com/switches/push-button" target="_blank" rel="noopener">View on Components101 ↗</a>
-        <div class="chip-help-section">
-          <button class="chip-help-btn">How to use</button>
-          <div class="chip-help-text">
-            <strong>Typical wiring:</strong> Connect one side (TL/BL) to GND and the other side (TR/BR) to your input node plus a <strong>pull-up resistor to VCC</strong>. The input reads HIGH when the button is released, and LOW when pressed.<br><br>
-            <strong>Pin pairs:</strong> TL↔BL and TR↔BR are internally connected at all times. Press bridges both pairs together (TL=TR=BL=BR).
-          </div>
-        </div>`;
-
-      container.querySelector('.chip-help-btn').addEventListener('click', () => {
-        const helpText = container.querySelector('.chip-help-text');
-        const visible = helpText.classList.toggle('chip-help-text-open');
-        container.querySelector('.chip-help-btn').textContent = visible ? 'Hide' : 'How to use';
-      });
-      return;
-    }
-
-    // ── Push Button (2-pin momentary) ─────────────────────────────────────
-    if (comp.type === COMP.PUSH_BUTTON) {
-      title.textContent = 'Push Button (2-pin)';
-      const sim = this.simulator;
-      const nl  = sim.netlist;
-      const pinVoltage = (pin) => {
-        const net = nl.findNetByHole(pin.holeId);
-        if (!net) return undefined;
-        return sim.netVoltages.get(net.id);
-      };
-      const fmtV = (v) => {
-        if (v === undefined) return '<span class="pin-v-float">?</span>';
-        if (v >= 4.5)        return '<span class="pin-v-hi">H</span>';
-        if (v <= 0.5)        return '<span class="pin-v-lo">L</span>';
-        return `<span class="pin-v-mid">${v.toFixed(1)}</span>`;
-      };
-
-      const stateBadge = comp.pressed
-        ? '<div class="comp-state-badge comp-state-active">▶ PRESSED</div>'
-        : '<div class="comp-state-badge comp-state-inactive">○ RELEASED</div>';
-
-      const pinDefs = [
-        { name: 'A', label: 'Pin A' },
-        { name: 'B', label: 'Pin B' },
-      ];
-      let pinRows = '';
-      for (const pd of pinDefs) {
-        const cp = comp.pins.find(p => p.name === pd.name);
-        const v  = cp ? pinVoltage(cp) : undefined;
-        pinRows += `<tr>
-          <td class="pin-num">${pd.name}</td>
-          <td class="pin-name pin-passive">${pd.label}</td>
-          <td>${fmtV(v)}</td>
-        </tr>`;
-      }
-
-      const svgBtn = `
-        <svg class="btn-pinout-svg" viewBox="0 0 80 42" xmlns="http://www.w3.org/2000/svg">
-          <!-- body -->
-          <rect x="15" y="6" width="50" height="30" rx="5" fill="#1a1a1a" stroke="#555" stroke-width="2"/>
-          <!-- button cap -->
-          <circle cx="40" cy="21" r="10" fill="${comp.pressed ? '#555' : '#333'}" stroke="#777" stroke-width="1.5"/>
-          <circle cx="40" cy="21" r="6" fill="${comp.pressed ? '#f0e0cc' : '#d4b896'}" stroke="#bba" stroke-width="1"/>
-          <!-- pins -->
-          <rect x="0"  y="19" width="16" height="4" rx="1" fill="#aaa"/><text x="1" y="14" fill="#ffffff" font-size="7" font-family="monospace">A</text>
-          <rect x="64" y="19" width="16" height="4" rx="1" fill="#aaa"/><text x="66" y="14" fill="#ffffff" font-size="7" font-family="monospace">B</text>
-          ${comp.pressed ? '<line x1="8" y1="21" x2="72" y2="21" stroke="#4f4" stroke-width="1" stroke-dasharray="3,2"/>' : ''}
-        </svg>`;
-
-      container.innerHTML = `
-        <div class="comp-state-wrap">${stateBadge}</div>
-        <div class="chip-info-desc">Momentary 2-pin push button. A↔B open when released, bridged when pressed.</div>
-        <div class="btn-pinout-wrap">${svgBtn}</div>
-        <table class="chip-pinout-table">
-          <thead><tr><th class="pin-num">Pin</th><th class="pin-name">Name</th><th>State</th></tr></thead>
-          <tbody>${pinRows}</tbody>
-        </table>
-        <div class="chip-help-section">
-          <button class="chip-help-btn">How to use</button>
-          <div class="chip-help-text">
-            <strong>Typical wiring:</strong> Connect pin A to GND and pin B to your input node plus a <strong>pull-up resistor to VCC</strong>. The input reads HIGH when released, LOW when pressed.
-          </div>
-        </div>`;
-
-      container.querySelector('.chip-help-btn').addEventListener('click', () => {
-        const helpText = container.querySelector('.chip-help-text');
-        const visible = helpText.classList.toggle('chip-help-text-open');
-        container.querySelector('.chip-help-btn').textContent = visible ? 'Hide' : 'How to use';
-      });
-      return;
-    }
-
-    // ── Slide Switch (SPDT) ───────────────────────────────────────────────
-    if (comp.type === COMP.SLIDE_SWITCH) {
-      title.textContent = 'Slide Switch (SPDT)';
-      const sim = this.simulator;
-      const nl  = sim.netlist;
-      const pinVoltage = (pin) => {
-        const net = nl.findNetByHole(pin.holeId);
-        if (!net) return undefined;
-        return sim.netVoltages.get(net.id);
-      };
-      const fmtV = (v) => {
-        if (v === undefined) return '<span class="pin-v-float">?</span>';
-        if (v >= 4.5)        return '<span class="pin-v-hi">H</span>';
-        if (v <= 0.5)        return '<span class="pin-v-lo">L</span>';
-        return `<span class="pin-v-mid">${v.toFixed(1)}</span>`;
-      };
-
-      const stateLabels = ['1–2 connected', 'OPEN (all floating)', '2–3 connected'];
-      const stateBadge = `<div class="comp-state-badge comp-state-active">⇄ ${stateLabels[comp.state]}</div>`;
-
-      const pinDefs = [
-        { name: '1', label: 'Pin 1' },
-        { name: '2', label: 'Pin 2 (common)' },
-        { name: '3', label: 'Pin 3' },
-      ];
-      let pinRows = '';
-      for (const pd of pinDefs) {
-        const cp = comp.pins.find(p => p.name === pd.name);
-        const v  = cp ? pinVoltage(cp) : undefined;
-        pinRows += `<tr>
-          <td class="pin-num">${pd.name}</td>
-          <td class="pin-name pin-passive">${pd.label}</td>
-          <td>${fmtV(v)}</td>
-        </tr>`;
-      }
-
-      // SVG SPDT diagram
-      const c0 = comp.state === 0 ? '#4f4' : '#555'; // 1-2 active colour
-      const c2 = comp.state === 2 ? '#4f4' : '#555'; // 2-3 active colour
-      const svgSpdt = `
-        <svg class="spdt-svg" viewBox="0 0 110 60" xmlns="http://www.w3.org/2000/svg">
-          <!-- Pin labels -->
-          <text x="6"  y="14" fill="#ffffff" font-size="9" font-family="monospace">1</text>
-          <text x="6"  y="54" fill="#ffffff" font-size="9" font-family="monospace">3</text>
-          <text x="86" y="34" fill="#ffffff" font-size="9" font-family="monospace">2</text>
-          <!-- Pin stubs -->
-          <line x1="14" y1="10" x2="34" y2="10" stroke="#aaa" stroke-width="2"/>
-          <line x1="14" y1="50" x2="34" y2="50" stroke="#aaa" stroke-width="2"/>
-          <line x1="76" y1="30" x2="96" y2="30" stroke="#aaa" stroke-width="2"/>
-          <!-- Dots at pin ends -->
-          <circle cx="34" cy="10" r="3" fill="#aaa"/>
-          <circle cx="34" cy="50" r="3" fill="#aaa"/>
-          <circle cx="76" cy="30" r="3" fill="#aaa"/>
-          <!-- Switch arm to pin 2 (common) -->
-          <line x1="76" y1="30" x2="${comp.state === 0 ? '34' : comp.state === 2 ? '34' : '55'}" y2="${comp.state === 0 ? '10' : comp.state === 2 ? '50' : '30'}" stroke="${comp.state === 1 ? '#555' : '#4f4'}" stroke-width="2.5" stroke-linecap="round"/>
-          <!-- Connections (dashed when active) -->
-          ${comp.state === 0 ? '<line x1="34" y1="10" x2="76" y2="30" stroke="#4f4" stroke-width="1.5" stroke-dasharray="4,2"/>' : ''}
-          ${comp.state === 2 ? '<line x1="34" y1="50" x2="76" y2="30" stroke="#4f4" stroke-width="1.5" stroke-dasharray="4,2"/>' : ''}
-        </svg>`;
-
-      container.innerHTML = `
-        <div class="comp-state-wrap">${stateBadge}</div>
-        <div class="chip-info-desc">3-position Single Pole Double Throw (SPDT) slide switch. Click to cycle states.</div>
-        <div class="btn-pinout-wrap">${svgSpdt}</div>
-        <table class="chip-pinout-table">
-          <thead><tr><th class="pin-num">#</th><th class="pin-name">Name</th><th>State</th></tr></thead>
-          <tbody>${pinRows}</tbody>
-        </table>
-        <div class="chip-pinout-legend">
-          <span style="color:#888">3 states: 1–2 &nbsp;·&nbsp; OPEN &nbsp;·&nbsp; 2–3 &nbsp;&nbsp;|&nbsp;&nbsp; Click to advance</span>
-        </div>
-        <div class="chip-help-section">
-          <button class="chip-help-btn">Grounding &amp; wiring tips</button>
-          <div class="chip-help-text">
-            <strong>Pin 2 is the common (wiper).</strong> Pins 1 and 3 are the two switched terminals.<br><br>
-            <strong>As a digital input:</strong> Wire pin 2 to VCC. Connect pin 1 (or 3) to your signal node plus a <strong>pull-down resistor (1 kΩ–10 kΩ) to GND</strong>. When the switch selects that pin, the node is pulled HIGH. In the OPEN state the pull-down holds the node LOW.<br><br>
-            <strong>Important floating pins:</strong> The unselected terminal (pin 1 or 3) floats in the open and opposite-selected states. A <strong>pull-down resistor to GND on each output pin</strong> prevents undefined logic levels. Without pull-downs, any unconnected pin can drift to an unpredictable voltage.<br><br>
-            <strong>Center-off use:</strong> Place the switch in the OPEN state to cut the circuit entirely both pin 1 and pin 3 are then floating.
-          </div>
-        </div>`;
-
-      container.querySelector('.chip-help-btn').addEventListener('click', () => {
-        const helpText = container.querySelector('.chip-help-text');
-        const visible = helpText.classList.toggle('chip-help-text-open');
-        container.querySelector('.chip-help-btn').textContent = visible ? 'Hide' : 'Grounding & wiring tips';
-      });
-      return;
-    }
-
-    // ── 7-Segment Display ─────────────────────────────────────────────────
+    // ── 7 Segment Display ─────────────────────────────────────────────────
     if (comp.type === COMP.SEVEN_SEG) {
-      title.textContent = '7-Segment';
+      title.textContent = '7 Segment';
       const s = comp.segments;
       const isAnode = !!comp.commonAnode;
       const comTag  = isAnode ? '5V' : 'GND';
-      const titleText = `Common ${isAnode ? 'Anode' : 'Cathode'} 7-Segment Display`;
+      const titleText = `Common ${isAnode ? 'Anode' : 'Cathode'} 7 Segment Display`;
 
       // ── Layout (viewBox 0 0 280 290) ─────────────────────────────────────
       const VBW = 280, VBH = 290;
@@ -1315,13 +1115,13 @@ class App {
       const PIN_NUM_TOP_Y  = BY1 + 10;                     // pin numbers inside body, top edge
       const PIN_NUM_BOT_Y  = BY2 - 6;                      // pin numbers inside body, bottom edge
 
-      // Standardized neutral pin styling — no state-dependent colors
+      // Standardized neutral pin styling   no state-dependent colors
       const C_PIN_NAME = '#cfcfcf';
       const C_PIN_NUM  = '#777';
       const C_LEG      = '#9a9a9a';
       const C_TITLE    = '#d8d8d8';
 
-      // Horizontal squish factor (graphics only — text counter-scales to stay
+      // Horizontal squish factor (graphics only   text counter-scales to stay
       // at native aspect ratio).
       const SX     = 0.771;
       const INV_SX = (1 / SX).toFixed(5);  // ~1.29702
@@ -1351,7 +1151,7 @@ class App {
         const fs = pd.name.length > 4 ? 7.5 : 9;
         const fw = pd.com ? '600' : '400';
         const y  = top ? PIN_NAME_TOP_Y : PIN_NAME_BOT_Y;
-        return txt(x, y, `text-anchor="middle" fill="${C_PIN_NAME}" font-size="${fs}" font-family="monospace" font-weight="${fw}"`, pd.name);
+        return txt(x, y, `text-anchor="middle" fill="${C_PIN_NAME}" font-size="${fs}" font-family="Roboto, Arial, sans-serif" font-weight="${fw}"`, pd.name);
       };
       const legSvg = (i, top) => {
         const x = PX7[i];
@@ -1363,7 +1163,7 @@ class App {
         const pd = top ? topPins7[i] : botPins7[i];
         const x  = PX7[i];
         const y  = top ? PIN_NUM_TOP_Y : PIN_NUM_BOT_Y;
-        return txt(x, y, `text-anchor="middle" fill="${C_PIN_NUM}" font-size="9" font-weight="bold" font-family="monospace"`, pd.num);
+        return txt(x, y, `text-anchor="middle" fill="${C_PIN_NUM}" font-size="9" font-weight="bold" font-family="Roboto, Arial, sans-serif"`, pd.num);
       };
 
       let pinNamesAndLegs = '';
@@ -1379,7 +1179,7 @@ class App {
       const DX = 140 - DW / 2;                       // 70
       const DY = (BY1 + BY2) / 2 - DH / 2;           // 76
 
-      // Inner digit area — proportions tuned from the canvas renderer
+      // Inner digit area   proportions tuned from the canvas renderer
       const dgW = DW * 0.55;                         // 77
       const dgH = DH * 0.86;                         // 120.4
       const dgX = DX + (DW - dgW) / 2;               // ~101.5
@@ -1403,7 +1203,7 @@ class App {
         const lx = sx + sw / 2;
         const ly = sy + t / 2 + parseFloat(labFs) * 0.36;
         return `<polygon points="${pts}" fill="${segCol(name)}"/>`
-             + txt(lx, ly, `text-anchor="middle" font-family="monospace" font-size="${labFs}" font-weight="bold" fill="${labCol(name)}"`, name);
+             + txt(lx, ly, `text-anchor="middle" font-family="Roboto, Arial, sans-serif" font-size="${labFs}" font-weight="bold" fill="${labCol(name)}"`, name);
       };
       // Vertical hex segment + centered label
       const hexV = (sx, sy, sh, name) => {
@@ -1411,17 +1211,17 @@ class App {
         const lx = sx + t / 2;
         const ly = sy + sh / 2 + parseFloat(labFs) * 0.36;
         return `<polygon points="${pts}" fill="${segCol(name)}"/>`
-             + txt(lx, ly, `text-anchor="middle" font-family="monospace" font-size="${labFs}" font-weight="bold" fill="${labCol(name)}"`, name);
+             + txt(lx, ly, `text-anchor="middle" font-family="Roboto, Arial, sans-serif" font-size="${labFs}" font-weight="bold" fill="${labCol(name)}"`, name);
       };
 
-      // Decimal point — circle large enough to host its label inside
+      // Decimal point   circle large enough to host its label inside
       const dpR = t * 0.78;
       const dpX = dgX + dgW + gap + dpR;
       const dpY = dgY + dgH - dpR;
       const dpFs = (dpR * 0.95).toFixed(1);
       const dpSvg =
         `<circle cx="${dpX}" cy="${dpY}" r="${dpR}" fill="${segCol('dp')}"/>`
-      + txt(dpX, dpY + parseFloat(dpFs) * 0.36, `text-anchor="middle" font-family="monospace" font-size="${dpFs}" font-weight="bold" fill="${labCol('dp')}"`, 'dp');
+      + txt(dpX, dpY + parseFloat(dpFs) * 0.36, `text-anchor="middle" font-family="Roboto, Arial, sans-serif" font-size="${dpFs}" font-weight="bold" fill="${labCol('dp')}"`, 'dp');
 
       const segmentsSvg = ''
         + hexH(dgX + t,           dgY,                            'a')
@@ -1440,7 +1240,7 @@ class App {
       // at full native width even though graphics are horizontally squeezed.
       const VBW_S = (VBW * SX).toFixed(3);
       const titleSvg = txt(VBW / 2, 16,
-        `text-anchor="middle" fill="${C_TITLE}" font-size="11" font-weight="bold" font-family="monospace"`,
+        `text-anchor="middle" fill="${C_TITLE}" font-size="11" font-weight="bold" font-family="Roboto, Arial, sans-serif"`,
         titleText);
       const diagSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${VBW_S} ${VBH}" style="width:77.1%;display:block;margin-bottom:6px">
   <g transform="scale(${SX} 1)">
@@ -1458,7 +1258,7 @@ class App {
 </svg>`;
 
       const explanationHtml = `
-<div class="chip-info-desc">7-segment LED display. Each segment is a separate LED sharing one common pin.</div>
+<div class="chip-info-desc">7 segment LED display. Each segment is a separate LED sharing one common pin.</div>
 <div class="chip-help-section">
   <div class="chip-help-text chip-help-text-open">
     <div class="chip-guide-subtitle">Common anode</div>
@@ -1466,7 +1266,7 @@ class App {
     <div class="chip-guide-subtitle">Common cathode</div>
     <div class="chip-guide-paragraph">COM → GND (0V). A segment turns ON when its pin is driven HIGH. Current path: VCC → resistor → pin → LED → COM → GND.</div>
     <div class="chip-guide-subtitle">Current limits</div>
-    <div class="chip-guide-paragraph">Max per segment: 20 mA, typical 10–15 mA. At 5V with a 2.0V LED forward voltage, use a 220Ω resistor for about 15 mA per segment.</div>
+    <div class="chip-guide-paragraph">Max per segment: 20 mA, typical 10 15 mA. At 5V with a 2.0V LED forward voltage, use a 220Ω resistor for about 15 mA per segment.</div>
   </div>
 </div>`;
 
@@ -1484,12 +1284,11 @@ class App {
     const pinVoltage = (pin) => {
       const net = nl.findNetByHole(pin.holeId);
       if (!net) return undefined;
-      if (sim.floatingNets.has(net.id)) return undefined;
       return sim.netVoltages.get(net.id);
     };
 
     const fmtV = (v) => {
-      if (v === undefined) return '<span class="pin-v-float">?</span>';
+      if (v === undefined) return '<span class="pin-v-lo">0.0</span>';
       if (v >= 4.5)        return '<span class="pin-v-hi">H</span>';
       if (v <= 0.5)        return '<span class="pin-v-lo">L</span>';
       return `<span class="pin-v-mid">${v.toFixed(1)}</span>`;
@@ -1504,7 +1303,8 @@ class App {
       if (net.isVCC) hasVCC = true;
       if (net.isGND) hasGND = true;
     }
-    const powered = hasVCC && hasGND;
+    // Chips flagged noVccPin (ULN2003, LM7805) have no VCC pin — GND alone powers them.
+    const powered = hasGND && (hasVCC || def.noVccPin);
 
     // Power status badge
     const vccDefPin = def.pinout.find(p => p.pin === def.vcc);
@@ -1515,9 +1315,9 @@ class App {
     let powerBadge;
     if (powered) {
       powerBadge = ``;
-    } else if (!hasVCC && !hasGND) {
+    } else if (!hasVCC && !hasGND && !def.noVccPin) {
       powerBadge = `<div class="chip-power-badge chip-power-none">Chip Unpowered, connect pin ${def.vcc} to VCC and pin ${def.gnd} to GND</div>`;
-    } else if (!hasVCC) {
+    } else if (!hasVCC && !def.noVccPin) {
       powerBadge = `<div class="chip-power-badge chip-power-partial">Missing VCC, connect pin ${def.vcc} to VCC</div>`;
     } else {
       powerBadge = `<div class="chip-power-badge chip-power-partial">Missing GND, connect pin ${def.gnd} to GND</div>`;
@@ -1534,7 +1334,7 @@ class App {
 
     // ── SVG DIP diagram ───────────────────────────────────────────────────
     {
-      const ACTIVE_LOW_NAMES = new Set(['CLR', 'MR', 'RST', 'RESET', '1CLR', '2CLR', '1MR', '2MR']);
+      const ACTIVE_LOW_NAMES = new Set(['CLR', 'MR', 'RST', 'RESET', '1CLR', '2CLR', '1MR', '2MR', 'LOAD']);
       const isActiveLow = p => ACTIVE_LOW_NAMES.has(p.name) || (p.name.length > 1 && p.name.endsWith('n')) || /active[\s-]low/i.test(p.description || '');
       const dipName = p => isActiveLow(p) && p.name.endsWith('n') ? p.name.slice(0, -1) : p.name;
       const maxNameLen = Math.max(...def.pinout.map(p => dipName(p).length));
@@ -1555,11 +1355,11 @@ class App {
       const bcy      = bodyTopY + bH / 2;
       const familyLabel = getFamilySpec(comp.chipFamily ?? this.state.chipFamily).label; // '74LS' | '74HC' | '74HCT'
       const displayName = (def.name || '').replace(/^74x/, familyLabel);
-      const typeCol  = t => t === 'input' ? '#8d8' : t === 'output' ? '#e88' : '#fd6';
+      const typeCol  = t => t === 'input' ? '#8d8' : t === 'output' ? '#e88' : t === 'nc' ? '#888' : '#fd6';
       const fmtVSvg  = (pin) => {
         const cp = comp.getPinByName(pin.name);
-        const v  = cp ? pinVoltage(cp) : undefined;
-        if (v === undefined) return { t: '?', c: '#666' };
+        let v  = cp ? pinVoltage(cp) : undefined;
+        if (v === undefined) v = 0;
         if (v >= 4.5) return { t: '5V', c: '#6d6' };
         if (v <= 0.5) return { t: '0V', c: '#d66' };
         return { t: v.toFixed(1) + 'V', c: '#fa4' };
@@ -1574,14 +1374,14 @@ class App {
         const { t, c } = fmtVSvg(pin);
         const x = px(i);
         const col = typeCol(pin.type);
-        s += '<text x="' + x + '" y="' + (voltH - 1) + '" text-anchor="middle" font-family="Menlo,Consolas,monospace" font-size="8" fill="' + c + '">' + t + '</text>';
-        s += '<text x="' + x + '" y="' + (voltH + nameH - 1) + '" text-anchor="middle" font-family="Menlo,Consolas,monospace" font-size="9" font-weight="bold" fill="' + col + '">' + dipName(pin) + '</text>';
+        s += '<text x="' + x + '" y="' + (voltH - 1) + '" text-anchor="middle" font-family="Roboto, Arial, sans-serif" font-size="8" fill="' + c + '">' + t + '</text>';
+        s += '<text x="' + x + '" y="' + (voltH + nameH - 1) + '" text-anchor="middle" font-family="Roboto, Arial, sans-serif" font-size="9" font-weight="bold" fill="' + col + '">' + dipName(pin) + '</text>';
         if (isActiveLow(pin)) { const hw = dipName(pin).length * 2.7; s += '<line x1="' + (x - hw).toFixed(1) + '" y1="' + (voltH + nameH - 10) + '" x2="' + (x + hw).toFixed(1) + '" y2="' + (voltH + nameH - 10) + '" stroke="' + col + '" stroke-width="0.9"/>'; }
         // Flat metallic leg (matches canvas style without harsh chrome gradient)
         s += '<rect x="' + (x - legW / 2) + '" y="' + (voltH + nameH + pinGap) + '" width="' + legW + '" height="' + legLen + '" fill="#aaaaaa"/>';
       }
 
-      // Body (flat, matches canvas chip art — almost solid black epoxy)
+      // Body (flat, matches canvas chip art   almost solid black epoxy)
       s += '<rect x="0" y="' + bodyTopY + '" width="' + svgW + '" height="' + bH + '" rx="2" fill="#111" stroke="#222" stroke-width="0.8"/>';
       // Notch (filled semicircle on left edge)
       s += '<circle cx="0" cy="' + bcy + '" r="6" fill="#555"/>';
@@ -1592,16 +1392,16 @@ class App {
       // Top pin numbers inside body
       for (let i = 0; i < half; i++) {
         const pin = def.pinout[def.pins - 1 - i];
-        s += '<text x="' + px(i) + '" y="' + (bodyTopY + 13) + '" text-anchor="middle" font-family="Menlo,Consolas,monospace" font-size="7.5" fill="#666">' + pin.pin + '</text>';
+        s += '<text x="' + px(i) + '" y="' + (bodyTopY + 13) + '" text-anchor="middle" font-family="Roboto, Arial, sans-serif" font-size="7.5" fill="#666">' + pin.pin + '</text>';
       }
 
-      // Chip name (with family substituted) centered in body — laser-etched warm white like canvas
-      s += '<text x="' + (svgW / 2) + '" y="' + (bcy + 4) + '" text-anchor="middle" font-family="Menlo,Consolas,monospace" font-size="11" font-weight="bold" fill="#d8d4cc" letter-spacing="1.8">' + displayName + '</text>';
+      // Chip name (with family substituted) centered in body   laser-etched warm white like canvas
+      s += '<text x="' + (svgW / 2) + '" y="' + (bcy + 4) + '" text-anchor="middle" font-family="Roboto, Arial, sans-serif" font-size="11" font-weight="bold" fill="#d8d4cc" letter-spacing="1.8">' + displayName + '</text>';
 
       // Bottom pin numbers inside body
       for (let i = 0; i < half; i++) {
         const pin = def.pinout[i];
-        s += '<text x="' + px(i) + '" y="' + (bodyBotY - 4) + '" text-anchor="middle" font-family="Menlo,Consolas,monospace" font-size="7.5" fill="#666">' + pin.pin + '</text>';
+        s += '<text x="' + px(i) + '" y="' + (bodyBotY - 4) + '" text-anchor="middle" font-family="Roboto, Arial, sans-serif" font-size="7.5" fill="#666">' + pin.pin + '</text>';
       }
 
       // Bottom pins
@@ -1611,13 +1411,13 @@ class App {
         const x = px(i);
         const col = typeCol(pin.type);
         s += '<rect x="' + (x - legW / 2) + '" y="' + bodyBotY + '" width="' + legW + '" height="' + legLen + '" fill="#aaaaaa"/>';
-        s += '<text x="' + x + '" y="' + (bodyBotY + legLen + nameH - 1) + '" text-anchor="middle" font-family="Menlo,Consolas,monospace" font-size="9" font-weight="bold" fill="' + col + '">' + dipName(pin) + '</text>';
+        s += '<text x="' + x + '" y="' + (bodyBotY + legLen + nameH - 1) + '" text-anchor="middle" font-family="Roboto, Arial, sans-serif" font-size="9" font-weight="bold" fill="' + col + '">' + dipName(pin) + '</text>';
         if (isActiveLow(pin)) { const hw = dipName(pin).length * 2.7; s += '<line x1="' + (x - hw).toFixed(1) + '" y1="' + (bodyBotY + legLen + nameH - 10) + '" x2="' + (x + hw).toFixed(1) + '" y2="' + (bodyBotY + legLen + nameH - 10) + '" stroke="' + col + '" stroke-width="0.9"/>'; }
-        s += '<text x="' + x + '" y="' + (bodyBotY + legLen + nameH + voltH - 1) + '" text-anchor="middle" font-family="Menlo,Consolas,monospace" font-size="8" fill="' + c + '">' + t + '</text>';
+        s += '<text x="' + x + '" y="' + (bodyBotY + legLen + nameH + voltH - 1) + '" text-anchor="middle" font-family="Roboto, Arial, sans-serif" font-size="8" fill="' + c + '">' + t + '</text>';
       }
 
       s += '</svg></div>';
-      s += '<div class="chip-pinout-legend"><span class="legend-input">● Input</span> <span class="legend-output">● Output</span> <span class="legend-power">● Power</span></div>';
+      s += '<div class="chip-pinout-legend"><span class="legend-input">● Input</span> <span class="legend-output">● Output</span> <span class="legend-power">● Power</span> <span class="legend-nc">● No Connect</span></div>';
       html += s;
     }
 
@@ -1631,6 +1431,7 @@ class App {
           <option value="LS" ${chipFamilyVal === 'LS' ? 'selected' : ''}>74LS</option>
           <option value="HC" ${chipFamilyVal === 'HC' ? 'selected' : ''}>74HC</option>
           <option value="HCT" ${chipFamilyVal === 'HCT' ? 'selected' : ''}>74HCT</option>
+          <option value="LVC" ${chipFamilyVal === 'LVC' ? 'selected' : ''}>74LVC</option>
         </select>
       </div>`;
     }
@@ -1647,27 +1448,96 @@ class App {
           if (v === undefined) return undefined;
           return v >= vth ? 1 : 0;
         };
-        const qPattern = /^Q(?:[0-9]+|[A-H])?$/;
+        // Returns the bit position encoded in a Q pin name:
+        //   QA→0, QB→1, …, QH→7  |  Q0→0, Q1→1, Q4→4, Q14→14
+        // Returns -1 for non-Q pins (RCO, CO, MAX/MIN, etc.)
+        const qBitPos = (name) => {
+          const m = name.match(/^Q([A-H]|[0-9]+)?$/);
+          if (!m) return -1;
+          if (!m[1]) return 0;
+          return /^[A-H]$/.test(m[1]) ? m[1].charCodeAt(0) - 65 : parseInt(m[1], 10);
+        };
         let counterRows = '';
         counterGates.forEach((gate, idx) => {
-          const qPins = (gate.outputs || []).filter(n => qPattern.test(n));
+          const qPins = (gate.outputs || []).filter(n => qBitPos(n) >= 0);
           if (qPins.length === 0) return;
-          const bits = qPins.map(readBit);
-          const anyUnknown = bits.some(b => b === undefined);
-          let value = 0;
-          for (let i = 0; i < bits.length; i++) if (bits[i] === 1) value |= (1 << i);
-          const binStr = bits.map(b => b === undefined ? '?' : b).reverse().join('');
+          // Sort LSB→MSB by bit position so index 0 is always the lowest-significance bit
+          const sorted = [...qPins].sort((a, b) => qBitPos(a) - qBitPos(b));
           const label = counterGates.length > 1 ? `Counter ${idx + 1}` : 'Count';
+
+          // Decoded (one-hot) counter — Q outputs are mutually exclusive step indicators,
+          // not weighted binary bits.  Find the active output and report its step number.
+          if (gate.type.includes('DECODED')) {
+            const active = sorted.find(n => readBit(n) === 1);
+            const stepStr = active !== undefined ? String(qBitPos(active)) : '?';
+            counterRows += `<div class="gate-eval-row">` +
+              `<span class="gate-eval-expr">${label}: ` +
+              `<span class="gate-eval-out gate-eval-hi">${stepStr}</span>` +
+              ` <span style="color:#666">(decoded)</span>` +
+              `</span></div>`;
+            return;
+          }
+
+          const bits = sorted.map(readBit);
+          const anyUnknown = bits.some(b => b === undefined);
+          // Value: use array index (not pin name) as bit weight so that chips whose
+          // Q outputs are ordered LSB-first in gate.outputs decode correctly regardless
+          // of whether the naming convention is 0-based (Q0=bit0) or 1-based (Q1=bit0).
+          let value = 0;
+          for (let i = 0; i < bits.length; i++) {
+            if (bits[i] === 1) value |= (1 << i);
+          }
+          // Binary string: sorted is LSB→MSB; reverse → MSB first (standard notation)
+          const binStr = bits.map(b => b === undefined ? '?' : b).reverse().join('');
           const valStr = anyUnknown ? '?' : String(value);
+          // Explicit bit-significance label so the user knows which pin is MSB/LSB
+          const msbPin = sorted[sorted.length - 1];
+          const lsbPin = sorted[0];
+          const bitLabel = msbPin !== lsbPin ? `${msbPin}..${lsbPin}` : lsbPin;
           counterRows += `<div class="gate-eval-row">` +
             `<span class="gate-eval-expr">${label}: ` +
             `<span class="gate-eval-out gate-eval-hi">${valStr}</span>` +
-            ` <span style="color:#666">(${qPins.length}-bit · b${binStr})</span>` +
+            ` <span style="color:#666">(${sorted.length}-bit · b${binStr} [${bitLabel}])</span>` +
             `</span></div>`;
         });
         if (counterRows) {
           html += `<div class="gate-eval-section"><div class="gate-eval-title">Counter</div>${counterRows}</div>`;
         }
+      }
+    }
+
+    // ── 555 Timing Readout (computed from the R/C parts wired to the pins) ─
+    {
+      const hasTimer = (def.gates || []).some(g => g.type === 'TIMER_555');
+      if (hasTimer) {
+        const analyses = analyze555Timing(comp, def, nl, this.state.components);
+        let rows = '';
+        // Grayscale only — no state colors. Mode name bold, values plain,
+        // hints/notes dimmed. Each fact on its own line per Dean's layout.
+        const row  = (inner) => `<div class="gate-eval-row" style="justify-content:center;text-align:center"><span class="gate-eval-expr">${inner}</span></div>`;
+        const mode = (text) => row(`<b style="color:#e0e0e0">${text}</b>`);
+        const val  = (text) => row(`<span style="color:#cfcfcf">${text}</span>`);
+        const muted = (text) => row(`<span style="color:#888">${text}</span>`);
+        for (const a of analyses) {
+          const tag = a.label ? `${a.label}: ` : '';
+          if (a.mode === 'astable') {
+            rows += mode(`${tag}Astable`);
+            rows += val(`${fmtFreq(a.freq)} · ${fmtTime(a.period)} period`);
+            if (a.r2 > 0) {
+              rows += val(`${fmtTime(a.tHigh)} high · ${fmtTime(a.tLow)} low`);
+              rows += val(`${(a.duty * 100).toFixed(0)}% duty cycle`);
+            }
+            if (a.note) rows += muted(a.note);
+          } else if (a.mode === 'monostable') {
+            rows += mode(`${tag}Monostable`);
+            rows += val(`${fmtTime(a.pulse)} pulse`);
+          } else if (a.hint) {
+            rows += muted(`${tag}${a.hint}`);
+          } else {
+            rows += muted(`${tag}No RC timing network detected — see Chip Guide below for astable/monostable wiring`);
+          }
+        }
+        html += `<div class="gate-eval-section" style="text-align:center"><div class="gate-eval-title" style="text-align:center">Timing (from connected parts)</div>${rows}</div>`;
       }
     }
 
@@ -1736,7 +1606,7 @@ class App {
       helpBtn.addEventListener('click', () => {
         const helpText = container.querySelector('.chip-help-text');
         const visible = helpText.classList.toggle('chip-help-text-open');
-        helpBtn.textContent = visible ? 'Hide' : 'Chip Guide';
+        helpBtn.textContent = visible ? t('sim.hide', { def: 'Hide' }) : t('sim.chipGuide', { def: 'Chip Guide' });
       });
     }
   }
@@ -1756,18 +1626,20 @@ class App {
     html += `<div class="chip-guide-subtitle">Pinout</div>`;
     html += '<table class="chip-guide-table"><tbody>';
     const sorted = [...def.pinout].sort((a, b) => a.pin - b.pin);
-    const ACTIVE_LOW_NAMES = new Set(['CLR', 'MR', 'RST', 'RESET', '1CLR', '2CLR', '1MR', '2MR']);
+    const ACTIVE_LOW_NAMES = new Set(['CLR', 'MR', 'RST', 'RESET', '1CLR', '2CLR', '1MR', '2MR', 'LOAD']);
+    const typeColor = t => t === 'input' ? '#8d8' : t === 'output' ? '#e88' : t === 'nc' ? '#888' : '#fd6';
     for (const p of sorted) {
       const al = ACTIVE_LOW_NAMES.has(p.name) || (p.name.length > 1 && p.name.endsWith('n')) || /active[\s-]low/i.test(p.description || '');
       const dn = al && p.name.endsWith('n') ? p.name.slice(0, -1) : p.name;
       const nameCell = al ? `<span style="text-decoration:overline">${dn}</span>` : dn;
-      html += `<tr><td class="cg-pin">${p.pin}</td><td class="cg-name">${nameCell}</td><td class="cg-desc">${this._describePinName(p.name, def)}</td></tr>`;
+      const col = typeColor(p.type);
+      html += `<tr><td class="cg-pin">${p.pin}</td><td class="cg-name" style="color:${col}">${nameCell}</td><td class="cg-desc">${this._applyOverlines(this._describePinName(p.name, def))}</td></tr>`;
     }
     html += '</tbody></table>';
 
     // ── Chip Explanation (overview) last in sidebar
     const overview = this._chipOverview(def);
-    if (overview) html += `<div class="chip-guide-overview">${overview}</div>`;
+    if (overview) html += `<div class="chip-guide-overview">${this._applyOverlines(overview)}</div>`;
 
     return html;
   }
@@ -1786,7 +1658,7 @@ class App {
     }
 
     for (const paragraph of section.paragraphs || []) {
-      html += `<div class="chip-guide-paragraph">${this._escapeHtml(paragraph)}</div>`;
+      html += `<div class="chip-guide-paragraph">${this._applyOverlines(this._escapeHtml(paragraph))}</div>`;
     }
 
     if (Array.isArray(section.formulas) && section.formulas.length) {
@@ -1800,16 +1672,27 @@ class App {
     if (Array.isArray(section.list) && section.list.length) {
       html += '<ul class="chip-guide-list">';
       for (const item of section.list) {
-        html += `<li>${this._escapeHtml(item)}</li>`;
+        html += `<li>${this._applyOverlines(this._escapeHtml(item))}</li>`;
       }
       html += '</ul>';
     }
 
     if (section.note) {
-      html += `<div class="chip-guide-note">${this._escapeHtml(section.note)}</div>`;
+      html += `<div class="chip-guide-paragraph">${this._applyOverlines(this._escapeHtml(section.note))}</div>`;
     }
 
     return html;
+  }
+
+  // Convert "PINNAME (active LOW)" to overline HTML in already-safe text.
+  _applyOverlines(html) {
+    return html
+      .replace(/\b([A-Z][A-Z0-9]+)n(_[A-Z0-9]+)/g,
+        '<span style="text-decoration:overline">$1</span>$2')
+      .replace(/\b([A-Z][A-Z0-9]+)n\b/g,
+        '<span style="text-decoration:overline">$1</span>')
+      .replace(/\b([A-Z][A-Z0-9]{1,})\s*\(active LOW\)/g,
+        '<span style="text-decoration:overline">$1</span>');
   }
 
   _escapeHtml(text) {
@@ -1844,72 +1727,72 @@ class App {
       case 'XNOR':
         return `${multi}Exclusive-NOR gate. Output is HIGH when both inputs match. Opposite of XOR useful for equality detection.`;
       case 'BUFFER':
-        return `${multi}Non-inverting buffer. Output follows the input with no logic inversion. Used to boost drive strength when a signal needs to fan out to many loads.`;
+        return `${multi}Non inverting buffer. Output follows the input with no logic inversion. Used to boost drive strength when a signal needs to fan out to many loads.`;
       case 'AOI_2WIDE':
       case 'AOI_4WIDE':
-        return 'AND-OR-INVERT gate. Each section ANDs a group of inputs, the results are OR-ed together, and the whole thing is inverted all in one stage. Efficient way to implement sum-of-products (SOP) logic without chaining separate gates.';
+        return 'AND OR-INVERT gate. Each section ANDs a group of inputs, the results are OR-ed together, and the whole thing is inverted all in one stage. Efficient way to implement sum-of-products (SOP) logic without chaining separate gates.';
       case 'DECODER_2TO4':
-        return '2-to-4 line decoder. The 2-bit address (A, B) selects exactly one of four active-LOW outputs; the rest stay HIGH. Enable must be asserted. Useful for chip-select generation and small demux tasks.';
+        return '2-to-4 line decoder. The 2 bit address (A, B) selects exactly one of four active LOW outputs; the rest stay HIGH. Enable must be asserted. Useful for chip-select generation and small demux tasks.';
       case 'DECODER_3TO8':
-        return '3-to-8 line decoder / demultiplexer. The 3-bit address drives exactly one of eight active-LOW outputs LOW while the rest stay HIGH. Three enable pins must all be satisfied. Standard address decoder for memory banking and bus expansion.';
+        return '3 to 8 line decoder / demultiplexer. The 3 bit address drives exactly one of eight active LOW outputs LOW while the rest stay HIGH. Three enable pins must all be satisfied. Standard address decoder for memory banking and bus expansion.';
       case 'DECODER_4TO16':
-        return '4-to-16 line decoder. The 4-bit address selects one of 16 active-LOW outputs. Enable input lets you cascade two chips to build a 5-to-32 decoder.';
+        return '4-to-16 line decoder. The 4 bit address selects one of 16 active LOW outputs. Enable input lets you cascade two chips to build a 5-to-32 decoder.';
       case 'BCD_DECIMAL':
-        return 'BCD-to-decimal decoder. Converts a 4-bit BCD digit (0–9) so that the corresponding decimal output goes LOW while the rest stay HIGH. Inputs 10–15 drive all outputs HIGH (blanked). Designed for driving indicator lamps or relay banks.';
+        return 'BCD to-decimal decoder. Converts a 4 bit BCD digit (0 9) so that the corresponding decimal output goes LOW while the rest stay HIGH. Inputs 10 15 drive all outputs HIGH (blanked). Designed for driving indicator lamps or relay banks.';
       case 'MUX_8TO1':
-        return '8-to-1 multiplexer. A 3-bit select code routes one of eight data inputs to the output. Both true (Y) and complemented (W) outputs are available. Enable input disables both outputs when HIGH.';
+        return '8-to-1 multiplexer. A 3 bit select code routes one of eight data inputs to the output. Both true (Y) and complemented (W) outputs are available. Enable input disables both outputs when HIGH.';
       case 'MUX_16TO1':
-        return '16-to-1 multiplexer. A 4-bit select code routes one of 16 data inputs to the output. Active-LOW enable; both true and complement outputs available. Useful as a 16-bit look-up table or data selector.';
+        return '16-to-1 multiplexer. A 4 bit select code routes one of 16 data inputs to the output. Active LOW enable; both true and complement outputs available. Useful as a 16 bit look-up table or data selector.';
       case 'D_FF_QUAD':
-        return 'Quad D flip-flop. Four independent edge-triggered D flip-flops, each with its own clock, set, and clear. Each captures its D input on the rising clock edge and holds it until the next.';
+        return 'Quad D flip flop. Four independent edge triggered D flip flops, each with its own clock, set, and clear. Each captures its D input on the rising clock edge and holds it until the next.';
       case 'D_FF_HEX':
-        return 'Hex D flip-flop. Six D flip-flops sharing a common clock and a common active-LOW clear. All six capture their D inputs simultaneously on the rising clock edge.';
+        return 'Hex D flip flop. Six D flip flops sharing a common clock and a common active LOW clear. All six capture their D inputs simultaneously on the rising clock edge.';
       case 'D_FF_OCTAL':
-        return 'Octal D flip-flop. Eight D flip-flops on a shared clock. All eight capture their D inputs on the rising edge in lock-step. The classic 8-bit pipeline register and bus latch.';
+        return 'Octal D flip flop. Eight D flip flops on a shared clock. All eight capture their D inputs on the rising edge in lock-step. The classic 8 bit pipeline register and bus latch.';
       case 'D_FF_OCTAL_TRI':
-        return 'Octal D flip-flop with tri-state outputs. Like the octal D-FF, but the outputs go high-impedance when OE is deasserted letting you connect multiple chips directly on a shared data bus.';
+        return 'Octal D flip flop with tri state outputs. Like the octal D-FF, but the outputs go high-impedance when OE is deasserted letting you connect multiple chips directly on a shared data bus.';
       case 'D_LATCH_OCTAL_TRI':
-        return 'Octal transparent D latch with tri-state outputs. While LE is HIGH, outputs follow their D inputs in real time. When LE goes LOW, the last value is captured and held. OE = HIGH puts all outputs in high-Z so the bus is free for other drivers.';
+        return 'Octal transparent D latch with tri state outputs. While LE is HIGH, outputs follow their D inputs in real time. When LE goes LOW, the last value is captured and held. OE = HIGH puts all outputs in high-Z so the bus is free for other drivers.';
       case 'ADDRESSABLE_LATCH':
-        return '1-of-8 addressable latch (demux with memory). A 3-bit address selects which of the eight output latches receives the D input. In latch mode each selected bit stores independently; in demux mode the addressed output follows D while the rest hold. Handy for expanding a single control line to eight independent outputs.';
+        return '1-of-8 addressable latch (demux with memory). A 3 bit address selects which of the eight output latches receives the D input. In latch mode each selected bit stores independently; in demux mode the addressed output follows D while the rest hold. Handy for expanding a single control line to eight independent outputs.';
       case 'COUNTER_4BIT':
-        return '4-bit binary ripple counter. Each flip-flop output clocks the next stage, dividing the input frequency by 2 each time for an overall ÷16. Async clear resets all four bits immediately.';
+        return '4 bit binary ripple counter. Each flip flop output clocks the next stage, dividing the input frequency by 2 each time for an overall ÷16. Async clear resets all four bits immediately.';
       case 'COUNTER_DECADE':
-        return 'Decade ripple counter. Counts in binary from 0 to 9, then automatically resets to 0 on the next clock a divide-by-10 cascade. Pair QA (÷2) with QD (÷5) for independent divider stages.';
+        return 'Decade ripple counter. Counts in binary from 0 to 9, then automatically resets to 0 on the next clock a divide by-10 cascade. Pair QA (÷2) with QD (÷5) for independent divider stages.';
       case 'COUNTER_DIV12':
-        return 'Divide-by-12 ripple counter. An internal feedback network resets at 12, giving a 12-state binary sequence. Used in 12-hour clock displays and frequency synthesizer chains.';
+        return 'Divide by-12 ripple counter. An internal feedback network resets at 12, giving a 12-state binary sequence. Used in 12-hour clock displays and frequency synthesizer chains.';
       case 'COUNTER_SYNC_BIN':
-        return '4-bit synchronous binary counter. All flip-flops clock simultaneously no ripple, no glitches. Counts 0–15, cascadable via ripple-carry output. Two count-enable pins (EP, ET) give you look-ahead carry capability.';
+        return '4 bit synchronous binary counter. All flip flops clock simultaneously no ripple, no glitches. Counts 0 15, cascadable via ripple-carry output. Two count-enable pins (EP, ET) give you look ahead carry capability.';
       case 'COUNTER_SYNC_BIN_SC':
-        return '4-bit synchronous binary counter with synchronous clear. Identical to the standard sync binary counter except the clear takes effect on the next rising clock edge rather than immediately avoiding timing hazards in high-speed designs.';
+        return '4 bit synchronous binary counter with synchronous clear. Identical to the standard sync binary counter except the clear takes effect on the next rising clock edge rather than immediately avoiding timing hazards in high speed designs.';
       case 'COUNTER_SYNC_DECADE':
-        return '4-bit synchronous decade counter. Counts 0–9 with all flip-flops clocking simultaneously. Resets synchronously on the 10th clock. Cascadable for multi-digit BCD counting.';
+        return '4 bit synchronous decade counter. Counts 0 9 with all flip flops clocking simultaneously. Resets synchronously on the 10th clock. Cascadable for multi-digit BCD counting.';
       case 'COUNTER_UPDOWN':
-        return '4-bit synchronous up/down binary counter. Counts up (0→15) or down (15→0) depending on the U/D control pin. Parallel load lets you preset any starting value. Cascadable via MAX/MIN terminal-count output.';
+        return '4 bit synchronous up/down binary counter. Counts up (0→15) or down (15→0) depending on the U/D control pin. Parallel load lets you preset any starting value. Cascadable via MAX/MIN terminal-count output.';
       case 'COUNTER_UPDOWN_DC':
-        return '4-bit synchronous up/down decade counter. Same as the up/down binary counter but resets at 9 when counting up (0→9) or at 0 when counting down. Produces a BCD output suitable for driving decoders directly.';
+        return '4 bit synchronous up/down decade counter. Same as the up/down binary counter but resets at 9 when counting up (0→9) or at 0 when counting down. Produces a BCD output suitable for driving decoders directly.';
       case 'SHIFT_REG_4BIT':
-        return '4-bit universal shift register. Can shift left, shift right, load parallel data, or hold controlled by two mode pins (S0, S1). Cascade the serial output to a second chip to build wider shift registers.';
+        return '4 bit universal shift register. Can shift left, shift right, load parallel data, or hold controlled by two mode pins (S0, S1). Cascade the serial output to a second chip to build wider shift registers.';
       case 'SHIFT_REG_SIPO':
-        return 'Serial-in, parallel-out shift register. Data enters one bit per clock via the serial input; all bits appear simultaneously on the parallel outputs. Expands a serial data stream into parallel form the building block of SPI receivers and LED drivers.';
+        return 'Serial in, parallel out shift register. Data enters one bit per clock via the serial input; all bits appear simultaneously on the parallel outputs. Expands a serial data stream into parallel form the building block of SPI receivers and LED drivers.';
       case 'SHIFT_REG_PISO':
-        return 'Parallel-in, serial-out shift register. Loads 8 bits of parallel data in one shot, then clocks them out serially one bit at a time. Used to serialize a byte for transmission over a single wire.';
+        return 'Parallel in, serial out shift register. Loads 8 bits of parallel data in one shot, then clocks them out serially one bit at a time. Used to serialize a byte for transmission over a single wire.';
       case 'SHIFT_REG_LATCH':
-        return 'Shift register with separated storage latch. Data shifts through an 8-bit register privately; the outputs only update when you fire the storage-register clock (RCLK). Prevents glitchy transitions while the shift is in progress essential for driving LEDs or other visible loads cleanly.';
+        return 'Shift register with separated storage latch. Data shifts through an 8 bit register privately; the outputs only update when you fire the storage-register clock (RCLK). Prevents glitchy transitions while the shift is in progress essential for driving LEDs or other visible loads cleanly.';
       case 'REG_4BIT_TRI':
-        return '4-bit register with tri-state outputs. Stores 4 bits on the clock edge; the OE pin puts all outputs in high-impedance so the register can sit on a shared bus without driving it.';
+        return '4 bit register with tri state outputs. Stores 4 bits on the clock edge; the OE pin puts all outputs in high-impedance so the register can sit on a shared bus without driving it.';
       case 'PRIORITY_ENC_8TO3':
-        return '8-to-3 priority encoder. Scans eight active-LOW inputs and outputs the 3-bit binary code for the highest-numbered asserted input. If multiple inputs are active at once, the highest wins. Cascade EO → EI to build a 16-to-4 (or wider) encoder.';
+        return '8 to 3 priority encoder. Scans eight active LOW inputs and outputs the 3 bit binary code for the highest-numbered asserted input. If multiple inputs are active at once, the highest wins. Cascade EO → EI to build a 16-to-4 (or wider) encoder.';
       case 'COMPARATOR_4BIT':
-        return '4-bit magnitude comparator. Compares two 4-bit binary words A and B and asserts one of three outputs: A>B, A=B, or A<B. Cascade inputs (AGTBIN, AEQBIN, ALTBIN) let you chain chips for 8-bit, 12-bit, or wider comparisons.';
+        return '4 bit magnitude comparator. Compares two 4 bit binary words A and B and asserts one of three outputs: A>B, A=B, or A<B. Cascade inputs (AGTBIN, AEQBIN, ALTBIN) let you chain chips for 8 bit, 12 bit, or wider comparisons.';
       case 'ADDER_4BIT':
-        return '4-bit binary full adder. Adds two 4-bit numbers (A0–A3, B0–B3) plus a carry-in (C0) and produces a 4-bit sum (S0–S3) and carry-out (C4). Wire C4 to C0 of the next chip to build an 8-bit or wider adder.';
+        return '4 bit binary full adder. Adds two 4 bit numbers (A0 A3, B0 B3) plus a carry in (C0) and produces a 4 bit sum (S0 S3) and carry out (C4). Wire C4 to C0 of the next chip to build an 8 bit or wider adder.';
       case 'TRANSCEIVER_8BIT':
-        return '8-bit bidirectional bus transceiver. Passes data between two 8-bit buses. DIR controls which direction: A→B or B→A. OE disables all drivers and puts both sides in high-Z when not needed. Typical use: isolating a CPU bus from a peripheral bus.';
+        return '8 bit bidirectional bus transceiver. Passes data between two 8 bit buses. DIR controls which direction: A→B or B→A. OE disables all drivers and puts both sides in high-Z when not needed. Typical use: isolating a CPU bus from a peripheral bus.';
       case 'RAM_16X4':
-        return '16×4-bit static RAM. Sixteen 4-bit locations addressed by A0–A3. Write enable (WE, active-LOW) stores whatever is on the data inputs to the selected address. Output enable (OE, active-LOW) drives the stored value onto the outputs. Use as a 16-entry look-up table or small scratchpad.';
+        return '16×4 bit static RAM. Sixteen 4 bit locations addressed by A0 A3. Write enable (WE, active LOW) stores whatever is on the data inputs to the selected address. Output enable (OE, active LOW) drives the stored value onto the outputs. Use as a 16-entry look-up table or small scratchpad.';
       case 'TIMER_555':
-        return 'General-purpose timer / oscillator. The 555 watches analog voltages on TRIG and THRESH, flips an internal latch when they cross its reference levels, and controls both OUTPUT and the DISCHARGE transistor from that latch state.';
+        return 'General purpose timer / oscillator. The 555 watches analog voltages on TRIG and THRESH, flips an internal latch when they cross its reference levels, and controls both OUTPUT and the DISCHARGE transistor from that latch state.';
       default:
         return '';
     }
@@ -1942,49 +1825,49 @@ class App {
     if (/^NC\d*$/.test(n)) return 'No connect leave unconnected';
 
     // ── Clock
-    if (n === 'CLK' || n === 'CK' || n === 'CP') return 'Clock input, rising-edge triggered';
+    if (n === 'CLK' || n === 'CK' || n === 'CP') return 'Clock input, rising edge triggered';
     if (n === 'UP')   return 'Count-up clock increments on rising edge';
     if (n === 'DOWN') return 'Count-down clock decrements on rising edge';
-    if (/^\d+CLK$/.test(n)) { const g = n.match(/^(\d+)/)[1]; return `Clock for flip-flop ${g}, rising-edge triggered`; }
+    if (/^\d+CLK$/.test(n)) { const g = n.match(/^(\d+)/)[1]; return `Clock for flip flop ${g}, rising edge triggered`; }
     if (n === 'CLKINH') return 'Clock inhibit HIGH blocks the clock';
 
     // ── Async clear / preset
-    if (n === 'CLR' || n === 'MR') return 'Clear, active-LOW forces all outputs to 0';
-    if (n === 'SRCLR')             return 'Shift register clear, active-LOW resets all bits to 0';
-    if (n === 'PRE' || n === 'SD') return 'Preset, active-LOW forces Q HIGH';
-    if (/^\d+CLR$/.test(n)) { const g = n.match(/^(\d+)/)[1]; return `Clear for flip-flop ${g}, active-LOW`; }
-    if (/^\d+PRE$/.test(n)) { const g = n.match(/^(\d+)/)[1]; return `Preset for flip-flop ${g}, active-LOW`; }
+    if (n === 'CLR' || n === 'MR') return 'Clear, active LOW forces all outputs to 0';
+    if (n === 'SRCLR')             return 'Shift register clear, active LOW resets all bits to 0';
+    if (n === 'PRE' || n === 'SD') return 'Preset, active LOW forces Q HIGH';
+    if (/^\d+CLR$/.test(n)) { const g = n.match(/^(\d+)/)[1]; return `Clear for flip flop ${g}, active LOW`; }
+    if (/^\d+PRE$/.test(n)) { const g = n.match(/^(\d+)/)[1]; return `Preset for flip flop ${g}, active LOW`; }
 
     // ── Output / input enables
-    if (n === 'OE')  return 'Output enable, active-LOW outputs are high-Z when HIGH';
-    if (n === '1OE') return 'Output enable for bus 1, active-LOW';
-    if (n === '2OE') return 'Output enable for bus 2, active-LOW';
-    if (n === 'OE1') return 'Output enable 1, active-LOW';
-    if (n === 'OE2') return 'Output enable 2, active-LOW';
-    if (n === 'IE1') return 'Input enable 1, active-LOW HIGH disables data loading';
-    if (n === 'IE2') return 'Input enable 2, active-LOW HIGH disables data loading';
+    if (n === 'OE')  return 'Output enable, active LOW outputs are high-Z when HIGH';
+    if (n === '1OE') return 'Output enable for bus 1, active LOW';
+    if (n === '2OE') return 'Output enable for bus 2, active LOW';
+    if (n === 'OE1') return 'Output enable 1, active LOW';
+    if (n === 'OE2') return 'Output enable 2, active LOW';
+    if (n === 'IE1') return 'Input enable 1, active LOW HIGH disables data loading';
+    if (n === 'IE2') return 'Input enable 2, active LOW HIGH disables data loading';
 
     // ── Decoder / gate enable pins
     if (n === 'G1') {
       const hasG2A = def.pinout.some(p => p.name.toUpperCase() === 'G2A');
-      return hasG2A ? 'Enable input, active-HIGH chip off when LOW' : 'Enable input, active-LOW';
+      return hasG2A ? 'Enable input, active HIGH chip off when LOW' : 'Enable input, active LOW';
     }
-    if (n === 'G2' || n === 'G2A' || n === 'G2B') return 'Enable input, active-LOW chip off when HIGH';
+    if (n === 'G2' || n === 'G2A' || n === 'G2B') return 'Enable input, active LOW chip off when HIGH';
     if (/^\d+G$/.test(n)) {
-      return gateType === 'NOR' ? 'Strobe HIGH forces output LOW' : 'Enable input, active-LOW';
+      return gateType === 'NOR' ? 'Strobe HIGH forces output LOW' : 'Enable input, active LOW';
     }
-    if (n === 'ME') return 'Memory enable, active-LOW';
+    if (n === 'ME') return 'Memory enable, active LOW';
 
     // ── Latch / register controls
     if (n === 'LE')    return 'Latch enable transparent when HIGH, latches on falling edge';
     if (n === 'SRCLK') return 'Shift register clock shifts data on rising edge';
     if (n === 'RCLK')  return 'Storage register clock latches shift data on rising edge';
-    if (n === 'WE')    return 'Write enable, active-LOW';
+    if (n === 'WE')    return 'Write enable, active LOW';
     if (n === 'SH/LD') return 'Shift/load HIGH shifts, LOW loads parallel data';
 
     // ── Count / direction controls
-    if (n === 'CE' || n === 'EP' || n === 'ET' || n === 'CEP' || n === 'CET' || n === 'CTEN') return 'Count enable, active-LOW';
-    if (n === 'PE' || n === 'LOAD') return 'Parallel load, active-LOW loads preset data on next clock';
+    if (n === 'CE' || n === 'EP' || n === 'ET' || n === 'CEP' || n === 'CET' || n === 'CTEN') return 'Count enable, active LOW';
+    if (n === 'PE' || n === 'LOAD') return 'Parallel load, active LOW loads preset data on next clock';
     if (n === 'U/D' || n === 'D/U') return 'Count direction HIGH counts up, LOW counts down';
     if (n === 'DIR') return 'Direction HIGH: A→B, LOW: B→A';
     if (n === 'S' || n === 'SEL') return 'Select chooses between data inputs';
@@ -2003,10 +1886,10 @@ class App {
     if (n === 'BO')      return 'Borrow output';
     if (n === 'MAX/MIN') return 'Terminal count HIGH at max when counting up, at min when counting down';
 
-    // ── 7-segment display controls
-    if (n === 'BI/RBO') return 'Blanking input / ripple blank output, active-LOW';
-    if (n === 'RBI')    return 'Ripple blanking input, active-LOW blanks leading zeros';
-    if (n === 'LT')     return 'Lamp test, active-LOW lights all segments';
+    // ── 7 segment display controls
+    if (n === 'BI/RBO') return 'Blanking input / ripple blank output, active LOW';
+    if (n === 'RBI')    return 'Ripple blanking input, active LOW blanks leading zeros';
+    if (n === 'LT')     return 'Lamp test, active LOW lights all segments';
 
     // ── Serial / shift register
     if (n === 'SER' || n === 'SI') return 'Serial data input';
@@ -2014,13 +1897,13 @@ class App {
     if (n === 'QHN')               return 'Inverted serial output (Q̅H)';
 
     // ── Priority encoder
-    if (n === 'EI') return 'Enable input, active-LOW';
+    if (n === 'EI') return 'Enable input, active LOW';
     if (n === 'EO') return 'Enable output connect to EI of next encoder to daisy-chain';
     if (n === 'GS') return 'Group signal output HIGH when any input is active';
 
     // ── Adder carry
-    if (n === 'C0') return 'Carry-in tie to GND for standalone use, or to C4 of previous stage';
-    if (n === 'C4') return 'Carry-out connect to C0 of next adder stage to cascade';
+    if (n === 'C0') return 'Carry in tie to GND for standalone use, or to C4 of previous stage';
+    if (n === 'C4') return 'Carry out connect to C0 of next adder stage to cascade';
 
     // ── Double-indexed pins: 1A1, 2B3, etc. (AOI groups or bus driver banks)
     const doubleMatch = n.match(/^(\d+)([A-Z])(\d+)$/);
@@ -2030,7 +1913,7 @@ class App {
       return `Bus ${gNum}, channel ${idx} ${group === 'Y' ? 'output' : 'input'}`;
     }
 
-    // ── JK flip-flop inputs: 1J, 2J, 1K, 2K, 3J, 3K
+    // ── JK flip flop inputs: 1J, 2J, 1K, 2K, 3J, 3K
     const jkMatch = n.match(/^(\d+)([JK])$/);
     if (jkMatch) {
       const [, idx, type] = jkMatch;
@@ -2068,17 +1951,17 @@ class App {
     // ── Single output Y (e.g. 7430, 7454)
     if (n === 'Y') return 'Gate output';
 
-    // ── Numbered D inputs: 1D-8D (individual flip-flop data)
+    // ── Numbered D inputs: 1D-8D (individual flip flop data)
     if (/^\d+D$/.test(n)) {
       const num = n.match(/^(\d+)/)[1];
-      return `Data input for flip-flop / register ${num}`;
+      return `Data input for flip flop / register ${num}`;
     }
 
     // ── Numbered Q outputs: 1Q-8Q, 1Qn-4Qn
     const numberedQMatch = n.match(/^(\d+)(QN?)$/);
     if (numberedQMatch) {
       const [, num, qType] = numberedQMatch;
-      return qType === 'QN' ? `Inverted Q output (Q̅) for flip-flop ${num}` : `Q output for flip-flop ${num}`;
+      return qType === 'QN' ? `Inverted Q output (Q̅) for flip flop ${num}` : `Q output for flip flop ${num}`;
     }
 
     // ── Numbered CLK/CLR not already caught (e.g. 1CLK via regex above already handles it)
@@ -2094,7 +1977,7 @@ class App {
       return `Bit ${bit} output${lsb}`;
     }
 
-    // ── 7-segment outputs: a-g, dp
+    // ── 7 segment outputs: a-g, dp
     if (/^[a-g]$/.test(name)) return `Segment ${name}`;
     if (name === 'dp' || n === 'DP') return 'Decimal point segment';
 
@@ -2142,14 +2025,14 @@ class App {
 
     // ── Context-sensitive single-letter pins
     if (n === 'A') {
-      if (gateType === 'SHIFT_REG_SIPO') return 'Serial data input (AND-gated with B)';
+      if (gateType === 'SHIFT_REG_SIPO') return 'Serial data input (AND gated with B)';
       if (isShift)   return 'Parallel load data, bit 0';
       if (isCounter) return 'Parallel load data, bit 0';
       if (isDecoder || isBCD) return 'Address/BCD bit 0 (LSB)';
       return 'Input A';
     }
     if (n === 'B') {
-      if (gateType === 'SHIFT_REG_SIPO') return 'Serial data input (AND-gated with A)';
+      if (gateType === 'SHIFT_REG_SIPO') return 'Serial data input (AND gated with A)';
       if (isShift)   return 'Parallel load data, bit 1';
       if (isCounter) return 'Parallel load data, bit 1';
       if (isDecoder || isBCD) return 'Address/BCD bit 1';
@@ -2201,6 +2084,8 @@ class App {
     const snapshot = this.undoStack.pop();
     deserializeState(snapshot, this.state, this.world);
     this._rebuildWorldTiles();
+    this.textBoxManager.deserialize(this.state.textBoxes ?? []);
+    this.imageBoxManager.deserialize(this.state.imageBoxes ?? []);
     this.state.selectedItems = [];
     this._resetTransientRefs();
     this.onCircuitChanged();
@@ -2226,13 +2111,18 @@ class App {
     if (this.world.isInitialTile(tx, ty)) return;
     this.pushUndo();
     // Remove components whose pins are on this tile
+    const removedIds = new Set();
     this.state.components = this.state.components.filter(comp => {
       if (!comp.placed) return true;
-      return !comp.pins.some(p => {
+      const onTile = comp.pins.some(p => {
         const h = parseHoleId(p.holeId);
         return h.tileX === tx && h.tileY === ty;
       });
+      if (onTile) removedIds.add(comp.id);
+      return !onTile;
     });
+    // Drop retained drive states/couplings for the removed components.
+    this.simulator.purgeComponentStates(removedIds);
     // Remove wires with endpoints on this tile
     this.state.wireManager.wires = this.state.wireManager.wires.filter(wire => {
       const s = parseHoleId(wire.startHoleId);
@@ -2264,7 +2154,7 @@ class App {
 
   deleteSelected() {
     if (this.state.selectedItems.length === 0) return;
-    const floatingInput = document.getElementById('floating-input-overlay');
+    const floatingInput = document.getElementById('floating input-overlay');
     if (floatingInput) floatingInput.remove();
     this.pushUndo();
     const compIds = new Set();
@@ -2283,9 +2173,20 @@ class App {
       !wireIds.has(w.id) && !deletedHoles.has(w.startHoleId) && !deletedHoles.has(w.endHoleId)
     );
     this.state.components = this.state.components.filter(c => !compIds.has(c.id));
+    // Drop retained drive states/couplings for the deleted components so
+    // orphans can't keep driving nets at their old hole positions.
+    this.simulator.purgeComponentStates(compIds);
     this.state.selectedItems = [];
     if (this.currentInfoComp && compIds.has(this.currentInfoComp.id)) {
       this._closeInfoPanel();
+    }
+    // Close the probe panel if its component or wire was just deleted.
+    if (this.currentProbe) {
+      const p = this.currentProbe;
+      if ((p.comp && compIds.has(p.comp.id)) ||
+          (p.kind === 'wire' && wireIds.has(p.wire.id))) {
+        this._closeInfoPanel();
+      }
     }
     // If any in-flight interaction ref points at a deleted component, drop the
     // entire interaction (held buttons, drag ghosts, bounce timers).
@@ -2316,135 +2217,25 @@ class App {
     if (!this.clipboard) return;
     if (this.clipboard.components.length === 0 && this.clipboard.wires.length === 0) return;
 
-    // Single chip paste: enter ghost placement mode so user can drag to a valid spot
-    // (avoids silent failure when offset position is blocked by another chip)
-    if (this.clipboard.components.length === 1 && this.clipboard.wires.length === 0) {
-      const data = this.clipboard.components[0];
-      if (data.type === COMP.CHIP) {
-        this.interaction.startPlacement(data.type, data.chipId);
-        return;
-      }
-    }
-
-    this.pushUndo();
-
-    // Smart col offset: place next to the currently selected component when possible
-    let COL_OFFSET = 5;
-    if (this.state.selectedItems.length === 1 && this.state.selectedItems[0].type === 'component') {
-      const selComp = this.state.selectedItems[0].ref;
-      if (selComp.placed && selComp.pins.length > 0) {
-        const rightmostCol = Math.max(...selComp.pins.map(p => parseInt(p.holeId.split(':')[3])));
-        const clipData = this.clipboard.components[0];
-        if (clipData) {
-          let leftmostClipCol;
-          if (clipData.startHoleId) {
-            leftmostClipCol = Math.min(
-              parseInt(clipData.startHoleId.split(':')[3]),
-              parseInt(clipData.endHoleId.split(':')[3])
-            );
-          } else {
-            leftmostClipCol = clipData.col || 0;
-          }
-          const computed = rightmostCol - leftmostClipCol + 2;
-          if (computed > 0) COL_OFFSET = computed;
-        }
-      }
-    }
-
-    const offsetHoleId = (id) => {
-      const parts = id.split(':');
-      const newCol = parseInt(parts[3]) + COL_OFFSET;
-      if (newCol >= 63) return null;
-      return `${parts[0]}:${parts[1]}:${parts[2]}:${newCol}:${parts[4]}`;
-    };
-    const newItems = [];
-    for (const data of this.clipboard.components) {
-      const comp = createComponent(data.type, data.chipId);
-      if (!comp) continue;
-      if (data.type === COMP.BUTTON && data.vertical) {
-        comp.vertical = true;
-        comp.colSpan = 2;
-      }
-      if (data.startHoleId && data.endHoleId && comp.placeWireLike) {
-        const s = offsetHoleId(data.startHoleId);
-        const e = offsetHoleId(data.endHoleId);
-        if (!s || !e) continue;
-        comp.placeWireLike(s, e);
-      } else if (data.col !== undefined) {
-        const newCol = (data.col || 0) + COL_OFFSET;
-        if (newCol + (comp.colSpan || 1) > 63) continue;
-        comp.place(data.tileX ?? 0, data.tileY ?? 0, newCol, data.row);
-      } else {
-        continue;
-      }
-      if (data.resistance !== undefined && comp.setResistance) comp.setResistance(data.resistance);
-      if (data.color !== undefined && comp.color !== undefined) comp.color = data.color;
-      if (data.on !== undefined) comp.on = data.on;
-      if (data.pressed !== undefined) comp.pressed = data.pressed;
-      if (data.state !== undefined && data.type === COMP.SLIDE_SWITCH) comp.state = data.state;
-      if (this.interaction._checkOverlap(comp)) continue;
-      this.state.components.push(comp);
-      newItems.push({ type: 'component', ref: comp });
-    }
-    for (const data of this.clipboard.wires) {
-      const s = offsetHoleId(data.startHoleId);
-      const e = offsetHoleId(data.endHoleId);
-      if (!s || !e) continue;
-      if (this.state.wireManager.findEndpointAtHole(s)) continue;
-      if (this.state.wireManager.findEndpointAtHole(e)) continue;
-      const wire = this.state.wireManager.addWire(s, e);
-      wire.color = data.color;
-      newItems.push({ type: 'wire', ref: wire });
-    }
-    this.state.selectedItems = newItems;
-    this.onCircuitChanged();
+    // All paste flows route through the ghost preview: the cluster (components +
+    // wires) follows the cursor; left-click commits. Matches single-chip paste
+    // and lands "where the mouse is" instead of at a fixed offset from origin.
+    this.interaction.startPastePreview(this.clipboard);
   }
 
   cutSelected() {
     this.copySelected();
     this.deleteSelected();
   }
-  // ── Pure Digital Mode Toggle ───────────────────────────────────────────────
-  // Shared handler for both the Settings dropdown and the Analyzer panel
-  // items. Flips state.pureDigital, syncs both UI items, persists, re-runs
-  // simulation, and refreshes any open side panel.
-  _togglePureDigital() {
-    this.state.pureDigital = !this.state.pureDigital;
-    const itemS = document.getElementById('more-pure-digital');
-    const itemA = document.getElementById('la-pure-digital');
-    if (itemS) itemS.classList.toggle('active', this.state.pureDigital);
-    if (itemA) itemA.classList.toggle('active', this.state.pureDigital);
-    const badge = document.getElementById('pure-digital-badge');
-    if (badge) badge.style.display = this.state.pureDigital ? '' : 'none';
-    saveToLocalStorage(this.state);
-    this.simulator.pureDigital = this.state.pureDigital;
-    this.simulator.evaluate(this.world, this.state.components, this.state.wireManager);
-    if (this.state.showLogicView)    this._showLogicAnalyzer();
-    if (this.state.showCircuitInfo)  this._showCircuitInfo();
-    this._updateStatusBar();
-  }
-
-  // Force Pure Digital off and sync UI/simulator. Used on clear and on
-  // opening a different project so the mode doesn't bleed across sessions.
-  _resetPureDigital() {
-    if (!this.state.pureDigital) return;
-    this.state.pureDigital = false;
-    const itemS = document.getElementById('more-pure-digital');
-    const itemA = document.getElementById('la-pure-digital');
-    if (itemS) itemS.classList.remove('active');
-    if (itemA) itemA.classList.remove('active');
-    const badge = document.getElementById('pure-digital-badge');
-    if (badge) badge.style.display = 'none';
-    this.simulator.pureDigital = false;
-  }
-
   // ── Circuit Changed Callback ───────────────────────────────────────────────
   onCircuitChanged() {
     if (this._dirty !== undefined) this._dirty = true;
     this._renderDirty = true;
     this.lastInteractionTime = Date.now();
-    // Keep the simulator's solver mode in sync with the app flag
-    this.simulator.pureDigital = this.state.pureDigital ?? false;
+    // Reassign wire nets from physical connectivity before anything reads
+    // wire.startNet, so stale numbers from any mutation path (drag, paste,
+    // undo, future code) can't leak into the simulator or renderer.
+    this.state.wireManager.recomputeNets(this.world);
     // Run circuit simulation (voltages, currents, LEDs, 7-segs)
     this.simulator.evaluate(this.world, this.state.components, this.state.wireManager);
     // Start/restart time-stepping loop for capacitor-based circuits
@@ -2454,8 +2245,67 @@ class App {
       // during time-stepping and calling JSON.stringify 50×/s is wasteful.
       this._renderDirty = true;
       this._updateStatusBar();
+      // Refresh Circuit Analyzer so cap charge/voltage track time-stepping.
+      // Throttle to ~10Hz; full HTML rebuild is too heavy at 50Hz.
+      if (this.state.showCircuitInfo) {
+        const now = performance.now();
+        if (now - (this._lastAnalyzerRefresh || 0) >= 100) {
+          this._lastAnalyzerRefresh = now;
+          this._showCircuitInfo();
+        }
+      }
+      // Refresh chip side panel so pin voltages track time-stepping too.
+      // Skip the rebuild if the user is interacting with a control in the
+      // panel (e.g. an open <select> dropdown) — replacing the element while
+      // its native popup is open silently dismisses the popup.
+      if (this.currentInfoComp) {
+        const now = performance.now();
+        if (now - (this._lastChipInfoRefresh || 0) >= 100) {
+          const ae = document.activeElement;
+          const panel = document.getElementById('side-panel');
+          const userInteracting = ae && panel && panel.contains(ae) &&
+            (ae.tagName === 'SELECT' || ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA');
+          if (!userInteracting) {
+            this._lastChipInfoRefresh = now;
+            const _c = this.currentInfoComp;
+            if (_c.type === COMP.BUTTON || _c.type === COMP.PUSH_BUTTON || _c.type === COMP.SWITCH) {
+              this.showInputContextPanel(_c);
+            } else if (_c.type === COMP.SLIDE_SWITCH) {
+              this.showSlideContextPanel(_c);
+            } else if (_c.type === COMP.DIP_SWITCH) {
+              this.showDipSwitchContextPanel(_c);
+            } else if (_c.type === COMP.CLOCK) {
+              this.showClockContextPanel(_c);
+            } else if (_c.type === COMP.CRYSTAL) {
+              // Crystal panel is static (no live readouts) — skip the periodic
+              // rebuild, which would detach a preset button mid-click while
+              // the crystal's edges keep the time loop solving.
+            } else {
+              this.showChipInfo(_c);
+            }
+          }
+        }
+      }
+      // Refresh the probe panel so its voltage/current track time-stepping too.
+      if (this.currentProbe) {
+        const now = performance.now();
+        if (now - (this._lastProbeRefresh || 0) >= 100) {
+          this._lastProbeRefresh = now;
+          this.showProbePanel(this.currentProbe);
+        }
+      }
     });
-    debouncedSave(this.state, this._currentFilePath || null);
+    debouncedSave(this.state);
+    // Snapshot for cached projects list on structural changes
+    const structHash =
+      this.state.components.filter(c => c.placed).length + ':' +
+      this.state.wireManager.wires.length;
+    if (structHash !== this._lastStructuralHash) {
+      this._lastStructuralHash = structHash;
+      const sticky = getStoredFilename();
+      const snapName = (sticky || suggestCircuitName(this.state.components)).replace(/\.json$/i, '');
+      saveProjectSnapshot(this.state, this._currentProjectId, snapName);
+    }
     // Update bottom status bar (overcurrent errors + red outlines)
     this._updateStatusBar();
     // Only refresh the info panel if a chip/7-seg is currently being viewed
@@ -2465,9 +2315,17 @@ class App {
         this.showInputContextPanel(_c);
       } else if (_c.type === COMP.SLIDE_SWITCH) {
         this.showSlideContextPanel(_c);
+      } else if (_c.type === COMP.CLOCK) {
+        this.showClockContextPanel(_c);
+      } else if (_c.type === COMP.CRYSTAL) {
+        this.showCrystalContextPanel(_c);
       } else {
         this.showChipInfo(_c);
       }
+    }
+    // Refresh the probe panel (right-click wire/LED readout) if open
+    if (this.currentProbe) {
+      this.showProbePanel(this.currentProbe);
     }
     // Refresh logic analyzer if open
     if (this.state.showLogicView) {
@@ -2484,6 +2342,7 @@ class App {
     this.state.showLogicView = true;
     this.state.showCircuitInfo = false;
     this.currentInfoComp = null;
+    this.currentProbe = null;
 
     const panel = document.getElementById('side-panel');
     const container = document.getElementById('analysis-content');
@@ -2551,14 +2410,6 @@ class App {
 
     let html = '';
 
-    // ── Mode toggle (Pure Digital) ──
-    html += `<div class="la-section-title">Mode</div>
-      <div class="dropdown-item dropdown-item-toggle${this.state.pureDigital ? ' active' : ''}"
-           id="la-pure-digital" style="margin-bottom:8px;">
-        <span class="dropdown-item-name">Pure Digital</span>
-        <span class="dropdown-item-desc">Ignore analog HIGH/LOW only, no warnings</span>
-      </div>`;
-
     // ── Current State ──
     if (switches.length > 0 || buttons.length > 0 || leds.length > 0) {
       html += '<div class="la-section-title">Current State</div>';
@@ -2567,7 +2418,7 @@ class App {
       for (const sw of switches) {
         const label = labels.get(sw.id);
         const isOn = sw.type === COMP.SLIDE_SWITCH ? (sw.state !== 1) : sw.on;
-        html += `<li class="la-state-item">
+        html += `<li class="la-state-item la-state-item--interactive" data-la-sw-id="${sw.id}">
           <span class="la-state-label la-state-label-in">${label}</span>
           <span class="la-state-val ${isOn ? 'la-state-on' : 'la-state-off'}">${isOn ? 'ON' : 'OFF'}</span>
         </li>`;
@@ -2575,7 +2426,7 @@ class App {
 
       for (const btn of buttons) {
         const label = labels.get(btn.id);
-        html += `<li class="la-state-item">
+        html += `<li class="la-state-item la-state-item--interactive" data-la-btn-id="${btn.id}">
           <span class="la-state-label la-state-label-in">${label}</span>
           <span class="la-state-val ${btn.pressed ? 'la-state-on' : 'la-state-off'}">${btn.pressed ? 'ON' : 'OFF'}</span>
         </li>`;
@@ -2644,11 +2495,45 @@ class App {
       }
     }
 
-    if (html === '') {
-      html = '<div class="empty-state">Place switches/buttons (inputs) and LEDs (outputs) wired through chips to see logic expressions.</div>';
+    if (switches.length === 0 && buttons.length === 0 && leds.length === 0 && result.expressions.length === 0) {
+      html += '<div class="empty-state">No combinational logic components found.</div>';
     }
 
     container.innerHTML = html;
+
+    // Wire up interactive switches in the state list
+    for (const sw of switches) {
+      const el = container.querySelector(`[data-la-sw-id="${sw.id}"]`);
+      if (!el) continue;
+      el.addEventListener('click', () => {
+        if (sw.held) return;
+        this.pushUndo();
+        if (sw.type === COMP.SLIDE_SWITCH) {
+          sw.state = sw.state === 2 ? 0 : 2;
+        } else {
+          sw.on = !sw.on;
+        }
+        this.onCircuitChanged();
+      });
+    }
+
+    // Wire up interactive buttons in the state list (momentary: hold while mouse is down)
+    for (const btn of buttons) {
+      const el = container.querySelector(`[data-la-btn-id="${btn.id}"]`);
+      if (!el) continue;
+      el.addEventListener('mousedown', () => {
+        if (btn.held) return;
+        btn.pressed = true;
+        this.interaction._pressedButton = btn;
+        this.onCircuitChanged();
+        document.addEventListener('mouseup', () => {
+          if (btn.held) return;
+          btn.pressed = false;
+          if (this.interaction._pressedButton === btn) this.interaction._pressedButton = null;
+          this.onCircuitChanged();
+        }, { once: true });
+      });
+    }
 
     // Wire up the format dropdown
     const sel = document.getElementById('la-format-select');
@@ -2659,11 +2544,6 @@ class App {
       });
     }
 
-    // Wire up the Pure Digital toggle
-    const pdItem = document.getElementById('la-pure-digital');
-    if (pdItem) {
-      pdItem.addEventListener('click', () => this._togglePureDigital());
-    }
   }
 
   // ── Circuit Info Panel ───────────────────────────────────────────────────
@@ -2671,12 +2551,13 @@ class App {
   // Shared label map builder: R1, D1, U1, Button1, Switch1, SEG1...
   _buildLabelMap(comps) {
     const labelMap = new Map();
-    const counters = { R: 0, C: 0, D: 0, U: 0, B: 0, S: 0, SW: 0, SEG: 0 };
+    const counters = { R: 0, C: 0, L: 0, D: 0, U: 0, B: 0, S: 0, SW: 0, SEG: 0, DIP: 0 };
     for (const comp of comps) {
       switch (comp.type) {
         case COMP.RESISTOR:     labelMap.set(comp.id, `R${++counters.R}`); break;
         case COMP.CAPACITOR:    labelMap.set(comp.id, `C${++counters.C}`); break;
         case COMP.POLARIZED_CAPACITOR: labelMap.set(comp.id, `C${++counters.C}`); break;
+        case COMP.INDUCTOR:     labelMap.set(comp.id, `L${++counters.L}`); break;
         case COMP.DIODE:         labelMap.set(comp.id, `D${++counters.D}`); break;
         case COMP.LED:          labelMap.set(comp.id, `D${++counters.D}`); break;
         case COMP.CHIP:         labelMap.set(comp.id, `U${++counters.U}`); break;
@@ -2684,6 +2565,7 @@ class App {
         case COMP.PUSH_BUTTON:  labelMap.set(comp.id, `Button${++counters.B}`); break;
         case COMP.SWITCH:       labelMap.set(comp.id, `Switch${++counters.S}`); break;
         case COMP.SLIDE_SWITCH: labelMap.set(comp.id, `Switch${++counters.SW}`); break;
+        case COMP.DIP_SWITCH:   labelMap.set(comp.id, `DIP${++counters.DIP}`); break;
         case COMP.SEVEN_SEG:    labelMap.set(comp.id, `SEG${++counters.SEG}`); break;
       }
     }
@@ -2692,7 +2574,6 @@ class App {
 
   // Shared warning builder returns [{level, msg, compId}]
   _buildCircuitWarnings(comps, sim, nl, labelMap, fmtI) {
-    if (this.state.pureDigital) return [];
     const warnings = [];
     const spec = getFamilySpec(this.state.chipFamily);
 
@@ -2730,7 +2611,26 @@ class App {
       }
     }
 
-    // 7-seg warnings 
+    // Polarized capacitor reverse-polarity
+    for (const comp of comps) {
+      if (comp.type !== COMP.POLARIZED_CAPACITOR || !comp.placed) continue;
+      if (!comp.pins || comp.pins.length < 2) continue;
+      const netA = nl.findNetByHole(comp.pins[0].holeId);
+      const netB = nl.findNetByHole(comp.pins[1].holeId);
+      if (!netA || !netB) continue;
+      const vA = sim.netVoltages.get(netA.id);
+      const vB = sim.netVoltages.get(netB.id);
+      if (vA === undefined || vB === undefined) continue;
+      const vCap = vA - vB;
+      if (vCap < -0.3) {
+        const lbl = labelMap.get(comp.id) || 'C?';
+        warnings.push({ level: 'error',
+          msg: `${lbl}: reverse polarity (${vCap.toFixed(2)} V)   + lead at lower voltage, real cap would leak and fail`,
+          compId: comp.id });
+      }
+    }
+
+    // 7-seg warnings
     for (const comp of comps.filter(c => c.type === COMP.SEVEN_SEG)) {
       const lbl = labelMap.get(comp.id);
       const com1Net = nl.findNetByPin(comp, 'COM1');
@@ -2766,7 +2666,7 @@ class App {
         }
         if (perSegEst > MAX_SAFE) {
           warnings.push({ level: 'error',
-            msg: `${lbl}: no current limiting resistor — ~${fmtI(perSegEst)}/seg (max 30 mA/seg) — segments will burn out`,
+            msg: `${lbl}: no current limiting resistor   ~${fmtI(perSegEst)}/seg (max 30 mA/seg)   segments will burn out`,
             compId: comp.id });
         } else {
           warnings.push({ level: 'warn',
@@ -2826,7 +2726,7 @@ class App {
       }
     }
 
-    // Gray-zone input warnings (family-dependent thresholds) 
+    // Gray-zone input warnings (family dependent thresholds) 
     // Inputs above VIL but below VIH are indeterminate for the selected family.
     const GRAY_LOW  = spec.VIL;
     const GRAY_HIGH = spec.VIH;
@@ -2853,8 +2753,8 @@ class App {
       }
     }
 
-    // Floating-input warnings (CMOS families: HC, HCT) 
-    // 74LS tolerates floating inputs via internal weak pull-up. 74HC / 74HCT
+    // Floating input warnings (CMOS families: HC, HCT) 
+    // 74LS tolerates floating inputs via internal weak pull up. 74HC / 74HCT
     // inputs are high-impedance CMOS a floating input is electrically
     // indeterminate and can self-oscillate or draw through-current.
     for (const comp of comps.filter(c => c.type === COMP.CHIP)) {
@@ -2870,16 +2770,16 @@ class App {
       }
       if (floatPins.length > 0) {
         warnings.push({ level: 'warn',
-          msg: `${lbl}: floating input on pin${floatPins.length > 1 ? 's' : ''} ${floatPins.join(', ')} ${chipSpec.label} requires an explicit pull-up or pull-down`,
+          msg: `${lbl}: floating input on pin${floatPins.length > 1 ? 's' : ''} ${floatPins.join(', ')} ${chipSpec.label} requires an explicit pull up (140 kΩ) or pull down to GND`,
           compId: comp.id });
       }
     }
 
-    // Clock frequency vs family max 
-    for (const comp of comps.filter(c => c.type === COMP.CLOCK)) {
+    // Clock/crystal frequency vs family max
+    for (const comp of comps.filter(c => c.type === COMP.CLOCK || c.type === COMP.CRYSTAL)) {
       const f = comp.frequencyHz || 0;
       if (f > spec.MAX_FREQ_HZ) {
-        const lbl = labelMap.get(comp.id) || 'Clock';
+        const lbl = labelMap.get(comp.id) || (comp.type === COMP.CRYSTAL ? 'Crystal' : 'Clock');
         const fMHz  = (f / 1e6).toFixed(1);
         const maxMHz = (spec.MAX_FREQ_HZ / 1e6).toFixed(0);
         warnings.push({ level: 'warn',
@@ -2888,7 +2788,7 @@ class App {
       }
     }
 
-    // Fan-out: too many chip inputs on one chip output 
+    // Fan out: too many chip inputs on one chip output 
     for (const comp of comps.filter(c => c.type === COMP.CHIP)) {
       const chipSpec = getFamilySpec(comp.chipFamily ?? this.state.chipFamily);
       const lbl = labelMap.get(comp.id);
@@ -2907,7 +2807,7 @@ class App {
         }
         if (loadCount > chipSpec.MAX_FANOUT) {
           warnings.push({ level: 'warn',
-            msg: `${lbl}: ${loadCount} chip inputs on output ${pin.name} exceeds ${chipSpec.label} fan-out of ${chipSpec.MAX_FANOUT}`,
+            msg: `${lbl}: ${loadCount} chip inputs on output ${pin.name} exceeds ${chipSpec.label} fan out of ${chipSpec.MAX_FANOUT}`,
             compId: comp.id });
         }
       }
@@ -2932,7 +2832,7 @@ class App {
       }
     }
 
-    // 7-segment segment input pins in gray zone
+    // 7 segment segment input pins in gray zone
     for (const comp of comps.filter(c => c.type === COMP.SEVEN_SEG)) {
       const lbl = labelMap.get(comp.id);
       const segNames = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'dp'];
@@ -2982,13 +2882,11 @@ class App {
     // Check for power supply voltage drop (VCC sagging below 3.5V → overcurrent)
     let psuVoltageDrop = false;
     let psuMinVoltage = 5;
-    if (!this.state.pureDigital) {
-      for (const net of nl.nodes) {
-        if (!net.isVCC) continue;
-        const v = sim.netVoltages.get(net.id);
-        if (v !== undefined && v < psuMinVoltage) psuMinVoltage = v;
-        if (v !== undefined && v < 3.5) psuVoltageDrop = true;
-      }
+    for (const net of nl.nodes) {
+      if (!net.isVCC) continue;
+      const v = sim.netVoltages.get(net.id);
+      if (v !== undefined && v < psuMinVoltage) psuMinVoltage = v;
+      if (v !== undefined && v < 3.5) psuVoltageDrop = true;
     }
 
     const el = document.getElementById('overcurrent-status');
@@ -2998,11 +2896,11 @@ class App {
     }
 
     const parts = [];
-    if (!this.state.pureDigital && sim.shortCircuits && sim.shortCircuits.length > 0) {
+    if (sim.shortCircuits && sim.shortCircuits.length > 0) {
       parts.push(`Short circuit on ${sim.shortCircuits.length} net(s)`);
     }
     if (psuVoltageDrop) {
-      parts.push(`Power supply: significant voltage drop (${psuMinVoltage.toFixed(2)}V) — overcurrent`);
+      parts.push(`Power supply: significant voltage drop (${psuMinVoltage.toFixed(2)}V)   overcurrent`);
     }
     if (errors.length > 0) {
       // Group unique component labels
@@ -3025,6 +2923,7 @@ class App {
     this.state.showLogicView = false;
     this.state.showValues = true;
     this.currentInfoComp = null;
+    this.currentProbe = null;
 
     const panel = document.getElementById('side-panel');
     const container = document.getElementById('analysis-content');
@@ -3211,7 +3110,7 @@ class App {
       html += '</tbody></table>';
     }
 
-    // ── 7-Segment Displays ────────────────────────────────────────────────
+    // ── 7 Segment Displays ────────────────────────────────────────────────
     const sevenSegs = comps.filter(c => c.type === COMP.SEVEN_SEG);
     if (sevenSegs.length > 0) {
       const findResistorOnNet = (netId) => {
@@ -3225,7 +3124,7 @@ class App {
         return null;
       };
       const segNames = ['a','b','c','d','e','f','g','dp'];
-      html += '<div class="ci-section-title">7-Segment Displays</div>';
+      html += '<div class="ci-section-title">7 Segment Displays</div>';
       html += '<table class="ci-table"><thead><tr>' +
         '<th>Seg</th><th>State</th><th>ΔV</th><th>Current</th>' +
         '</tr></thead><tbody>';
@@ -3310,6 +3209,32 @@ class App {
           <td class="ci-val">${Clbl}</td>
           <td class="ci-val ci-drop">${dV !== undefined ? dV.toFixed(2) + 'V' : ''}</td>
           <td class="ci-val ci-cur">${Q !== undefined ? fmtQ(Q) : ''}</td>
+        </tr>`;
+      }
+      html += '</tbody></table>';
+    }
+
+    // ── Inductors ─────────────────────────────────────────────────────────
+    const inductors = comps.filter(c => c.type === COMP.INDUCTOR);
+    if (inductors.length > 0) {
+      html += '<div class="ci-section-title">Inductors</div>';
+      html += '<table class="ci-table"><thead><tr>' +
+        '<th>Comp</th><th>L</th><th>ΔV</th><th>Current</th>' +
+        '</tr></thead><tbody>';
+      for (const comp of inductors) {
+        const lbl  = labelMap.get(comp.id);
+        const netA = nl.findNetByHole(comp.pins[0].holeId);
+        const netB = nl.findNetByHole(comp.pins[1].holeId);
+        const vA   = netA ? sim.netVoltages.get(netA.id) : undefined;
+        const vB   = netB ? sim.netVoltages.get(netB.id) : undefined;
+        const dV   = (vA !== undefined && vB !== undefined) ? (vA - vB) : undefined;
+        const I    = sim.componentCurrents.get(comp.id);
+        const Llbl = comp.getLabel ? comp.getLabel() : `${comp.inductance}H`;
+        html += `<tr data-comp-id="${comp.id}" class="ci-clickable-row">
+          <td class="ci-lbl">${lbl}</td>
+          <td class="ci-val">${Llbl}</td>
+          <td class="ci-val ci-drop">${dV !== undefined ? dV.toFixed(2) + 'V' : ''}</td>
+          <td class="ci-val ci-cur">${fmtI(I)}</td>
         </tr>`;
       }
       html += '</tbody></table>';
@@ -3457,6 +3382,12 @@ class App {
   // ── Right-click panel for Switch / Buttons ───────────────────────────────
   showInputContextPanel(comp) {
     this.currentInfoComp = comp;
+    this.currentProbe = null;
+    // Take over the side panel from Circuit Analyzer / Logic Analyzer so their
+    // time-step refresh loop doesn't repaint over the component panel.
+    this.state.showCircuitInfo = false;
+    this.state.showLogicView = false;
+    document.getElementById('btn-logic').classList.remove('active');
     const panel = document.getElementById('side-panel');
     const container = document.getElementById('analysis-content');
     const title = document.querySelector('#side-panel .panel-title');
@@ -3477,41 +3408,53 @@ class App {
       let svgHtml = '';
       if (isButton) {
         const pressed = !!comp.pressed;
+        // Straddling the channel rotates the button 90° on the board; match it.
+        const rot = comp.vertical ? ' style="transform:rotate(90deg)"' : '';
         svgHtml = `
           <div class="btn-pinout-wrap">
-            <svg class="btn-pinout-svg" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+            <svg class="btn-pinout-svg"${rot} viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
               <rect x="10" y="10" width="60" height="60" rx="6" fill="#1a1a1a" stroke="#555" stroke-width="2"/>
               <circle cx="40" cy="40" r="16" fill="${pressed ? '#555' : '#333'}" stroke="#777" stroke-width="1.5"/>
               <circle cx="40" cy="40" r="10" fill="${pressed ? '#888' : '#444'}" stroke="#999" stroke-width="1"/>
-              <rect x="4"  y="20" width="8" height="4" rx="1" fill="#aaa"/><text x="2" y="17" fill="#ffffff" font-size="7" font-family="monospace">TL</text>
-              <rect x="68" y="20" width="8" height="4" rx="1" fill="#aaa"/><text x="64" y="17" fill="#ffffff" font-size="7" font-family="monospace">TR</text>
-              <rect x="4"  y="56" width="8" height="4" rx="1" fill="#aaa"/><text x="2" y="68" fill="#ffffff" font-size="7" font-family="monospace">BL</text>
-              <rect x="68" y="56" width="8" height="4" rx="1" fill="#aaa"/><text x="64" y="68" fill="#ffffff" font-size="7" font-family="monospace">BR</text>
+              <rect x="4"  y="20" width="8" height="4" rx="1" fill="#aaa"/>
+              <rect x="68" y="20" width="8" height="4" rx="1" fill="#aaa"/>
+              <rect x="4"  y="56" width="8" height="4" rx="1" fill="#aaa"/>
+              <rect x="68" y="56" width="8" height="4" rx="1" fill="#aaa"/>
               <line x1="8" y1="22" x2="8" y2="58" stroke="${pressed ? '#4f4' : '#484'}" stroke-width="1" stroke-dasharray="3,2"/>
               <line x1="72" y1="22" x2="72" y2="58" stroke="${pressed ? '#4f4' : '#484'}" stroke-width="1" stroke-dasharray="3,2"/>
               ${pressed ? '<line x1="8" y1="40" x2="72" y2="40" stroke="#4f4" stroke-width="1" stroke-dasharray="3,2"/>' : ''}
             </svg>
-          </div>
-          <div class="chip-pinout-legend" style="margin-bottom:10px">
-            <span style="color:#888">TL/BL always joined &nbsp;·&nbsp; TR/BR always joined &nbsp;·&nbsp; Press bridges both pairs</span>
           </div>`;
       } else if (isPushBtn) {
         const pressed = !!comp.pressed;
+        // Detect on-board orientation from the two terminal holes: when they
+        // straddle the channel the button reads more vertical than horizontal,
+        // so rotate the diagram 90° to match how the button is drawn.
+        const aPos = comp.pins[0] && this.world.getHolePosById(comp.pins[0].holeId);
+        const bPos = comp.pins[1] && this.world.getHolePosById(comp.pins[1].holeId);
+        const pbVert = aPos && bPos && Math.abs(bPos.y - aPos.y) > Math.abs(bPos.x - aPos.x);
+        const rot = pbVert ? ' style="transform:rotate(90deg)"' : '';
         svgHtml = `
           <div class="btn-pinout-wrap">
-            <svg class="btn-pinout-svg" viewBox="0 0 80 42" xmlns="http://www.w3.org/2000/svg">
+            <svg class="btn-pinout-svg"${rot} viewBox="0 0 80 42" xmlns="http://www.w3.org/2000/svg">
               <rect x="15" y="6" width="50" height="30" rx="5" fill="#1a1a1a" stroke="#555" stroke-width="2"/>
               <circle cx="40" cy="21" r="10" fill="${pressed ? '#555' : '#333'}" stroke="#777" stroke-width="1.5"/>
               <circle cx="40" cy="21" r="6" fill="${pressed ? '#f0e0cc' : '#d4b896'}" stroke="#bba" stroke-width="1"/>
-              <rect x="0"  y="19" width="16" height="4" rx="1" fill="#aaa"/><text x="1" y="14" fill="#ffffff" font-size="7" font-family="monospace">A</text>
-              <rect x="64" y="19" width="16" height="4" rx="1" fill="#aaa"/><text x="66" y="14" fill="#ffffff" font-size="7" font-family="monospace">B</text>
+              <rect x="0"  y="19" width="16" height="4" rx="1" fill="#aaa"/>
+              <rect x="64" y="19" width="16" height="4" rx="1" fill="#aaa"/>
               ${pressed ? '<line x1="8" y1="21" x2="72" y2="21" stroke="#4f4" stroke-width="1" stroke-dasharray="3,2"/>' : ''}
             </svg>
-          </div>
-          <div class="chip-pinout-legend" style="margin-bottom:10px">
-            <span style="color:#888">A↔B open when released &nbsp;·&nbsp; Press bridges A and B</span>
           </div>`;
       }
+
+      // Pull-up guidance is only shown for the switch; the buttons omit it.
+      const pullResHtml = isSwitch ? `
+        <div class="ctx-pullres-link">
+          <div style="color:#aaa;font-size:11px;margin-bottom:4px">Recommended pull-up: ${getFamilySpec(this.state.chipFamily).FLOAT_HIGH ? '1.4 kΩ' : '140 kΩ'} to VCC</div>
+          <a href="/docs#floating" target="_blank" rel="noopener">
+            About pull down &amp; pull up resistors ↗
+          </a>
+        </div>` : '';
 
       container.innerHTML = `
         <div class="ctx-panel-controls">
@@ -3519,11 +3462,7 @@ class App {
           <div class="ctx-toggle-item${bounceOn ? ' active' : ''}" id="ctx-bounce-toggle">Realistic Bouncing</div>
         </div>
         ${svgHtml}
-        <div class="ctx-pullres-link">
-          <a href="docs.html#floating" target="_blank" rel="noopener">
-            About pull-down &amp; pull-up resistors ↗
-          </a>
-        </div>`;
+        ${pullResHtml}`;
 
       container.querySelector('#ctx-hold-toggle').addEventListener('click', () => {
         comp.held = !comp.held;
@@ -3559,6 +3498,12 @@ class App {
   // ── Right-click panel for Slide Switch ───────────────────────────────────
   showSlideContextPanel(comp) {
     this.currentInfoComp = comp;
+    this.currentProbe = null;
+    // Take over the side panel from Circuit Analyzer / Logic Analyzer so their
+    // time-step refresh loop doesn't repaint over the component panel.
+    this.state.showCircuitInfo = false;
+    this.state.showLogicView = false;
+    document.getElementById('btn-logic').classList.remove('active');
     const panel = document.getElementById('side-panel');
     const container = document.getElementById('analysis-content');
     const title = document.querySelector('#side-panel .panel-title');
@@ -3568,25 +3513,507 @@ class App {
 
     title.textContent = 'Slide Switch (SPDT)';
 
-    const stateLabels = ['1–2 connected', 'OPEN', '2–3 connected'];
-    const stateBadge = `<div class="comp-state-badge comp-state-active">⇄ ${stateLabels[comp.state]}</div>`;
+    const s = comp.state;
+    const armX = s === 0 ? '44' : s === 2 ? '44' : '55';
+    const armY = s === 0 ? '10' : s === 2 ? '50' : '30';
 
     container.innerHTML = `
-      <div class="comp-state-wrap">${stateBadge}</div>
-      <div class="chip-info-desc" style="margin-bottom:10px">
-        This is a <strong>3-position SPDT switch</strong>, not a simple 2-state toggle. It has three states:
-        <ul class="ctx-spdt-list">
-          <li><strong>1–2:</strong> Pin 2 (common) connected to Pin 1.</li>
-          <li><strong>OPEN:</strong> All three pins are disconnected. Both output pins (1 and 3) will float to undefined voltages unless held by pull-down (or pull-up) resistors.</li>
-          <li><strong>2–3:</strong> Pin 2 (common) connected to Pin 3.</li>
-        </ul>
-        The center OPEN position is why this is a <strong>3-state</strong> switch it cannot be represented as a single ON/OFF toggle.
+      <div class="btn-pinout-wrap">
+        <svg class="spdt-svg" viewBox="0 0 120 60" xmlns="http://www.w3.org/2000/svg">
+          <text x="3"  y="14" fill="#aaa" font-size="9" font-family="Roboto, Arial, sans-serif">1</text>
+          <text x="3"  y="54" fill="#aaa" font-size="9" font-family="Roboto, Arial, sans-serif">3</text>
+          <text x="99" y="34" fill="#aaa" font-size="9" font-family="Roboto, Arial, sans-serif">2</text>
+          <line x1="24" y1="10" x2="44" y2="10" stroke="#aaa" stroke-width="2"/>
+          <line x1="24" y1="50" x2="44" y2="50" stroke="#aaa" stroke-width="2"/>
+          <line x1="76" y1="30" x2="96" y2="30" stroke="#aaa" stroke-width="2"/>
+          <circle cx="44" cy="10" r="3" fill="#aaa"/>
+          <circle cx="44" cy="50" r="3" fill="#aaa"/>
+          <circle cx="76" cy="30" r="3" fill="#aaa"/>
+          <line x1="76" y1="30" x2="${armX}" y2="${armY}" stroke="#ddd" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
       </div>
-      <div class="ctx-pullres-link">
-        <a href="docs.html#floating" target="_blank" rel="noopener">
-          About pull-down &amp; pull-up resistors ↗
+      <div class="spdt-state-btns">
+        <button class="spdt-state-btn${s === 0 ? ' active' : ''}" id="spdt-btn-0">1─2</button>
+        <button class="spdt-state-btn${s === 1 ? ' active' : ''}" id="spdt-btn-1">OPEN</button>
+        <button class="spdt-state-btn${s === 2 ? ' active' : ''}" id="spdt-btn-2">2─3</button>
+      </div>
+      <div class="chip-pinout-legend" style="margin-bottom:10px">
+        <span style="color:#aaa">Click toggles 1-2 / 2-3. Shift+click sets OPEN</span>
+      </div>
+      <div class="ctx-pullres-link" style="text-align:center;margin-top:24px">
+        <div style="color:#aaa;font-size:11px;margin-bottom:4px">Recommended pull-up: ${getFamilySpec(this.state.chipFamily).FLOAT_HIGH ? '1.4 kΩ' : '140 kΩ'} to VCC</div>
+        <a href="/docs#floating" target="_blank" rel="noopener">
+          About pull down &amp; pull up resistors ↗
         </a>
       </div>`;
+
+    for (const [btnId, newState] of [['spdt-btn-0', 0], ['spdt-btn-1', 1], ['spdt-btn-2', 2]]) {
+      container.querySelector(`#${btnId}`).addEventListener('click', () => {
+        if (comp.state === newState) return;
+        this.pushUndo();
+        comp.state = newState;
+        this.onCircuitChanged();
+      });
+    }
+  }
+
+  showDipSwitchContextPanel(comp) {
+    this.currentInfoComp = comp;
+    this.currentProbe = null;
+    this.state.showCircuitInfo = false;
+    this.state.showLogicView = false;
+    document.getElementById('btn-logic').classList.remove('active');
+    const panel = document.getElementById('side-panel');
+    const container = document.getElementById('analysis-content');
+    const title = document.querySelector('#side-panel .panel-title');
+    panel.classList.remove('collapsed');
+    this.renderer._resize();
+    this._renderDirty = true;
+
+    title.textContent = `DIP Switch (${comp.count}-Switch)`;
+
+    const btns = comp.states.map((on, i) => `
+      <button class="spdt-state-btn${on ? ' active' : ''}" data-sw="${i}">
+        ${i + 1}
+      </button>`).join('');
+
+    container.innerHTML = `
+      <div class="chip-pinout-legend" style="margin-bottom:8px;color:#aaa;font-size:11px">
+        Click a switch to toggle it.
+      </div>
+      <div class="spdt-state-btns" style="flex-wrap:wrap;gap:4px">
+        ${btns}
+      </div>
+      <div class="ctx-pullres-link" style="text-align:center;margin-top:24px">
+        <a href="/docs#floating" target="_blank" rel="noopener">
+          About pull down &amp; pull up resistors ↗
+        </a>
+      </div>`;
+
+    container.querySelectorAll('[data-sw]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const i = parseInt(btn.dataset.sw, 10);
+        this.pushUndo();
+        comp.states[i] = !comp.states[i];
+        this.onCircuitChanged();
+      });
+    });
+  }
+
+  // ── Right-click panel for Simple Clock (push-pull) ───────────────────────
+  showClockContextPanel(comp) {
+    this.currentInfoComp = comp;
+    this.currentProbe = null;
+    // Take over the side panel from Circuit Analyzer / Logic Analyzer so their
+    // time-step refresh loop doesn't repaint over the clock panel.
+    this.state.showCircuitInfo = false;
+    this.state.showLogicView = false;
+    document.getElementById('btn-logic').classList.remove('active');
+    const panel = document.getElementById('side-panel');
+    const container = document.getElementById('analysis-content');
+    const title = document.querySelector('#side-panel .panel-title');
+    panel.classList.remove('collapsed');
+    this.renderer._resize();
+    this._renderDirty = true;
+
+    title.textContent = 'Simple Clock (Push-Pull)';
+
+    if (comp.dutyCycle === undefined) comp.dutyCycle = 0.5;
+    const dutyPct = Math.round(comp.dutyCycle * 100);
+
+    container.innerHTML = `
+      <div class="ctx-duty-wrap">
+        <div class="ctx-duty-label">
+          <span>Duty Cycle</span>
+          <span id="ctx-duty-readout">${dutyPct}% high</span>
+        </div>
+        <input type="range" id="ctx-duty-slider" min="1" max="99" step="1" value="${dutyPct}" class="ctx-duty-slider">
+        <div class="ctx-duty-help">
+          Fraction of each period spent HIGH (5V). 50% = symmetric square wave.
+        </div>
+      </div>
+      <div style="color:#bbb;font-size:12px;line-height:1.5;padding:0 4px">
+        <p style="margin:0 0 8px 0">
+          The Simple Clock is a <b>push-pull</b> source with a single terminal (CLK).
+          Internally it behaves like an SPDT switch that flips between <b>5V</b> and <b>GND</b>
+          at the frequency you set, so the one output pin is always actively driven — never floating.
+        </p>
+        <p style="margin:0 0 8px 0">
+          <b>Push</b> = when HIGH, the terminal is connected to 5V and sources current into your circuit.<br>
+          <b>Pull</b> = when LOW, the terminal is connected to GND and sinks current to ground.
+        </p>
+        <p style="margin:0;color:#888">
+          Because it actively drives both rails, you do <b>not</b> need a pull-up or pull-down
+          resistor on the CLK line — wire it straight into a chip's clock input.
+        </p>
+      </div>`;
+
+    const slider = container.querySelector('#ctx-duty-slider');
+    const readout = container.querySelector('#ctx-duty-readout');
+    let undoPushed = false;
+    slider.addEventListener('input', () => {
+      if (!undoPushed) { this.pushUndo(); undoPushed = true; }
+      const pct = parseInt(slider.value, 10);
+      comp.dutyCycle = pct / 100;
+      readout.textContent = `${pct}% high`;
+      this.onCircuitChanged();
+    });
+    slider.addEventListener('change', () => { undoPushed = false; });
+  }
+
+  // ── Crystal context panel: right-click a 2-pin crystal ─────────────────────
+  // Same shape as the clock panel, but the adjustable quantity is frequency:
+  // a real crystal's frequency is fixed by its quartz cut, so "setting" it
+  // models unplugging the can and installing a different one. Duty stays 50%.
+  showCrystalContextPanel(comp) {
+    this.currentInfoComp = comp;
+    this.currentProbe = null;
+    // Take over the side panel from Circuit Analyzer / Logic Analyzer so their
+    // time-step refresh loop doesn't repaint over this panel.
+    this.state.showCircuitInfo = false;
+    this.state.showLogicView = false;
+    document.getElementById('btn-logic').classList.remove('active');
+    const panel = document.getElementById('side-panel');
+    const container = document.getElementById('analysis-content');
+    const title = document.querySelector('#side-panel .panel-title');
+    panel.classList.remove('collapsed');
+    this.renderer._resize();
+    this._renderDirty = true;
+
+    title.textContent = 'Quartz Crystal (Push-Pull)';
+
+    // Practical range only — this simulator's crystal is a visual demo (LED
+    // blink, slow counter), not a real oscillator can. Past ~50 Hz an LED
+    // just blurs, so there's no MHz/kHz tier worth offering.
+    const presets = [
+      { label: '1 Hz',  hz: 1 },
+      { label: '2 Hz',  hz: 2 },
+      { label: '4 Hz',  hz: 4 },
+      { label: '5 Hz',  hz: 5 },
+      { label: '8 Hz',  hz: 8 },
+      { label: '10 Hz', hz: 10 },
+      { label: '16 Hz', hz: 16 },
+      { label: '32 Hz', hz: 32 },
+      { label: '50 Hz', hz: 50 },
+    ];
+
+    container.innerHTML = `
+      <div class="ctx-duty-wrap">
+        <div class="ctx-duty-label">
+          <span>Frequency</span>
+          <span id="ctx-xtal-readout">${comp.getLabel()}</span>
+        </div>
+        <div class="ctx-xtal-presets">
+          ${presets.map((p, i) =>
+            `<button class="ctx-xtal-preset${p.hz === comp.frequencyHz ? ' active' : ''}" data-idx="${i}">${p.label}</button>`
+          ).join('')}
+        </div>
+        <div class="ctx-xtal-custom">
+          <input type="text" id="ctx-xtal-input" placeholder="custom Hz, e.g. 45" autocomplete="off" spellcheck="false">
+          <button id="ctx-xtal-set">Set</button>
+        </div>
+        <div class="ctx-duty-help">
+          Swap in a different crystal can. Practical range is about 1–50 Hz — faster just blurs the LED.
+        </div>
+      </div>
+      <div style="color:#bbb;font-size:12px;line-height:1.5;padding:0 4px">
+        <p style="margin:0 0 8px 0">
+          A quartz crystal resonates at <b>one fixed frequency</b> set by how its quartz
+          sliver was cut at the factory. You never tune a crystal — you pick a can with
+          the frequency you need. Setting the frequency here models swapping the can.
+        </p>
+        <p style="margin:0 0 8px 0">
+          Like the Simple Clock, the output pin (A) is <b>push-pull</b>: actively driven
+          to 5V then GND, never floating, so it wires straight into a chip's clock input.
+          Pin B is the ground-reference leg. Duty cycle is locked at <b>50%</b> — there is
+          no slider, because a crystal's symmetric resonance is exactly what you buy it for.
+        </p>
+        <p style="margin:0;color:#888">
+          A real bare crystal is passive — it only oscillates with an amplifier (usually
+          an inverter) wrapped around it. The simulator hands you the finished clock
+          signal directly. Above ~30 Hz an LED blurs; use Timing Analysis to see fast edges.
+        </p>
+      </div>`;
+
+    const setFreq = (hz) => {
+      if (!isFinite(hz) || hz <= 0) return;
+      this.pushUndo();
+      comp.frequencyHz = hz;
+      this.onCircuitChanged();   // re-renders this panel via currentInfoComp
+    };
+    container.querySelectorAll('.ctx-xtal-preset').forEach(btn => {
+      btn.addEventListener('click', () => setFreq(presets[parseInt(btn.dataset.idx, 10)].hz));
+    });
+    const input = container.querySelector('#ctx-xtal-input');
+    const commit = () => setFreq(parseFloat(input.value));
+    container.querySelector('#ctx-xtal-set').addEventListener('click', commit);
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') commit();
+      e.stopPropagation(); // prevent board hotkeys while typing
+    });
+  }
+
+  // ── Probe panel: right-click a wire/LED/resistor/capacitor for a bare readout ──
+  // probe = { kind: 'wire', wire } | { kind: 'led'|'resistor'|'capacitor', comp }.
+  // Shows only the relevant electrical quantities for that part — nothing else.
+  // Lives in the same side panel as the other context panels and is re-rendered
+  // each simulation step via onCircuitChanged.
+  showProbePanel(probe) {
+    // If the probed item was deleted out from under us, close instead of crashing.
+    if (probe.comp && !this.state.components.includes(probe.comp)) {
+      this._closeInfoPanel();
+      return;
+    }
+    if (probe.kind === 'wire' && !this.state.wireManager.wires.includes(probe.wire)) {
+      this._closeInfoPanel();
+      return;
+    }
+
+    this.currentProbe = probe;
+    this.currentInfoComp = null;
+    // Take over the side panel from Circuit Analyzer / Logic Analyzer.
+    this.state.showCircuitInfo = false;
+    this.state.showLogicView = false;
+    document.getElementById('btn-logic').classList.remove('active');
+    const panel = document.getElementById('side-panel');
+    const container = document.getElementById('analysis-content');
+    const title = document.querySelector('#side-panel .panel-title');
+    panel.classList.remove('collapsed');
+    this.renderer._resize();
+    this._renderDirty = true;
+
+    const sim = this.simulator;
+    const nl  = sim.netlist;
+
+    const fmtV = (v) => (v === undefined || v === null) ? '—' : v.toFixed(2) + ' V';
+    const fmtI = (a) => {
+      if (a === undefined || a === null) return '—';
+      const mA = a * 1000;
+      if (Math.abs(mA) < 0.001) return '0 mA';
+      if (Math.abs(mA) < 0.1)   return (a * 1e6).toFixed(0) + ' µA';
+      if (Math.abs(mA) < 100)   return mA.toFixed(2) + ' mA';
+      return mA.toFixed(0) + ' mA';
+    };
+    const fmtC = (c) => {            // capacitance, farads
+      if (c === undefined || c === null) return '—';
+      if (c >= 1e-3) return (c * 1e3).toFixed(1) + ' mF';
+      if (c >= 1e-6) return (c * 1e6).toFixed(1) + ' µF';
+      if (c >= 1e-9) return (c * 1e9).toFixed(1) + ' nF';
+      return (c * 1e12).toFixed(1) + ' pF';
+    };
+    const fmtQ = (q) => {            // charge, coulombs
+      if (q === undefined || q === null) return '—';
+      const aq = Math.abs(q);
+      if (aq < 1e-15) return '0 C';
+      if (aq >= 1)    return q.toFixed(2) + ' C';
+      if (aq >= 1e-3) return (q * 1e3).toFixed(2) + ' mC';
+      if (aq >= 1e-6) return (q * 1e6).toFixed(2) + ' µC';
+      if (aq >= 1e-9) return (q * 1e9).toFixed(2) + ' nC';
+      return (q * 1e12).toFixed(2) + ' pC';
+    };
+    // High/low terminal voltages and the drop across a 2-pin component, from
+    // its solved net voltages. "high"/"low" are by potential, so drop ≥ 0.
+    const acrossVolts = (comp) => {
+      const nA = nl.findNetByHole(comp.pins[0].holeId);
+      const nB = nl.findNetByHole(comp.pins[1].holeId);
+      const vA = nA ? sim.netVoltages.get(nA.id) : undefined;
+      const vB = nB ? sim.netVoltages.get(nB.id) : undefined;
+      if (vA === undefined || vB === undefined) return { high: undefined, low: undefined, drop: undefined };
+      return { high: Math.max(vA, vB), low: Math.min(vA, vB), drop: Math.abs(vA - vB) };
+    };
+
+    // Build a list of [label, value] rows per probed item — nothing else.
+    let rows = [];
+    if (probe.kind === 'led') {
+      const comp = probe.comp;
+      title.textContent = 'LED';
+      // Anode = pins[0], cathode = pins[1]; forward drop is anode − cathode.
+      const aNet = nl.findNetByHole(comp.pins[0].holeId);
+      const kNet = nl.findNetByHole(comp.pins[1].holeId);
+      const vA = aNet ? sim.netVoltages.get(aNet.id) : undefined;
+      const vK = kNet ? sim.netVoltages.get(kNet.id) : undefined;
+      const drop = (vA !== undefined && vK !== undefined) ? (vA - vK) : undefined;
+      rows = [
+        ['Anode', fmtV(vA)],
+        ['Cathode', fmtV(vK)],
+        ['Voltage Drop', fmtV(drop)],
+        ['Current', fmtI(sim.componentCurrents.get(comp.id) || 0)],
+      ];
+    } else if (probe.kind === 'resistor') {
+      const comp = probe.comp;
+      title.textContent = 'Resistor';
+      const { high, low, drop } = acrossVolts(comp);
+      rows = [
+        ['Resistance', comp.getLabel ? comp.getLabel() : comp.resistance + ' Ω'],
+        ['V+', fmtV(high)],
+        ['V−', fmtV(low)],
+        ['Voltage Drop', fmtV(drop)],
+        ['Current', fmtI(sim.componentCurrents.get(comp.id) || 0)],
+      ];
+    } else if (probe.kind === 'capacitor') {
+      const comp = probe.comp;
+      title.textContent = comp.type === COMP.POLARIZED_CAPACITOR ? 'Capacitor (Polarized)' : 'Capacitor';
+      // vPrev is the simulator's integrated cap voltage (the state variable);
+      // charge follows from Q = C·V.
+      const vCap = comp.vPrev ?? 0;
+      rows = [
+        ['Capacitance', fmtC(comp.capacitance)],
+        ['Charge', fmtQ(comp.capacitance * vCap)],
+        ['Voltage', fmtV(vCap)],
+      ];
+    } else if (probe.kind === 'inductor') {
+      const comp = probe.comp;
+      title.textContent = 'Inductor';
+      // iPrev is the simulator's stored coil current (the state variable);
+      // the interesting number for a coil is its current, not its voltage.
+      const { drop } = acrossVolts(comp);
+      rows = [
+        ['Inductance', comp.getLabel ? comp.getLabel() : comp.inductance + ' H'],
+        ['Current', fmtI(Math.abs(comp.iPrev ?? 0))],
+        ['Voltage Drop', fmtV(drop)],
+      ];
+    } else { // wire (jumper)
+      const wire = probe.wire;
+      title.textContent = 'Wire';
+      // A jumper is a single electrical node, so its voltage is the net potential.
+      const net = nl.findNetByHole(wire.startHoleId) || nl.findNetByHole(wire.endHoleId);
+      rows = [
+        ['Voltage', fmtV(net ? sim.netVoltages.get(net.id) : undefined)],
+        // Actual current through THIS jumper, as a series meter would read it.
+        ['Current', fmtI(this._wireCurrent(wire))],
+      ];
+    }
+
+    container.innerHTML = `
+      <div class="probe-readout">
+        ${rows.map(([label, value]) => `
+        <div class="probe-row">
+          <span class="probe-label">${label}</span>
+          <span class="probe-value">${value}</span>
+        </div>`).join('')}
+      </div>`;
+  }
+
+  // Current actually flowing through a single jumper wire — what a multimeter
+  // placed in series would read. The simulator treats jumpers as ideal merges
+  // (no per-wire current), so we reconstruct it by KCL: a jumper is an edge in
+  // the graph of breadboard strips that make up its net. Cutting that edge
+  // splits the net in two; the current through the wire is the net current
+  // entering whichever side we can account for from its branch currents.
+  _wireCurrent(wire) {
+    const sim = this.simulator;
+    const nl  = sim.netlist;
+    const world = this.world;
+    const net = nl.findNetByHole(wire.startHoleId) || nl.findNetByHole(wire.endHoleId);
+    if (!net) return 0;
+    const holeSet = net.holes;
+
+    // Union-find: group the net's holes into physical breadboard strips. Strips
+    // are joined by the board itself (getConnectedHoles), NOT by jumper wires.
+    const parent = new Map();
+    for (const h of holeSet) parent.set(h, h);
+    const find = (h) => { let r = h; while (parent.get(r) !== r) r = parent.get(r); while (parent.get(h) !== r) { const n = parent.get(h); parent.set(h, r); h = n; } return r; };
+    const union = (a, b) => { const ra = find(a), rb = find(b); if (ra !== rb) parent.set(ra, rb); };
+    for (const h of holeSet) {
+      for (const nb of world.getConnectedHoles(h)) {
+        if (holeSet.has(nb)) union(h, nb);
+      }
+    }
+    const stripOf = (holeId) => find(holeId);
+
+    const sStart = stripOf(wire.startHoleId);
+    const sEnd   = stripOf(wire.endHoleId);
+    // Wire's two holes already share a strip → it bridges nothing, carries ~0.
+    if (sStart === sEnd) return 0;
+
+    // Jumper wires within this net are the edges between strips. The wires that
+    // directly parallel this one (same pair of strips) form a bundle; current
+    // splits evenly across them.
+    const netWires = this.state.wireManager.wires.filter(w =>
+      holeSet.has(w.startHoleId) && holeSet.has(w.endHoleId));
+    const adj = new Map();
+    const addAdj = (a, b) => { if (!adj.has(a)) adj.set(a, []); adj.get(a).push(b); };
+    let parallelCount = 0;
+    for (const w of netWires) {
+      const a = stripOf(w.startHoleId), b = stripOf(w.endHoleId);
+      const parallelToW = (a === sStart && b === sEnd) || (a === sEnd && b === sStart);
+      if (parallelToW) { parallelCount++; continue; } // exclude the whole bundle
+      addAdj(a, b); addAdj(b, a);
+    }
+    if (parallelCount < 1) parallelCount = 1;
+
+    // BFS one side of the cut (sStart) without crossing the parallel bundle.
+    const side1 = new Set([sStart]);
+    const queue = [sStart];
+    while (queue.length) {
+      const s = queue.pop();
+      for (const nb of (adj.get(s) || [])) if (!side1.has(nb)) { side1.add(nb); queue.push(nb); }
+    }
+    const onSide1 = (holeId) => side1.has(stripOf(holeId));
+
+    // Sum signed branch current entering each side from cross-net components we
+    // can model (passive: resistor / LED / diode / capacitor). A side that also
+    // carries an un-modelled source (power rail, chip pin, clock, 7-seg, switch)
+    // is flagged incomputable; we then read the current off the purely-passive
+    // side instead — by KCL it carries the same magnitude through the wire.
+    let sum1 = 0, sum2 = 0;
+    let ok1 = true, ok2 = true;
+    for (const h of holeSet) {
+      if (parseHoleId(h).type === 'power') { if (onSide1(h)) ok1 = false; else ok2 = false; }
+    }
+    for (const { comp, pin } of net.pins) {
+      const s1 = onSide1(pin.holeId);
+      const inj = this._pinInjection(comp, pin);
+      if (inj === undefined) { if (s1) ok1 = false; else ok2 = false; continue; }
+      if (s1) sum1 += inj; else sum2 += inj;
+    }
+
+    let total;
+    if (ok1)      total = Math.abs(sum1);
+    else if (ok2) total = Math.abs(sum2);
+    else          total = Math.abs(sum1); // best effort when both sides have sources
+    return total / parallelCount;
+  }
+
+  // Signed current entering `pin`'s net from a 2-terminal passive component
+  // (positive = into the net). Returns undefined for components we don't model
+  // as passive branches (chips, switches, etc.) so the caller can fall back.
+  _pinInjection(comp, pin) {
+    const sim = this.simulator;
+    const nl  = sim.netlist;
+    const thisNet = nl.findNetByHole(pin.holeId);
+    const vThis = thisNet ? sim.netVoltages.get(thisNet.id) : undefined;
+
+    if (comp.type === COMP.RESISTOR) {
+      const other = comp.pins.find(p => p !== pin);
+      const oNet  = other ? nl.findNetByHole(other.holeId) : null;
+      const vOther = oNet ? sim.netVoltages.get(oNet.id) : undefined;
+      if (vThis === undefined || vOther === undefined || !comp.resistance) return undefined;
+      return (vOther - vThis) / comp.resistance; // current flows in from the higher side
+    }
+    if (comp.type === COMP.LED || comp.type === COMP.DIODE) {
+      const I = sim.componentCurrents.get(comp.id) || 0;
+      // Conventional current flows anode→cathode: it leaves the anode net (−I)
+      // and enters the cathode net (+I). pins[0]=anode, pins[1]=cathode.
+      const isAnode = comp.pins[0] === pin;
+      return isAnode ? -I : I;
+    }
+    if (comp.type === COMP.CAPACITOR || comp.type === COMP.POLARIZED_CAPACITOR) {
+      const I = sim.componentCurrents.get(comp.id) || 0;
+      const other = comp.pins.find(p => p !== pin);
+      const oNet  = other ? nl.findNetByHole(other.holeId) : null;
+      const vOther = oNet ? sim.netVoltages.get(oNet.id) : undefined;
+      if (vThis === undefined || vOther === undefined) return undefined;
+      return Math.sign(vOther - vThis) * I; // charging current flows toward the lower side
+    }
+    if (comp.type === COMP.INDUCTOR) {
+      // Stored current iPrev flows pin A → pin B: it leaves A's net (−I)
+      // and enters B's net (+I). pins[0]=A, pins[1]=B.
+      const I = comp.iPrev || 0;
+      const isA = comp.pins[0] === pin;
+      return isA ? -I : I;
+    }
+    return undefined;
   }
 
   // ── Rotating Status Message & Bug Report ─────────────────────────────────
@@ -3595,9 +4022,9 @@ class App {
     const messages = [
       { text: 'Found a bug? <u>Report it</u>', action: 'bugreport' },
       { text: 'Feedback?', action: 'feedback' },
-      { text: 'Got questions? Ask the community', href: 'https://www.reddit.com/r/74SIM' },
+      { text: 'Got questions? Ask the community', href: 'https://www.reddit.com/r/74Sim' },
       { text: `${chipCount} chips, infinite possibilities` },
-      { text: 'Want to support 74SIM? Share with your friends' },
+      { text: 'Want to support 74Sim? Share with your friends' },
     ];
 
     const span = document.getElementById('rotating-message-text');
@@ -3645,106 +4072,145 @@ class App {
   }
 
   _openBugReport() {
-    this._initReportModalsOnce();
-    const el = document.getElementById('bug-report-backdrop');
-    if (el) el.style.display = 'flex';
+    window.open('/bug-report', '_blank');
   }
 
   _openFeedback() {
-    this._initReportModalsOnce();
-    const el = document.getElementById('feedback-backdrop');
-    if (el) el.style.display = 'flex';
+    window.open('/feedback', '_blank');
   }
 
-  // Wire up the bug-report / feedback modals on first open.
-  // Submission goes through the Tauri Rust command in desktop mode, and
-  // through a same-origin POST to /api/reports in web mode.
-  _initReportModalsOnce() {
-    if (this._reportModalsReady) return;
-    this._reportModalsReady = true;
-
-    const closeOf = (backdropId) => {
-      const el = document.getElementById(backdropId);
-      if (el) el.style.display = 'none';
-    };
-
-    const wire = ({ backdropId, closeId, formId, descId, submitId, statusId, kind, submitLabel }) => {
-      const backdrop = document.getElementById(backdropId);
-      const closeBtn = document.getElementById(closeId);
-      const form     = document.getElementById(formId);
-      const submit   = document.getElementById(submitId);
-      const status   = document.getElementById(statusId);
-      const desc     = document.getElementById(descId);
-      if (!form || !submit) return;
-
-      if (closeBtn) closeBtn.addEventListener('click', () => closeOf(backdropId));
-      if (backdrop) backdrop.addEventListener('click', (e) => {
-        if (e.target === e.currentTarget) closeOf(backdropId);
-      });
-
-      form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const text = (desc?.value || '').trim();
-        if (!text) return;
-        submit.disabled = true;
-        if (status) { status.style.color = '#888'; status.textContent = 'Submitting...'; }
-        try {
-          if (isTauri()) {
-            const t = globalThis.__TAURI__;
-            await t.core.invoke('submit_report', { reportType: kind, description: text });
-          } else {
-            const fd = new FormData();
-            fd.append('report_type', kind);
-            fd.append('description', text);
-            // For bug reports, forward any selected screenshots to the server.
-            if (kind === 'bug') {
-              const filesEl = document.getElementById('bug-images');
-              if (filesEl?.files) {
-                for (const f of filesEl.files) fd.append('images', f);
-              }
-            }
-            const res = await fetch('/api/reports', { method: 'POST', body: fd });
-            if (!res.ok) {
-              const data = await res.json().catch(() => ({}));
-              throw new Error(data.detail || `Server error ${res.status}`);
-            }
-          }
-          if (status) { status.style.color = '#60c060'; status.textContent = 'Thanks — submitted!'; }
-          if (desc) desc.value = '';
-          submit.textContent = 'Submitted';
-          setTimeout(() => {
-            closeOf(backdropId);
-            submit.disabled = false;
-            submit.textContent = submitLabel;
-            if (status) status.textContent = '';
-          }, 1200);
-        } catch (err) {
-          if (status) { status.style.color = '#e06060'; status.textContent = String(err?.message || err); }
-          submit.disabled = false;
-        }
-      });
-    };
-
-    wire({
-      backdropId: 'bug-report-backdrop', closeId: 'bug-report-close',
-      formId: 'bug-report-form', descId: 'bug-explanation',
-      submitId: 'bug-report-submit', statusId: 'bug-report-status',
-      kind: 'bug', submitLabel: 'Submit Bug Report',
-    });
-    wire({
-      backdropId: 'feedback-backdrop', closeId: 'feedback-close',
-      formId: 'feedback-form', descId: 'feedback-text',
-      submitId: 'feedback-submit', statusId: 'feedback-status',
-      kind: 'feedback', submitLabel: 'Submit Feedback',
-    });
-  }
-
-  _closeInfoPanel() {
+  // ── Timing Analysis panel ─────────────────────────────────────────
+  // Opt-in timing mode: real per-chip tPD, event-driven engine (js/timing.js),
+  // waveform lanes for every clock and test point (js/timingDiagram.js).
+  _showTimingAnalyzer() {
+    // Take over the shared side panel (same convention as the other views).
     this.currentInfoComp = null;
+    this.currentProbe = null;
     this.state.showLogicView = false;
     this.state.showCircuitInfo = false;
     this.state.showValues = false;
     this.state.logicLabels = null;
+    this.state.showTiming = true;
+
+    const panel = document.getElementById('side-panel');
+    const container = document.getElementById('analysis-content');
+    const title = document.querySelector('#side-panel .panel-title');
+    title.textContent = 'Timing Analysis';
+    panel.classList.remove('collapsed');
+    this.renderer._resize();
+    this._renderDirty = true;
+
+    container.innerHTML = `
+      <div class="timing-modes" id="tm-modes">
+        <button class="timing-mode" id="tm-mode-stop" data-mode="stop">■ Stopped</button>
+        <button class="timing-mode" id="tm-mode-real" data-mode="real">▶ Real time<small>1 s / s</small></button>
+        <button class="timing-mode" id="tm-mode-prop" data-mode="prop">▶ Propagation<small>10 ns / s</small></button>
+      </div>
+      <div class="timing-row">
+        <button class="timing-btn" id="tm-step" title="Advance the analysis by 10 ns">Step 10 ns</button>
+        <button class="timing-btn" id="tm-reset" title="Restart the analysis at t = 0">t=0</button>
+        <span class="timing-time" id="tm-time">t = 0 ps</span>
+      </div>
+      <div class="timing-row">
+        <span class="timing-behind" id="tm-behind" style="display:none">⚠ can't keep up — lower the speed or clock</span>
+      </div>
+      <canvas id="timing-canvas"></canvas>
+      <div class="timing-row">
+        <button class="timing-btn" id="tm-place-tp" title="Place a Test Point probe on the board to record its trace">+ Place Test Point</button>
+      </div>`;
+
+    // Enter timing mode: current settled state becomes t=0.
+    const eng = this.simulator.beginTimingMode(this.world, this.state.components, this.state.wireManager);
+    eng.rateNsPerSec = 10;
+    eng.running = true;
+    eng.onReset = () => {
+      if (this.timingDiagram) this.timingDiagram.resetView();
+      this._renderDirty = true;
+    };
+
+    this.timingDiagram = new TimingDiagram(container.querySelector('#timing-canvas'), this);
+
+    // Three-way run mode: Stopped / Real time / Propagation-scale. The buttons
+    // form a segmented control — one is always active and highlighted.
+    const modeBtns = container.querySelectorAll('.timing-mode');
+    const setMode = (mode) => {
+      if (mode === 'stop') {
+        eng.running = false;
+      } else if (mode === 'real') {
+        eng.rateNsPerSec = 1e9;
+        eng.running = true;
+        // Seconds-scale zoom: at this pxPerNs the 1-2-5 time axis lands on a
+        // 500 ms step, i.e. a marker every half second in the "1 s / s" view.
+        if (this.timingDiagram) { this.timingDiagram.pxPerNs = 2e-7; this.timingDiagram.follow = true; }
+      } else { // 'prop'
+        eng.rateNsPerSec = 10;
+        eng.running = true;
+        // Nanosecond-scale zoom for propagation-delay viewing.
+        if (this.timingDiagram) { this.timingDiagram.pxPerNs = 6; this.timingDiagram.follow = true; }
+      }
+      modeBtns.forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
+    };
+    modeBtns.forEach(b => b.addEventListener('click', () => setMode(b.dataset.mode)));
+    setMode('prop');
+
+    container.querySelector('#tm-step').addEventListener('click', () => {
+      setMode('stop');
+      eng.advanceByPs(10000); // 10 ns
+      this._renderDirty = true;
+    });
+    // t=0 restarts the analysis and drops playback to Stopped, so the trace
+    // freezes at t=0 instead of immediately running forward again.
+    container.querySelector('#tm-reset').addEventListener('click', () => {
+      setMode('stop');
+      eng.reset();
+    });
+    // Place a Test Point probe straight from the panel (adds a lane on drop).
+    container.querySelector('#tm-place-tp').addEventListener('click', () => {
+      this.interaction.startPlacement(COMP.TESTPOINT);
+    });
+  }
+
+  /**
+   * Leave timing mode and restore the live engine. Safe to call from any
+   * path — the panel close button, another view taking over the side panel,
+   * or a full state reload. No-op when timing was never entered.
+   */
+  _teardownTimingMode() {
+    if (!this.state.showTiming && !this.simulator.timing) return;
+    this.state.showTiming = false;
+    if (this.timingDiagram) { this.timingDiagram.destroy(); this.timingDiagram = null; }
+    const wasActive = !!(this.simulator.timing && this.simulator.timing.active);
+    this.simulator.endTimingMode();
+    const panel = document.getElementById('side-panel');
+    if (panel) panel.classList.remove('timing-wide');
+    if (wasActive) this.onCircuitChanged(); // re-evaluate live + restart wall-clock loop
+  }
+
+  _updateTimingReadout() {
+    const eng = this.simulator.timing;
+    if (!eng) return;
+    const el = document.getElementById('tm-time');
+    if (el) {
+      const ps = eng.timePs;
+      const fmt = ps < 1e3 ? `${ps} ps`
+        : ps < 1e6 ? `${(ps / 1e3).toFixed(1)} ns`
+        : ps < 1e9 ? `${(ps / 1e6).toFixed(3)} µs`
+        : ps < 1e12 ? `${(ps / 1e9).toFixed(3)} ms`
+        : `${(ps / 1e12).toFixed(3)} s`;
+      el.textContent = `t = ${fmt}`;
+    }
+    const behind = document.getElementById('tm-behind');
+    if (behind) behind.style.display = eng.behind ? '' : 'none';
+  }
+
+  _closeInfoPanel() {
+    this.currentInfoComp = null;
+    this.currentProbe = null;
+    this.state.showLogicView = false;
+    this.state.showCircuitInfo = false;
+    this.state.showValues = false;
+    this.state.logicLabels = null;
+    this._teardownTimingMode();
     const panel = document.getElementById('side-panel');
     panel.classList.add('collapsed');
     // Resize after the CSS width transition completes so the canvas fills the
@@ -3772,10 +4238,81 @@ class App {
     // holds closure refs to the old component objects. After topology
     // replacement those refs are orphans; their stale PUSH_PULL stamps would
     // still be applied at their old hole positions during the next MNA solve,
-    // producing intermediate voltages (~2.5–3 V) on contested nets.
+    // producing intermediate voltages (~2.5 3 V) on contested nets.
     this.simulator.pinDriveStates.clear();
+    // Same for chip pin couplings (bilateral switches, analog muxes): stale
+    // entries would keep a phantom resistive bridge stamped between holes.
+    this.simulator.chipCouplings.clear();
   }
 
+  // ── Cached Projects ────────────────────────────────────────────────────────
+  _renderCachedProjects() {
+    const container = document.getElementById('cached-projects-list');
+    if (!container) return;
+    const projects = getProjectCache();
+    container.innerHTML = '';
+    if (projects.length === 0) {
+      container.innerHTML = `<div class="cached-project-empty">${t('file.noCached', { def: 'No cached projects yet' })}</div>`;
+      return;
+    }
+    for (const p of projects) {
+      const isActive = p.id === this._currentProjectId;
+      const item = document.createElement('div');
+      item.className = 'dropdown-item cached-project-item' + (isActive ? ' cached-project-active' : '');
+      item.dataset.id = p.id;
+
+      const d = new Date(p.timestamp);
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      const yy = String(d.getFullYear()).slice(-2);
+      const dateStr = `${mm}/${dd}/${yy}`;
+      const countStr = `${p.componentCount} components`;
+
+      item.innerHTML = `
+        <div class="cached-project-row">
+          <div class="cached-project-info">
+            <span class="cached-project-name">${_escHtml(p.name)}${isActive ? ' <span class="cached-project-badge">current</span>' : ''}</span>
+            <span class="cached-project-meta">${dateStr} · ${countStr}</span>
+          </div>
+          <button class="cached-project-delete" data-id="${p.id}" title="Remove from cache">×</button>
+        </div>`;
+
+      item.querySelector('.cached-project-delete').addEventListener('click', (e) => {
+        e.stopPropagation();
+        deleteProjectFromCache(p.id);
+        this._renderCachedProjects();
+      });
+
+      item.addEventListener('click', () => {
+        if (!isActive) this._loadCachedProject(p.id);
+      });
+
+      container.appendChild(item);
+    }
+  }
+
+  _loadCachedProject(id) {
+    const entry = loadProjectById(id);
+    if (!entry || !entry.state) return;
+    if (deserializeState(entry.state, this.state, this.world)) {
+      this._rebuildWorldTiles();
+      this.textBoxManager.deserialize(this.state.textBoxes);
+      this.imageBoxManager.deserialize(this.state.imageBoxes);
+      this._resetTransientRefs();
+      this._currentProjectId = id;
+      setCurrentProjectId(id);
+      this._lastStructuralHash = '';
+      // Restore the sticky filename for this project so saves suggest its name.
+      if (entry.name) {
+        const fname = /\.json$/i.test(entry.name) ? entry.name : `${entry.name}.json`;
+        setStoredFilename(fname);
+      } else {
+        clearStoredFilename();
+      }
+      this.onCircuitChanged();
+      this._closeAllDropdowns();
+    }
+  }
 }
 
 function _escHtml(str) {

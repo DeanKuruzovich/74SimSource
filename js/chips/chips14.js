@@ -8,7 +8,7 @@ export const CHIPS_BLOCK_14 = {
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic
      Wikipedia: https://en.wikipedia.org/wiki/Open_collector
      Wikipedia: https://en.wikipedia.org/wiki/Read-only_memory */
-  '74185': {
+  '74x185': {
     name: '74x185',
     simpleName: 'Binary to BCD Converter (OC)',
     description: '6 bit binary to BCD code converter with open collector outputs (16-pin)',
@@ -17,7 +17,7 @@ export const CHIPS_BLOCK_14 = {
     gnd: 8,
     openCollector: true,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74185a.pdf',
-    tags: ['converter', 'binary', 'bcd', 'code converter', 'open-collector'],
+    tags: ['converter', 'binary', 'bcd', 'code converter', 'open collector'],
     guideOverview: 'The 74x185 is a 6 bit binary to BCD code converter with open collector outputs. Internally it operates as a ROM lookup that maps a 6 bit binary value (0 to 63) to two BCD digits: a ones digit (0 to 9) on Y2 to Y5 and a tens digit (0 to 6) on Y6 to Y8. The active LOW chip enable G tristates all outputs when HIGH, allowing multiple converters to share an open collector bus with pull up resistors.',
     guidePinDescriptions: {
       'Y8':  'BCD tens digit bit 2 (decimal weight 40). Active LOW open collector output. LOW means this bit is set; an external pull up resistor is required.',
@@ -62,7 +62,7 @@ export const CHIPS_BLOCK_14 = {
       {
         title: 'Binary to BCD Conversion',
         paragraphs: [
-          'Binary (natural binary) encodes numbers as powers of 2. BCD (Binary-Coded Decimal) encodes each decimal digit separately: 63 in BCD is 0110_0011₂ (tens digit 6, ones digit 3). The 74x185 handles 6 bit binary inputs (0 to 63) and performs this conversion via an internal ROM lookup.',
+          'Binary (natural binary) encodes numbers as powers of 2. BCD (Binary Coded Decimal) encodes each decimal digit separately: 63 in BCD is 0110_0011₂ (tens digit 6, ones digit 3). The 74x185 handles 6 bit binary inputs (0 to 63) and performs this conversion via an internal ROM lookup.',
           'The ones digit (0 to 9) appears on outputs Y2 to Y5 and the tens digit (0 to 6) appears on Y6 to Y8. All outputs are active LOW open collector. A LOW on an output means that BCD bit is set.',
         ],
       },
@@ -70,14 +70,14 @@ export const CHIPS_BLOCK_14 = {
         title: 'Open Collector Bus Use',
         paragraphs: [
           'Because outputs are open collector, each output requires an external pull up resistor (typically 1 to 4.7 kΩ to VCC) to produce a HIGH logic level. Multiple 74x185 outputs can share the same bus line. The bus is pulled LOW if any enabled output asserts it.',
-          'The G enable pin lets you multiplex several converters onto a shared bus. Only the converter with G LOW drives the bus; the others remain high-impedance.',
+          'The G enable pin lets you multiplex several converters onto a shared bus. Only the converter with G LOW drives the bus; the others remain high impedance.',
         ],
       },
       {
         title: 'Common Uses',
         list: [
-          'Driving BCD 7-segment decoders (74x47/48) from a binary counter.',
-          'Multi-digit decimal displays where a binary count must be split into individual decimal digits.',
+          'Driving BCD 7 segment decoders (74x47/48) from a binary counter.',
+          'Multi digit decimal displays where a binary count must be split into individual decimal digits.',
           'Code conversion in measurement and test equipment.',
         ],
       },
@@ -88,16 +88,16 @@ export const CHIPS_BLOCK_14 = {
   /* Primary source: Texas Instruments, SN74S189 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74s189.pdf
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic
      Wikipedia: https://en.wikipedia.org/wiki/Random-access_memory */
-  '74189': {
+  '74x189': {
     name: '74x189',
     simpleName: '64 bit RAM (16x4, Inv Out)',
-    description: '64 bit static RAM (16 words × 4 bits) with inverted tristate data outputs (16-pin)',
+    description: '64-bit static RAM (16 words × 4 bits), inverted 3-state outputs (16-pin)',
     pins: 16,
     vcc: 16,
     gnd: 8,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74s189.pdf',
-    tags: ['ram', 'memory', 'storage', '16x4', 'inverted', 'tri-state'],
-    guideOverview: 'The 74x189 is a 64 bit static RAM organized as 16 words of 4 bits each. Four address pins (A0 to A3) select one of 16 locations; four data input pins (D1 to D4) write to it when both CS and WE are pulled LOW simultaneously. The outputs Q1 to Q4 present the logical complement (inverted) of the stored data, a characteristic of this bipolar SRAM family. The companion 74219 provides the same organization with non inverting outputs.',
+    tags: ['ram', 'memory', 'storage', '16x4', 'inverted', 'tri state'],
+    guideOverview: 'The 74x189 is a 64 bit static RAM organized as 16 words of 4 bits each. Four address pins (A0 to A3) select one of 16 locations; four data input pins (D1 to D4) write to it when both CS and WE are pulled LOW simultaneously. The outputs Q1 to Q4 present the logical complement (inverted) of the stored data, a characteristic of this bipolar SRAM family. The companion 74x219 provides the same organization with non inverting outputs.',
     guidePinDescriptions: {
       'A0':  'Address bit 0 (LSB). Selects one of 16 words along with A1 to A3.',
       'Q1':  'Inverted data output bit 1. Presents the complement of the stored bit when CS is LOW; tristated when CS is HIGH.',
@@ -142,7 +142,7 @@ export const CHIPS_BLOCK_14 = {
       {
         title: 'How Static RAM Works',
         paragraphs: [
-          'Static RAM (SRAM) stores each bit in a cross-coupled inverter pair, a bistable latch that holds its state indefinitely while power is applied. Unlike DRAM, no refresh is needed. The 74x189 contains 16 such 4 bit words for 64 bits total.',
+          'Static RAM (SRAM) stores each bit in a cross coupled inverter pair, a bistable latch that holds its state indefinitely while power is applied. Unlike DRAM, no refresh is needed. The 74x189 contains 16 such 4 bit words for 64 bits total.',
           'Read cycle: hold CS LOW and WE HIGH, set the address, and wait for the access time (typically 35 ns for the LS variant). Stored data appears inverted on Q1 to Q4.',
           'Write cycle: hold CS LOW, set address and data on D1 to D4, then pulse WE LOW. Data is captured on the LOW to HIGH edge of WE (or CS, whichever rises first).',
         ],
@@ -151,7 +151,7 @@ export const CHIPS_BLOCK_14 = {
         title: 'Inverted Outputs',
         paragraphs: [
           'Q1 to Q4 always show the logical complement of the stored bits. A stored 1 reads back as Q=0. Design the surrounding circuitry to account for this: feed Q outputs into active LOW inputs, or add inverters to restore true polarity.',
-          'The 74219 is a pin-compatible variant with non inverting tristate outputs, a drop-in replacement when inverted outputs are inconvenient.',
+          'The 74x219 is a pin compatible variant with non inverting tristate outputs, a drop-in replacement when inverted outputs are inconvenient.',
         ],
       },
       {
@@ -167,10 +167,10 @@ export const CHIPS_BLOCK_14 = {
   // ── 74190: Sync Up/Down Decade Counter, 16-pin ─────────────────────────────
   /* Primary source: Texas Instruments, SN74LS190 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls190.pdf
      Wikipedia: https://en.wikipedia.org/wiki/Counter_(digital) */
-  '74190': {
+  '74x190': {
     name: '74x190',
     simpleName: 'Sync Up/Down Decade Counter',
-    description: 'Synchronous presettable BCD decade up/down counter with single clock and ripple carry output (16-pin)',
+    description: 'Sync presettable BCD up/down counter, single clock, ripple carry (16-pin)',
     pins: 16,
     vcc: 16,
     gnd: 8,
@@ -233,9 +233,9 @@ export const CHIPS_BLOCK_14 = {
         ],
       },
       {
-        title: 'Comparison with 74192',
+        title: 'Comparison with 74x192',
         paragraphs: [
-          'The 74190 uses a single clock with a UD direction pin. The 74192 uses separate CLK_UP and CLK_DOWN inputs and asynchronous LOAD/CLR. Choose 74190 when a single clock source drives both count directions; choose 74192 when up and down clocks come from independent sources.',
+          'The 74x190 uses a single clock with a UD direction pin. The 74x192 uses separate CLK_UP and CLK_DOWN inputs and asynchronous LOAD/CLR. Choose 74x190 when a single clock source drives both count directions; choose 74x192 when up and down clocks come from independent sources.',
         ],
       },
     ],
@@ -244,16 +244,16 @@ export const CHIPS_BLOCK_14 = {
   // ── 74192: Sync Up/Down Decade Counter (Dual Clk), 16-pin ──────────────────
   /* Primary source: Texas Instruments, SN74LS192 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls192.pdf
      Wikipedia: https://en.wikipedia.org/wiki/Counter_(digital) */
-  '74192': {
+  '74x192': {
     name: '74x192',
     simpleName: 'Sync Up/Down Decade Counter (Dual Clk)',
-    description: 'Synchronous presettable BCD decade up/down counter with separate up/down clocks and async clear (16-pin)',
+    description: 'Sync presettable BCD up/down counter, dual clocks, async CLR (16-pin)',
     pins: 16,
     vcc: 16,
     gnd: 8,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls192.pdf',
     tags: ['counter', 'bcd', 'decade', 'up/down', 'synchronous', 'preset', 'dual clock', 'sequential'],
-    guideOverview: 'The 74x192 is a synchronous presettable BCD decade counter with separate CLK_UP and CLK_DOWN inputs, allowing independent clock sources for each counting direction. Asynchronous active LOW LOAD presets any BCD value instantly (no clock needed); asynchronous active HIGH CLR resets to zero immediately. CO (carry out) pulses LOW when counting up through 9→0; BO (borrow out) pulses LOW when counting down through 0→9. Both are used for cascading multi-digit counters.',
+    guideOverview: 'The 74x192 is a synchronous presettable BCD decade counter with separate CLK_UP and CLK_DOWN inputs, allowing independent clock sources for each counting direction. Asynchronous active LOW LOAD presets any BCD value instantly (no clock needed); asynchronous active HIGH CLR resets to zero immediately. CO (carry out) pulses LOW when counting up through 9→0; BO (borrow out) pulses LOW when counting down through 0→9. Both are used for cascading multi digit counters.',
     guidePinDescriptions: {
       'QA':       'BCD count output, bit 0 (weight 1, LSB).',
       'QB':       'BCD count output, bit 1 (weight 2).',
@@ -299,11 +299,11 @@ export const CHIPS_BLOCK_14 = {
         title: 'Dual Clock Operation',
         paragraphs: [
           'Apply the up count clock signal to CLK_UP while holding CLK_DOWN HIGH (inactive). For down counting, apply the clock to CLK_DOWN while holding CLK_UP HIGH. Never clock both inputs simultaneously, as this causes undefined behaviour.',
-          'Because LOAD and CLR are asynchronous, you can preset or clear the counter at any time without waiting for a clock edge. This is useful for initialising multi-digit displays or implementing modulo-N counters.',
+          'Because LOAD and CLR are asynchronous, you can preset or clear the counter at any time without waiting for a clock edge. This is useful for initialising multi digit displays or implementing modulo N counters.',
         ],
       },
       {
-        title: 'Cascading for Multi-Digit Counting',
+        title: 'Cascading for Multi Digit Counting',
         paragraphs: [
           'Connect CO of the ones digit counter to CLK_UP of the tens digit counter. Each time the ones digit rolls over from 9 to 0, the CO pulse clocks the tens digit upward by one.',
           'For down counting cascades, connect BO of the ones digit to CLK_DOWN of the tens digit.',
@@ -315,16 +315,16 @@ export const CHIPS_BLOCK_14 = {
   // ── 74194: 4 bit Bidirectional Shift Register, 16-pin ──────────────────────
   /* Primary source: Texas Instruments, SN74LS194A datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls194a.pdf
      Wikipedia: https://en.wikipedia.org/wiki/Shift_register */
-  '74194': {
+  '74x194': {
     name: '74x194',
     simpleName: '4 bit Bidirectional Shift Register',
-    description: '4 bit bidirectional universal shift register with async CLR and mode control (16-pin)',
+    description: '4-bit bidirectional universal shift register, async CLR + mode (16-pin)',
     pins: 16,
     vcc: 16,
     gnd: 8,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls194a.pdf',
     tags: ['shift register', '4 bit', 'bidirectional', 'parallel load', 'sequential'],
-    guideOverview: 'The 74x194 is a 4 bit universal bidirectional shift register. Two mode select pins (S0, S1) choose from four operations: hold the current state (00), shift right one position with SER_R entering at QA (01), shift left one position with SER_L entering at QD (10), or load all four bits in parallel from A to D (11). An asynchronous active LOW CLR forces all outputs LOW regardless of clock or mode. It is the go-to chip for serial/parallel data conversion and ring counter applications.',
+    guideOverview: 'The 74x194 is a 4 bit universal bidirectional shift register. Two mode select pins (S0, S1) choose from four operations: hold the current state (00), shift right one position with SER_R entering at QA (01), shift left one position with SER_L entering at QD (10), or load all four bits in parallel from A to D (11). An asynchronous active LOW CLR forces all outputs LOW regardless of clock or mode. It is the go to chip for serial/parallel data conversion and ring counter applications.',
     guidePinDescriptions: {
       'CLR':   'Asynchronous clear, active LOW. Immediately forces all Q outputs to 0, independent of clock or mode select.',
       'SER_R': 'Serial right shift input. Data here is loaded into QA on the rising clock edge when S1S0=01 (shift right). QA→QB→QC→QD shift in sequence.',
@@ -396,35 +396,35 @@ export const CHIPS_BLOCK_14 = {
     ],
   },
 
-  // ── 74195: 4 bit Shift Register (J-K Input), 16-pin ────────────────────────
+  // ── 74195: 4 bit Shift Register (JK Input), 16-pin ────────────────────────
   /* Primary source: Texas Instruments, SN74LS195A datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls195a.pdf
      Wikipedia: https://en.wikipedia.org/wiki/Shift_register */
-  '74195': {
+  '74x195': {
     name: '74x195',
-    simpleName: '4 bit Shift Register (J-K Input)',
-    description: '4 bit parallel-access shift register with J-K̄ serial inputs, async CLR, and complementary QD (16-pin)',
+    simpleName: '4 bit Shift Register (JK Input)',
+    description: '4-bit parallel-access shift register, JK̄ serial in, async CLR (16-pin)',
     pins: 16,
     vcc: 16,
     gnd: 8,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls195a.pdf',
     tags: ['shift register', '4 bit', 'parallel load', 'jk input', 'sequential'],
-    guideOverview: 'The 74x195 is a 4 bit parallel-access shift register whose first stage accepts J and K̄ (NOT-K) serial inputs instead of a single D input. This gives more control over how a new bit enters the register: J=1 and K̄=1 sets QA HIGH; K̄=0 (K=1) always clears QA regardless of J. Stages 2 to 4 are standard D-type shift stages. Active LOW CLR resets all outputs; active LOW PE (parallel enable) loads all four bits on the rising clock edge. Both QD and its complement (QDn) are provided.',
+    guideOverview: 'The 74x195 is a 4 bit parallel access shift register whose first stage accepts J and K̄ (NOT K) serial inputs instead of a single D input. This gives more control over how a new bit enters the register: J=1 and K̄=1 sets QA HIGH; K̄=0 (K=1) always clears QA regardless of J. Stages 2 to 4 are standard D type shift stages. Active LOW CLR resets all outputs; active LOW PE (parallel enable) loads all four bits on the rising clock edge. Both QD and its complement (QDn) are provided.',
     guidePinDescriptions: {
       'CLR': 'Asynchronous clear, active LOW. Immediately resets all Q outputs to 0.',
-      'J':   'J serial input to the first stage. When K̄ (Kn) is HIGH and J is HIGH, QA goes HIGH on the next rising clock edge.',
-      'Kn':  'K̄ (NOT-K) serial input to the first stage. When LOW (K=1), QA is forced LOW on the next rising clock edge regardless of J. When HIGH, J controls QA.',
+      'J': 'J serial input to the first stage. When K̄ (Kn) is HIGH and J is HIGH, QA goes HIGH on the next rising clock edge.',
+      'Kn': 'K̄ (NOT K) serial input to the first stage. When LOW (K=1), QA is forced LOW on the next rising clock edge regardless of J. When HIGH, J controls QA.',
       'CLK': 'Clock input, rising edge triggered. Shifts data through the register or loads parallel data.',
-      'PE':  'Parallel Enable, active LOW. When LOW, parallel inputs A to D are loaded into QA to QD on the rising clock edge.',
-      'A':   'Parallel data input to QA. Loaded when PE is LOW on a rising clock edge.',
-      'B':   'Parallel data input to QB.',
+      'PE': 'Parallel Enable, active LOW. When LOW, parallel inputs A to D are loaded into QA to QD on the rising clock edge.',
+      'A': 'Parallel data input to QA. Loaded when PE is LOW on a rising clock edge.',
+      'B': 'Parallel data input to QB.',
       'GND': 'Ground reference (pin 8).',
-      'C':   'Parallel data input to QC.',
-      'D':   'Parallel data input to QD.',
-      'QD':  'Last stage output (MSB). Serial output for cascading to the next chip.',
+      'C': 'Parallel data input to QC.',
+      'D': 'Parallel data input to QD.',
+      'QD': 'Last stage output (MSB). Serial output for cascading to the next chip.',
       'QDn': 'Complement of QD. Useful as a feedback input (to J) for making a Johnson counter, or as a serial input to the next stage.',
-      'QC':  'Stage 3 output.',
-      'QB':  'Stage 2 output.',
-      'QA':  'First stage output, controlled by the J-K̄ serial inputs.',
+      'QC': 'Stage 3 output.',
+      'QB': 'Stage 2 output.',
+      'QA': 'First stage output, controlled by the JK̄ serial inputs.',
       'VCC': 'Positive supply (+5 V, pin 16).',
     },
     pinout: [
@@ -451,9 +451,9 @@ export const CHIPS_BLOCK_14 = {
     sequential: true,
     guideSections: [
       {
-        title: 'J-K̄ First Stage Behaviour',
+        title: 'JK̄ First Stage Behaviour',
         paragraphs: [
-          'The J and K̄ inputs give the first stage J-K flip-flop behaviour. The truth table for QA on the next clock edge is:',
+          'The J and K̄ inputs give the first stage JK flip flop behaviour. The truth table for QA on the next clock edge is:',
         ],
         formulas: [
           'J=0, Kn=0 → QA=0 (K dominates, clears)',
@@ -471,8 +471,8 @@ export const CHIPS_BLOCK_14 = {
       {
         title: 'Common Uses',
         list: [
-          'Serial data interfaces where the first bit must be set or cleared under explicit J-K control.',
-          'PRBS (pseudo-random bit sequence) generators using XOR feedback into J.',
+          'Serial data interfaces where the first bit must be set or cleared under explicit JK control.',
+          'PRBS (pseudo random bit sequence) generators using XOR feedback into J.',
           'Sequence generators for motor control or LED chasing patterns.',
         ],
       },
@@ -483,28 +483,28 @@ export const CHIPS_BLOCK_14 = {
   /* Primary source: Texas Instruments, SN74196 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74196.pdf
      Wikipedia: https://en.wikipedia.org/wiki/Counter_(digital)
      Wikipedia: https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
-  '74196': {
+  '74x196': {
     name: '74x196',
     simpleName: 'Presettable Decade Counter/Latch',
-    description: 'Presettable bi-quinary decade counter/latch with asynchronous clear and preset, same function as 74176 (14-pin)',
+    description: 'Presettable bi-quinary decade counter/latch, async CLR/preset (14-pin)',
     pins: 14,
     vcc: 14,
     gnd: 7,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74196.pdf',
-    tags: ['counter', 'decade', 'bi-quinary', 'preset', 'sequential'],
-    guideOverview: 'The 74x196 is a presettable bi-quinary decade counter with separate divide-by-2 (CLK1 → QA) and divide-by-5 (CLK2 → QB to QD) sections. Connecting QA to CLK2 builds a standard BCD decade counter (÷10) with the BCD sequence on QA to QD. Asynchronous active LOW CLR and active LOW LOAD allow instant reset or preset to any value without needing a clock edge. It is functionally equivalent to the 74176 but includes a latch function on the LOAD pin.',
+    tags: ['counter', 'decade', 'bi quinary', 'preset', 'sequential'],
+    guideOverview: 'The 74x196 is a presettable bi quinary decade counter with separate divide by-2 (CLK1 → QA) and divide by-5 (CLK2 → QB to QD) sections. Connecting QA to CLK2 builds a standard BCD decade counter (÷10) with the BCD sequence on QA to QD. Asynchronous active LOW CLR and active LOW LOAD allow instant reset or preset to any value without needing a clock edge. It is functionally equivalent to the 74x176 but includes a latch function on the LOAD pin.',
     guidePinDescriptions: {
-      'CLK2': 'Clock for the divide-by-5 section (QB, QC, QD). Rising edge triggered. Connect QA here for BCD counting.',
+      'CLK2': 'Clock for the divide by-5 section (QB, QC, QD). Rising edge triggered. Connect QA here for BCD counting.',
       'D':    'Parallel preset data bit D (MSB, weight 8).',
       'C':    'Parallel preset data bit C (weight 4).',
       'B':    'Parallel preset data bit B (weight 2).',
       'A':    'Parallel preset data bit A (LSB, weight 1).',
       'LOAD': 'Parallel load enable, active LOW. When LOW, immediately latches A to D into QA to QD (asynchronous, no clock needed).',
       'GND':  'Ground reference (pin 7).',
-      'CLK1': 'Clock for the divide-by-2 section (QA). Rising edge triggered. Connect to external clock for BCD mode.',
-      'QA':   'Divide-by-2 output. Connect to CLK2 for standard BCD decade counting.',
-      'QB':   'Bit 1 output of the divide-by-5 section (weight 2).',
-      'QC':   'Bit 2 output of the divide-by-5 section (weight 4).',
+      'CLK1': 'Clock for the divide by-2 section (QA). Rising edge triggered. Connect to external clock for BCD mode.',
+      'QA':   'Divide by-2 output. Connect to CLK2 for standard BCD decade counting.',
+      'QB':   'Bit 1 output of the divide by-5 section (weight 2).',
+      'QC':   'Bit 2 output of the divide by-5 section (weight 4).',
       'QD':   'Bit 3 output (MSB, weight 8).',
       'CLR':  'Asynchronous clear, active LOW. Immediately resets all outputs to 0.',
       'VCC':  'Positive supply (+5 V, pin 14).',
@@ -537,16 +537,16 @@ export const CHIPS_BLOCK_14 = {
         ],
       },
       {
-        title: 'Bi-Quinary Mode',
+        title: 'Bi Quinary Mode',
         paragraphs: [
-          'Apply the clock to CLK2 and connect QD back to CLK1. This creates a bi-quinary (5-2) sequence with a symmetrical divide-by-10. The divide-by-10 output has a 50% duty cycle, making it useful for frequency division in clocks and measurement circuits.',
+          'Apply the clock to CLK2 and connect QD back to CLK1. This creates a bi quinary (5-2) sequence with a symmetrical divide by-10. The divide by-10 output has a 50% duty cycle, making it useful for frequency division in clocks and measurement circuits.',
         ],
       },
       {
         title: 'Asynchronous Control',
         paragraphs: [
           'Pull LOAD LOW with the desired count on A to D to instantly preset without a clock. Pull CLR LOW to instantly reset to 0000. These operations are asynchronous and override both clocks.',
-          'The 74196 is functionally identical to the 74176 for most purposes. The added latch function on LOAD means the preset value is retained even while LOAD is held LOW.',
+          'The 74x196 is functionally identical to the 74x176 for most purposes. The added latch function on LOAD means the preset value is retained even while LOAD is held LOW.',
         ],
       },
     ],
@@ -556,26 +556,26 @@ export const CHIPS_BLOCK_14 = {
   /* Primary source: Texas Instruments, SN74197 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74197.pdf
      Wikipedia: https://en.wikipedia.org/wiki/Counter_(digital)
      Wikipedia: https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
-  '74197': {
+  '74x197': {
     name: '74x197',
     simpleName: 'Presettable Binary Counter/Latch',
-    description: 'Presettable 4 bit binary counter/latch with asynchronous clear and preset, same function as 74177 (14-pin)',
+    description: 'Presettable 4-bit binary counter/latch, async CLR/preset (14-pin)',
     pins: 14,
     vcc: 14,
     gnd: 7,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74197.pdf',
     tags: ['counter', 'binary', '4 bit', 'preset', 'sequential'],
-    guideOverview: 'The 74x197 is a presettable 4 bit binary counter split into a divide-by-2 section (CLK1 → QA) and a divide-by-8 section (CLK2 → QB to QD). Connecting QA to CLK2 forms a full 4 bit (0 to 15) binary counter. Asynchronous active LOW CLR and active LOW LOAD allow instant reset or preset without a clock. It is the binary equivalent of the 74196 decade counter and is functionally compatible with the 74177.',
+    guideOverview: 'The 74x197 is a presettable 4 bit binary counter split into a divide by-2 section (CLK1 → QA) and a divide by-8 section (CLK2 → QB to QD). Connecting QA to CLK2 forms a full 4 bit (0 to 15) binary counter. Asynchronous active LOW CLR and active LOW LOAD allow instant reset or preset without a clock. It is the binary equivalent of the 74x196 decade counter and is functionally compatible with the 74x177.',
     guidePinDescriptions: {
-      'CLK2': 'Clock for the divide-by-8 section (QB, QC, QD). Rising edge triggered. Connect QA here for full 4 bit binary counting.',
+      'CLK2': 'Clock for the divide by-8 section (QB, QC, QD). Rising edge triggered. Connect QA here for full 4 bit binary counting.',
       'D':    'Parallel preset data bit D (MSB, weight 8).',
       'C':    'Parallel preset data bit C (weight 4).',
       'B':    'Parallel preset data bit B (weight 2).',
       'A':    'Parallel preset data bit A (LSB, weight 1).',
       'LOAD': 'Parallel load enable, active LOW. When LOW, immediately latches A to D into QA to QD (asynchronous).',
       'GND':  'Ground reference (pin 7).',
-      'CLK1': 'Clock for the divide-by-2 section (QA). Rising edge triggered. Connect to external clock for 4 bit binary mode.',
-      'QA':   'Divide-by-2 output (LSB, weight 1). Connect to CLK2 for full binary counting.',
+      'CLK1': 'Clock for the divide by-2 section (QA). Rising edge triggered. Connect to external clock for 4 bit binary mode.',
+      'QA':   'Divide by-2 output (LSB, weight 1). Connect to CLK2 for full binary counting.',
       'QB':   'Binary count bit 1 (weight 2).',
       'QC':   'Binary count bit 2 (weight 4).',
       'QD':   'Binary count bit 3 (MSB, weight 8).',
@@ -612,14 +612,14 @@ export const CHIPS_BLOCK_14 = {
       {
         title: 'Independent Sections',
         paragraphs: [
-          'CLK1 and CLK2 are fully independent. Use CLK1 alone for a ÷2 divider (output QA). Use CLK2 alone for a ÷8 divider (outputs QB to QD). This lets you derive multiple clock frequencies from a single 74197.',
+          'CLK1 and CLK2 are fully independent. Use CLK1 alone for a ÷2 divider (output QA). Use CLK2 alone for a ÷8 divider (outputs QB to QD). This lets you derive multiple clock frequencies from a single 74x197.',
         ],
       },
       {
         title: 'Cascading',
         paragraphs: [
           'For counts beyond 16, connect QD of the first 74x197 to CLK1 of the second (and QA of second to its own CLK2 for a second ÷16 stage), giving a ÷256 binary counter. Use CLR to synchronise multiple cascaded stages to a known starting point.',
-          'The 74197 is functionally identical to the 74177; the added latch on LOAD retains the preset value while LOAD is held LOW.',
+          'The 74x197 is functionally identical to the 74x177; the added latch on LOAD retains the preset value while LOAD is held LOW.',
         ],
       },
     ],
@@ -628,16 +628,16 @@ export const CHIPS_BLOCK_14 = {
   // ── 74198: 8 bit Bidirectional Shift Register, 24-pin ──────────────────────
   /* Primary source: Texas Instruments, SN74198 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74198.pdf
      Wikipedia: https://en.wikipedia.org/wiki/Shift_register */
-  '74198': {
+  '74x198': {
     name: '74x198',
     simpleName: '8 bit Bidirectional Shift Register',
-    description: '8 bit bidirectional universal shift register with mode control, async CLR, and serial inputs (24-pin)',
+    description: '8-bit bidirectional universal shift register, mode + async CLR (24-pin)',
     pins: 24,
     vcc: 24,
     gnd: 12,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74198.pdf',
     tags: ['shift register', '8 bit', 'bidirectional', 'parallel load', 'sequential'],
-    guideOverview: 'The 74x198 is the 8 bit version of the 74x194 universal bidirectional shift register, housed in a 24-pin DIP. The same four modes apply: hold (S1S0=00), shift right (S1S0=01, data enters via SER_R at QA), shift left (S1S0=10, data enters via SER_L at QH), and parallel load (S1S0=11). Asynchronous active LOW CLR resets all 8 outputs to zero. The 8 bit width makes it directly useful for byte-wide serial/parallel conversion without any cascading required.',
+    guideOverview: 'The 74x198 is the 8 bit version of the 74x194 universal bidirectional shift register, housed in a 24-pin DIP. The same four modes apply: hold (S1S0=00), shift right (S1S0=01, data enters via SER_R at QA), shift left (S1S0=10, data enters via SER_L at QH), and parallel load (S1S0=11). Asynchronous active LOW CLR resets all 8 outputs to zero. The 8 bit width makes it directly useful for byte wide serial/parallel conversion without any cascading required.',
     guidePinDescriptions: {
       'QH':    'Bit 7 output (MSB). Serial output endpoint for right shift cascading; data exits here last during right shift.',
       'QG':    'Bit 6 output.',
@@ -710,51 +710,51 @@ export const CHIPS_BLOCK_14 = {
       {
         title: 'SPI and Serial Interfaces',
         paragraphs: [
-          'For SPI-style output: parallel load one byte (S1S0=11), then shift right 8 times (S1S0=01), reading QH serially on each clock. This transmits a complete byte over a single wire in 8 clock cycles.',
-          'For SPI-style input: clock 8 bits into SER_R (S1S0=01), then switch to hold (S1S0=00) and read the parallel outputs QA to QH.',
+          'For SPI style output: parallel load one byte (S1S0=11), then shift right 8 times (S1S0=01), reading QH serially on each clock. This transmits a complete byte over a single wire in 8 clock cycles.',
+          'For SPI style input: clock 8 bits into SER_R (S1S0=01), then switch to hold (S1S0=00) and read the parallel outputs QA to QH.',
         ],
       },
     ],
   },
 
-  // ── 74199: 8 bit Shift Register (J-K Input), 24-pin ────────────────────────
+  // ── 74199: 8 bit Shift Register (JK Input), 24-pin ────────────────────────
   /* Primary source: Texas Instruments, SN74199 datasheet. [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74199.pdf
      Wikipedia: https://en.wikipedia.org/wiki/Shift_register */
-  '74199': {
+  '74x199': {
     name: '74x199',
-    simpleName: '8 bit Shift Register (J-K Input)',
-    description: '8 bit universal shift register with J-K̄ serial inputs and parallel load (24-pin)',
+    simpleName: '8 bit Shift Register (JK Input)',
+    description: '8-bit universal shift register, JK̄ serial in + parallel load (24-pin)',
     pins: 24,
     vcc: 24,
     gnd: 12,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74199.pdf',
     tags: ['shift register', '8 bit', 'parallel load', 'jk input', 'sequential'],
-    guideOverview: 'The 74x199 is the 8 bit counterpart of the 74x195 shift register. Its first stage uses J and K̄ serial inputs for flexible serial entry control, while stages 2 to 8 are standard shift stages. Active LOW PE loads all 8 bits in parallel on the rising clock edge; active LOW CLR resets all outputs immediately. Housed in a 24-pin package to accommodate the 8 bit parallel data bus, it is suited for byte-wide serial data paths with flexible first bit control.',
+    guideOverview: 'The 74x199 is the 8 bit counterpart of the 74x195 shift register. Its first stage uses J and K̄ serial inputs for flexible serial entry control, while stages 2 to 8 are standard shift stages. Active LOW PE loads all 8 bits in parallel on the rising clock edge; active LOW CLR resets all outputs immediately. Housed in a 24-pin package to accommodate the 8 bit parallel data bus, it is suited for byte wide serial data paths with flexible first bit control.',
     guidePinDescriptions: {
-      'CLR':  'Asynchronous clear, active LOW. Immediately resets all 8 outputs to 0.',
-      'CLK':  'Clock input, rising edge triggered. Shifts data or loads parallel data.',
-      'J':    'J serial input to the first stage (QA). When Kn is HIGH and J is HIGH, QA goes HIGH on next clock edge.',
-      'Kn':   'K̄ (NOT-K) serial input. When LOW (K=1), QA is forced LOW on next rising edge regardless of J.',
-      'PE':   'Parallel Enable, active LOW. When LOW, parallel data A to H is loaded into QA to QH on the rising clock edge.',
-      'QA':   'First stage output, controlled by J-K̄ serial inputs (LSB).',
-      'QB':   'Stage 2 output.',
-      'QC':   'Stage 3 output.',
-      'QD':   'Stage 4 output.',
-      'QE':   'Stage 5 output.',
-      'QF':   'Stage 6 output.',
-      'GND':  'Ground reference (pin 12).',
-      'QG':   'Stage 7 output.',
-      'QH':   'Last stage output (MSB). Serial output for cascading. Connect to J of the next 74x199.',
-      'A':    'Parallel data input to QA.',
-      'B':    'Parallel data input to QB.',
-      'C':    'Parallel data input to QC.',
-      'D':    'Parallel data input to QD.',
-      'E':    'Parallel data input to QE.',
-      'F':    'Parallel data input to QF.',
-      'G2':   'Parallel data input to QG (labelled G2 in this pinout to avoid naming conflict).',
-      'H':    'Parallel data input to QH.',
-      'NC1':  'Not connected. Leave unconnected.',
-      'VCC':  'Positive supply (+5 V, pin 24).',
+      'CLR': 'Asynchronous clear, active LOW. Immediately resets all 8 outputs to 0.',
+      'CLK': 'Clock input, rising edge triggered. Shifts data or loads parallel data.',
+      'J': 'J serial input to the first stage (QA). When Kn is HIGH and J is HIGH, QA goes HIGH on next clock edge.',
+      'Kn': 'K̄ (NOT K) serial input. When LOW (K=1), QA is forced LOW on next rising edge regardless of J.',
+      'PE': 'Parallel Enable, active LOW. When LOW, parallel data A to H is loaded into QA to QH on the rising clock edge.',
+      'QA': 'First stage output, controlled by JK̄ serial inputs (LSB).',
+      'QB': 'Stage 2 output.',
+      'QC': 'Stage 3 output.',
+      'QD': 'Stage 4 output.',
+      'QE': 'Stage 5 output.',
+      'QF': 'Stage 6 output.',
+      'GND': 'Ground reference (pin 12).',
+      'QG': 'Stage 7 output.',
+      'QH': 'Last stage output (MSB). Serial output for cascading. Connect to J of the next 74x199.',
+      'A': 'Parallel data input to QA.',
+      'B': 'Parallel data input to QB.',
+      'C': 'Parallel data input to QC.',
+      'D': 'Parallel data input to QD.',
+      'E': 'Parallel data input to QE.',
+      'F': 'Parallel data input to QF.',
+      'G2': 'Parallel data input to QG (labelled G2 in this pinout to avoid naming conflict).',
+      'H': 'Parallel data input to QH.',
+      'NC1': 'Not connected. Leave unconnected.',
+      'VCC': 'Positive supply (+5 V, pin 24).',
     },
     pinout: [
       { pin:  1, name: 'CLR',  type: 'input' },
@@ -788,9 +788,9 @@ export const CHIPS_BLOCK_14 = {
     sequential: true,
     guideSections: [
       {
-        title: 'J-K̄ First Stage',
+        title: 'JK̄ First Stage',
         paragraphs: [
-          'The first stage (QA) uses J-K̄ inputs identical to those on the 74195. Kn=0 always forces QA LOW; Kn=1 lets J set QA HIGH. This gives precise control over the first bit entering the serial data stream.',
+          'The first stage (QA) uses JK̄ inputs identical to those on the 74x195. Kn=0 always forces QA LOW; Kn=1 lets J set QA HIGH. This gives precise control over the first bit entering the serial data stream.',
         ],
         formulas: [
           'J=1, Kn=1 → QA=1 (set)',
@@ -800,7 +800,7 @@ export const CHIPS_BLOCK_14 = {
       {
         title: 'Cascading to 16 Bits',
         paragraphs: [
-          'Connect QH of the first 74x199 to the J input of a second 74x199, tie the second chip\'s Kn HIGH, and share CLK and PE. This gives a 16 bit register with J-K\u0304 input control on the MSB entry point.',
+          'Connect QH of the first 74x199 to the J input of a second 74x199, tie the second chip\'s Kn HIGH, and share CLK and PE. This gives a 16 bit register with JK̄ input control on the MSB entry point.',
         ],
       },
     ],
@@ -810,30 +810,30 @@ export const CHIPS_BLOCK_14 = {
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic
      Wikipedia: https://en.wikipedia.org/wiki/Random-access_memory */
-  '74200': {
+  '74x200': {
     name: '74x200',
     simpleName: '256 bit RAM (256x1)',
-    description: '256 bit static RAM organized as 256 words × 1 bit with tristate outputs (16-pin)',
+    description: '256-bit static RAM (256 words × 1 bit), 3-state outputs (16-pin)',
     pins: 16,
     vcc: 16,
     gnd: 8,
     datasheet: 'https://en.wikipedia.org/wiki/7400-series_integrated_circuits',
-    tags: ['ram', 'memory', 'storage', '256x1', 'tri-state'],
-    guideOverview: 'The 74x200 is a 256 bit static RAM organized as 256 words of 1 bit each. An 8 bit address (A0 to A7) selects one of 256 locations. The single bit DIN and DOUT pins make it a natural fit for bit-slice memory designs. Place eight chips in parallel with shared address, CS, and WE lines to form a 256×8 RAM. Active LOW CS enables the chip; active LOW WE selects write mode when asserted simultaneously with CS.',
+    tags: ['ram', 'memory', 'storage', '256x1', 'tri state'],
+    guideOverview: 'The 74x200 is a 256 bit static RAM organized as 256 words of 1 bit each. An 8 bit address (A0 to A7) selects one of 256 locations. The single bit DIN and DOUT pins make it a natural fit for bit slice memory designs. Place eight chips in parallel with shared address, CS, and WE lines to form a 256×8 RAM. Active LOW CS enables the chip; active LOW WE selects write mode when asserted simultaneously with CS.',
     guidePinDescriptions: {
-      'A6':  'Address bit 6.',
-      'A5':  'Address bit 5.',
-      'A4':  'Address bit 4.',
-      'A3':  'Address bit 3.',
-      'A2':  'Address bit 2.',
-      'A1':  'Address bit 1.',
-      'A0':  'Address bit 0 (LSB).',
+      'A6': 'Address bit 6.',
+      'A5': 'Address bit 5.',
+      'A4': 'Address bit 4.',
+      'A3': 'Address bit 3.',
+      'A2': 'Address bit 2.',
+      'A1': 'Address bit 1.',
+      'A0': 'Address bit 0 (LSB).',
       'GND': 'Ground reference (pin 8).',
       'DIN': 'Data input. The logic level here is written to the selected address when CS and WE are both LOW.',
-      'WE':  'Write Enable, active LOW. When LOW with CS LOW, writes DIN to the addressed cell. When HIGH, the chip is in read mode and DOUT reflects the stored bit.',
-      'CS':  'Chip Select, active LOW. Must be LOW for any read or write. When HIGH, DOUT is tristated (high-impedance).',
-      'DOUT':'Data output (tristate). Reflects the stored bit at the selected address when CS is LOW and WE is HIGH.',
-      'A7':  'Address bit 7 (MSB). With A0 to A6, fully specifies one of 256 locations.',
+      'WE': 'Write Enable, active LOW. When LOW with CS LOW, writes DIN to the addressed cell. When HIGH, the chip is in read mode and DOUT reflects the stored bit.',
+      'CS': 'Chip Select, active LOW. Must be LOW for any read or write. When HIGH, DOUT is tristated (high impedance).',
+      'DOUT': 'Data output (tristate). Reflects the stored bit at the selected address when CS is LOW and WE is HIGH.',
+      'A7': 'Address bit 7 (MSB). With A0 to A6, fully specifies one of 256 locations.',
       'NC1': 'Not connected. Leave unconnected.',
       'NC2': 'Not connected. Leave unconnected.',
       'VCC': 'Positive supply (+5 V, pin 16).',
@@ -865,13 +865,13 @@ export const CHIPS_BLOCK_14 = {
         title: 'Read and Write Cycles',
         paragraphs: [
           'Read: assert CS LOW and keep WE HIGH, place a stable 8 bit address on A0 to A7, and wait the access time (typically 35 to 70 ns). DOUT then reflects the stored bit.',
-          'Write: assert CS LOW, set WE LOW, apply the address and data on DIN. Data is captured on the rising edge of WE (or CS, whichever de-asserts first). Ensure address and DIN are stable before the write strobe.',
+          'Write: assert CS LOW, set WE LOW, apply the address and data on DIN. Data is captured on the rising edge of WE (or CS, whichever de asserts first). Ensure address and DIN are stable before the write strobe.',
         ],
       },
       {
-        title: 'Bit-Slice Memory Expansion',
+        title: 'Bit Slice Memory Expansion',
         paragraphs: [
-          'A single 74x200 stores one bit per location. For byte-wide memory, wire eight 74x200 chips with shared A0 to A7, CS, and WE; connect each chip\'s DIN and DOUT to one bit of the data bus. This gives 256 bytes of SRAM using standard 7400 parts.',
+          'A single 74x200 stores one bit per location. For byte wide memory, wire eight 74x200 chips with shared A0 to A7, CS, and WE; connect each chip\'s DIN and DOUT to one bit of the data bus. This gives 256 bytes of SRAM using standard 74x00 parts.',
         ],
       },
     ],
@@ -881,16 +881,16 @@ export const CHIPS_BLOCK_14 = {
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic
      Wikipedia: https://en.wikipedia.org/wiki/Random-access_memory */
-  '74201': {
+  '74x201': {
     name: '74x201',
     simpleName: '256 bit RAM (256x1)',
-    description: '256 bit static RAM organized as 256 words × 1 bit with tristate outputs (compatible with 74200) (16-pin)',
+    description: '256-bit static RAM (256 × 1 bit), 3-state out, 74200-compatible (16-pin)',
     pins: 16,
     vcc: 16,
     gnd: 8,
     datasheet: 'https://en.wikipedia.org/wiki/7400-series_integrated_circuits',
-    tags: ['ram', 'memory', 'storage', '256x1', 'tri-state'],
-    guideOverview: 'The 74x201 is functionally identical to the 74x200, a 256 bit (256×1) static RAM with tristate output, 8 bit addressing, and active LOW CS and WE controls. It was offered by different manufacturers as a second-source pin-compatible replacement for the 74200. In any design, 74200 and 74201 are interchangeable.',
+    tags: ['ram', 'memory', 'storage', '256x1', 'tri state'],
+    guideOverview: 'The 74x201 is functionally identical to the 74x200, a 256 bit (256×1) static RAM with tristate output, 8 bit addressing, and active LOW CS and WE controls. It was offered by different manufacturers as a second source pin compatible replacement for the 74x200. In any design, 74x200 and 74x201 are interchangeable.',
     guidePinDescriptions: {
       'A6':  'Address bit 6.',
       'A5':  'Address bit 5.',
@@ -933,9 +933,9 @@ export const CHIPS_BLOCK_14 = {
     sequential: true,
     guideSections: [
       {
-        title: 'Compatibility with 74200',
+        title: 'Compatibility with 74x200',
         paragraphs: [
-          'The 74x201 is pin-for-pin and functionally compatible with the 74x200. See the 74200 entry for full read/write cycle documentation and expansion techniques. Use either part interchangeably in your design.',
+          'The 74x201 is pin for pin and functionally compatible with the 74x200. See the 74x200 entry for full read/write cycle documentation and expansion techniques. Use either part interchangeably in your design.',
         ],
       },
     ],
@@ -945,31 +945,31 @@ export const CHIPS_BLOCK_14 = {
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic
      Wikipedia: https://en.wikipedia.org/wiki/Random-access_memory */
-  '74202': {
+  '74x202': {
     name: '74x202',
     simpleName: '256 bit RAM (256x1, Power-Down)',
-    description: '256 bit static RAM (256 × 1 bit) with tristate outputs and power-down control (16-pin)',
+    description: '256-bit static RAM (256 × 1 bit), 3-state out, power-down (16-pin)',
     pins: 16,
     vcc: 16,
     gnd: 8,
     datasheet: 'https://en.wikipedia.org/wiki/7400-series_integrated_circuits',
-    tags: ['ram', 'memory', 'storage', '256x1', 'tri-state', 'power-down'],
-    guideOverview: 'The 74x202 is a 256 bit (256×1) static RAM with the same address and data organisation as the 74x200, plus an additional PD (power-down) pin. When PD is asserted HIGH, the chip enters a low power standby state and DOUT enters the high-impedance state. Stored data is retained throughout power-down as long as VCC remains applied. This makes the 74202 useful in battery-backed or power-sensitive designs.',
+    tags: ['ram', 'memory', 'storage', '256x1', 'tri state', 'power-down'],
+    guideOverview: 'The 74x202 is a 256 bit (256×1) static RAM with the same address and data organisation as the 74x200, plus an additional PD (power down) pin. When PD is asserted HIGH, the chip enters a low power standby state and DOUT enters the high impedance state. Stored data is retained throughout power down as long as VCC remains applied. This makes the 74x202 useful in battery backed or power sensitive designs.',
     guidePinDescriptions: {
-      'A6':  'Address bit 6.',
-      'A5':  'Address bit 5.',
-      'A4':  'Address bit 4.',
-      'A3':  'Address bit 3.',
-      'A2':  'Address bit 2.',
-      'A1':  'Address bit 1.',
-      'A0':  'Address bit 0 (LSB).',
+      'A6': 'Address bit 6.',
+      'A5': 'Address bit 5.',
+      'A4': 'Address bit 4.',
+      'A3': 'Address bit 3.',
+      'A2': 'Address bit 2.',
+      'A1': 'Address bit 1.',
+      'A0': 'Address bit 0 (LSB).',
       'GND': 'Ground reference (pin 8).',
       'DIN': 'Data input. Written to the addressed location when CS and WE are both LOW.',
-      'WE':  'Write Enable, active LOW. LOW = write mode (with CS); HIGH = read mode.',
-      'CS':  'Chip Select, active LOW. Must be LOW for any access; when HIGH, DOUT enters the high-impedance state.',
-      'DOUT':'Data output (tristate). Valid when CS is LOW and WE is HIGH and PD is LOW.',
-      'A7':  'Address bit 7 (MSB).',
-      'PD':  'Power-Down control, active HIGH. When HIGH, the chip enters low power standby; DOUT enters the high-impedance state but all stored data is retained.',
+      'WE': 'Write Enable, active LOW. LOW = write mode (with CS); HIGH = read mode.',
+      'CS': 'Chip Select, active LOW. Must be LOW for any access; when HIGH, DOUT enters the high impedance state.',
+      'DOUT': 'Data output (tristate). Valid when CS is LOW and WE is HIGH and PD is LOW.',
+      'A7': 'Address bit 7 (MSB).',
+      'PD': 'Power Down control, active HIGH. When HIGH, the chip enters low power standby; DOUT enters the high impedance state but all stored data is retained.',
       'NC1': 'Not connected. Leave unconnected.',
       'VCC': 'Positive supply (+5 V, pin 16).',
     },
@@ -997,12 +997,12 @@ export const CHIPS_BLOCK_14 = {
     sequential: true,
     guideSections: [
       {
-        title: 'Power-Down Operation',
+        title: 'Power Down Operation',
         paragraphs: [
-          'Assert PD HIGH when the RAM is idle. In power-down mode, supply current drops significantly while all stored bits are retained (static SRAM holds data as long as VCC is present). De-assert PD (LOW) before any read or write operation.',
-          'PD puts DOUT in the high-impedance state independently of CS; even if CS is LOW, asserting PD will disable the output. Always de-assert PD before attempting bus transactions.',
+          'Assert PD HIGH when the RAM is idle. In power down mode, supply current drops significantly while all stored bits are retained (static SRAM holds data as long as VCC is present). De assert PD (LOW) before any read or write operation.',
+          'PD puts DOUT in the high impedance state independently of CS; even if CS is LOW, asserting PD will disable the output. Always de assert PD before attempting bus transactions.',
         ],
-        note: 'For standard read/write operation, see the 74200 guide the interface is otherwise identical.',
+        note: 'For standard read/write operation, see the 74x200 guide the interface is otherwise identical.',
       },
     ],
   },

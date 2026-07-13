@@ -1,0 +1,331 @@
+{
+  "components": [
+    {
+      "id": 1,
+      "type": "chip",
+      "tileX": 0,
+      "tileY": 0,
+      "col": 20,
+      "row": 4,
+      "chipId": "74x34",
+      "chipFamily": "LVC"
+    },
+    {
+      "id": 2,
+      "type": "push_button",
+      "startHoleId": "0:0:power:20:3",
+      "endHoleId": "0:0:main:20:6"
+    },
+    {
+      "id": 3,
+      "type": "resistor",
+      "resistance": 470,
+      "startHoleId": "0:0:main:21:6",
+      "endHoleId": "0:0:main:30:6"
+    },
+    {
+      "id": 4,
+      "type": "led",
+      "color": "red",
+      "startHoleId": "0:0:main:30:7",
+      "endHoleId": "0:0:power:30:2"
+    },
+    {
+      "id": 5,
+      "type": "push_button",
+      "startHoleId": "0:0:power:22:3",
+      "endHoleId": "0:0:main:22:6"
+    },
+    {
+      "id": 6,
+      "type": "resistor",
+      "resistance": 10000,
+      "startHoleId": "0:0:main:22:7",
+      "endHoleId": "0:0:power:22:2"
+    },
+    {
+      "id": 7,
+      "type": "resistor",
+      "resistance": 470,
+      "startHoleId": "0:0:main:23:6",
+      "endHoleId": "0:0:main:34:6"
+    },
+    {
+      "id": 8,
+      "type": "led",
+      "color": "green",
+      "startHoleId": "0:0:main:34:7",
+      "endHoleId": "0:0:power:34:2"
+    },
+    {
+      "id": 9,
+      "type": "resistor",
+      "resistance": 10000,
+      "startHoleId": "0:0:main:24:7",
+      "endHoleId": "0:0:power:24:3"
+    },
+    {
+      "id": 10,
+      "type": "push_button",
+      "startHoleId": "0:0:main:24:6",
+      "endHoleId": "0:0:power:24:2"
+    },
+    {
+      "id": 11,
+      "type": "resistor",
+      "resistance": 470,
+      "startHoleId": "0:0:main:25:6",
+      "endHoleId": "0:0:main:38:6"
+    },
+    {
+      "id": 12,
+      "type": "led",
+      "color": "yellow",
+      "startHoleId": "0:0:main:38:7",
+      "endHoleId": "0:0:power:38:2"
+    },
+    {
+      "id": 13,
+      "type": "resistor",
+      "resistance": 12000,
+      "startHoleId": "0:0:power:28:1",
+      "endHoleId": "0:0:main:28:0"
+    },
+    {
+      "id": 14,
+      "type": "resistor",
+      "resistance": 10000,
+      "startHoleId": "0:0:main:28:1",
+      "endHoleId": "0:0:power:28:0"
+    },
+    {
+      "id": 15,
+      "type": "resistor",
+      "resistance": 470,
+      "startHoleId": "0:0:main:26:3",
+      "endHoleId": "0:0:main:42:6"
+    },
+    {
+      "id": 16,
+      "type": "led",
+      "color": "blue",
+      "startHoleId": "0:0:main:42:7",
+      "endHoleId": "0:0:power:42:2"
+    },
+    {
+      "id": 17,
+      "type": "resistor",
+      "resistance": 470,
+      "startHoleId": "0:0:main:44:2",
+      "endHoleId": "0:0:main:44:6"
+    },
+    {
+      "id": 18,
+      "type": "led",
+      "color": "white",
+      "startHoleId": "0:0:main:44:7",
+      "endHoleId": "0:0:power:44:2"
+    },
+    {
+      "id": 19,
+      "type": "resistor",
+      "resistance": 470,
+      "startHoleId": "0:0:main:45:2",
+      "endHoleId": "0:0:main:45:6"
+    },
+    {
+      "id": 20,
+      "type": "led",
+      "color": "white",
+      "startHoleId": "0:0:main:45:7",
+      "endHoleId": "0:0:power:45:2"
+    },
+    {
+      "id": 21,
+      "type": "resistor",
+      "resistance": 470,
+      "startHoleId": "0:0:main:46:2",
+      "endHoleId": "0:0:main:46:6"
+    },
+    {
+      "id": 22,
+      "type": "led",
+      "color": "white",
+      "startHoleId": "0:0:main:46:7",
+      "endHoleId": "0:0:power:46:2"
+    },
+    {
+      "id": 23,
+      "type": "resistor",
+      "resistance": 470,
+      "startHoleId": "0:0:main:47:2",
+      "endHoleId": "0:0:main:47:6"
+    },
+    {
+      "id": 24,
+      "type": "led",
+      "color": "white",
+      "startHoleId": "0:0:main:47:7",
+      "endHoleId": "0:0:power:47:2"
+    },
+    {
+      "id": 25,
+      "type": "resistor",
+      "resistance": 470,
+      "startHoleId": "0:0:main:48:2",
+      "endHoleId": "0:0:main:48:6"
+    },
+    {
+      "id": 26,
+      "type": "led",
+      "color": "white",
+      "startHoleId": "0:0:main:48:7",
+      "endHoleId": "0:0:power:48:2"
+    },
+    {
+      "id": 27,
+      "type": "resistor",
+      "resistance": 470,
+      "startHoleId": "0:0:main:50:2",
+      "endHoleId": "0:0:main:50:6"
+    },
+    {
+      "id": 28,
+      "type": "led",
+      "color": "white",
+      "startHoleId": "0:0:main:50:7",
+      "endHoleId": "0:0:power:50:2"
+    }
+  ],
+  "wires": [
+    {
+      "id": 1,
+      "startHoleId": "0:0:main:20:3",
+      "endHoleId": "0:0:power:20:1",
+      "color": "#ff6b6b"
+    },
+    {
+      "id": 2,
+      "startHoleId": "0:0:main:26:6",
+      "endHoleId": "0:0:power:26:2",
+      "color": "#2244bb"
+    },
+    {
+      "id": 3,
+      "startHoleId": "0:0:main:28:2",
+      "endHoleId": "0:0:main:25:3",
+      "color": "#0984e3"
+    },
+    {
+      "id": 4,
+      "startHoleId": "0:0:main:23:3",
+      "endHoleId": "0:0:power:23:1",
+      "color": "#ff6b6b"
+    },
+    {
+      "id": 5,
+      "startHoleId": "0:0:main:24:3",
+      "endHoleId": "0:0:main:44:0",
+      "color": "#b2bec3"
+    },
+    {
+      "id": 6,
+      "startHoleId": "0:0:main:44:1",
+      "endHoleId": "0:0:main:45:0",
+      "color": "#b2bec3"
+    },
+    {
+      "id": 7,
+      "startHoleId": "0:0:main:45:1",
+      "endHoleId": "0:0:main:46:0",
+      "color": "#b2bec3"
+    },
+    {
+      "id": 8,
+      "startHoleId": "0:0:main:46:1",
+      "endHoleId": "0:0:main:47:0",
+      "color": "#b2bec3"
+    },
+    {
+      "id": 9,
+      "startHoleId": "0:0:main:47:1",
+      "endHoleId": "0:0:main:48:0",
+      "color": "#b2bec3"
+    },
+    {
+      "id": 10,
+      "startHoleId": "0:0:main:48:1",
+      "endHoleId": "0:0:main:50:0",
+      "color": "#b2bec3"
+    }
+  ],
+  "extraTiles": [],
+  "textBoxes": [
+    {
+      "id": 1,
+      "x": 180,
+      "y": -150,
+      "w": 680,
+      "h": 44,
+      "text": "Title: Logic Families",
+      "v": 2
+    },
+    {
+      "id": 2,
+      "x": 180,
+      "y": -100,
+      "w": 680.4420952102233,
+      "h": 67.11127891355548,
+      "text": "Description: Demonstration of the differences between 74 chip families.",
+      "v": 2
+    },
+    {
+      "id": 3,
+      "x": -403.7599591303084,
+      "y": 141.24216008668296,
+      "w": 780,
+      "h": 150,
+      "text": "(RED) (1A, pin 1) = a button to +5V with NO pull-down -- the classic beginner mistake. Pressed = HIGH; released = FLOATING. On 74LS the floating TTL input self-biases HIGH through its internal ~100k pull-up, so the LED stays ON even after you release. Switch to 74HC and the same released input reads LOW. Same wires, opposite result -- on real silicon a floating CMOS input can sit anywhere and drift. GREEN (2A) = the same button plus a 10k pull-down: a clean LOW in every family. YELLOW (3A) = a 10k pull-up with a button to GND (active-low): idle HIGH in every family. Rule: every input needs a defined level -- a driver, a pull-up, or a pull-down.",
+      "v": 2
+    },
+    {
+      "id": 4,
+      "x": 180,
+      "y": 444.8894761974441,
+      "w": 781.7778197283889,
+      "h": 125.77744217288905,
+      "text": "(BLUE). The 12k/10k divider feeds a fixed ~2.3 V into buffer 4A (pin 9). Is 2.3 V a HIGH or a LOW? Depends who you ask: 74LS switches near 1.4 V, so it says HIGH and the blue LED lights. 74HC is pure CMOS and switches near 2.5 V (VIH 3.5 V!), so it says LOW -- blue goes dark. 74HCT is CMOS inside but built with TTL thresholds exactly so it can read signals like this one: flip to HCT and blue comes back. 74LVC keeps TTL-style thresholds too. ",
+      "v": 2
+    },
+    {
+      "id": 5,
+      "x": 180,
+      "y": 580,
+      "w": 780,
+      "h": 140,
+      "text": "(WHITE). Buffer 5 (5A tied HIGH) drives six LED branches from one output pin. Every output has internal resistance: about 714 ohms for 74LS, 150 for 74HC/HCT, 50 for 74LVC. On 74LS the six loads drag the output down to ~2.3 V, below the LED forward voltage plus margin, so the whole bank sits dark: the output is overloaded. Switch to 74HC and the stiffer driver holds ~3.1 V: all six light dimly. On 74LVC (~3.9 V) they are clearly brighter. Fan-out is this same idea with gate inputs as the load: one 74LS output is rated to drive 10 LS inputs, while CMOS families are rated for ~50 CMOS inputs (their inputs draw almost no DC current). More loads than the rating and your HIGH stops being a HIGH.",
+      "v": 2
+    },
+    {
+      "id": 6,
+      "x": 180,
+      "y": 740,
+      "w": 780,
+      "h": 140,
+      "text": "Speed: max usable clock is roughly 35 MHz for 74LS, 25 MHz for 74HC/HCT, and 100 MHz for 74LVC, the low-voltage CMOS family (its bipolar cousin 74LVT is similar for this lesson). The stiffer the output driver (Station 3), the faster it charges wire and input capacitance -- drive and speed are the same physics. Power: 74LS draws milliamps constantly just being powered (bipolar bias currents), while CMOS families draw microamps standing still and only spend energy when switching (charge x voltage x frequency, CV^2f). That is why battery-powered logic is CMOS.",
+      "v": 2
+    }
+  ],
+  "imageBoxes": [],
+  "chipFamily": "LS",
+  "showNetPower": false,
+  "showSimpleChipNames": false,
+  "showRealisticBoard": false,
+  "showLogicView": false,
+  "showCircuitInfo": false,
+  "showValues": false,
+  "lastUsedChips": [
+    "74x34"
+  ],
+  "logicFormat": "programming"
+}

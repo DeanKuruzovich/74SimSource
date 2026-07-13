@@ -1,7 +1,7 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  font-family: 'SF Mono', 'Menlo', 'Monaco', 'Consolas', monospace;
+  font-family: var(--font-body);
   background: var(--bg);
   color: var(--text-dim);
   min-height: 100vh;
@@ -18,32 +18,9 @@ a:hover { color: var(--link-hover); text-decoration: underline; }
 
 .card {
   width: 100%;
-  max-width: 960px;
+  max-width: 620px;
+  text-align: center;
 }
-
-.back-row {
-  display: flex;
-  align-items: center;
-  margin-bottom: 18px;
-}
-
-.back-btn {
-  background: none;
-  border: 1px solid var(--border);
-  color: var(--text-dim);
-  font-family: inherit;
-  font-size: 13px;
-  padding: 6px 12px 6px 10px;
-  border-radius: 3px;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  text-decoration: none;
-  transition: border-color 0.12s, color 0.12s;
-}
-.back-btn:hover { border-color: var(--text-muted); color: var(--text); text-decoration: none; }
-.back-btn svg { display: block; }
 
 h1 {
   font-size: 22px;
@@ -96,10 +73,20 @@ h2 {
   margin-bottom: 14px;
 }
 
+/* Cross-links to the other courses, under the course blurb */
+.course-switch {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: -8px 0 22px;
+}
+.course-switch a { color: var(--accent); text-decoration: none; }
+.course-switch a:hover { text-decoration: underline; }
+.course-switch:empty { display: none; }
+
 .lesson-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .lesson-card {
@@ -133,3 +120,72 @@ h2 {
 @media (max-width: 600px) {
   body { padding: 40px 20px 60px; }
 }
+
+/* ── Lesson-complete popup ───────────────────────────────────────────────── */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.62);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 100;
+}
+.modal-overlay[hidden] { display: none; }
+
+.modal {
+  width: 100%;
+  max-width: 440px;
+  background: var(--bg-elev);
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  padding: 28px 26px 24px;
+  text-align: center;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.55);
+}
+
+.modal-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: 0;
+  margin-bottom: 10px;
+  text-transform: none;
+}
+
+.modal-body {
+  color: var(--text-dim);
+  font-size: 14px;
+  margin-bottom: 22px;
+}
+
+.modal-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.modal-btn {
+  display: inline-block;
+  padding: 10px 18px;
+  border-radius: 4px;
+  border: 1px solid var(--border-strong);
+  background: var(--bg-elev-2);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.12s, border-color 0.12s;
+}
+.modal-btn:hover { background: #333; border-color: var(--text-muted); text-decoration: none; color: var(--text); }
+
+.modal-btn.primary {
+  background: #e6e6e6;
+  border-color: #e6e6e6;
+  color: var(--text-inverse);
+  font-weight: 600;
+}
+.modal-btn.primary:hover { background: #fff; border-color: #fff; color: var(--text-inverse); }

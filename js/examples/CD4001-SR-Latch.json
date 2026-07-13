@@ -1,0 +1,144 @@
+{
+  "components": [
+    {
+      "id": 1,
+      "type": "chip",
+      "tileX": 0,
+      "tileY": 0,
+      "col": 20,
+      "row": 4,
+      "chipId": "CD4001"
+    },
+    {
+      "id": 3,
+      "type": "push_button",
+      "startHoleId": "0:0:power:20:3",
+      "endHoleId": "0:0:main:20:9"
+    },
+    {
+      "id": 4,
+      "type": "resistor",
+      "resistance": 10000,
+      "startHoleId": "0:0:main:20:6",
+      "endHoleId": "0:0:power:22:2"
+    },
+    {
+      "id": 6,
+      "type": "resistor",
+      "resistance": 10000,
+      "startHoleId": "0:0:main:24:8",
+      "endHoleId": "0:0:power:27:2"
+    },
+    {
+      "id": 8,
+      "type": "led",
+      "color": "green",
+      "startHoleId": "0:0:main:30:7",
+      "endHoleId": "0:0:power:30:2"
+    },
+    {
+      "id": 9,
+      "type": "resistor",
+      "resistance": 470,
+      "startHoleId": "0:0:main:23:8",
+      "endHoleId": "0:0:main:34:6"
+    },
+    {
+      "id": 10,
+      "type": "led",
+      "color": "red",
+      "startHoleId": "0:0:main:34:7",
+      "endHoleId": "0:0:power:34:2"
+    },
+    {
+      "id": 11,
+      "type": "capacitor",
+      "capacitance": 0.000001,
+      "startHoleId": "0:0:main:20:8",
+      "endHoleId": "0:0:power:18:3"
+    },
+    {
+      "id": 7,
+      "type": "resistor",
+      "resistance": 470,
+      "startHoleId": "0:0:main:22:8",
+      "endHoleId": "0:0:main:30:6"
+    }
+  ],
+  "wires": [
+    {
+      "id": 1,
+      "startHoleId": "0:0:main:20:3",
+      "endHoleId": "0:0:power:20:1",
+      "color": "#ff6b6b"
+    },
+    {
+      "id": 2,
+      "startHoleId": "0:0:main:26:6",
+      "endHoleId": "0:0:power:26:2",
+      "color": "#2244bb"
+    },
+    {
+      "id": 3,
+      "startHoleId": "0:0:main:22:6",
+      "endHoleId": "0:0:main:25:7",
+      "color": "#00b894"
+    },
+    {
+      "id": 4,
+      "startHoleId": "0:0:main:23:7",
+      "endHoleId": "0:0:main:21:7",
+      "color": "#fdcb6e"
+    }
+  ],
+  "extraTiles": [],
+  "textBoxes": [
+    {
+      "id": 1,
+      "x": 428.01695996150784,
+      "y": -111.13167045379355,
+      "w": 205.35161795928104,
+      "h": 40,
+      "text": "Title: CD4001 NOR SR Latch",
+      "v": 2
+    },
+    {
+      "id": 2,
+      "x": 235.52618506600948,
+      "y": -59.28079761825995,
+      "w": 640,
+      "h": 60,
+      "text": "Description: Two cross-coupled NOR gates of a CD4001 make a Set-Reset (SR) latch that remembers one bit. Press SET, the green Q LED latches ON; press RESET, it latches OFF.",
+      "v": 2
+    },
+    {
+      "id": 4,
+      "x": 611.6224453492922,
+      "y": 368.7847892340544,
+      "w": 65.6012453974074,
+      "h": 40,
+      "text": "Output",
+      "v": 2
+    },
+    {
+      "id": 5,
+      "x": 693.0608501127724,
+      "y": 369.7102256518212,
+      "w": 64.6271820888341,
+      "h": 40,
+      "text": "<div>Output'</div>",
+      "v": 2
+    }
+  ],
+  "chipFamily": "LS",
+  "showNetPower": false,
+  "showSimpleChipNames": false,
+  "showRealisticBoard": false,
+  "showLogicView": false,
+  "showCircuitInfo": false,
+  "showValues": false,
+  "lastUsedChips": [
+    "CD4001"
+  ],
+  "logicFormat": "programming"
+}

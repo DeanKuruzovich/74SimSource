@@ -1,0 +1,622 @@
+#!/usr/bin/env python3
+"""Spawn parallel Claude agents to implement the next missing chips in 74Sim.
+
+Reads the importance-ordered work list in chips-to-add.md, picks the top N
+not-yet-done chips, and runs one Opus agent per chip in parallel. Each agent
+implements its chip, verifies it, and checks its line off in chips-to-add.md.
+
+Runs on your Claude Code subscription (the SDK uses the logged-in `claude` CLI
+auth when ANTHROPIC_API_KEY is unset) — so there is no per-token dollar cost to
+report; usage counts against your plan's limits instead.
+
+Resilience: if the account hits a usage limit, agents don't fail — they pause,
+wait for the limit to reset, and RESUME the same session (full prior context),
+so in-progress work is not lost. A heartbeat every HEARTBEAT_SEC shows how many
+agents are working, what each is doing, and the 5-hour usage % when known.
+
+Agents run with permissions bypassed (unattended). If an agent hits a decision
+it genuinely can't resolve, it can call the `ask_user` tool, which prompts you
+here; if you don't start typing within 15 seconds it tells the agent to figure
+it out on its own.
+
+Usage:
+    pip install claude-agent-sdk        # into a clean venv (see note below)
+    python3 claudChipAdder              # or ./claudChipAdder
+
+Note on the venv: do NOT install into backend/.venv — its pip's vendored
+resolvelib is broken (ImportError: RequirementInformation). Use a fresh venv,
+e.g.  python3 -m venv .venv-chipadder && .venv-chipadder/bin/pip install claude-agent-sdk
+then run with  .venv-chipadder/bin/python3 claudChipAdder
+"""
+
+import asyncio
+import re
+import select
+import sys
+import time
+from datetime import datetime
+from pathlib import Path
+
+try:
+    import termios
+    import tty
+    _HAVE_TTY = True
+except ImportError:  # non-unix; fall back to plain line input
+    _HAVE_TTY = False
+
+try:
+    from claude_agent_sdk import (
+        AssistantMessage,
+        ClaudeAgentOptions,
+        ClaudeSDKClient,
+        RateLimitEvent,
+        ResultMessage,
+        TextBlock,
+        ThinkingBlock,
+        ToolUseBlock,
+        create_sdk_mcp_server,
+        tool,
+    )
+except ImportError:
+    sys.exit("Missing dependency. Run: pip install claude-agent-sdk")
+
+REPO_ROOT = Path(__file__).resolve().parent
+LIST_PATH = REPO_ROOT / "chips-to-add.md"
+CHIPS_DIR = REPO_ROOT / "js" / "chips"
+LOG_DIR = REPO_ROOT / "claudChipAdder-logs"
+
+MODEL = "claude-opus-4-8"
+NUM_AGENTS = 10
+MAX_ERROR_RETRIES = 3
+ASK_TIMEOUT_SEC = 15.0
+HEARTBEAT_SEC = 10          # how often the "N agents working" status prints
+RATE_LIMIT_POLL_SEC = 60     # fallback wait when a limit has no reset timestamp (normal mode)
+FIVE_HOUR_SEC = 5 * 3600     # superAuto fallback wait when a limit has no reset timestamp
+
+# superAuto: run the ENTIRE backlog unattended. Keep grabbing the next NUM_AGENTS
+# chips until chips-to-add.md is empty, and when usage runs out with no reported
+# reset time, wait the full 5-hour window for it to come back, then continue.
+superAuto = True
+
+# Only one agent may own the terminal prompt at a time (agents run concurrently).
+ASK_LOCK = asyncio.Lock()
+
+AUTO_PROCEED_MSG = (
+    "No response from the operator within 15 seconds — they are running this "
+    "unattended with minimal effort and are not watching. Figure it out "
+    "yourself: pick the most reasonable option based on the datasheet and the "
+    "repo's existing conventions, and keep going. Don't ask again unless you "
+    "are genuinely, hard blocked."
+)
+
+# Matches:  - [ ] CD4047 — function — primitive   (em-dash separated)
+# IDs are either CMOS-4000 parts (CD####) to ADD as new chips, or 74-series
+# parts (74x###) that already exist as stubs and get UPGRADED in place.
+ROW_RE = re.compile(r"^- \[(?P<done>[ xX])\]\s+(?P<id>(?:CD\d{4,5}|74x\d{3,5}))\s+—\s+(?P<rest>.*)$")
+
+
+# ── Monitoring ───────────────────────────────────────────────────────────────
+
+class Monitor:
+    """Shared status board for all agents plus a periodic heartbeat printer."""
+
+    ACTIVE = ("thinking", "working", "waiting")
+
+    def __init__(self):
+        self.activity = {}          # label -> (status, short text)
+        self.last_rate = None       # most recent RateLimitInfo seen
+        self.five_hour_util = None  # 0.0-1.0, only the five_hour window
+        self.prompting = False      # True while an ask_user prompt owns the TTY
+        self._stop = asyncio.Event()
+
+    def update(self, label, status, text=""):
+        self.activity[label] = (status, text)
+
+    def note_rate(self, info):
+        self.last_rate = info
+        if info.rate_limit_type == "five_hour" and info.utilization is not None:
+            self.five_hour_util = info.utilization
+
+    def print_heartbeat(self):
+        active = {l: v for l, v in self.activity.items() if v[0] in self.ACTIVE}
+        if not active:
+            return
+        ts = datetime.now().strftime("%H:%M:%S")
+        head = f"[{ts}] {len(active)} agent(s) working"
+        if self.five_hour_util is not None:
+            head += f"  ·  5h usage: {self.five_hour_util * 100:.0f}%"
+        elif self.last_rate is not None and self.last_rate.utilization is not None:
+            head += f"  ·  {self.last_rate.rate_limit_type} usage: {self.last_rate.utilization * 100:.0f}%"
+        lines = [head]
+        for label, (status, text) in active.items():
+            lines.append(f"    {label:<8} {status:<8} {text}")
+        print("\n".join(lines), flush=True)
+
+    async def run(self):
+        while not self._stop.is_set():
+            try:
+                await asyncio.wait_for(self._stop.wait(), timeout=HEARTBEAT_SEC)
+            except asyncio.TimeoutError:
+                if not self.prompting:  # don't scribble over an ask_user prompt
+                    self.print_heartbeat()
+
+    def stop(self):
+        self._stop.set()
+
+
+def _short(text, n=90):
+    text = " ".join((text or "").split())
+    return text[:n] + ("…" if len(text) > n else "")
+
+
+def _tool_summary(block):
+    inp = block.input or {}
+    for key in ("file_path", "path", "command", "pattern", "url", "question"):
+        if key in inp:
+            return f"{block.name}: {_short(str(inp[key]), 64)}"
+    return block.name
+
+
+def _to_epoch_seconds(ts):
+    if not ts:
+        return None
+    ts = float(ts)
+    return ts / 1000.0 if ts > 1e12 else ts  # tolerate ms timestamps
+
+
+def _is_rate_limit_error(result):
+    if result is None or not getattr(result, "is_error", False):
+        return False
+    if getattr(result, "api_error_status", None) == 429:
+        return True
+    blob = (" ".join(result.errors or []) + " " + (getattr(result, "subtype", "") or "")).lower()
+    return "rate limit" in blob or "rate_limit" in blob or "429" in blob
+
+
+# ── Work list ────────────────────────────────────────────────────────────────
+
+def load_pending_chips():
+    """Top-to-bottom (= importance order) not-yet-checked chips in chips-to-add.md."""
+    if not LIST_PATH.exists():
+        sys.exit(f"Missing {LIST_PATH.name}. It's the work list this script reads.")
+    chips = []
+    for line in LIST_PATH.read_text().splitlines():
+        m = ROW_RE.match(line.strip())
+        if not m or m.group("done").strip().lower() == "x":
+            continue
+        func, _, prim = m.group("rest").partition("—")
+        chips.append(
+            {
+                "id": m.group("id"),
+                "number": m.group("id")[2:],
+                "function": func.strip(),
+                "notes": prim.strip() or "n/a",
+            }
+        )
+    return chips
+
+
+def next_block_numbers(n):
+    existing = [
+        int(m.group(1))
+        for p in CHIPS_DIR.glob("chips*.js")
+        if (m := re.fullmatch(r"chips(\d+)\.js", p.name))
+    ]
+    start = max(existing, default=0) + 1
+    return list(range(start, start + n))
+
+
+# ── ask_user tool ────────────────────────────────────────────────────────────
+
+def _blocking_ask(label, question):
+    """Prompt on the real terminal. Return the typed answer, or None if the
+    operator doesn't start typing within ASK_TIMEOUT_SEC. Blocking — call via
+    run_in_executor so the other agents keep working."""
+    border = "═" * 72
+    sys.stdout.write(
+        f"\n{border}\n[{label}] the agent is asking you a question:\n\n"
+        f"  {question}\n\n"
+        f"  (answer + Enter within {int(ASK_TIMEOUT_SEC)}s, "
+        f"or it proceeds on its own)\n> "
+    )
+    sys.stdout.flush()
+
+    if not _HAVE_TTY or not sys.stdin or not sys.stdin.isatty():
+        # No real TTY: wait for a whole line, timing out the same way.
+        ready, _, _ = select.select([sys.stdin], [], [], ASK_TIMEOUT_SEC)
+        return sys.stdin.readline().strip() if ready else None
+
+    fd = sys.stdin.fileno()
+    old = termios.tcgetattr(fd)
+    try:
+        tty.setcbreak(fd)  # so we can see the FIRST keystroke, not wait for Enter
+        ready, _, _ = select.select([sys.stdin], [], [], ASK_TIMEOUT_SEC)
+        if not ready:
+            return None  # never started typing
+        first = sys.stdin.read(1)
+    finally:
+        termios.tcsetattr(fd, termios.TCSADRAIN, old)
+
+    if first in ("\n", "\r"):
+        return ""  # started typing but submitted empty
+    sys.stdout.write(first)  # echo the char cbreak swallowed
+    sys.stdout.flush()
+    rest = sys.stdin.readline()
+    return (first + rest).strip()
+
+
+def make_ask_server(label, monitor):
+    """Per-agent in-process MCP server exposing one tool: ask_user."""
+
+    @tool(
+        "ask_user",
+        "Ask the human operator a question when you hit a decision you cannot "
+        "resolve yourself (e.g. an ambiguous datasheet, two valid pinouts). "
+        "Returns their answer, or — if they don't respond within 15 seconds — "
+        "an instruction to proceed on your own. Use sparingly.",
+        {"question": str},
+    )
+    async def ask_user(args):
+        question = (args.get("question") or "").strip() or "(no question text)"
+        async with ASK_LOCK:
+            monitor.update(label, "waiting", "asking you a question")
+            monitor.prompting = True
+            loop = asyncio.get_running_loop()
+            try:
+                answer = await loop.run_in_executor(None, _blocking_ask, label, question)
+            finally:
+                monitor.prompting = False
+        if answer:
+            print(f"[{label}] operator answered; resuming", flush=True)
+            return {"content": [{"type": "text", "text": f"Operator answered: {answer}"}]}
+        print(f"[{label}] no answer in {int(ASK_TIMEOUT_SEC)}s -> told agent to proceed on its own", flush=True)
+        return {"content": [{"type": "text", "text": AUTO_PROCEED_MSG}]}
+
+    return create_sdk_mcp_server("ask", "1.0.0", [ask_user])
+
+
+# ── Prompts ──────────────────────────────────────────────────────────────────
+
+def build_stub_upgrade_prompt(chip):
+    return f"""You are bringing ONE existing STUB chip in the 74Sim breadboard simulator to life.
+
+Target chip: {chip['id']}  ({chip['function']})
+
+{chip['id']} ALREADY EXISTS in this repo as a documentation stub: an entry in one
+of the js/chips/chips*.js files whose `gate` is `GENERIC_STUB` and whose `tags`
+include 'stub'. Its pinout, pin descriptions and guide text are already written.
+Your job is to UPGRADE IT IN PLACE so it actually simulates — do NOT create a
+new chip file, and do NOT touch any other chip's entry.
+
+Read first: CLAUDE.md, Manifesto.md (the writing standard for any human-facing
+text), then CMOS-4000-Coverage-Plan.md Section 4 "Per-chip add procedure" — the
+datasheet/verification discipline there applies. Pull the real datasheet (curl +
+Read with pages:, never trust a text-summary fetch of these PDFs, see issues.md
+C4). VERIFY the existing stub's pinout against the datasheet — the stub was hand-
+entered and may be wrong; never trust a sibling chip's pinout (issues.md C2, the
+CD4082 lesson). Fix the pinout if the datasheet disagrees.
+
+Procedure:
+1. Locate the entry: grep js/chips/ for "'{chip['id']}'". Read the whole entry.
+2. Decide the engine behavior. Reuse an existing primitive in
+   js/specificChipsSim.js ONLY if it genuinely matches this part's function and
+   pin order (verify, don't assume). Otherwise add a NEW primitive (dispatch
+   case + evaluator) following the conventions of the parts around it.
+3. Replace `GENERIC_STUB` with the real primitive and wire any inputs/outputs the
+   primitive needs. Remove 'stub' from the `tags` array.
+4. Improve the existing docs only where they're thin or wrong — keep them in
+   Manifesto.md voice (plain, concise, no AI-isms, no sales tone). Don't bloat.
+5. Add a js/debug/scenarios/ regression that exercises the real behavior, and
+   verify the chip loads and behaves (headless harness in js/debug/).
+
+CITE YOUR SOURCES — in the SOURCE CODE ONLY, never in user-facing text (the chip
+description, guideOverview, guideSections and pin descriptions stay clean per
+Manifesto.md). In the entry's header comment give an IEEE-style reference for
+every source you actually used:
+  // Source: <Manufacturer>, "<Exact datasheet title>", <doc number> (<date>).
+  //   [Online]. Available: <URL>. Verified: <what you read — e.g. "terminal
+  //   assignment + function table, page 1, read as 300-dpi PDF images">.
+If you reconciled two sources or fell back to a search/app note/second
+manufacturer, cite each and say which you trusted for what and why. Every pin
+number and behavioral claim must be traceable to a citation in the code.
+
+Several agents run at once in this same tree. They each own a DIFFERENT chip
+entry, but multiple entries may live in the same chips*.js file and you all share
+js/specificChipsSim.js. Make minimal, localized edits; re-read a file right
+before editing it so you don't clobber another agent's concurrent change.
+
+You have a tool `mcp__ask__ask_user`. Call it ONLY if you hit a real decision you
+cannot resolve from the datasheet or the repo's conventions. The operator is
+mostly away; if they don't answer in 15s you'll be told to proceed on your own.
+
+EFFORT POLICY — best effort, but DON'T grind forever. Some of these parts are
+genuinely hard: no clean datasheet survives (semi-proprietary or long-obsolete),
+or the function is fundamentally analog / not meaningfully simulatable in this
+digital engine. Examples you may hit: register files (e.g. 74x870), parity bus
+transceivers (74x833/834/853/854), diagnostic / scan registers (74x818/819/978),
+and anything whose datasheet you simply cannot find. For these:
+  - First genuinely try: a faithful behavioral model of the core digital function
+    is the goal, even if you approximate or omit a hard-to-model corner.
+  - If after a real search you cannot find enough trustworthy info, OR the part
+    is inherently not simulatable here, it is ACCEPTABLE to LEAVE IT A STUB:
+    keep `GENERIC_STUB` and the 'stub' tag in place.
+  - When you leave a stub, you MUST leave a code comment on that entry explaining
+    WHY it stayed a stub (what you looked for, what was missing or unmodelable),
+    and add a matching line to issues.md. Don't silently give up.
+
+When {chip['id']} actually simulates and is verified:
+1. Edit chips-to-add.md: change this chip's line from "- [ ] {chip['id']}" to
+   "- [x] {chip['id']}". This is the live list and your check-off is required.
+2. If you hit a real divergence from hardware worth recording (e.g. an analog
+   behavior you could only approximate), add a line to issues.md following its
+   existing conventions. (No CMOS-4000-Coverage-Plan.md entry — that doc tracks
+   only the CD#### parts, not these 74-series upgrades.)
+3. Leave the result as your final working-tree state. Do not commit.
+
+If instead you DELIBERATELY left it a stub per the effort policy above (couldn't
+find info, or not simulatable): still check it off in chips-to-add.md but append
+a reason so it isn't retried forever — i.e. change the line to
+"- [x] {chip['id']} … — LEFT AS STUB: <one-line reason>". The code comment and
+issues.md line are required in that case.
+
+This is unattended — permissions are pre-approved. Work the whole procedure end
+to end and don't stop until {chip['id']} actually simulates, is deliberately and
+documentedly left a stub, or you are genuinely blocked."""
+
+
+def build_prompt(chip, block_num):
+    # 74-series IDs already exist as documentation stubs — upgrade in place
+    # rather than authoring a new chip file.
+    if chip["id"].startswith("74x"):
+        return build_stub_upgrade_prompt(chip)
+    return f"""You are implementing ONE missing chip in the 74Sim breadboard simulator (this repo).
+
+Target chip: {chip['id']}  ({chip['function']})
+Mapped primitive / hint: {chip['notes']}
+
+Read first: CLAUDE.md, Manifesto.md (the writing standard for any human-facing
+text), then CMOS-4000-Coverage-Plan.md Section 4 "Per-chip add procedure" and
+follow it exactly — pull the real datasheet (curl + Read with pages:, never
+trust a text-summary fetch of these PDFs, see issues.md C4), and never copy a
+sibling chip's pinout (see issues.md C2, the CD4082 lesson).
+
+CITE YOUR SOURCES — in the SOURCE CODE ONLY, never in user-facing text (chip
+descriptions, guideOverview, guideSections, pin descriptions stay clean per
+Manifesto.md — no citation clutter there for now). For every fact about pinout
+or behavior, leave a citation in a code comment so the next person can audit it.
+At minimum, in the chip block's header comment, give an IEEE-style reference for
+each source you actually used, in this form:
+  // Source: <Manufacturer>, "<Exact datasheet title>", <doc number> (<date>).
+  //   [Online]. Available: <URL>. Verified: <what you read — e.g. "terminal
+  //   assignment + function table, page 1, read as 300-dpi PDF images">.
+If you had to reconcile two sources, or used a search result / app note / a
+second manufacturer's part because the primary was missing or ambiguous, cite
+each one and note which you trusted for what and why. The goal: every pinout pin
+number and every behavioral claim is traceable to a citation in the code.
+
+This run has several agents working on different chips in this same working
+directory at once. To avoid colliding with the others on shared chip files,
+put {chip['id']} alone in a NEW file js/chips/chips{block_num}.js exporting
+CHIPS_BLOCK_{block_num}, instead of batching ~10-15 chips per file like the doc
+otherwise suggests. Still do every other step normally: wire it into
+js/chips.js (import + spread), verify load + behavior with the headless harness
+in js/debug/, and tag 'stub' if you fall back to a GENERIC_STUB or similar
+inert primitive.
+
+You have a tool `mcp__ask__ask_user`. Call it ONLY if you hit a real decision
+you cannot resolve from the datasheet or the repo's conventions. The operator
+is mostly away; if they don't answer in 15s you'll be told to proceed on your
+own, so default to deciding yourself.
+
+When {chip['id']} is fully implemented and verified:
+1. Edit chips-to-add.md: change this chip's line from "- [ ] {chip['id']}" to
+   "- [x] {chip['id']}". This is the live list and your check-off is required.
+2. Also mark its row done in CMOS-4000-Coverage-Plan.md (same ✅ style as Batch
+   1) and update its Section 2 implemented list — that doc is the human tracker.
+3. If you hit a real divergence from hardware worth recording, add a line to
+   issues.md following its existing conventions.
+4. Leave the result as your final working-tree state. Do not commit.
+
+This is unattended — permissions are pre-approved. Work the whole procedure end
+to end and don't stop until {chip['id']} is done or you are genuinely blocked."""
+
+
+def build_retry_prompt(chip, result):
+    error_detail = "\n".join(getattr(result, "errors", None) or [str(result)])
+    return f"""The previous attempt on {chip['id']} ended in an error:
+
+{error_detail}
+
+I'm running this unattended on purpose and putting in minimal effort on my end —
+I'm not going to debug this for you. Figure out the root cause yourself, fix it,
+and keep going until {chip['id']} is fully implemented, verified, and checked off
+in chips-to-add.md. Don't ask me anything else."""
+
+
+def build_resume_prompt(chip):
+    return (
+        f"We were paused because the account hit its usage limit; it has now "
+        f"reset. Continue exactly where you left off on {chip['id']}. First check "
+        f"what you'd already done (files written, js/chips.js wiring, verification) "
+        f"so you don't duplicate work, then finish: implement, verify with the "
+        f"js/debug harness, and check {chip['id']} off in chips-to-add.md. Do not "
+        f"start over."
+    )
+
+
+# ── Agent driver ─────────────────────────────────────────────────────────────
+
+async def drain(client, log_file, monitor, label):
+    """Consume one response turn. Log detail, feed the monitor, and return
+    (ResultMessage, rate_limit_reset_at) where reset_at is set only if the turn
+    was hard-rejected by a usage limit."""
+    result = None
+    rl_reset_at = None
+    async for message in client.receive_response():
+        if isinstance(message, AssistantMessage):
+            for block in message.content:
+                if isinstance(block, TextBlock):
+                    log_file.write(block.text + "\n")
+                    if block.text.strip():
+                        monitor.update(label, "working", _short(block.text))
+                elif isinstance(block, ThinkingBlock):
+                    log_file.write("[thinking] " + block.thinking + "\n")
+                    monitor.update(label, "thinking", _short(block.thinking))
+                elif isinstance(block, ToolUseBlock):
+                    log_file.write(f"[tool] {block.name} {block.input}\n")
+                    monitor.update(label, "working", _tool_summary(block))
+            log_file.flush()
+        elif isinstance(message, RateLimitEvent):
+            info = message.rate_limit_info
+            monitor.note_rate(info)
+            log_file.write(
+                f"[rate-limit] status={info.status} type={info.rate_limit_type} "
+                f"util={info.utilization} resets_at={info.resets_at}\n"
+            )
+            log_file.flush()
+            if info.status == "rejected":
+                rl_reset_at = info.resets_at or rl_reset_at
+        elif isinstance(message, ResultMessage):
+            result = message
+    return result, rl_reset_at
+
+
+async def wait_for_reset(monitor, label, reset_at):
+    """Sleep until a usage limit resets, updating the heartbeat with a countdown.
+    Progress is preserved — the caller resumes the same session afterward."""
+    reset_at = _to_epoch_seconds(reset_at)
+    now = time.time()
+    if reset_at and reset_at > now:
+        target = reset_at + 5                     # honor the reported reset (may be sooner than 5h)
+    elif superAuto:
+        target = now + FIVE_HOUR_SEC              # no timestamp: wait the full 5h window
+    else:
+        target = now + RATE_LIMIT_POLL_SEC        # no timestamp: poll again shortly
+    print(f"[{label}] usage limit hit — pausing ~{int(target - now)}s, will resume (progress saved)", flush=True)
+    while True:
+        remaining = target - time.time()
+        if remaining <= 0:
+            break
+        mins, secs = divmod(int(remaining), 60)
+        monitor.update(label, "waiting", f"usage limit — resuming in {mins}m{secs:02d}s (progress saved)")
+        await asyncio.sleep(min(15, remaining))
+    monitor.update(label, "working", "resuming after limit reset")
+
+
+async def implement_chip(chip, block_num, monitor):
+    label = chip["id"]
+    LOG_DIR.mkdir(exist_ok=True)
+    monitor.update(label, "working", "starting")
+    print(f"[{label}] starting -> js/chips/chips{block_num}.js (log: claudChipAdder-logs/{label}.log)", flush=True)
+
+    session_id = None
+    sent_initial = False
+    last_was_rl = False
+    error_retries = 0
+    result = None
+
+    with open(LOG_DIR / f"{label}.log", "w") as log_file:
+        while True:
+            options = ClaudeAgentOptions(
+                cwd=str(REPO_ROOT),
+                model=MODEL,
+                permission_mode="bypassPermissions",
+                mcp_servers={"ask": make_ask_server(label, monitor)},
+                resume=session_id,  # None first time; resumes prior context after a pause
+            )
+            if not sent_initial:
+                prompt = build_prompt(chip, block_num)
+            elif last_was_rl:
+                prompt = build_resume_prompt(chip)
+            else:
+                prompt = build_retry_prompt(chip, result)
+
+            try:
+                async with ClaudeSDKClient(options=options) as client:
+                    await client.query(prompt)
+                    result, rl_reset_at = await drain(client, log_file, monitor, label)
+                sent_initial = True
+                if result is not None and getattr(result, "session_id", None):
+                    session_id = result.session_id
+            except Exception as exc:
+                log_file.write(f"[exception] {exc!r}\n")
+                log_file.flush()
+                # If a hard usage limit was just seen, treat the crash as a pause.
+                if monitor.last_rate is not None and monitor.last_rate.status == "rejected":
+                    last_was_rl = True
+                    await wait_for_reset(monitor, label, monitor.last_rate.resets_at)
+                    continue
+                monitor.update(label, "failed", repr(exc))
+                print(f"[{label}] crashed: {exc!r}", flush=True)
+                return chip, False, repr(exc)
+
+            # Usage limit -> wait for reset and RESUME (progress kept, no retry burned).
+            if rl_reset_at or _is_rate_limit_error(result):
+                last_was_rl = True
+                fallback = monitor.last_rate.resets_at if monitor.last_rate else None
+                await wait_for_reset(monitor, label, rl_reset_at or fallback)
+                continue
+
+            # Hard error -> burn a retry, feeding the error back in.
+            if result is not None and getattr(result, "is_error", False):
+                if error_retries < MAX_ERROR_RETRIES:
+                    error_retries += 1
+                    last_was_rl = False
+                    print(f"[{label}] attempt {error_retries} failed ({result.subtype}), sending error back", flush=True)
+                    monitor.update(label, "working", f"error retry {error_retries}")
+                    continue
+                break  # out of retries
+
+            break  # success
+
+    ok = result is not None and not getattr(result, "is_error", False)
+    monitor.update(label, "done" if ok else "failed", "")
+    print(f"[{label}] {'done' if ok else 'gave up'}", flush=True)
+    return chip, ok, result
+
+
+async def run_batch(selected, monitor):
+    block_nums = next_block_numbers(len(selected))
+    print("\nBatch: " + ", ".join(c["id"] for c in selected), flush=True)
+    return await asyncio.gather(
+        *(implement_chip(chip, block_num, monitor) for chip, block_num in zip(selected, block_nums))
+    )
+
+
+async def main():
+    mode = "superAuto — grinding the whole backlog" if superAuto else "single batch"
+    print(f"Mode: {mode}. Heartbeat every {HEARTBEAT_SEC}s.")
+    print("Usage limits pause-and-resume (progress saved), not fail.")
+
+    monitor = Monitor()
+    heartbeat = asyncio.create_task(monitor.run())
+    all_results = []
+    processed = set()  # chips attempted this run (success or fail) — never reselect
+
+    try:
+        while True:
+            pending = [c for c in load_pending_chips() if c["id"] not in processed]
+            if not pending:
+                break
+            selected = pending[:NUM_AGENTS]
+            print(f"\n({len(pending)} pending; taking the top {len(selected)} by importance.)")
+            results = await run_batch(selected, monitor)
+            all_results.extend(results)
+            processed.update(chip["id"] for chip, _ok, _r in results)
+            if not superAuto:
+                break  # one batch only
+    finally:
+        monitor.stop()
+        await heartbeat
+
+    print("\n=== Summary ===")
+    if not all_results:
+        print("No unchecked chips left in chips-to-add.md. Nothing to do.")
+    for chip, ok, _result in all_results:
+        print(f"{chip['id']}: {'OK' if ok else 'FAILED'}")
+    if superAuto and all_results:
+        print(f"\nBacklog now: {len(load_pending_chips())} chip(s) still unchecked in chips-to-add.md.")
+
+
+if __name__ == "__main__":
+    asyncio.run(main())

@@ -4,8 +4,8 @@
 // simulator.js after the class definition, so all methods work as normal
 // instance methods with `this` referring to the CircuitSimulator instance.
 
-import { COMP } from './constants.js';
-import { BCD_7SEG_CC_TABLE, BCD_7SEG_TABLE } from './chips.js';
+import { COMP, DRIVE } from './constants.js';
+import { BCD_7SEG_CC_TABLE, BCD_7SEG_CC_7448_TABLE, BCD_7SEG_TABLE, BCD_7SEG_7447_TABLE } from './chips.js';
 
 const VCC_VOLTAGE = 5; // matches simulator.js needed by 555 timer internal threshold
 
@@ -18,7 +18,9 @@ const chipEvaluators = {};
 // shorthand and they close over the same module scope (BCD tables, etc.).
 class _ChipEvalMixin {
   _evaluateChip(comp) {
-    // Chip requires BOTH VCC and GND connections to function
+    // Chip requires BOTH VCC and GND connections to function.
+    // Chips flagged noVccPin (ULN2003, LM7805) have no VCC pin at all and
+    // only need GND.
     let hasVCC = false, hasGND = false;
     for (const pin of comp.pins) {
       if (pin.type !== 'power') continue;
@@ -27,7 +29,7 @@ class _ChipEvalMixin {
       if (net.isVCC) hasVCC = true;
       if (net.isGND) hasGND = true;
     }
-    if (!hasVCC || !hasGND) return false;
+    if (!hasGND || (!hasVCC && !comp.chipDef.noVccPin)) return false;
 
     let changed = false;
 
@@ -35,6 +37,9 @@ class _ChipEvalMixin {
       switch (gate.type) {
         case 'D_FF':
           if (this._evaluateDFF(comp, gate)) changed = true;
+          continue;
+        case 'D_FF_NEG':
+          if (this._evaluateDFFNeg(comp, gate)) changed = true;
           continue;
         case 'JK_FF':
           if (this._evaluateJKFF(comp, gate)) changed = true;
@@ -47,6 +52,9 @@ class _ChipEvalMixin {
           continue;
         case 'JK_FF_FULL_NEG':
           if (this._evaluateJKFFFullNeg(comp, gate)) changed = true;
+          continue;
+        case 'JK_FF_CMOS':
+          if (this._evaluateJKFFCMOS(comp, gate)) changed = true;
           continue;
         case 'D_LATCH':
           if (this._evaluateDLatch(comp, gate)) changed = true;
@@ -63,8 +71,17 @@ class _ChipEvalMixin {
         case 'BCD_7SEG':
           if (this._evaluateBCD7Seg(comp, gate)) changed = true;
           continue;
+        case 'BCD_7SEG_7447':
+          if (this._evaluateBCD7Seg7447(comp, gate)) changed = true;
+          continue;
         case 'BCD_7SEG_CC':
           if (this._evaluateBCD7SegCC(comp, gate)) changed = true;
+          continue;
+        case 'BCD_7SEG_CC_7448':
+          if (this._evaluateBCD7SegCC7448(comp, gate)) changed = true;
+          continue;
+        case 'SEG7_TO_BCD_915':
+          if (this._evaluateSeg7ToBcd915(comp, gate)) changed = true;
           continue;
         case 'DECODER_3TO8':
           if (this._evaluateDecoder3to8(comp, gate)) changed = true;
@@ -84,14 +101,23 @@ class _ChipEvalMixin {
         case 'SHIFT_REG_SISO':
           if (this._evaluateShiftRegSISO(comp, gate)) changed = true;
           continue;
+        case 'SHIFT_REG_18BIT_4006':
+          if (this._evaluateShiftReg18Bit4006(comp, gate)) changed = true;
+          continue;
+        case 'SHIFT_REG_64BIT_4031':
+          if (this._evaluateShiftReg64Bit4031(comp, gate)) changed = true;
+          continue;
         case 'SHIFT_REG_4BIT':
           if (this._evaluateShiftReg4Bit(comp, gate)) changed = true;
+          continue;
+        case 'SHIFT_REG_4BIT_PIPO_4035':
+          if (this._evaluateShiftReg4BitPipo4035(comp, gate)) changed = true;
           continue;
         case 'MONOSTABLE':
           if (this._evaluateMonostable(comp, gate)) changed = true;
           continue;
-        case 'MONOSTABLE_RETRIG':
-          if (this._evaluateMonostableRetrig(comp, gate)) changed = true;
+        case 'MONOSTABLE_RC':
+          if (this._evaluateMonostableRC(comp, gate)) changed = true;
           continue;
         case 'MONOSTABLE_122':
           if (this._evaluateMonostable122(comp, gate)) changed = true;
@@ -132,6 +158,9 @@ class _ChipEvalMixin {
         case 'SHIFT_REG_SIPO':
           if (this._evaluateShiftRegSIPO(comp, gate)) changed = true;
           continue;
+        case 'SHIFT_REG_DUAL4_SIPO_4015':
+          if (this._evaluateShiftRegDual4Sipo4015(comp, gate)) changed = true;
+          continue;
         case 'SHIFT_REG_PISO':
           if (this._evaluateShiftRegPISO(comp, gate)) changed = true;
           continue;
@@ -150,11 +179,26 @@ class _ChipEvalMixin {
         case 'COUNTER_UPDOWN_DC':
           if (this._evaluateCounterUpDownDC(comp, gate)) changed = true;
           continue;
+        case 'COUNTER_UPDOWN_4029':
+          if (this._evaluateCounterUpDown4029(comp, gate)) changed = true;
+          continue;
+        case 'COUNTER_UPDOWN_TRI_779':
+          if (this._evaluateCounterUpDownTri779(comp, gate)) changed = true;
+          continue;
+        case 'COUNTER_PROG_MODN_4018':
+          if (this._evaluateCounterProgModN4018(comp, gate)) changed = true;
+          continue;
         case 'TRI_NOT_LO':
           if (this._evaluateTriNotLo(comp, gate)) changed = true;
           continue;
         case 'TRANSCEIVER_8BIT':
           if (this._evaluateTransceiver8Bit(comp, gate)) changed = true;
+          continue;
+        case 'BUS_XCVR_10BIT_DUAL_TRI':
+          if (this._evaluateBusXcvr10BitDualTri(comp, gate)) changed = true;
+          continue;
+        case 'BUS_XCVR_9BIT_QUAD_OE':
+          if (this._evaluateBusXcvr9BitQuadOe(comp, gate)) changed = true;
           continue;
         case 'BUS_SWITCH_10BIT':
           if (this._evaluateBusSwitch10Bit(comp, gate)) changed = true;
@@ -165,6 +209,9 @@ class _ChipEvalMixin {
         case 'MUX_2TO1_TRI':
           if (this._evaluateMux2to1Tri(comp, gate)) changed = true;
           continue;
+        case 'MUX_3BUS_TRI':
+          if (this._evaluateMux3BusTri(comp, gate)) changed = true;
+          continue;
         case 'ADDRESSABLE_LATCH':
           if (this._evaluateAddressableLatch(comp, gate)) changed = true;
           continue;
@@ -174,8 +221,41 @@ class _ChipEvalMixin {
         case 'D_LATCH_OCTAL_TRI':
           if (this._evaluateDLatchOctalTri(comp, gate)) changed = true;
           continue;
+        case 'READBACK_LATCH':
+          if (this._evaluateReadBackLatch(comp, gate)) changed = true;
+          continue;
         case 'D_FF_OCTAL_TRI':
           if (this._evaluateDFFOctalTri(comp, gate)) changed = true;
+          continue;
+        case 'D_FF_REG_TRI':
+          if (this._evaluateDFFRegTri(comp, gate)) changed = true;
+          continue;
+        case 'D_FF_REG_TRI_CLR_EN':
+          if (this._evaluateDFFRegTriClrEn(comp, gate)) changed = true;
+          continue;
+        case 'D_FF_REG_TRI_SET_INV':
+          if (this._evaluateDFFRegTriSetInv(comp, gate)) changed = true;
+          continue;
+        case 'D_FF_REG_SYNC_CLR_TRI':
+          if (this._evaluateDFFRegSyncClrTri(comp, gate)) changed = true;
+          continue;
+        case 'D_FF_REG_TRI_CLR':
+          if (this._evaluateDFFRegTriClr(comp, gate)) changed = true;
+          continue;
+        case 'D_LATCH_REG_TRI':
+          if (this._evaluateDLatchRegTri(comp, gate)) changed = true;
+          continue;
+        case 'LATCH_READBACK_TRI':
+          if (this._evaluateLatchReadbackTri(comp, gate)) changed = true;
+          continue;
+        case 'LATCH_READBACK_BIDIR_TRI':
+          if (this._evaluateLatchReadbackBidirTri(comp, gate)) changed = true;
+          continue;
+        case 'REG_READBACK_996':
+          if (this._evaluateRegReadback996(comp, gate)) changed = true;
+          continue;
+        case 'DIAG_SCAN_REG_818':
+          if (this._evaluateDiagScanReg818(comp, gate)) changed = true;
           continue;
         case 'TRI_BUFFER_DUAL_OE':
           if (this._evaluateTriBufferDualOE(comp, gate)) changed = true;
@@ -188,6 +268,9 @@ class _ChipEvalMixin {
           continue;
         case 'BCD_DECIMAL':
           if (this._evaluateBCDDecimal(comp, gate)) changed = true;
+          continue;
+        case 'BCD_DECIMAL_HI':
+          if (this._evaluateBCDDecimalHi(comp, gate)) changed = true;
           continue;
         case 'XS3_DECIMAL':
           if (this._evaluateXS3Decimal(comp, gate)) changed = true;
@@ -231,6 +314,9 @@ class _ChipEvalMixin {
         case 'SHIFT_REG_5BIT':
           if (this._evaluateShiftReg5Bit(comp, gate)) changed = true;
           continue;
+        case 'COUNTER_JOHNSON_4018':
+          if (this._evaluateCounterJohnson4018(comp, gate)) changed = true;
+          continue;
         case 'RATE_MULT_6BIT':
           if (this._evaluateRateMult6Bit(comp, gate)) changed = true;
           continue;
@@ -242,6 +328,9 @@ class _ChipEvalMixin {
           continue;
         case 'SR_LATCH':
           if (this._evaluateSRLatch(comp, gate)) changed = true;
+          continue;
+        case 'SR_LATCH_QUAD_TRI':
+          if (this._evaluateSRLatchQuadTri(comp, gate)) changed = true;
           continue;
         case 'DEC_3TO8_REG':
           if (this._evaluateDec3To8Reg(comp, gate)) changed = true;
@@ -255,6 +344,9 @@ class _ChipEvalMixin {
         case 'PRIORITY_ENC_8LINE':
           if (this._evaluatePriorityEnc8Line(comp, gate)) changed = true;
           continue;
+        case 'PRIORITY_ENC_8TO3_HI':
+          if (this._evaluatePriorityEnc8to3Hi(comp, gate)) changed = true;
+          continue;
         case 'MUX_8TO1_INV':
           if (this._evaluateMux8to1Inv(comp, gate)) changed = true;
           continue;
@@ -263,6 +355,18 @@ class _ChipEvalMixin {
           continue;
         case 'COUNTER_7SEG':
           if (this._evaluateCounter7Seg(comp, gate)) changed = true;
+          continue;
+        case 'COUNTER_7SEG_4026':
+          if (this._evaluateCounter7Seg4026(comp, gate)) changed = true;
+          continue;
+        case 'COUNTER_7SEG_RB':
+          if (this._evaluateCounter7SegRb(comp, gate)) changed = true;
+          continue;
+        case 'COUNTER_7SEG_40110':
+          if (this._evaluateCounter7Seg40110(comp, gate)) changed = true;
+          continue;
+        case 'COUNTER_DISP_MUX_925':
+          if (this._evaluateCounterDispMux925(comp, gate)) changed = true;
           continue;
         case 'COUNTER_SYNC_DECADE_SC':
           if (this._evaluateCounterSyncDecadeSC(comp, gate)) changed = true;
@@ -276,6 +380,9 @@ class _ChipEvalMixin {
         case 'RATE_MULT_DECADE':
           if (this._evaluateRateMultDecade(comp, gate)) changed = true;
           continue;
+        case 'RATE_MULT_BCD_4527':
+          if (this._evaluateRateMultBcd4527(comp, gate)) changed = true;
+          continue;
         case 'COUNTER_UPDOWN_DECADE':
           if (this._evaluateCounterUpDownDecade(comp, gate)) changed = true;
           continue;
@@ -287,6 +394,9 @@ class _ChipEvalMixin {
           continue;
         case 'REG_FILE_8X2_TRI':
           if (this._evaluateRegFile8x2Tri(comp, gate)) changed = true;
+          continue;
+        case 'REG_FILE_DUAL16X4_TRI':
+          if (this._evaluateRegFileDual16x4Tri(comp, gate)) changed = true;
           continue;
         case 'COUNTER_BIQ_PRESET':
           if (this._evaluateCounterBiqPreset(comp, gate)) changed = true;
@@ -305,6 +415,9 @@ class _ChipEvalMixin {
           continue;
         case 'CARRY_LOOKAHEAD':
           if (this._evaluateCarryLookahead(comp, gate)) changed = true;
+          continue;
+        case 'CARRY_LOOKAHEAD_32':
+          if (this._evaluateCarryLookahead32(comp, gate)) changed = true;
           continue;
         case 'FULL_ADDER_DUAL':
           if (this._evaluateFullAdderDual(comp, gate)) changed = true;
@@ -332,6 +445,15 @@ class _ChipEvalMixin {
           continue;
         case 'SHIFT_REG_8BIT_BIDIR':
           if (this._evaluateShiftReg8BitBidir(comp, gate)) changed = true;
+          continue;
+        case 'SHIFT_REG_8BIT_BUS_4034':
+          if (this._evaluateShiftReg8BitBus4034(comp, gate)) changed = true;
+          continue;
+        case 'SHIFT_REG_8BIT_DUALRANK_952':
+          if (this._evaluateShiftReg8BitDualRank952(comp, gate)) changed = true;
+          continue;
+        case 'SHIFT_REG_8BIT_DUALRANK_964':
+          if (this._evaluateShiftReg8BitDualRank964(comp, gate)) changed = true;
           continue;
         case 'SHIFT_REG_8BIT_JK':
           if (this._evaluateShiftReg8BitJK(comp, gate)) changed = true;
@@ -405,6 +527,15 @@ class _ChipEvalMixin {
         case 'LATCH_TRANS_4BIT':
           if (this._evaluateLatchTrans4Bit(comp, gate)) changed = true;
           continue;
+        case 'LATCH_4BIT_TRI_RST':
+          if (this._evaluateLatch4BitTriRst(comp, gate)) changed = true;
+          continue;
+        case 'LATCH_4BIT_TRI_873':
+          if (this._evaluateLatch4BitTri873(comp, gate)) changed = true;
+          continue;
+        case 'LATCH_4BIT_TRI_INV_880':
+          if (this._evaluateLatch4BitTriInv880(comp, gate)) changed = true;
+          continue;
         case 'TRI_NOT_HI':
           if (this._evaluateTriNotHi(comp, gate)) changed = true;
           continue;
@@ -429,6 +560,9 @@ class _ChipEvalMixin {
         case 'MUX_8TO1_TRI':
           if (this._evaluateMux8to1Tri(comp, gate)) changed = true;
           continue;
+        case 'MUX_8TO1_TRI_INH':
+          if (this._evaluateMux8to1TriInh(comp, gate)) changed = true;
+          continue;
         case 'MUX_4TO1_TRI':
           if (this._evaluateMux4to1Tri(comp, gate)) changed = true;
           continue;
@@ -443,6 +577,9 @@ class _ChipEvalMixin {
           continue;
         case 'MULT_2X4BIT':
           if (this._evaluateMult2x4Bit(comp, gate)) changed = true;
+          continue;
+        case 'MULT_2X2_4554':
+          if (this._evaluateMult2x2_4554(comp, gate)) changed = true;
           continue;
         case 'BUFFER_COMP':
           if (this._evaluateBufferComp(comp, gate)) changed = true;
@@ -471,6 +608,9 @@ class _ChipEvalMixin {
         case 'PARITY_9BIT_SIMPLE':
           if (this._evaluateParity9BitSimple(comp, gate)) changed = true;
           continue;
+        case 'PARITY_9BIT_INH':
+          if (this._evaluateParity9BitInh(comp, gate)) changed = true;
+          continue;
         case 'ACCUMULATOR_4BIT':
           if (this._evaluateAccumulator4Bit(comp, gate)) changed = true;
           continue;
@@ -498,14 +638,20 @@ class _ChipEvalMixin {
         case 'FREQ_DIV_PROG_12BIT':
           if (this._evaluateFreqDivProg12Bit(comp, gate)) changed = true;
           continue;
+        case 'FREQ_DIV_PROG_4059':
+          if (this._evaluateFreqDivProg4059(comp, gate)) changed = true;
+          continue;
+        case 'FREQ_DIV_PROG_4536':
+          if (this._evaluateFreqDivProg4536(comp, gate)) changed = true;
+          continue;
         case 'COUNTER_4BIT_DIV':
           if (this._evaluateCounter4BitDiv(comp, gate)) changed = true;
           continue;
         case 'SHIFT_REG_4BIT_BIDIR_TRI':
           if (this._evaluateShiftReg4BitBidirTri(comp, gate)) changed = true;
           continue;
-        case 'PLL_FILTER':
-          if (this._evaluatePllFilter(comp, gate)) changed = true;
+        case 'SHIFT_REG_4BIT_UNIV_TRI':
+          if (this._evaluateShiftReg4BitUnivTri(comp, gate)) changed = true;
           continue;
         case 'MUX_QUAD_2TO1_STORED':
           if (this._evaluateMuxQuad2to1Stored(comp, gate)) changed = true;
@@ -513,8 +659,8 @@ class _ChipEvalMixin {
         case 'SHIFT_REG_8BIT_UNIV_TRI':
           if (this._evaluateShiftReg8BitUnivTri(comp, gate)) changed = true;
           continue;
-        case 'RAM_256X1_OC':
-          if (this._evaluateRam256x1OC(comp, gate)) changed = true;
+        case 'RAM_256X1_OC_N':
+          if (this._evaluateRam256x1OCN(comp, gate)) changed = true;
           continue;
         case 'CLK_DIV2_OCT':
           if (this._evaluateClkDiv2Oct(comp, gate)) changed = true;
@@ -565,6 +711,12 @@ class _ChipEvalMixin {
         case 'SHIFT_REG_8BIT_BIDIR_CLR_TRI':
           if (this._evaluateShiftReg8BitBidirClrTri(comp, gate)) changed = true;
           continue;
+        case 'SHIFT_REG_8BIT_UNIV_CLR_TRI':
+          if (this._evaluateShiftReg8BitUnivClrTri(comp, gate)) changed = true;
+          continue;
+        case 'VCO_STUB':
+          if (this._evaluateVco124(comp, gate)) changed = true;
+          continue;
         case 'VCO_SINGLE_EN':
           if (this._evaluateVcoSingleEn(comp, gate)) changed = true;
           continue;
@@ -573,18 +725,6 @@ class _ChipEvalMixin {
           continue;
         case 'VCO_DUAL_EN':
           if (this._evaluateVcoDualEn(comp, gate)) changed = true;
-          continue;
-        case 'PLA_12IN_6OUT_TRI':
-          if (this._evaluatePla12in6outTri(comp, gate)) changed = true;
-          continue;
-        case 'PLA_12IN_6OUT_OC':
-          if (this._evaluatePla12in6outOC(comp, gate)) changed = true;
-          continue;
-        case 'PLA_12IN_6OUT_SREG_TRI':
-          if (this._evaluatePla12in6outSregTri(comp, gate)) changed = true;
-          continue;
-        case 'PLA_12IN_6OUT_SREG_OC':
-          if (this._evaluatePla12in6outSregOC(comp, gate)) changed = true;
           continue;
         case 'CLK_DRIVER_QUAD_TRI':
           if (this._evaluateClkDriverQuadTri(comp, gate)) changed = true;
@@ -629,6 +769,9 @@ class _ChipEvalMixin {
         case 'D_LATCH_QUAD_COMPL':
           if (this._evaluateDLatchQuadCompl(comp, gate)) changed = true;
           continue;
+        case 'D_LATCH_QUAD_4042':
+          if (this._evaluateDLatchQuad4042(comp, gate)) changed = true;
+          continue;
         case 'JK_NOT_FF_QUAD':
           if (this._evaluateJkNotFfQuad(comp, gate)) changed = true;
           continue;
@@ -637,6 +780,9 @@ class _ChipEvalMixin {
           continue;
         case 'D_FF_HEX_CE':
           if (this._evaluateDFfHexCe(comp, gate)) changed = true;
+          continue;
+        case 'D_FF_9BIT_CLR_CE_TRI':
+          if (this._evaluateDFf9BitClrCeTri(comp, gate)) changed = true;
           continue;
         case 'D_FF_QUAD_CE_COMPL':
           if (this._evaluateDFfQuadCeCompl(comp, gate)) changed = true;
@@ -658,6 +804,12 @@ class _ChipEvalMixin {
           continue;
         case 'SERIAL_ADDER_QUAD':
           if (this._evaluateSerialAdderQuad(comp, gate)) changed = true;
+          continue;
+        case 'SERIAL_ADDER_TRIPLE_4032':
+          if (this._evaluateSerialAdderTriple4032(comp, gate)) changed = true;
+          continue;
+        case 'SERIAL_ADDER_TRIPLE_4038':
+          if (this._evaluateSerialAdderTriple4038(comp, gate)) changed = true;
           continue;
         case 'D_FF_QUAD_TRI_COMPL':
           if (this._evaluateDFfQuadTriCompl(comp, gate)) changed = true;
@@ -783,6 +935,9 @@ class _ChipEvalMixin {
         case 'COUNTER_8BIT_UPDOWN_SYNC':
           if (this._evaluateCounter8BitUpdownSync(comp, gate)) changed = true;
           continue;
+        case 'COUNTER_8BIT_SYNC_867':
+          if (this._evaluateCounter8BitSync867(comp, gate)) changed = true;
+          continue;
         // Block 28
         case 'BURST_ERR_RECOVERY':
           if (this._evaluateBurstErrRecovery(comp, gate)) changed = true;
@@ -804,15 +959,6 @@ class _ChipEvalMixin {
           continue;
         case 'ADC_6BIT_FLASH':
           if (this._evaluateAdc6BitFlash(comp, gate)) changed = true;
-          continue;
-        case 'SAR_8BIT':
-          if (this._evaluateSar8Bit(comp, gate)) changed = true;
-          continue;
-        case 'SAR_8BIT_EXP':
-          if (this._evaluateSar8BitExp(comp, gate)) changed = true;
-          continue;
-        case 'SAR_12BIT_EXP':
-          if (this._evaluateSar12BitExp(comp, gate)) changed = true;
           continue;
         case 'ADC_8BIT_SAR':
           if (this._evaluateAdc8BitSar(comp, gate)) changed = true;
@@ -838,15 +984,6 @@ class _ChipEvalMixin {
         case 'CMP_8BIT_REG_OC':
           if (this._evaluateCmp8BitRegOc(comp, gate)) changed = true;
           continue;
-        case 'CMP_16BIT_PROG':
-          if (this._evaluateCmp16BitProg(comp, gate)) changed = true;
-          continue;
-        case 'CMP_12BIT_PROG':
-          if (this._evaluateCmp12BitProg(comp, gate)) changed = true;
-          continue;
-        case 'CMP_12BIT_OC':
-          if (this._evaluateCmp12BitOc(comp, gate)) changed = true;
-          continue;
         case 'LATCH_OCTAL_TRI':
           if (this._evaluateLatchOctalTri(comp, gate)) changed = true;
           continue;
@@ -855,6 +992,9 @@ class _ChipEvalMixin {
           continue;
         case 'LATCH_OCTAL_INV_TRI':
           if (this._evaluateLatchOctalInvTri(comp, gate)) changed = true;
+          continue;
+        case 'LATCH_READBACK_INV':
+          if (this._evaluateLatchReadbackInv(comp, gate)) changed = true;
           continue;
         case 'REG_OCTAL_INV_TRI':
           if (this._evaluateRegOctalInvTri(comp, gate)) changed = true;
@@ -879,6 +1019,9 @@ class _ChipEvalMixin {
           continue;
         case 'TRANSCEIVER_OCTAL_LATCH':
           if (this._evaluateTransceiverOctalLatch(comp, gate)) changed = true;
+          continue;
+        case 'TRANSCEIVER_OCTAL_LATCH_SEL':
+          if (this._evaluateTransceiverOctalLatchSel(comp, gate)) changed = true;
           continue;
         case 'DECODER_3TO8_LATCH_ACK':
           if (this._evaluateDecoder3to8LatchAck(comp, gate)) changed = true;
@@ -916,6 +1059,15 @@ class _ChipEvalMixin {
           continue;
         case 'REG_OCTAL_SYNCLR_INV_TRI':
           if (this._evaluateRegOctalSynclrInvTri(comp, gate)) changed = true;
+          continue;
+        case 'BUS_FF_9BIT_TRI':
+          if (this._evaluateBusFf9BitTri(comp, gate)) changed = true;
+          continue;
+        case 'BUS_FF_10BIT_TRI':
+          if (this._evaluateBusFf10BitTri(comp, gate)) changed = true;
+          continue;
+        case 'BUS_FF_8BIT_3OE_TRI':
+          if (this._evaluateBusFf8Bit3OeTri(comp, gate)) changed = true;
           continue;
         case 'COUNTER_8BIT_BIDIR_TRI':
           if (this._evaluateCounter8BitBidirTri(comp, gate)) changed = true;
@@ -966,11 +1118,26 @@ class _ChipEvalMixin {
         case 'PARITY_BUFFER_INV_STUB':
           if (this._evaluateParityBufferStub(comp, gate)) changed = true;
           continue;
+        case 'LATCH_TRANS_TRI':
+          if (this._evaluateLatchTransTri(comp, gate)) changed = true;
+          continue;
         case 'LATCH_8BIT_TRI':
           if (this._evaluateLatch8BitTri(comp, gate)) changed = true;
           continue;
         case 'LATCH_8BIT_INV_TRI':
           if (this._evaluateLatch8BitInvTri(comp, gate)) changed = true;
+          continue;
+        case 'LATCH_10BIT_READBACK_INV':
+          if (this._evaluateLatch10BitReadbackInv(comp, gate)) changed = true;
+          continue;
+        case 'LATCH_9BIT_PRE_CLR_TRI':
+          if (this._evaluateLatch9BitPreClrTri(comp, gate)) changed = true;
+          continue;
+        case 'LATCH_8BIT_PRE_CLR_OC3_TRI':
+          if (this._evaluateLatch8BitPreClrOc3Tri(comp, gate)) changed = true;
+          continue;
+        case 'LATCH_9BIT_READBACK_TRI':
+          if (this._evaluateLatch9BitReadbackTri(comp, gate)) changed = true;
           continue;
         case 'SHIFT_REG_16BIT_STUB':
           if (this._evaluateShiftReg16BitStub(comp, gate)) changed = true;
@@ -979,8 +1146,8 @@ class _ChipEvalMixin {
           if (this._evaluateAddrComp16BitStub(comp, gate)) changed = true;
           continue;
         // ── Block 36 ──────────────────────────────────────────────────────────
-        case 'ACC_4BIT_STUB':
-          if (this._evaluateAcc4BitStub(comp, gate)) changed = true;
+        case 'ACC_4BIT_681':
+          if (this._evaluateAcc4Bit681(comp, gate)) changed = true;
           continue;
         case 'COMPARATOR_8BIT_PQ':
           if (this._evaluateComparator8BitPq(comp, gate)) changed = true;
@@ -991,21 +1158,84 @@ class _ChipEvalMixin {
         case 'COMPARATOR_8BIT_EQ':
           if (this._evaluateComparator8BitEq(comp, gate)) changed = true;
           continue;
+        case 'COMPARATOR_8BIT_CASCADE':
+          if (this._evaluateComparator8BitCascade(comp, gate)) changed = true;
+          continue;
+        case 'COMPARATOR_8BIT_LATCH':
+          if (this._evaluateComparator8BitLatch(comp, gate)) changed = true;
+          continue;
+        case 'PARITY_BUFFER':
+          if (this._evaluateParityBuffer(comp, gate)) changed = true;
+          continue;
+        case 'PARITY_BUFFER_INV':
+          if (this._evaluateParityBufferInv(comp, gate)) changed = true;
+          continue;
+        case 'XCVR_PARITY_LATCH_INV':
+          if (this._evaluateXcvrParityLatch854(comp, gate)) changed = true;
+          continue;
+        case 'XCVR_PARITY_REG':
+          if (this._evaluateXcvrParityReg833(comp, gate)) changed = true;
+          continue;
+        case 'XCVR_PARITY_REG_INV':
+          if (this._evaluateXcvrParityReg834(comp, gate)) changed = true;
+          continue;
+        case 'XCVR_PARITY_LATCH':
+          if (this._evaluateXcvrParityLatch853(comp, gate)) changed = true;
+          continue;
+        case 'PARITY_XCVR':
+          if (this._evaluateParityXcvr(comp, gate)) changed = true;
+          continue;
+        case 'XCVR_PARITY':
+          if (this._evaluateXcvrParity(comp, gate)) changed = true;
+          continue;
+        case 'XCVR_PARITY_INV':
+          if (this._evaluateXcvrParityInv(comp, gate)) changed = true;
+          continue;
+        case 'ADDR_COMP_CASCADE':
+          if (this._evaluateAddrCompCascade(comp, gate)) changed = true;
+          continue;
+        case 'ADDR_COMP_LATCH':
+          if (this._evaluateAddrCompLatch(comp, gate)) changed = true;
+          continue;
+        case 'ADDR_COMP_FIXED':
+          if (this._evaluateAddrCompFixed(comp, gate)) changed = true;
+          continue;
+        case 'ECC_SECDED':
+          if (this._evaluateEccSecded(comp, gate)) changed = true;
+          continue;
         case 'COUNTER_LATCH_MUX_STUB':
           if (this._evaluateCounterLatchMuxStub(comp, gate)) changed = true;
           continue;
+        case 'COUNTER_REG_MUX_TRI':
+          if (this._evaluateCounterRegMuxTri(comp, gate)) changed = true;
+          continue;
+        case 'COUNTER_UPDOWN_REG_MUX_TRI':
+          if (this._evaluateCounterUpdownRegMuxTri(comp, gate)) changed = true;
+          continue;
+        case 'DUAL_CTR16_REG_TRI':
+          if (this._evaluateDualCtr16RegTri(comp, gate)) changed = true;
+          continue;
+        case 'BUS_XCVR_9BIT_DUAL_OE':
+          if (this._evaluateBusXcvr9BitDualOE(comp, gate)) changed = true;
+          continue;
         // ── Block 37 ──────────────────────────────────────────────────────────
-        case 'PLL_7046':
-          if (this._evaluatePll7046(comp, gate)) changed = true;
-          continue;
-        case 'PLL_9046':
-          if (this._evaluatePll9046(comp, gate)) changed = true;
-          continue;
         case 'JTAG_ASP':
           if (this._evaluateJtagAsp(comp, gate)) changed = true;
           continue;
+        case 'COUNTER_PROG_RIPPLE_OSC':
+          if (this._evaluateCounterProgRippleOsc(comp, gate)) changed = true;
+          continue;
+        case 'KEY_ENCODER_SCAN':
+          if (this._evaluateKeyEncoderScan(comp, gate)) changed = true;
+          continue;
+        case 'DUAL_RANK_SHIFT_962':
+          if (this._evaluateDualRankShift962(comp, gate)) changed = true;
+          continue;
         case 'GENERIC_STUB':
           if (this._evaluateGenericStub(comp, gate)) changed = true;
+          continue;
+        case 'SHIFT_REG_DUAL_RANK_963':
+          if (this._evaluateShiftRegDualRank963(comp, gate)) changed = true;
           continue;
         // ── Block 67 555/556/558 Timers ────────────────────────────────────
         case 'TIMER_555':
@@ -1014,8 +1244,36 @@ class _ChipEvalMixin {
         case 'TIMER_558_SECTION':
           if (this._evaluateTimer558Section(comp, gate)) changed = true;
           continue;
+        // ── Block 71 — analog companions, 2764 EPROM, crystal oscillator ──
+        case 'COMPARATOR_OC':
+          if (this._evaluateComparatorOC(comp, gate)) changed = true;
+          continue;
+        case 'OPAMP':
+          if (this._evaluateOpamp(comp, gate)) changed = true;
+          continue;
+        case 'DARLINGTON_OC':
+          if (this._evaluateDarlingtonOC(comp, gate)) changed = true;
+          continue;
+        case 'VREG_5V':
+          if (this._evaluateVreg5V(comp, gate)) changed = true;
+          continue;
+        case 'EPROM_8KX8':
+          if (this._evaluateEprom8kx8(comp, gate)) changed = true;
+          continue;
+        case 'XTAL_OSC':
+          if (this._evaluateXtalOsc(comp, gate)) changed = true;
+          continue;
         case 'MUX_QUINT_2TO1':
           if (this._evaluateMuxQuint2to1(comp, gate)) changed = true;
+          continue;
+        case 'MUX_QUINT_3TO1':
+          if (this._evaluateMuxQuint3to1(comp, gate)) changed = true;
+          continue;
+        case 'MUX_HEX_UNIVERSAL':
+          if (this._evaluateMuxHexUniversal(comp, gate)) changed = true;
+          continue;
+        case 'MUX_3IN_4BIT_DC_OE':
+          if (this._evaluateMux3in4bitDcOe(comp, gate)) changed = true;
           continue;
         // ── Block 58 ──────────────────────────────────────────────────────────
         case 'SHIFT_REG_LATCH_4094':
@@ -1031,11 +1289,23 @@ class _ChipEvalMixin {
         case 'COUNTER_BCD_UPDOWN_CD':
           if (this._evaluateCounterBcdUpdownCd(comp, gate)) changed = true;
           continue;
+        case 'BCD_DIVN_DOWN_4522':
+          if (this._evaluateBcdDivNDown4522(comp, gate)) changed = true;
+          continue;
         case 'BCD_7SEG_4511':
           if (this._evaluateBcd7seg4511(comp, gate)) changed = true;
           continue;
         case 'BCD_7SEG_4543':
           if (this._evaluateBcd7seg4543(comp, gate)) changed = true;
+          continue;
+        case 'BCD_7SEG_4543_HC':
+          if (this._evaluateBcd7seg4543hc(comp, gate)) changed = true;
+          continue;
+        case 'BCD_7SEG_4055':
+          if (this._evaluateBcd7seg4055(comp, gate)) changed = true;
+          continue;
+        case 'BCD_7SEG_4056':
+          if (this._evaluateBcd7seg4056(comp, gate)) changed = true;
           continue;
         case 'DEC_4TO16_LATCH_HI':
           if (this._evaluateDec4to16LatchHi(comp, gate)) changed = true;
@@ -1059,28 +1329,82 @@ class _ChipEvalMixin {
         case 'SHIFT_REG_8BIT_PISO_CD':
           if (this._evaluateShiftReg8BitPisoCd(comp, gate)) changed = true;
           continue;
+        case 'SERIAL_PARALLEL_MULT_784':
+          if (this._evaluateSerialParallelMult784(comp, gate)) changed = true;
+          continue;
+        case 'SHIFT_REG_8BIT_PISO_CD4021':
+          if (this._evaluateShiftReg8BitPisoCd4021(comp, gate)) changed = true;
+          continue;
+        case 'SHIFT_REG_MUX_LATCH_835':
+          if (this._evaluateShiftRegMuxLatch835(comp, gate)) changed = true;
+          continue;
         case 'SHIFT_REG_4BIT_SIPO':
           if (this._evaluateShiftReg4BitSipo(comp, gate)) changed = true;
           continue;
         case 'BILATERAL_SWITCH':
           if (this._evaluateBilateralSwitch(comp, gate)) changed = true;
           continue;
+        case 'ANALOG_MUX_8':
+          if (this._evaluateAnalogMux8(comp, gate)) changed = true;
+          continue;
+        case 'ANALOG_MUX_16':
+          if (this._evaluateAnalogMux16(comp, gate)) changed = true;
+          continue;
+        case 'ANALOG_MUX_DUAL4':
+          if (this._evaluateAnalogMuxDual4(comp, gate)) changed = true;
+          continue;
+        case 'ANALOG_MUX_DUAL4_4852':
+          if (this._evaluateAnalogMuxDual4_4852(comp, gate)) changed = true;
+          continue;
+        case 'ANALOG_MUX_DUAL8':
+          if (this._evaluateAnalogMuxDual8(comp, gate)) changed = true;
+          continue;
+        case 'ANALOG_MUX_TRIPLE2':
+          if (this._evaluateAnalogMuxTriple2(comp, gate)) changed = true;
+          continue;
+        case 'ANALOG_MUX_8_LATCH':
+          if (this._evaluateAnalogMux8Latch(comp, gate)) changed = true;
+          continue;
+        case 'ANALOG_MUX_DUAL4_LATCH':
+          if (this._evaluateAnalogMuxDual4Latch(comp, gate)) changed = true;
+          continue;
+        case 'ANALOG_MUX_TRIPLE2_LATCH':
+          if (this._evaluateAnalogMuxTriple2Latch(comp, gate)) changed = true;
+          continue;
         case 'COUNTER_DECADE_DECODED':
           if (this._evaluateCounterDecadeDecoded(comp, gate)) changed = true;
+          continue;
+        case 'COUNTER_OCTAL_DECODED':
+          if (this._evaluateCounterOctalDecoded(comp, gate)) changed = true;
           continue;
         case 'COUNTER_BIN_OSC_14':
           if (this._evaluateCounterBinOsc14(comp, gate)) changed = true;
           continue;
-        // ── Block 63 ─────────────────────────────────────────────────────────
-        case 'SHIFT_REG_8BIT_CS_OE':
-          if (this._evaluateShiftReg8BitCsOe(comp, gate)) changed = true;
+        case 'COUNTER_BIN_OSC_14_CLKO':
+          if (this._evaluateCounterBinOsc14Clko(comp, gate)) changed = true;
           continue;
-        case 'DUAL_CTR_8BIT_REG':
-          if (this._evaluateDualCtr8BitReg(comp, gate)) changed = true;
+        case 'COUNTER_DISPLAY_4DIGIT_928':
+          if (this._evaluateCounterDisplay4Digit928(comp, gate)) changed = true;
+          continue;
+        case 'COUNTER_DISPLAY_4DIGIT_926':
+          if (this._evaluateCounterDisplay4Digit926(comp, gate)) changed = true;
+          continue;
+        case 'COUNTER_DISPLAY_4DIGIT_927':
+          if (this._evaluateCounterDisplay4Digit927(comp, gate)) changed = true;
+          continue;
+        case 'COUNTER_BIN_RIPPLE':
+          if (this._evaluateCounterBinRipple(comp, gate)) changed = true;
+          continue;
+        case 'COUNTER_BCD_DUAL_4518':
+          if (this._evaluateCounterBcdDual4518(comp, gate)) changed = true;
           continue;
         // ── Block 65 ─────────────────────────────────────────────────────────
         case 'BCD_DOWN_2DEC':
           if (this._evaluateBcdDown2Dec(comp, gate)) changed = true;
+          continue;
+        // ── Block 129 (CD40102) ───────────────────────────────────────────────
+        case 'BCD_DOWN_2DEC_CD40102':
+          if (this._evaluateBcdDown2DecCd40102(comp, gate)) changed = true;
           continue;
         case 'BIN_DOWN_8BIT':
           if (this._evaluateBinDown8Bit(comp, gate)) changed = true;
@@ -1088,10 +1412,22 @@ class _ChipEvalMixin {
         case 'FIFO_16X4_RST_TRI':
           if (this._evaluateFifo16x4RstTri(comp, gate)) changed = true;
           continue;
+        // ── Block 70 ─────────────────────────────────────────────────────────
+        case 'EEPROM_2KX8':
+          if (this._evaluateEeprom2kx8(comp, gate)) changed = true;
+          continue;
+        // ── Block 104 ────────────────────────────────────────────────────────
+        case 'AO_BIPHASE_PAIR':
+          if (this._evaluateAoBiphasePair(comp, gate)) changed = true;
+          continue;
       }
 
-      // Read input pin voltages → digital values
-      const inputBits = this._readGateInputs(comp, gate.inputs);
+      // Read input pin voltages → digital values.
+      // Schmitt-input chips (chipDef.schmittInputs) use hysteretic reading
+      // with VT+/VT- thresholds and per-input latched state.
+      const inputBits = (comp.chipDef && comp.chipDef.schmittInputs)
+        ? gate.inputs.map(pin => this._readSchmittBit(comp, pin))
+        : this._readGateInputs(comp, gate.inputs);
 
       // Compute gate output
       let outputBit;
@@ -1099,7 +1435,6 @@ class _ChipEvalMixin {
         case 'XORSEL':   { const [a,b,c] = inputBits; const xorVal = a ^ b; outputBit = c ? (xorVal ? 0 : 1) : xorVal; break; }
         case 'MUX_2TO1_INV': { const [a,b,sel,g] = inputBits; outputBit = g === 1 ? 0 : ((sel ? b : a) ? 0 : 1); break; }
         case 'NAND12_3ST': { const oe = inputBits[inputBits.length - 1]; if (oe !== 0) { if (this._drivePinHighZ(comp, gate.output)) changed = true; continue; } outputBit = inputBits.slice(0, -1).every(b => b) ? 0 : 1; break; }
-        case 'VCO_STUB': { for (const op of gate.outputs) { if (this._drivePinHighZ(comp, op)) changed = true; } continue; }
         case 'AND':  outputBit = inputBits.every(b => b) ? 1 : 0; break;
         case 'OR':   outputBit = inputBits.some(b => b)  ? 1 : 0; break;
         case 'NAND': outputBit = inputBits.every(b => b) ? 0 : 1; break;
@@ -1108,15 +1443,36 @@ class _ChipEvalMixin {
         case 'XOR':    outputBit = inputBits.reduce((a, b) => a ^ b, 0); break;
         case 'XNOR':   outputBit = inputBits.reduce((a, b) => a ^ b, 0) ? 0 : 1; break;
         case 'BUFFER': outputBit = inputBits[0] ? 1 : 0; break;
-        case 'AOI_2WIDE': outputBit = ((inputBits[0] & inputBits[1]) | (inputBits[2] & inputBits[3])) ? 0 : 1; break;
-        case 'AOI_4WIDE': outputBit = ((inputBits[0] & inputBits[1]) | (inputBits[2] & inputBits[3]) | (inputBits[4] & inputBits[5]) | (inputBits[6] & inputBits[7])) ? 0 : 1; break;
-        // NOR_STROBE: last input is strobe G (active HIGH disable). G=1→Y=1; G=0→Y=NOR(rest)
-        case 'NOR_STROBE': {
-          const g = inputBits[inputBits.length - 1];
-          outputBit = g ? 1 : (inputBits.slice(0, -1).some(b => b) ? 0 : 1);
+        // AOI_2WIDE: NOT((A&B)|(C&D)). Optional 5th input is an active-HIGH INHIBIT
+        // that ORs into the sum before inversion (E = NOT(INH + A·B + C·D)) — used
+        // by the CD4085 (two 2-in ANDs driving a 3-in NOR). Parts with only 4 inputs
+        // (74x50/74x51) leave inputBits[4] undefined, which coerces to 0 in the
+        // bitwise OR, so their behavior is unchanged.
+        case 'AOI_2WIDE': outputBit = ((inputBits[0] & inputBits[1]) | (inputBits[2] & inputBits[3]) | (inputBits[4] | 0)) ? 0 : 1; break;
+        // AOI_4WIDE: NOT((A·B)+(C·D)+(E·F)+(G·H)). Optional 9th/10th inputs model
+        // the CD4086's expand controls: inputBits[8] = INHIBIT/EXP (active-HIGH,
+        // ORs straight into the NOR — an active AND-gate fed here OR-expands the
+        // gate); inputBits[9] = ENABLE/EXP (active-HIGH enable — a LOW forces the
+        // output LOW, which is how a preceding stage's output AND-expands the gate:
+        // J = ENABLE · NOT(INH + ΣpairANDs)). Parts with only 8 inputs (a plain
+        // 4-wide AOI like the 74x54) leave both undefined → no inhibit, enabled.
+        case 'AOI_4WIDE': {
+          const inh4 = inputBits[8] | 0;
+          const endis4 = (inputBits[9] === undefined) ? 0 : (inputBits[9] ? 0 : 1);
+          outputBit = ((inputBits[0] & inputBits[1]) | (inputBits[2] & inputBits[3]) | (inputBits[4] & inputBits[5]) | (inputBits[6] & inputBits[7]) | inh4 | endis4) ? 0 : 1;
           break;
         }
-        // AND-OR and AND-OR-INVERT gate types for complex 74xx chips
+        // NOR_STROBE: last input is strobe G. Per the TI SN7423/SN7425 datasheet
+        // (SDLS082) the function is Y = NOT(G AND (A+B+C+D)): strobe HIGH enables
+        // normal NOR operation; strobe LOW forces the output HIGH. A floating
+        // strobe reads HIGH through the TTL pull-up, so an unwired strobe gives
+        // plain NOR behavior — matching the real part on a breadboard.
+        case 'NOR_STROBE': {
+          const g = inputBits[inputBits.length - 1];
+          outputBit = g ? (inputBits.slice(0, -1).some(b => b) ? 0 : 1) : 1;
+          break;
+        }
+        // AND OR and AND OR-INVERT gate types for complex 74xx chips
         // AO_3222: (A1&A2&A3)|(B1&B2)|(C1&C2)|(D1&D2)  [inputs 0..8]
         case 'AO_3222': outputBit = ((inputBits[0]&inputBits[1]&inputBits[2])|(inputBits[3]&inputBits[4])|(inputBits[5]&inputBits[6])|(inputBits[7]&inputBits[8])) ? 1 : 0; break;
         case 'AOI_3222': outputBit = ((inputBits[0]&inputBits[1]&inputBits[2])|(inputBits[3]&inputBits[4])|(inputBits[5]&inputBits[6])|(inputBits[7]&inputBits[8])) ? 0 : 1; break;
@@ -1139,7 +1495,7 @@ class _ChipEvalMixin {
         default: continue;
       }
 
-      // For open-collector chips, use OC drive (HIGH → HiZ, LOW → sink to GND)
+      // For open collector chips, use OC drive (HIGH → HiZ, LOW → sink to GND)
       const isOC = comp.chipDef && comp.chipDef.openCollector;
       if (isOC) {
         if (this._drivePinOC(comp, gate.output, outputBit)) changed = true;
@@ -1173,6 +1529,31 @@ class _ChipEvalMixin {
     return this._drivePinBits(comp, [qName, qnName], [state.q, state.q ? 0 : 1]);
   }
 
+  // Negative (falling) edge triggered D flip flop with active-LOW async preset
+  // and clear. Identical to _evaluateDFF except D is captured on the HIGH→LOW
+  // clock transition. Used by the 74x1074 (dual negative-edge dual D FF).
+  _evaluateDFFNeg(comp, gate) {
+    const [dName, clkName, preName, clrName] = gate.inputs;
+    const [qName, qnName] = gate.outputs;
+
+    const dBit = this._readPinBit(comp, dName);
+    const clkBit = this._readPinBit(comp, clkName);
+    const preBit = this._readPinBit(comp, preName);
+    const clrBit = this._readPinBit(comp, clrName);
+    const state = this._getSeqState(comp, qName, { q: 0, prevClk: 0 });
+
+    if (clrBit === 0) {
+      state.q = 0;
+    } else if (preBit === 0) {
+      state.q = 1;
+    } else if (clkBit === 0 && state.prevClk === 1) {
+      state.q = dBit;
+    }
+
+    state.prevClk = clkBit;
+    return this._drivePinBits(comp, [qName, qnName], [state.q, state.q ? 0 : 1]);
+  }
+
   _evaluateJKFF(comp, gate) {
     const [j1, j2, j3, k1, k2, k3, clkName, preName, clrName] = gate.inputs;
     return this._evaluateJKGate(comp, {
@@ -1182,6 +1563,10 @@ class _ChipEvalMixin {
       prePin: preName,
       clrPin: clrName,
       outputs: gate.outputs,
+      // Default false → active-LOW preset/clear (unchanged for existing JK_FF
+      // users). The CD4095/CD4096 gated J-K FFs set this true: their SET/RESET
+      // pins are active HIGH (see chips114.js).
+      preClrActiveHigh: gate.preClrActiveHigh || false,
     });
   }
 
@@ -1193,6 +1578,11 @@ class _ChipEvalMixin {
       clkPin: clkName,
       clrPin: clrName,
       outputs: gate.outputs,
+      // Optional per-gate clock edge. Absent (undefined) → _evaluateJKGate's
+      // 'rising' default, so every existing JK_FF_SIMPLE user is unchanged.
+      // Negative-edge parts (e.g. 74x107) set triggerEdge:'falling' on their
+      // gate to update Q on the HIGH→LOW transition (issues.md C113).
+      triggerEdge: gate.triggerEdge,
     });
   }
 
@@ -1218,6 +1608,19 @@ class _ChipEvalMixin {
       clrPin: clrName,
       outputs: gate.outputs,
       triggerEdge: 'falling',
+    });
+  }
+
+  _evaluateJKFFCMOS(comp, gate) {
+    const [jName, kName, clkName, sName, rName] = gate.inputs;
+    return this._evaluateJKGate(comp, {
+      jPins: [jName],
+      kPins: [kName],
+      clkPin: clkName,
+      prePin: sName,
+      clrPin: rName,
+      outputs: gate.outputs,
+      preClrActiveHigh: true,
     });
   }
 
@@ -1286,6 +1689,22 @@ class _ChipEvalMixin {
   }
 
   _evaluateBCD7Seg(comp, gate) {
+    // '46A/'47A/'246/'247 shared glyph font (6 and 9 drawn "with tails").
+    return this._evaluateBCD7SegTable(comp, gate, BCD_7SEG_TABLE);
+  }
+
+  _evaluateBCD7Seg7447(comp, gate) {
+    // 7446/7447 glyph font (tail-less 6 and 9, per TI SDLS111 T1), active LOW /
+    // common anode. Same control-pin behavior as above; only the digit patterns
+    // for 6 and 9 differ. See issues.md C108/C115.
+    return this._evaluateBCD7SegTable(comp, gate, BCD_7SEG_7447_TABLE);
+  }
+
+  // Shared common-anode (active-LOW) BCD-to-7-seg evaluator. `table` selects the
+  // glyph font. Segment ON = output LOW; lamp test (LT# LOW) wins, then blanking
+  // (BI#/RBO# or BI# LOW, or RBI# LOW on a decimal zero), then decode. Outputs
+  // sink open-collector when the chip def sets openCollector, else push-pull.
+  _evaluateBCD7SegTable(comp, gate, table) {
     const inputBits = gate.inputs.map(inputPinName => this._readPinBit(comp, inputPinName));
     const bcdVal = (inputBits[3] << 3) | (inputBits[2] << 2) | (inputBits[1] << 1) | inputBits[0];
     const lampTestLow = comp.getPinByName('LT') ? this._readPinBit(comp, 'LT') === 0 : false;
@@ -1299,7 +1718,7 @@ class _ChipEvalMixin {
     } else if (blankingLow || rippleBlankZero) {
       segBits = [1, 1, 1, 1, 1, 1, 1];
     } else {
-      const row = BCD_7SEG_TABLE.find(r => {
+      const row = table.find(r => {
         const rowVal = (r[0] << 3) | (r[1] << 2) | (r[2] << 1) | r[3];
         return rowVal === bcdVal;
       });
@@ -1321,6 +1740,21 @@ class _ChipEvalMixin {
   }
 
   _evaluateBCD7SegCC(comp, gate) {
+    // '247/'248 glyph font (6 and 9 drawn "with tails").
+    return this._evaluateBCD7SegCCTable(comp, gate, BCD_7SEG_CC_TABLE);
+  }
+
+  _evaluateBCD7SegCC7448(comp, gate) {
+    // 7446/7447/7448 glyph font (tail-less 6 and 9, per TI SDLS111). Same
+    // control-pin behavior as above, only the digit patterns differ.
+    return this._evaluateBCD7SegCCTable(comp, gate, BCD_7SEG_CC_7448_TABLE);
+  }
+
+  // Shared common-cathode (active-HIGH) BCD-to-7-seg evaluator. `table` selects
+  // the glyph font. Control pins are read directly off the component by name:
+  // LT/LAMP_TEST (all segments on), BI or BI/RBO (all segments off), and RBI
+  // (blank on a decimal zero). Lamp test wins, then blanking, then decode.
+  _evaluateBCD7SegCCTable(comp, gate, table) {
     const inputBits = gate.inputs.map(inputPinName => this._readPinBit(comp, inputPinName));
     const bcdVal = (inputBits[3] << 3) | (inputBits[2] << 2) | (inputBits[1] << 1) | inputBits[0];
     const lampTestName = comp.getPinByName('LAMP_TEST') ? 'LAMP_TEST' : (comp.getPinByName('LT') ? 'LT' : null);
@@ -1335,7 +1769,7 @@ class _ChipEvalMixin {
     } else if (blankingLow || rippleBlankZero) {
       segBits = [0, 0, 0, 0, 0, 0, 0];
     } else {
-      const row = BCD_7SEG_CC_TABLE.find(r => {
+      const row = table.find(r => {
         const rowVal = (r[0] << 3) | (r[1] << 2) | (r[2] << 1) | r[3];
         return rowVal === bcdVal;
       });
@@ -1351,6 +1785,81 @@ class _ChipEvalMixin {
       } else {
         if (this._drivePinBit(comp, gate.outputs[i], segBits[i])) changed = true;
       }
+    }
+    return changed;
+  }
+
+  // MM74C915 7-segment-to-BCD converter: the inverse of a 7-seg decoder.
+  // Reads the seven segment lines a..g of a display and works out which BCD
+  // digit (if any) they spell. See the 74x915 entry in chips44.js for the
+  // datasheet citation and the full segment/function table this encodes.
+  // inputs:  [a, b, c, d, e, f, g, INV, LE, OE]   (OE active LOW)
+  // outputs: [A, B, C, D, ERROR, MINUS]           (A=2^0 .. D=2^3)
+  _evaluateSeg7ToBcd915(comp, gate) {
+    const [aN, bN, cN, dN, eN, fN, gN, invN, leN, oeN] = gate.inputs;
+    const [aOut, bOut, cOut, dOut, errOut, minusOut] = gate.outputs;
+
+    // INVERT/NON-INVERT control: 0 = active-HIGH segments (input HIGH = lit),
+    // 1 = active-LOW segments (input LOW = lit). Normalise to "lit" bits.
+    const inv = this._readPinBit(comp, invN);
+    const raw = [aN, bN, cN, dN, eN, fN, gN].map(n => this._readPinBit(comp, n));
+    const seg = raw.map(v => (inv === 1 ? (v === 0 ? 1 : 0) : v));
+    const key = seg.join('');
+
+    // Valid character patterns, segment order [a,b,c,d,e,f,g]. Standard digit
+    // shapes plus the two accepted forms each for 1, 6 and 9 shown as paired
+    // glyphs in the datasheet truth table.
+    const DIGITS = {
+      '1111110': 0,
+      '0110000': 1, '0000110': 1,            // 1: right (b,c) or left (e,f)
+      '1101101': 2,
+      '1111001': 3,
+      '0110011': 4,
+      '1011011': 5,
+      '1011111': 6, '0011111': 6,            // 6: with top bar a, or without
+      '1110000': 7,
+      '1111111': 8,
+      '1111011': 9, '1110011': 9,            // 9: with bottom d, or without
+    };
+
+    // Resolve current input to {bcd:0-15 or null for Hi-Z, error, minus}.
+    let resolved;
+    if (key === '0000000') {
+      resolved = { bcd: 0b1111, error: 0, minus: 0 };   // blank display -> 1111
+    } else if (key === '0000001') {
+      resolved = { bcd: null, error: 1, minus: 1 };       // minus sign (g only)
+    } else if (Object.prototype.hasOwnProperty.call(DIGITS, key)) {
+      resolved = { bcd: DIGITS[key], error: 0, minus: 0 };
+    } else {
+      resolved = { bcd: null, error: 1, minus: 0 };       // non-standard code
+    }
+
+    // Latch Enable: LE=0 flow-through (transparent), LE=1 holds last value.
+    const state = this._getSeqState(comp, aOut, { bcd: null, error: 0, minus: 0 });
+    if (this._readPinBit(comp, leN) === 0) {
+      state.bcd = resolved.bcd;
+      state.error = resolved.error;
+      state.minus = resolved.minus;
+    }
+
+    let changed = false;
+    // ERROR and MINUS are always driven.
+    if (this._drivePinBit(comp, errOut, state.error)) changed = true;
+    if (this._drivePinBit(comp, minusOut, state.minus)) changed = true;
+
+    // BCD outputs go Hi-Z on an error condition (incl. minus) or when the
+    // active-LOW output enable is HIGH.
+    const oe = this._readPinBit(comp, oeN);
+    if (state.bcd === null || state.error === 1 || oe === 1) {
+      if (this._drivePinsHighZ(comp, [aOut, bOut, cOut, dOut])) changed = true;
+    } else {
+      const bits = [
+        state.bcd & 1,
+        (state.bcd >> 1) & 1,
+        (state.bcd >> 2) & 1,
+        (state.bcd >> 3) & 1,
+      ];
+      if (this._drivePinBits(comp, [aOut, bOut, cOut, dOut], bits)) changed = true;
     }
     return changed;
   }
@@ -1405,20 +1914,31 @@ class _ChipEvalMixin {
     return { qb: next & 1, qc: (next >> 1) & 1, qd: (next >> 2) & 1 };
   }
 
-  // Advance divide-by-6 section (used by 7492 divide-by-12 counter)
+  // Advance divide by-6 section (used by 7492 divide by-12 counter)
   // States: 0→1→2→3→4→5→0
   _advanceDiv6(qb, qc, qd) {
-    const state = qb | (qc << 1) | (qd << 2);
-    const next = state < 5 ? state + 1 : 0;
-    return { qb: next & 1, qc: (next >> 1) & 1, qd: (next >> 2) & 1 };
+    // 7492 ÷6 section is a ÷3 (QB,QC) followed by a ÷2 (QD), NOT a straight
+    // binary ÷6. Per the TI SN74LS92 COUNT SEQUENCE (SDLS940A, p.3), the states
+    // (QD QC QB) run 000,001,010,100,101,110 and repeat: QB,QC cycle 00→01→10→00
+    // (÷3) and QD toggles each time that ÷3 wraps back to 0, so QD is a symmetric
+    // ÷12 output. (A plain 0–5 binary count would give 011/111, which the real
+    // part never produces.)
+    const div3 = qb | (qc << 1);          // ÷3 sub-counter: 0,1,2
+    const wrap = div3 === 2;              // about to roll 2 → 0
+    const next3 = wrap ? 0 : div3 + 1;
+    const nqd = wrap ? (qd ^ 1) : qd;     // ÷2 toggles when the ÷3 wraps
+    return { qb: next3 & 1, qc: (next3 >> 1) & 1, qd: nqd };
   }
 
   _evaluateCounterDecade(comp, gate) {
     // 7490: Two independent sections.
-    // Section A: CKA → QA (÷2 toggle, falling-edge triggered)
-    // Section B: CKB → QB/QC/QD (÷5 BCD counter, falling-edge triggered)
-    // R01 AND R02 = 1 → async reset all to 0 (highest priority)
-    // R91 AND R92 = 1 → async set to 9 (QA=1, QB=0, QC=0, QD=1)
+    // Section A: CKA → QA (÷2 toggle, falling edge triggered)
+    // Section B: CKB → QB/QC/QD (÷5 BCD counter, falling edge triggered)
+    // R91 AND R92 = 1 → async set to 9 (QA=1, QB=0, QC=0, QD=1) — HIGHEST priority.
+    // R01 AND R02 = 1 → async reset all to 0.
+    // Per the TI SN7490A/SN74LS90 RESET/COUNT FUNCTION TABLE, set-to-nine wins when
+    // both the reset and the set-to-nine pairs are asserted (R0 is "don't care" in the
+    // set-to-9 row), so R9 is checked before R0.
     const [ckaName, ckbName, r01Name, r02Name, r91Name, r92Name] = gate.inputs;
     const [qaName, qbName, qcName, qdName] = gate.outputs;
     const state = this._getSeqState(comp, qaName,
@@ -1435,10 +1955,10 @@ class _ChipEvalMixin {
     const cka = this._readPinBit(comp, ckaName);
     const ckb = this._readPinBit(comp, ckbName);
 
-    if (r0) {
-      state.qa = state.qb = state.qc = state.qd = 0;
-    } else if (r9) {
+    if (r9) {
       state.qa = 1; state.qb = 0; state.qc = 0; state.qd = 1;
+    } else if (r0) {
+      state.qa = state.qb = state.qc = state.qd = 0;
     } else {
       if (state.prevCKA === 1 && cka === 0) state.qa ^= 1;
       if (state.prevCKB === 1 && ckb === 0) {
@@ -1514,7 +2034,7 @@ class _ChipEvalMixin {
   }
 
   _evaluateShiftRegSISO(comp, gate) {
-    // 7491: 8 bit serial-in serial-out shift register.
+    // 7491: 8 bit serial in serial out shift register.
     // Data input = A AND B. Shifts on rising edge of CP.
     // Q = output of 8th stage, Qn = its complement.
     const [aName, bName, cpName] = gate.inputs;
@@ -1535,9 +2055,13 @@ class _ChipEvalMixin {
   }
 
   _evaluateShiftReg4Bit(comp, gate) {
-    // 7495: 4 bit parallel-access shift register.
-    // MODE=0: shift mode rising CLK1 shifts SER→QA→QB→QC→QD
-    // MODE=1: parallel load rising CLK2 loads A→QA, B→QB, C→QC, D→QD
+    // 7495-family 4-bit parallel-access shift register.
+    //   MODE=0: shift mode  active CLK1 edge shifts SER→QA→QB→QC→QD
+    //   MODE=1: parallel load  active CLK2 edge loads A→QA, B→QB, C→QC, D→QD
+    // Clock edge: gate.edge === 'falling' → clock on the HIGH→LOW transition,
+    //   matching the real negative-edge-triggered SN74x95 (and 74x178). When
+    //   the flag is absent the legacy rising-edge behaviour is kept so other
+    //   users of this primitive are unaffected.
     const [serName, aName, bName, cName, dName, modeName, clk1Name, clk2Name] = gate.inputs;
     const [qaName, qbName, qcName, qdName] = gate.outputs;
     const state = this._getSeqState(comp, qaName,
@@ -1549,16 +2073,21 @@ class _ChipEvalMixin {
     const mode = this._readPinBit(comp, modeName);
     const clk1 = this._readPinBit(comp, clk1Name);
     const clk2 = this._readPinBit(comp, clk2Name);
+    const falling = gate.edge === 'falling';
+    const edge1 = falling ? (state.prevCLK1 === 1 && clk1 === 0)
+                          : (state.prevCLK1 === 0 && clk1 === 1);
+    const edge2 = falling ? (state.prevCLK2 === 1 && clk2 === 0)
+                          : (state.prevCLK2 === 0 && clk2 === 1);
 
-    if (mode === 0 && state.prevCLK1 === 0 && clk1 === 1) {
-      // Shift mode, rising CLK1
+    if (mode === 0 && edge1) {
+      // Shift mode, active CLK1 edge
       const ser = this._readPinBit(comp, serName);
       state.qd = state.qc;
       state.qc = state.qb;
       state.qb = state.qa;
       state.qa = ser;
-    } else if (mode === 1 && state.prevCLK2 === 0 && clk2 === 1) {
-      // Parallel load, rising CLK2
+    } else if (mode === 1 && edge2) {
+      // Parallel load, active CLK2 edge
       state.qa = this._readPinBit(comp, aName);
       state.qb = this._readPinBit(comp, bName);
       state.qc = this._readPinBit(comp, cName);
@@ -1568,6 +2097,60 @@ class _ChipEvalMixin {
     state.prevCLK2 = clk2;
     return this._drivePinBits(comp, [qaName, qbName, qcName, qdName],
       [state.qa, state.qb, state.qc, state.qd]);
+  }
+
+  _evaluateShiftReg4BitPipo4035(comp, gate) {
+    // CD4035: 4-stage clocked parallel-in/parallel-out shift register with
+    // J-K(bar) serial inputs, true/complement outputs, and async reset.
+    //   inputs:  [J, KBAR, CLK, PS, TC, RESET, I1, I2, I3, I4]
+    //   outputs: [Q1, Q2, Q3, Q4]
+    // Stage 1 is a J-K flip-flop whose second serial input is K-BAR (the
+    // complement of K): Q1next = J·(~Q1) + KBAR·Q1 (tie J=KBAR=D → a D-FF).
+    // Stages 2-4 are serial D flip-flops (Q2←Q1, Q3←Q2, Q4←Q3).
+    // All transfers happen on the POSITIVE clock edge. P/S (PARALLEL/SERIAL
+    // CONTROL) HIGH → synchronous parallel load of I1..I4 instead of shifting.
+    // RESET is asynchronous, ACTIVE HIGH (forces every stage to 0). T/C
+    // (TRUE/COMPLEMENT) chooses the output polarity asynchronously: HIGH →
+    // true register contents, LOW → the complement.
+    const [jName, kbarName, clkName, psName, tcName, resetName,
+           i1Name, i2Name, i3Name, i4Name] = gate.inputs;
+    const [q1Name, q2Name, q3Name, q4Name] = gate.outputs;
+    const state = this._getSeqState(comp, q1Name,
+      { q1: 0, q2: 0, q3: 0, q4: 0, prevCLK: 0 });
+
+    const reset = this._readPinBit(comp, resetName);
+    const clk = this._readPinBit(comp, clkName);
+
+    if (reset === 1) {
+      // Asynchronous active-HIGH reset (overrides the clock).
+      state.q1 = 0; state.q2 = 0; state.q3 = 0; state.q4 = 0;
+    } else if (state.prevCLK === 0 && clk === 1) {
+      // Positive clock edge.
+      const ps = this._readPinBit(comp, psName);
+      if (ps === 1) {
+        // Synchronous parallel load.
+        state.q1 = this._readPinBit(comp, i1Name);
+        state.q2 = this._readPinBit(comp, i2Name);
+        state.q3 = this._readPinBit(comp, i3Name);
+        state.q4 = this._readPinBit(comp, i4Name);
+      } else {
+        // Serial shift: stage 1 is a J-K(bar) flip-flop, stages 2-4 follow.
+        const j = this._readPinBit(comp, jName);
+        const kbar = this._readPinBit(comp, kbarName);
+        const nq1 = (j === 1 && state.q1 === 0) || (kbar === 1 && state.q1 === 1) ? 1 : 0;
+        state.q4 = state.q3;
+        state.q3 = state.q2;
+        state.q2 = state.q1;
+        state.q1 = nq1;
+      }
+    }
+    state.prevCLK = clk;
+
+    // True/complement output control (asynchronous w.r.t. the clock).
+    const tc = this._readPinBit(comp, tcName);
+    const pol = (q) => (tc === 0 ? (q ? 0 : 1) : q);
+    return this._drivePinBits(comp, [q1Name, q2Name, q3Name, q4Name],
+      [pol(state.q1), pol(state.q2), pol(state.q3), pol(state.q4)]);
   }
 
   _evaluateMonostable(comp, gate) {
@@ -1580,18 +2163,6 @@ class _ChipEvalMixin {
     const a2 = this._readPinBit(comp, a2Name);
     const b  = this._readPinBit(comp, bName);
     const triggered = ((a1 === 0 || a2 === 0) && b === 1) ? 1 : 0;
-    return this._drivePinBits(comp, [qName, qnName], [triggered, triggered ? 0 : 1]);
-  }
-
-  _evaluateMonostableRetrig(comp, gate) {
-    // 74123: Retriggerable monostable multivibrator.
-    // Static logic model: CLR=0 → output reset. CLR=1: triggered when A=0 AND B=1.
-    const [aName, bName, clrName] = gate.inputs;
-    const [qName, qnName] = gate.outputs;
-    const a   = this._readPinBit(comp, aName);
-    const b   = this._readPinBit(comp, bName);
-    const clr = this._readPinBit(comp, clrName);
-    const triggered = (clr === 0) ? 0 : (a === 0 && b === 1) ? 1 : 0;
     return this._drivePinBits(comp, [qName, qnName], [triggered, triggered ? 0 : 1]);
   }
 
@@ -1611,7 +2182,7 @@ class _ChipEvalMixin {
   }
 
   _evaluateTriBufferLo(comp, gate) {
-    // 74125: Active low output enable tri-state buffer.
+    // 74125: Active low output enable tri state buffer.
     // OE=0 (low) → output follows A. OE=1 (high) → HiZ.
     const [aName, oeName] = gate.inputs;
     const oe = this._readPinBit(comp, oeName);
@@ -1621,7 +2192,7 @@ class _ChipEvalMixin {
   }
 
   _evaluateTriBufferHi(comp, gate) {
-    // 74126: Active high output enable tri-state buffer.
+    // 74126: Active high output enable tri state buffer.
     // OE=1 (high) → output follows A. OE=0 (low) → HiZ.
     const [aName, oeName] = gate.inputs;
     const oe = this._readPinBit(comp, oeName);
@@ -1633,7 +2204,7 @@ class _ChipEvalMixin {
   // ── Chips5 gate evaluators ────────────────────────────────────────────────
 
   _evaluatePriorityEnc8to3(comp, gate) {
-    // 74148: 8-to-3 priority encoder. All inputs/outputs active LOW.
+    // 74148: 8 to 3 priority encoder. All inputs/outputs active LOW.
     // inputs: [I0..I7, EI], outputs: [A0, A1, A2, GS, EO]
     // EI=1 (disabled): all outputs HIGH.
     // EI=0, no input active: A=111, GS=1, EO=0.
@@ -1729,7 +2300,7 @@ class _ChipEvalMixin {
   }
 
   _evaluateCounterDecadeSimple(comp, gate) {
-    // 74x68: simple decade counter (0-9), rising-edge CLK, active LOW CLR.
+    // 74x68: simple decade counter (0-9), rising edge CLK, active LOW CLR.
     // inputs: [CLK, CLR], outputs: [QA, QB, QC, QD]
     const [clkN, clrN] = gate.inputs;
     const [qaName, qbName, qcName, qdName] = gate.outputs;
@@ -1750,7 +2321,7 @@ class _ChipEvalMixin {
   }
 
   _evaluateCounterBinSimple(comp, gate) {
-    // 74x69: simple 4 bit binary counter (0-15), rising-edge CLK, active LOW CLR.
+    // 74x69: simple 4 bit binary counter (0-15), rising edge CLK, active LOW CLR.
     // inputs: [CLK, CLR], outputs: [QA, QB, QC, QD]
     const [clkN, clrN] = gate.inputs;
     const [qaName, qbName, qcName, qdName] = gate.outputs;
@@ -1830,7 +2401,7 @@ class _ChipEvalMixin {
   }
 
   _evaluateJKFFPreset(comp, gate) {
-    // JK flip-flop with 3 input AND J and K, preset only (no CLR).
+    // JK flip flop with 3 input AND J and K, preset only (no CLR).
     // inputs: [J1, J2, J3, K1, K2, K3, CLK, PRE], outputs: [Q, Qn]
     const [j1, j2, j3, k1, k2, k3, clkName, preName] = gate.inputs;
     return this._evaluateJKGate(comp, {
@@ -1883,45 +2454,108 @@ class _ChipEvalMixin {
   }
 
   _evaluateShiftReg5Bit(comp, gate) {
-    // 74x96: 5 bit PIPO shift register with async preset and clear.
+    // 74x96 / SN7496: 5-bit shift register, five R-S master-slave flip-flops.
+    // Source: TI SDLS946 (SN7496/SN74LS96), page 1 function table + positive-
+    //   logic logic diagram, read as PDF page images (issues.md C4).
+    //   - CLR (pin 16) active-LOW, ASYNCHRONOUS: LOW forces every output LOW,
+    //     independent of the clock.
+    //   - Parallel load is an ASYNCHRONOUS, SET-ONLY preset. While PE (preset
+    //     enable) is HIGH, each preset input A..E that is HIGH forces its stage
+    //     HIGH; a LOW preset input does nothing (that stage holds). A preset
+    //     can only write 1s, so loading an exact word means CLEAR first, then
+    //     preset. Presetting is independent of the clock.
+    //   - Shift: on the rising CLK edge (PE low) SERIAL enters QA and the chain
+    //     shifts QA→QB→QC→QD→QE (QE is the serial output).
+    // Simplification: the datasheet forbids asserting CLEAR and PRESET together;
+    //   here CLEAR wins that illegal overlap (clear is the master reset), and
+    //   PE HIGH gates the clocked shift off (datasheet: PE must be low to clock).
     // inputs: [CLK, CLR, SER, A, B, C, D, E, PE], outputs: [QA, QB, QC, QD, QE]
-    // CLR=0: async clear. PE=1: parallel load A-E on rising CLK. PE=0: shift SER→QA..→QE.
     const [clkN, clrN, serN, aN, bN, cN, dN, eN, peN] = gate.inputs;
-    const [qaName, qbName, qcName, qdName, qeName] = gate.outputs;
+    const [qaName] = gate.outputs;
     const state = this._getSeqState(comp, qaName, { qa: 0, qb: 0, qc: 0, qd: 0, qe: 0, prevClk: 0 });
     this._drivePinBits(comp, gate.outputs, [state.qa, state.qb, state.qc, state.qd, state.qe]);
-    const clr = this._readPinBit(comp, clrN);
-    if (clr === 0) {
+    const clk = this._readPinBit(comp, clkN);
+    // Asynchronous clear dominates everything.
+    if (this._readPinBit(comp, clrN) === 0) {
       state.qa = state.qb = state.qc = state.qd = state.qe = 0;
-      state.prevClk = 0;
+      state.prevClk = clk;
       return this._drivePinBits(comp, gate.outputs, [0, 0, 0, 0, 0]);
     }
-    const clk = this._readPinBit(comp, clkN);
-    if (state.prevClk === 0 && clk === 1) {
-      const pe = this._readPinBit(comp, peN);
-      if (pe === 1) {
-        state.qa = this._readPinBit(comp, aN);
-        state.qb = this._readPinBit(comp, bN);
-        state.qc = this._readPinBit(comp, cN);
-        state.qd = this._readPinBit(comp, dN);
-        state.qe = this._readPinBit(comp, eN);
-      } else {
-        const ser = this._readPinBit(comp, serN);
-        state.qe = state.qd; state.qd = state.qc; state.qc = state.qb; state.qb = state.qa; state.qa = ser;
-      }
+    const pe = this._readPinBit(comp, peN);
+    // Clocked shift only when preset enable is low.
+    if (pe === 0 && state.prevClk === 0 && clk === 1) {
+      const ser = this._readPinBit(comp, serN);
+      state.qe = state.qd; state.qd = state.qc; state.qc = state.qb; state.qb = state.qa; state.qa = ser;
+    }
+    // Asynchronous, set-only preset (level-sensitive): HIGH input + PE HIGH sets that stage.
+    if (pe === 1) {
+      if (this._readPinBit(comp, aN) === 1) state.qa = 1;
+      if (this._readPinBit(comp, bN) === 1) state.qb = 1;
+      if (this._readPinBit(comp, cN) === 1) state.qc = 1;
+      if (this._readPinBit(comp, dN) === 1) state.qd = 1;
+      if (this._readPinBit(comp, eN) === 1) state.qe = 1;
     }
     state.prevClk = clk;
     return this._drivePinBits(comp, gate.outputs, [state.qa, state.qb, state.qc, state.qd, state.qe]);
+  }
+
+  _evaluateCounterJohnson4018(comp, gate) {
+    // CD4018B: CMOS presettable divide-by-N counter = 5 Johnson-counter stages.
+    // Source: TI/Harris, "CD4018B Types — CMOS Presettable Divide-By-'N' Counter",
+    //   SCHS028B (rev. Oct 2003), p.1 Description + p.2 Fig.1 Logic diagram, read
+    //   as rendered PDF page images (issues.md C4).
+    // Five D-type stages in a shift chain: on the POSITIVE clock edge each stage
+    // takes the previous stage's value and stage 1 takes DATA (Q1<-DATA,
+    // Q2<-Q1, ... Q5<-Q4). A divide-by-N is built externally by feeding ~Qn back
+    // to DATA (÷10,8,6,4,2 from ~Q5..~Q1; odd ratios via an external gate).
+    // RESET (pin 15) is active-HIGH and ASYNCHRONOUS — a HIGH clears all stages.
+    // PRESET ENABLE (pin 10) is active-HIGH and ASYNCHRONOUS — while HIGH the JAM
+    // inputs (J1..J5) are jammed into the stages, level-sensitive (no clock edge),
+    // per the datasheet: "A high PRESET-ENABLE signal allows information on the
+    // JAM inputs to preset the counter."
+    // inputs:  [CLK, RESET, DATA, PE, J1, J2, J3, J4, J5]
+    // outputs: [Q1, Q2, Q3, Q4, Q5]   (Q1 = first stage / Johnson LSB)
+    const [clkN, rstN, dataN, peN, j1N, j2N, j3N, j4N, j5N] = gate.inputs;
+    const [q1Name] = gate.outputs;
+    const state = this._getSeqState(comp, q1Name, { q1: 0, q2: 0, q3: 0, q4: 0, q5: 0, prevClk: 0 });
+    this._drivePinBits(comp, gate.outputs, [state.q1, state.q2, state.q3, state.q4, state.q5]);
+    const clk = this._readPinBit(comp, clkN);
+    // RESET dominates PRESET ENABLE (clear wins the disallowed RESET=PE=HIGH case).
+    if (this._readPinBit(comp, rstN) === 1) {
+      state.q1 = state.q2 = state.q3 = state.q4 = state.q5 = 0;
+      state.prevClk = clk;
+      return this._drivePinBits(comp, gate.outputs, [0, 0, 0, 0, 0]);
+    }
+    if (this._readPinBit(comp, peN) === 1) {
+      state.q1 = this._readPinBit(comp, j1N);
+      state.q2 = this._readPinBit(comp, j2N);
+      state.q3 = this._readPinBit(comp, j3N);
+      state.q4 = this._readPinBit(comp, j4N);
+      state.q5 = this._readPinBit(comp, j5N);
+      state.prevClk = clk;
+      return this._drivePinBits(comp, gate.outputs, [state.q1, state.q2, state.q3, state.q4, state.q5]);
+    }
+    if (state.prevClk === 0 && clk === 1) {
+      const data = this._readPinBit(comp, dataN);
+      state.q5 = state.q4; state.q4 = state.q3; state.q3 = state.q2; state.q2 = state.q1; state.q1 = data;
+    }
+    state.prevClk = clk;
+    return this._drivePinBits(comp, gate.outputs, [state.q1, state.q2, state.q3, state.q4, state.q5]);
   }
 
   _evaluateRateMult6Bit(comp, gate) {
     // 74x97: 6 bit binary rate multiplier. Simplified: Y = CLK & ENP when no cascade.
     // inputs: [CLK, ENP, A, B, C, D, E, F], outputs: [Y, Z, UNITY]
     // Static approximation: Y = CLK AND ENP (pass-through with enable).
+    // gate.enableActiveLow (opt-in, default off): the enable pin is active LOW, so
+    //   Y = CLK AND (NOT ENP). Used by the CD4089B whose STROBE blanks OUT when
+    //   HIGH (STR=1 → OUT=L per its truth table); the 74x97 leaves the flag off so
+    //   its behavior is unchanged.
     const [clkN, enpN] = gate.inputs;
     const [yName, zName] = gate.outputs;
     const clk = this._readPinBit(comp, clkN);
-    const enp = this._readPinBit(comp, enpN);
+    const enpRaw = this._readPinBit(comp, enpN);
+    const enp = gate.enableActiveLow ? (enpRaw ^ 1) : enpRaw;
     const y = clk & enp;
     let changed = false;
     if (this._drivePinBit(comp, yName, y)) changed = true;
@@ -1999,8 +2633,56 @@ class _ChipEvalMixin {
     return this._drivePinBit(comp, qName, state.q);
   }
 
+  _evaluateSRLatchQuadTri(comp, gate) {
+    // Quad cross-coupled 3-STATE CMOS R/S latch with one common active-HIGH
+    // output ENABLE. Backs two siblings sharing this structure (TI CD4043B/CD4044B,
+    // SCHS041D); set gate.activeLow to pick the variant:
+    //
+    //   gate.activeLow falsy → CD4043B (NOR latch, active-HIGH S/R, SET dominant).
+    //     ENABLE=1 truth table:
+    //       S=0,R=0 → hold;  S=1,R=0 → Q=1 (set);  S=0,R=1 → Q=0 (reset);
+    //       S=1,R=1 → Q=1 (datasheet: "DOMINATED BY S=1 INPUT").
+    //
+    //   gate.activeLow true  → CD4044B (NAND latch, active-LOW S/R, RESET dominant).
+    //     ENABLE=1 truth table:
+    //       S=1,R=1 → hold;  S=0,R=1 → Q=1 (set);  S=1,R=0 → Q=0 (reset);
+    //       S=0,R=0 → Q=0 (datasheet: "DOMINATED BY R=0 INPUT").
+    //
+    // inputs:  [S1,R1, S2,R2, S3,R3, S4,R4, ENABLE]
+    // outputs: [Q1, Q2, Q3, Q4]
+    // ENABLE = 0 → all four Q outputs go open-circuit (3-state / Hi-Z); the internal
+    //   latch state is retained, so re-enabling restores the held value.
+    // The latch state lives in a single 4-element array keyed off the first output.
+    const activeLow = gate.activeLow === true;
+    const state = this._getSeqState(comp, gate.outputs[0], { q: [0, 0, 0, 0] });
+    const en = this._readPinBit(comp, gate.inputs[8]);
+    let changed = false;
+    for (let i = 0; i < 4; i++) {
+      const s = this._readPinBit(comp, gate.inputs[2 * i]);
+      const r = this._readPinBit(comp, gate.inputs[2 * i + 1]);
+      if (activeLow) {
+        // NAND latch (CD4044): active-LOW inputs, RESET dominant.
+        if (r === 0) state.q[i] = 0;        // reset (dominates a simultaneous set)
+        else if (s === 0) state.q[i] = 1;   // set
+        // else (s=1,r=1): hold
+      } else {
+        // NOR latch (CD4043): active-HIGH inputs, SET dominant.
+        if (s === 1) state.q[i] = 1;        // set (dominates a simultaneous reset)
+        else if (r === 1) state.q[i] = 0;   // reset
+        // else (s=0,r=0): hold
+      }
+      const qName = gate.outputs[i];
+      if (en === 1) {
+        if (this._drivePinBit(comp, qName, state.q[i])) changed = true;
+      } else {
+        if (this._drivePinHighZ(comp, qName)) changed = true;
+      }
+    }
+    return changed;
+  }
+
   _evaluateDec3To8Reg(comp, gate) {
-    // 74AS131/74ALS131: 3-to-8 line decoder with address register, inverting outputs.
+    // 74AS131/74ALS131: 3 to 8 line decoder with address register, inverting outputs.
     // inputs: [CLK, OE, A0, A1, A2], outputs: [Y0..Y7]
     // Rising CLK: latch address inputs. OE=0: decode latched address → active LOW outputs.
     // OE=1: all outputs HiZ (3-state).
@@ -2031,7 +2713,7 @@ class _ChipEvalMixin {
   }
 
   _evaluateDec3To8Latch(comp, gate) {
-    // 74x137: 3-to-8 decoder with address latch. Active LOW G1n, active HIGH G2 enables.
+    // 74x137: 3 to 8 decoder with address latch. Active LOW G1n, active HIGH G2 enables.
     // inputs: [A0, A1, A2, G1n, G2, LE], outputs: [Y0..Y7]
     // LE=1 (transparent): address passes through. LE=0: address latched.
     // Outputs active LOW. Enabled when G1n=0 AND G2=1.
@@ -2056,7 +2738,7 @@ class _ChipEvalMixin {
   }
 
   _evaluatePriorityEnc10to4(comp, gate) {
-    // 74x147: 10-to-4-line BCD priority encoder. All inputs/outputs active LOW.
+    // 74x147: 10-to-4 line BCD priority encoder. All inputs/outputs active LOW.
     // inputs: [I1..I9] (9 active LOW inputs; I0 implicit lowest priority = any undriven)
     // outputs: [A0n, A1n, A2n, A3n] (active LOW BCD)
     // I9=highest priority. All inactive → output 0000 (all HIGH = ~0).
@@ -2075,7 +2757,7 @@ class _ChipEvalMixin {
   }
 
   _evaluatePriorityEnc8Line(comp, gate) {
-    // 74x149: 8-line cascadable priority encoder (1-of-8 output).
+    // 74x149: 8 line cascadable priority encoder (1-of-8 output).
     // inputs: [X0..X7, EI] X7=highest priority, active HIGH; EI=1 disables
     // outputs: [Y0..Y7, EO] Yn=LOW if Xn is highest active; EO=0 if no active input
     const bits = this._readGateInputs(comp, gate.inputs);
@@ -2097,6 +2779,39 @@ class _ChipEvalMixin {
     return changed;
   }
 
+  _evaluatePriorityEnc8to3Hi(comp, gate) {
+    // CD4532B: CMOS 8-bit priority encoder. ALL inputs and outputs are
+    // ACTIVE HIGH — this is the active-HIGH sibling of the 74x148
+    // (PRIORITY_ENC_8TO3), which is fully active-LOW with inverted-binary
+    // outputs and so does NOT fit here (issues.md C2 lesson). The hinted
+    // PRIORITY_ENC_8LINE (74x149) is a 1-of-8 active-LOW one-hot output, also
+    // wrong shape. New primitive required.
+    //   inputs:  [D0..D7, EI]   D7 = highest priority. EI = chip enable.
+    //   outputs: [Q0, Q1, Q2, GS, EO]  Q2Q1Q0 = binary index of highest D set.
+    // Behaviour (TI CD4532B SCHS082C TRUTH TABLE, verified — see chip header):
+    //   EI=0 (disabled):           GS=0, Q=000, EO=0  (all outputs LOW).
+    //   EI=1, no input active:     GS=0, Q=000, EO=1.
+    //   EI=1, Dn highest active:   GS=1, Q=bin(n), EO=0.
+    const bits = this._readGateInputs(comp, gate.inputs);
+    const ei = bits[8];
+    const [q0n, q1n, q2n, gsn, eon] = gate.outputs;
+    if (ei === 0) {
+      return this._drivePinBits(comp, [q0n, q1n, q2n, gsn, eon], [0, 0, 0, 0, 0]);
+    }
+    let highest = -1;
+    for (let i = 7; i >= 0; i--) { if (bits[i]) { highest = i; break; } }
+    if (highest === -1) {
+      return this._drivePinBits(comp, [q0n, q1n, q2n, gsn, eon], [0, 0, 0, 0, 1]);
+    }
+    return this._drivePinBits(comp, [q0n, q1n, q2n, gsn, eon], [
+      (highest >> 0) & 1,
+      (highest >> 1) & 1,
+      (highest >> 2) & 1,
+      1, // GS: priority input(s) present
+      0, // EO: low when any input is asserted
+    ]);
+  }
+
   _evaluateMux8to1Inv(comp, gate) {
     // 74x152: 8-to-1 multiplexer, inverted W output only, no strobe.
     // inputs: [D0..D7, A, B, C], outputs: [W]
@@ -2106,10 +2821,17 @@ class _ChipEvalMixin {
   }
 
   _evaluateDemux2to4(comp, gate) {
-    // Demux 2-to-4 with data input (C). Used by 74x155, 74x156.
+    // Demux 2-to-4 with data input (C). Used by 74x155, 74x156 (active-LOW out),
+    // and the CD4555/CD4556 dual 1-of-4 decoders.
     // inputs: [A, B, G, C] G=active LOW enable, C is data; pin ending 'n' → auto-invert
-    // outputs: [Y0..Y3] active LOW: Y_sel=0, others=1
-    // enabled when G=0 AND effective_C=0 (C if normal, NOT(pin) if name ends 'n')
+    // outputs: [Y0..Y3], sel = A | (B<<1) (A=LSB).
+    //   default (active-LOW, 74139/155/156 and CD4556): selected Y=0, others=1;
+    //     disabled → all=1.
+    //   gate.activeHigh (CD4555, "outputs HIGH on select"): selected Y=1, others=0;
+    //     disabled → all=0. Default off, so existing active-LOW users are unchanged.
+    // enabled when G=0 AND effective_C=0 (C if normal, NOT(pin) if name ends 'n').
+    //   A single-enable part (CD4555/CD4556 has only Enable Ē) wires Ē into both
+    //   the G and C slots so enabled ⇔ Ē=0.
     const [aName, bName, gName, cName] = gate.inputs;
     const a = this._readPinBit(comp, aName);
     const b = this._readPinBit(comp, bName);
@@ -2117,10 +2839,12 @@ class _ChipEvalMixin {
     const c = this._readPinBit(comp, cName, { invert: cName.endsWith('n') });
     const enabled = (g === 0) && (c === 0);
     const sel = a | (b << 1);
+    const activeHigh = gate.activeHigh === true;
     const isOC = comp.chipDef && comp.chipDef.openCollector;
     let changed = false;
     for (let i = 0; i < gate.outputs.length; i++) {
-      const bit = (enabled && i === sel) ? 0 : 1;
+      const selected = enabled && i === sel;
+      const bit = activeHigh ? (selected ? 1 : 0) : (selected ? 0 : 1);
       if (isOC) { if (this._drivePinOC(comp, gate.outputs[i], bit)) changed = true; }
       else { if (this._drivePinBit(comp, gate.outputs[i], bit)) changed = true; }
     }
@@ -2156,12 +2880,12 @@ class _ChipEvalMixin {
   }
 
   _evaluateCounter7Seg(comp, gate) {
-    // 74x143/74x144: Decade counter + latch + 7-segment decoder + driver.
+    // 74x143/74x144: Decade counter + latch + 7 segment decoder + driver.
     // inputs: [CLK, CLR, STROBE, ENP, ENT]
     // outputs: [QA, QB, QC, QD, RCO, a, b, c, d, e, f, g]
     // CLR=1(H): async clear. Rising CLK with ENP&ENT: count 0-9.
     // STROBE=1: transparent; STROBE=0: latch for 7-seg output.
-    // 74143: constant-current outputs (push-pull). 74144: OC outputs.
+    // 74143: constant-current outputs (push pull). 74144: OC outputs.
     const [clkN, clrN, strobeN, enpN, entN] = gate.inputs;
     const [qaName, qbName, qcName, qdName, rcoName] = gate.outputs.slice(0, 5);
     const segNames = gate.outputs.slice(5); // a,b,c,d,e,f,g
@@ -2183,7 +2907,7 @@ class _ChipEvalMixin {
     changed = this._drivePinBits(comp, [qaName, qbName, qcName, qdName],
       [n&1, (n>>1)&1, (n>>2)&1, (n>>3)&1]);
     if (this._drivePinBit(comp, rcoName, rco)) changed = true;
-    // 7-segment decode: standard mapping, active HIGH segments
+    // 7 segment decode: standard mapping, active HIGH segments
     const SEG7 = [
       [1,1,1,1,1,1,0], // 0
       [0,1,1,0,0,0,0], // 1
@@ -2198,11 +2922,219 @@ class _ChipEvalMixin {
     ];
     const segs = SEG7[state.latched] || SEG7[0];
     const isOC = comp.chipDef && comp.chipDef.openCollector;
+    const csList = comp.chipDef && comp.chipDef.currentSourceOutputs;
+    const csSet = csList ? new Set(csList) : null;
+    const csAmps = (comp.chipDef && comp.chipDef.currentSourceAmps) || 0.015;
     for (let i = 0; i < segNames.length && i < 7; i++) {
       const bit = segs[i] || 0;
-      if (isOC) { if (this._drivePinOC(comp, segNames[i], bit)) changed = true; }
-      else { if (this._drivePinBit(comp, segNames[i], bit)) changed = true; }
+      const pin = segNames[i];
+      if (isOC) {
+        if (this._drivePinOC(comp, pin, bit)) changed = true;
+      } else if (csSet && csSet.has(pin)) {
+        // Constant-current driver (e.g. 74x143): inject csAmps when segment is ON,
+        // tri-state when OFF (an isolated CS pin would otherwise blow up the MNA).
+        const ch = bit
+          ? this._drivePinCurrentSource(comp, pin, csAmps)
+          : this._drivePinHighZ(comp, pin);
+        if (ch) changed = true;
+      } else {
+        if (this._drivePinBit(comp, pin, bit)) changed = true;
+      }
     }
+    return changed;
+  }
+
+  _evaluateCounter7Seg4026(comp, gate) {
+    // CD4026B: decade (5-stage Johnson) counter + decoded 7-segment outputs
+    // with DISPLAY ENABLE blanking. NOT the 74x143/144 COUNTER_7SEG part — the
+    // CD4026 has no BCD QA..QD pins, no ENP/ENT, no STROBE latch and no
+    // count==9 RCO. Instead:
+    //   inputs:  [CLOCK, CLKINH, RESET, DISPEN]
+    //   outputs: [CARRY, DISPEN_OUT, UNGATED_C, a, b, c, d, e, f, g]
+    // RESET=1(H): async clear to count 0. Counter advances on the rising edge
+    // of the gated clock G = (CLOCK AND NOT CLKINH) — so it counts on a positive
+    // CLOCK transition while CLOCK INHIBIT is low, and (with CLOCK held high)
+    // CLOCK INHIBIT acts as a negative-edge clock. CARRY OUT is the divide-by-10
+    // output: HIGH for counts 0-4, LOW for 5-9 (rising edge at the 9->0 rollover
+    // clocks the next decade). DISPLAY ENABLE IN low forces the seven SEGMENT
+    // outputs low (display blank / power save) but does NOT affect CARRY OUT or
+    // the UNGATED "C" SEGMENT, which stay available continuously. DISPLAY ENABLE
+    // OUT is a buffered copy of DISPLAY ENABLE IN for cascading. Verified vs TI
+    // CD4026B SCHS031B (terminal diagram, Fig.1 logic diagram, Fig.3 timing).
+    const [clkN, clkInhN, resetN, dispEnN] = gate.inputs;
+    const [carryName, deoName, ucName] = gate.outputs.slice(0, 3);
+    const segNames = gate.outputs.slice(3); // a,b,c,d,e,f,g
+    const state = this._getSeqState(comp, carryName, { count: 0, prevGclk: 0 });
+    const clk   = this._readPinBit(comp, clkN);
+    const inh   = this._readPinBit(comp, clkInhN);
+    const reset = this._readPinBit(comp, resetN);
+    const dispEn = this._readPinBit(comp, dispEnN);
+    const gclk = (clk === 1 && inh === 0) ? 1 : 0;
+    if (reset === 1) {
+      state.count = 0;
+    } else if (state.prevGclk === 0 && gclk === 1) {
+      state.count = (state.count + 1) % 10;
+    }
+    state.prevGclk = gclk;
+    const n = state.count;
+    const carry = (n < 5) ? 1 : 0;
+    // Standard 7-segment font (active-HIGH), order a,b,c,d,e,f,g.
+    const SEG7 = [
+      [1,1,1,1,1,1,0], // 0
+      [0,1,1,0,0,0,0], // 1
+      [1,1,0,1,1,0,1], // 2
+      [1,1,1,1,0,0,1], // 3
+      [0,1,1,0,0,1,1], // 4
+      [1,0,1,1,0,1,1], // 5
+      [1,0,1,1,1,1,1], // 6
+      [1,1,1,0,0,0,0], // 7
+      [1,1,1,1,1,1,1], // 8
+      [1,1,1,1,0,1,1], // 9
+    ];
+    const segs = SEG7[n] || SEG7[0];
+    let changed = false;
+    if (this._drivePinBit(comp, carryName, carry)) changed = true;
+    if (this._drivePinBit(comp, deoName, dispEn)) changed = true;
+    // UNGATED "C" SEGMENT: c-segment decode, never gated by DISPLAY ENABLE.
+    if (this._drivePinBit(comp, ucName, segs[2])) changed = true;
+    for (let i = 0; i < segNames.length && i < 7; i++) {
+      const bit = dispEn ? (segs[i] || 0) : 0;
+      if (this._drivePinBit(comp, segNames[i], bit)) changed = true;
+    }
+    return changed;
+  }
+
+  _evaluateCounter7SegRb(comp, gate) {
+    // CD4033B: decade counter + decoded 7-segment driver with RIPPLE BLANKING
+    // and LAMP TEST (the zero-suppression sibling of the CD4026's DISPLAY ENABLE).
+    // inputs:  [CLK, CLK_INHIBIT, RESET, RBI, LAMP_TEST]
+    // outputs: [a, b, c, d, e, f, g, CARRY, RBO]
+    //   • Counter 0-9 advances on the RISING CLK edge while CLOCK INHIBIT is LOW.
+    //   • RESET=1 (HIGH): asynchronous clear to count 0.
+    //   • CARRY OUT (CLOCK/10): HIGH for counts 0-4, LOW for counts 5-9 — so its
+    //     rising edge at the 9->0 rollover clocks the next decade in a chain.
+    //   • Segments are active-HIGH (common-cathode) standard 7-seg decode.
+    //   • LAMP TEST=1 forces all seven segments ON (display "8"), overriding decode.
+    //   • Ripple blanking: a leading zero (count==0 AND RBI=LOW) is blanked (all
+    //     segments OFF) and RBO is driven LOW to propagate blanking to the next
+    //     less-significant stage; otherwise RBO is HIGH.
+    const [clkN, ciN, resetN, rbiN, ltN] = gate.inputs;
+    const segNames = gate.outputs.slice(0, 7); // a,b,c,d,e,f,g
+    const carryName = gate.outputs[7];
+    const rboName = gate.outputs[8];
+    const state = this._getSeqState(comp, segNames[0], { count: 0, prevClk: 0 });
+    const reset = this._readPinBit(comp, resetN);
+    const clk = this._readPinBit(comp, clkN);
+    const ci = this._readPinBit(comp, ciN);
+    if (reset === 1) {
+      state.count = 0;
+    } else if (state.prevClk === 0 && clk === 1 && ci === 0) {
+      state.count = (state.count + 1) % 10;
+    }
+    state.prevClk = clk;
+    const n = state.count;
+    const rbi = this._readPinBit(comp, rbiN);
+    const lampTest = this._readPinBit(comp, ltN);
+    // standard 7-segment decode, active-HIGH segments [a,b,c,d,e,f,g]
+    const SEG7 = [
+      [1,1,1,1,1,1,0], // 0
+      [0,1,1,0,0,0,0], // 1
+      [1,1,0,1,1,0,1], // 2
+      [1,1,1,1,0,0,1], // 3
+      [0,1,1,0,0,1,1], // 4
+      [1,0,1,1,0,1,1], // 5
+      [1,0,1,1,1,1,1], // 6
+      [1,1,1,0,0,0,0], // 7
+      [1,1,1,1,1,1,1], // 8
+      [1,1,1,1,0,1,1], // 9
+    ];
+    const blank = (n === 0 && rbi === 0); // leading-zero suppression
+    let segs;
+    if (lampTest === 1) segs = [1,1,1,1,1,1,1];
+    else if (blank) segs = [0,0,0,0,0,0,0];
+    else segs = SEG7[n] || SEG7[0];
+    let changed = false;
+    for (let i = 0; i < segNames.length && i < 7; i++) {
+      if (this._drivePinBit(comp, segNames[i], segs[i] || 0)) changed = true;
+    }
+    const carry = (n <= 4) ? 1 : 0;
+    if (this._drivePinBit(comp, carryName, carry)) changed = true;
+    const rbo = blank ? 0 : 1;
+    if (this._drivePinBit(comp, rboName, rbo)) changed = true;
+    return changed;
+  }
+
+  _evaluateCounter7Seg40110(comp, gate) {
+    // CD40110B: DUAL-CLOCKED decade up/down counter + output latch + 7-segment
+    // decoder + bipolar segment driver, plus CARRY and BORROW cascade outputs.
+    //   inputs:  [CLK_UP, CLK_DOWN, LATCH_ENABLE, TOGGLE_ENABLE, RESET]
+    //   outputs: [a, b, c, d, e, f, g, CARRY, BORROW]
+    // Source: Texas Instruments (data sheet acquired from Harris Semiconductor),
+    //   "CD40110B Types — CMOS Decade Up/Down Counter/Latch/Display Driver",
+    //   SCHS100. Verified vs the TRUTH TABLE + Functional Diagram (pages 1, 6)
+    //   read as 300-dpi PDF page images (issues.md C4). Behaviour modeled:
+    //   • CLK UP (pin 9) and CLK DOWN (pin 7) are SEPARATE positive-edge clocks:
+    //     a LOW->HIGH transition on CLK UP increments, on CLK DOWN decrements
+    //     (decade, mod-10 wrap). (Real silicon needs ~100 ns between the two
+    //     clocks' rising edges; 74Sim has no propagation delay — issues.md A1.)
+    //   • RESET (pin 5) active-HIGH, asynchronous: counter goes to 0.
+    //   • TOGGLE ENABLE (pin 4): truth-table column is the active-LOW count
+    //     enable — pin HIGH inhibits counting (count held), pin LOW enables it.
+    //   • LATCH ENABLE (pin 6): LOW = latch transparent (display follows the
+    //     counter); HIGH = latch holds the last value (display fixed) while the
+    //     counter keeps running underneath.
+    //   • Segments a-g are active-HIGH (sources current to a common-cathode LED),
+    //     standard 7-seg decode of the LATCHED value.
+    //   • CARRY (pin 10) is normally HIGH and pulses LOW when count==9 while
+    //     CLK UP is LOW; its rising edge at the 9->0 rollover clocks the next
+    //     decade. BORROW (pin 11) is normally HIGH and pulses LOW when count==0
+    //     while CLK DOWN is LOW. Same convention as the 74x192 COUNTER_DECADE_DC,
+    //     so CARRY->CLK UP / BORROW->CLK DOWN cascading works.
+    const [upN, downN, leN, teN, resetN] = gate.inputs;
+    const segNames = gate.outputs.slice(0, 7); // a,b,c,d,e,f,g
+    const carryName = gate.outputs[7];
+    const borrowName = gate.outputs[8];
+    const state = this._getSeqState(comp, segNames[0],
+      { count: 0, prevUP: 0, prevDOWN: 0, latched: 0 });
+    const up = this._readPinBit(comp, upN);
+    const down = this._readPinBit(comp, downN);
+    const le = this._readPinBit(comp, leN);
+    const te = this._readPinBit(comp, teN);
+    const reset = this._readPinBit(comp, resetN);
+    if (reset === 1) {
+      state.count = 0;
+    } else if (te === 0) { // TOGGLE ENABLE LOW = counting enabled
+      if (state.prevUP === 0 && up === 1)
+        state.count = (state.count + 1) % 10;
+      if (state.prevDOWN === 0 && down === 1)
+        state.count = (state.count - 1 + 10) % 10;
+    }
+    state.prevUP = up; state.prevDOWN = down;
+    // Output latch: transparent while LATCH ENABLE is LOW, holds while HIGH.
+    if (le === 0) state.latched = state.count;
+    const displayVal = state.latched;
+    // Standard active-HIGH 7-seg decode [a,b,c,d,e,f,g].
+    const SEG7 = [
+      [1,1,1,1,1,1,0], // 0
+      [0,1,1,0,0,0,0], // 1
+      [1,1,0,1,1,0,1], // 2
+      [1,1,1,1,0,0,1], // 3
+      [0,1,1,0,0,1,1], // 4
+      [1,0,1,1,0,1,1], // 5
+      [1,0,1,1,1,1,1], // 6
+      [1,1,1,0,0,0,0], // 7
+      [1,1,1,1,1,1,1], // 8
+      [1,1,1,1,0,1,1], // 9
+    ];
+    const segs = SEG7[displayVal] || SEG7[0];
+    let changed = false;
+    for (let i = 0; i < segNames.length && i < 7; i++) {
+      if (this._drivePinBit(comp, segNames[i], segs[i] || 0)) changed = true;
+    }
+    const carry  = (state.count === 9 && up   === 0) ? 0 : 1;
+    const borrow = (state.count === 0 && down === 0) ? 0 : 1;
+    if (this._drivePinBit(comp, carryName, carry)) changed = true;
+    if (this._drivePinBit(comp, borrowName, borrow)) changed = true;
     return changed;
   }
 
@@ -2311,6 +3243,96 @@ class _ChipEvalMixin {
     return changed;
   }
 
+  _evaluateRateMultBcd4527(comp, gate) {
+    // CD4527B: CMOS BCD (decade) rate multiplier.
+    //   inputs:  [CLK, CLR, SET9, STR, INH, CAS, A, B, C, D]
+    //   outputs: [OUT, OUTn, NINE, CARRY]   (CARRY = INHIBIT/CARRY OUT, pin 7)
+    //
+    // Source: Texas Instruments (acquired from Harris), "CD4527B Types — CMOS BCD
+    //   Rate Multiplier", SCHS080C (Rev. July 2003). Verified by reading the saved
+    //   PDF as page images (Read with pages:, NOT the text summarizer — issues.md
+    //   C4): TOP-VIEW Terminal Assignment (page 1), TRUTH TABLE (page 6), Logic
+    //   Diagram Fig.13 + Timing Diagram Fig.14 (page 5). Function: OUT delivers N
+    //   pulses for every 10 clock pulses, where N = BCD value of (D,C,B,A); e.g. the
+    //   datasheet's "when the BCD input is 8, there will be 8 out of every 10 input
+    //   pulses." A is LSB (weight 1) … D is MSB (weight 8). NOT cloned from the
+    //   74167 RATE_MULT_DECADE primitive (whose CLR/LOAD/ENP/ENT pin contract and
+    //   single-pulse Z model do not match this part — issues.md C2 lesson).
+    //
+    // Model: an internal decade counter (0-9) advances on each rising CLOCK edge.
+    //   Each of the ten counter states is "owned" by one rate weight; OUT pulses
+    //   (follows the clock) during the states whose owning weight bit is HIGH:
+    //     A (weight 1) owns {9}        B (weight 2) owns {3,7}
+    //     C (weight 4) owns {1,4,6,8}  D (weight 8) owns {1,2,3,4,5,6,7,8}
+    //   These state sets were chosen so the count of enabled states reproduces the
+    //   datasheet TRUTH TABLE for ALL 16 input codes: valid BCD 0-9 give exactly N
+    //   pulses, and the invalid codes 10-15 give 8 (A=0) or 9 (A=1) exactly as the
+    //   table shows — because every B/C state is a subset of D's eight states, so
+    //   adding B or C to D contributes nothing. The exact intra-cycle pulse PHASE of
+    //   the real silicon is not reproduced (74Sim has no sub-clock timing — A1);
+    //   only the pulse COUNT per 10 clocks and the truth-table logic levels are
+    //   modeled. Behavioral approximation in the spirit of issues.md B4.
+    const A_MASK = 1 << 9;                                       // {9}
+    const B_MASK = (1 << 3) | (1 << 7);                          // {3,7}
+    const C_MASK = (1 << 1) | (1 << 4) | (1 << 6) | (1 << 8);    // {1,4,6,8}
+    const D_MASK = (1<<1)|(1<<2)|(1<<3)|(1<<4)|(1<<5)|(1<<6)|(1<<7)|(1<<8); // {1..8}
+    const [clkN, clrN, set9N, strN, inhN, casN, aN, bN, cN, dN] = gate.inputs;
+    const [outName, outnName, nineName, carryName] = gate.outputs;
+    const state = this._getSeqState(comp, outName, { count: 0, prevClk: 0 });
+    const clk  = this._readPinBit(comp, clkN);
+    const clr  = this._readPinBit(comp, clrN);
+    const set9 = this._readPinBit(comp, set9N);
+    // Asynchronous CLEAR (→0, dominant) and SET TO "9" (→9), both active HIGH; the
+    // datasheet warns CLEAR and SET should not be HIGH together (non-valid state).
+    if (clr === 1) {
+      state.count = 0;
+    } else if (set9 === 1) {
+      state.count = 9;
+    } else if (state.prevClk === 0 && clk === 1) {
+      state.count = (state.count + 1) % 10;
+    }
+    state.prevClk = clk;
+
+    const a = this._readPinBit(comp, aN);
+    const b = this._readPinBit(comp, bN);
+    const c = this._readPinBit(comp, cN);
+    const d = this._readPinBit(comp, dN);
+    const s = state.count;
+    const enabled = (
+      (a && ((A_MASK >> s) & 1)) || (b && ((B_MASK >> s) & 1)) ||
+      (c && ((C_MASK >> s) & 1)) || (d && ((D_MASK >> s) & 1))
+    ) ? 1 : 0;
+
+    const str = this._readPinBit(comp, strN);   // STROBE: HIGH blanks OUT (→L)
+    const inh = this._readPinBit(comp, inhN);   // INHIBIT IN (carry in): HIGH inhibits
+    const cas = this._readPinBit(comp, casN);   // CASCADE: HIGH forces OUT HIGH
+
+    // OUT priority follows the datasheet truth-table order: any of INHIBIT-IN /
+    // STROBE / CLEAR / SET blanks the output LOW; CASCADE forces it HIGH; otherwise
+    // OUT is the clock-gated rate pulse (HIGH during the clock-HIGH of an owned state).
+    let out;
+    if (inh === 1 || str === 1 || clr === 1 || set9 === 1) {
+      out = 0;
+    } else if (cas === 1) {
+      out = 1;
+    } else {
+      out = (enabled && clk) ? 1 : 0;
+    }
+    const nine = (state.count === 9) ? 1 : 0;   // "9" OUT (pin 1): HIGH at count 9
+    // INHIBIT/CARRY OUT (pin 7): normally HIGH; LOW at terminal count 9 (the carry
+    // pulse that drives the next stage's INHIBIT IN when cascading). INHIBIT IN HIGH
+    // forces it HIGH (truth table).
+    let carry = (state.count === 9) ? 0 : 1;
+    if (inh === 1) carry = 1;
+
+    let changed = false;
+    if (this._drivePinBit(comp, outName, out)) changed = true;
+    if (outnName  && this._drivePinBit(comp, outnName, out ^ 1)) changed = true;
+    if (nineName  && this._drivePinBit(comp, nineName, nine)) changed = true;
+    if (carryName && this._drivePinBit(comp, carryName, carry)) changed = true;
+    return changed;
+  }
+
   _evaluateCounterUpDownDecade(comp, gate) {
     // 74168: Synchronous 4 bit up/down decade counter (single CLK).
     // inputs: [CLK, UD, LOAD, ENP, ENT, A, B, C, D]
@@ -2383,7 +3405,7 @@ class _ChipEvalMixin {
     // inputs: [D1, D2, D3, D4, WA1, WA2, WE, RA1, RA2, RE]
     // outputs: [Q1, Q2, Q3, Q4]
     // WE=0: write D1-D4 to address WA1,WA2. RE=0: read from address RA1,RA2.
-    // RE=1: outputs disabled (HIGH_Z for 3-state, OC pull up for open-collector).
+    // RE=1: outputs disabled (HIGH_Z for 3-state, OC pull up for open collector).
     const [d1N,d2N,d3N,d4N,wa1N,wa2N,weN,ra1N,ra2N,reN] = gate.inputs;
     const state = this._getSeqState(comp, gate.outputs[0], { mem: [0,0,0,0] });
     const we = this._readPinBit(comp, weN);
@@ -2434,8 +3456,83 @@ class _ChipEvalMixin {
     return this._drivePinBits(comp, gate.outputs, [(data)&1, (data>>1)&1]);
   }
 
+  _evaluateRegFileDual16x4Tri(comp, gate) {
+    // 74x870: dual 16-word × 4-bit register file with two bidirectional 3-state ports.
+    // Source: Texas Instruments, "SN74ALS870 Dual 16-by-4 Register Files", datasheet.
+    //   Verified: pin assignment read from page 1 as a rendered PDF-page image
+    //   (alldatasheet idx 28301); function semantics (S0/S1 file-select per port,
+    //   S2/S3 direction per port, per-file 1W/2W write-enable and 1A/2A address) and
+    //   the "B-input port takes priority" write tie-break confirmed from the TI
+    //   datasheet text. See the chip-entry header comment for full citations.
+    //
+    // inputs:  [S0,S1,S2,S3, 1W,2W,
+    //           1A0,1A1,1A2,1A3, 2A0,2A1,2A2,2A3,
+    //           DQA0,DQA1,DQA2,DQA3, DQB0,DQB1,DQB2,DQB3]
+    // outputs: [DQA0,DQA1,DQA2,DQA3, DQB0,DQB1,DQB2,DQB3]  (same physical bidir pins)
+    // Each file owns one address bus (1A / 2A) and one write-enable (1W / 2W, active LOW).
+    // S0 routes port A to file 1 (L) or file 2 (H); S1 does the same for port B.
+    // S2 sets port A direction: L = output (drive the DQA bus from the selected file),
+    // H = input (release DQA and write it into the selected file). S3 controls port B.
+    // Writes are level-sensitive while the file's W is LOW. If both ports write the
+    // same file, the B port's data is stored (B priority).
+    const [s0n,s1n,s2n,s3n, w1n,w2n,
+           a10,a11,a12,a13, a20,a21,a22,a23,
+           dqa0,dqa1,dqa2,dqa3, dqb0,dqb1,dqb2,dqb3] = gate.inputs;
+    const state = this._getSeqState(comp, gate.outputs[0],
+      { file1: new Array(16).fill(0), file2: new Array(16).fill(0) });
+
+    const s0 = this._readPinBit(comp, s0n);
+    const s1 = this._readPinBit(comp, s1n);
+    const s2 = this._readPinBit(comp, s2n);
+    const s3 = this._readPinBit(comp, s3n);
+    const w1 = this._readPinBit(comp, w1n);
+    const w2 = this._readPinBit(comp, w2n);
+    const addr1 = this._readPinBit(comp,a10) | (this._readPinBit(comp,a11)<<1) |
+                  (this._readPinBit(comp,a12)<<2) | (this._readPinBit(comp,a13)<<3);
+    const addr2 = this._readPinBit(comp,a20) | (this._readPinBit(comp,a21)<<1) |
+                  (this._readPinBit(comp,a22)<<2) | (this._readPinBit(comp,a23)<<3);
+    const dqaIn = this._readPinBit(comp,dqa0) | (this._readPinBit(comp,dqa1)<<1) |
+                  (this._readPinBit(comp,dqa2)<<2) | (this._readPinBit(comp,dqa3)<<3);
+    const dqbIn = this._readPinBit(comp,dqb0) | (this._readPinBit(comp,dqb1)<<1) |
+                  (this._readPinBit(comp,dqb2)<<2) | (this._readPinBit(comp,dqb3)<<3);
+
+    const aInput = s2 === 1;   // port A in input (write) mode
+    const bInput = s3 === 1;   // port B in input (write) mode
+    const aFile2 = s0 === 1;   // port A routed to file 2
+    const bFile2 = s1 === 1;   // port B routed to file 2
+
+    // Level-sensitive writes; B port wins a same-file conflict.
+    if (w1 === 0) {
+      if (bInput && !bFile2)      state.file1[addr1] = dqbIn;
+      else if (aInput && !aFile2) state.file1[addr1] = dqaIn;
+    }
+    if (w2 === 0) {
+      if (bInput && bFile2)       state.file2[addr2] = dqbIn;
+      else if (aInput && aFile2)  state.file2[addr2] = dqaIn;
+    }
+
+    let changed = false;
+    // Port A: output mode drives its file's word; input mode releases the bus.
+    if (aInput) {
+      for (const p of [dqa0,dqa1,dqa2,dqa3]) if (this._drivePinHighZ(comp, p)) changed = true;
+    } else {
+      const w = aFile2 ? state.file2[addr2] : state.file1[addr1];
+      if (this._drivePinBits(comp, [dqa0,dqa1,dqa2,dqa3],
+        [w&1,(w>>1)&1,(w>>2)&1,(w>>3)&1])) changed = true;
+    }
+    // Port B.
+    if (bInput) {
+      for (const p of [dqb0,dqb1,dqb2,dqb3]) if (this._drivePinHighZ(comp, p)) changed = true;
+    } else {
+      const w = bFile2 ? state.file2[addr2] : state.file1[addr1];
+      if (this._drivePinBits(comp, [dqb0,dqb1,dqb2,dqb3],
+        [w&1,(w>>1)&1,(w>>2)&1,(w>>3)&1])) changed = true;
+    }
+    return changed;
+  }
+
   _evaluateCounterBiqPreset(comp, gate) {
-    // 74176: Presettable decade bi-quinary counter/latch.
+    // 74176: Presettable decade bi quinary counter/latch.
     // inputs: [CLK1, CLK2, CLR, LOAD, A, B, C, D]
     // outputs: [QA, QB, QC, QD]
     // CLK1: toggles QA (÷2). CLK2: counts QBD in sequence (÷5 = 0,1,2,3,4,0...).
@@ -2498,7 +3595,7 @@ class _ChipEvalMixin {
   }
 
   _evaluateShiftReg4BitClr(comp, gate) {
-    // 74179: 4 bit parallel-access shift register with async CLR and complementary QDn.
+    // 74179: 4 bit parallel access shift register with async CLR and complementary QDn.
     // inputs: [SER, A, B, C, D, PE, CLK, CLR]
     // outputs: [QA, QB, QC, QD, QDn]
     // CLR=0: async clear. PE=1: parallel load on rising CLK. PE=0: shift on rising CLK.
@@ -2558,12 +3655,39 @@ class _ChipEvalMixin {
     return this._drivePinBits(comp, gate.outputs, [evenOut, oddOut]);
   }
 
+  _evaluateAoBiphasePair(comp, gate) {
+    // CD4037 AND/OR bi-phase pair (one of three sections).
+    // inputs: [A, B, C]  (A,B = the two common control lines; C = section data)
+    // outputs: [D, E]    (complementary bi-phase split outputs)
+    //
+    // Verified against the RCA CD4037A truth table (1980 RCA COS/MOS databook,
+    // p.519–520, read as a 300-dpi PDF page render — the scanned PDF's text layer
+    // is garbled OCR, so the functional diagram + truth table were read as images):
+    //   A B │ D    E
+    //   0 0 │ 1    1
+    //   1 0 │ C    C̄
+    //   0 1 │ C̄    C
+    //   1 1 │ 0    0
+    // which is exactly the AND-OR-INVERT pair (the on-chip output buffers invert):
+    //   D = NOT( (A·C̄) + (B·C) )
+    //   E = NOT( (A·C)  + (B·C̄) )
+    // The hinted non-inverting AO_22 can't reproduce this (output is HIGH when
+    // A=B=0, impossible from positive literals A/B/C), and the engine has no
+    // internal-net support to chain a NOT into AO_22 — hence this dedicated
+    // primitive. See issues.md.
+    const [a, b, c] = this._readGateInputs(comp, gate.inputs);
+    const nc = c ? 0 : 1;
+    const d = ((a & nc) | (b & c)) ? 0 : 1;
+    const e = ((a & c) | (b & nc)) ? 0 : 1;
+    return this._drivePinBits(comp, gate.outputs, [d, e]);
+  }
+
   _evaluateAlu4Bit(comp, gate) {
     // 74181: 4 bit ALU and function generator (active HIGH data convention).
     // inputs: [A0,A1,A2,A3, B0,B1,B2,B3, S0,S1,S2,S3, M, Cn]
     // outputs: [F0,F1,F2,F3, Cn4, P, G, AeqB]
     // M=1: logic operations. M=0: arithmetic operations.
-    // Cn is carry-in (active HIGH for arithmetic; ignored for logic).
+    // Cn is carry in (active HIGH for arithmetic; ignored for logic).
     const bits = this._readGateInputs(comp, gate.inputs);
     const a  = bits[0] | (bits[1]<<1) | (bits[2]<<2) | (bits[3]<<3);
     const b  = bits[4] | (bits[5]<<1) | (bits[6]<<2) | (bits[7]<<3);
@@ -2596,7 +3720,7 @@ class _ChipEvalMixin {
       f = logicFns[s](a, b);
       cn4 = 0; p = 0; g = 0;
     } else {
-      // Arithmetic operations (Cn is carry-in)
+      // Arithmetic operations (Cn is carry in)
       const bnot = (~b) & 0xF;
       const arithBase = [
         a,                   // 0000: A
@@ -2654,8 +3778,39 @@ class _ChipEvalMixin {
     return this._drivePinBits(comp, gate.outputs, [cnX, cnY, cnZ, pGrp, gGrp]);
   }
 
+  _evaluateCarryLookahead32(comp, gate) {
+    // 74882: 32 bit lookahead carry generator. Combines the propagate/generate
+    // signals of eight 4 bit ALU groups (e.g. eight 74x181/74x881, = 32 bits) and
+    // produces the anticipated carry into each 8 bit boundary in one gate delay.
+    // inputs:  [P0,G0,P1,G1,P2,G2,P3,G3,P4,G4,P5,G5,P6,G6,P7,G7, Cn]
+    // outputs: [Cn8, Cn16, Cn24, Cn32]
+    //
+    // Polarity note: the real SN74AS882 takes ACTIVE-LOW carry propagate/generate
+    // (P̄, Ḡ) and a HIGH Cn, and drives HIGH carry outputs. This model uses
+    // ACTIVE-HIGH P/G to match the rest of the in-sim 74x181 family: ALU_4BIT
+    // (_evaluateAlu4Bit) emits active-high P (all bits propagate) and G (any bit
+    // generates), and CARRY_LOOKAHEAD (74x182) consumes them active-high, so the
+    // 882 chains straight off the sim's ALUs. Under one consistent polarity the
+    // Boolean carry values are identical to the datasheet part.
+    //
+    // The carry out of group i is c(i+1) = G_i + P_i·c_i, with c0 = Cn. The four
+    // outputs are the carries crossing the 8/16/24/32 bit boundaries, i.e. the
+    // carries out of groups 1, 3, 5 and 7. Computing the group carries in sequence
+    // yields the same Boolean result the datasheet's flattened lookahead does.
+    const bits = this._readGateInputs(comp, gate.inputs);
+    let c = bits[16]; // Cn
+    const cout = new Array(8);
+    for (let i = 0; i < 8; i++) {
+      const p = bits[2 * i];
+      const g = bits[2 * i + 1];
+      c = g | (p & c);
+      cout[i] = c;
+    }
+    return this._drivePinBits(comp, gate.outputs, [cout[1], cout[3], cout[5], cout[7]]);
+  }
+
   _evaluateFullAdderDual(comp, gate) {
-    // 74183: Dual carry-save full adder.
+    // 74183: Dual carry save full adder.
     // Each section: inputs [A, B, Cin] → outputs [Sum, Cout]
     // inputs: [A1, B1, C1in, A2, B2, C2in]
     // outputs: [S1, C1out, S2, C2out]
@@ -2669,7 +3824,7 @@ class _ChipEvalMixin {
   }
 
   _evaluateBcdToBin5(comp, gate) {
-    // 74184: BCD to binary converter (ROM-based, open-collector, 5 input).
+    // 74184: BCD to binary converter (ROM based, open collector, 5 input).
     // inputs: [B1, B2, B3, B4, B5, G]  (B1=bit1, B2=bit2, ..., B5=bit5 of BCD)
     // outputs: [Y2, Y3, Y4, Y5, Y6, Y7, Y8]  (bits 1-7 of binary, OC)
     // G=0: enabled. G=1: all outputs HIGH_Z (OC disabled).
@@ -2694,7 +3849,7 @@ class _ChipEvalMixin {
   }
 
   _evaluateBinToBcd6(comp, gate) {
-    // 74185: 6 bit binary-to-BCD converter (ROM-based, open-collector).
+    // 74185: 6 bit binary-to-BCD converter (ROM based, open collector).
     // inputs: [B1, B2, B3, B4, B5, B6, G]  (B1=bit0 ... B6=bit5 of binary)
     // outputs: [Y2, Y3, Y4, Y5, Y6, Y7, Y8]  (bits 0-6 of packed BCD)
     // G=0: enabled. G=1: all outputs HIGH_Z.
@@ -2739,7 +3894,7 @@ class _ChipEvalMixin {
       return changed;
     }
     if (we === 0) {
-      // Write (non-inverted) data to memory
+      // Write (non inverted) data to memory
       for (let i = 0; i < 4; i++) state.mem[addr][i] = bits[4 + i];
     }
     // Read: output INVERTED stored data
@@ -2863,7 +4018,7 @@ class _ChipEvalMixin {
   }
 
   _evaluateShiftReg4BitJK(comp, gate) {
-    // 74195: 4 bit parallel-access shift register with J-K̄ serial input, async CLR.
+    // 74195: 4 bit parallel access shift register with JK̄ serial input, async CLR.
     // inputs: [CLR, CLK, J, Kn, PE, A, B, C, D]
     // outputs: [QA, QB, QC, QD, QDn]
     // CLR=0: async clear. PE=0: parallel load on rising CLK. PE=1: shift on rising CLK.
@@ -2932,8 +4087,277 @@ class _ChipEvalMixin {
     return this._drivePinBits(comp, outs, state.q);
   }
 
+  _evaluateShiftReg8BitBus4034(comp, gate) {
+    // CD4034B: 8-stage static bidirectional parallel/serial I/O bus register.
+    // Source: TI/Harris CD4034B SCHS037B (Rev. June 2003), p.1 description +
+    //   p.4 "TRUTH TABLE FOR REGISTER INPUT-LEVELS" + Fig.11 register-stage logic.
+    // inputs:  [CLK, PS, AS, AB, AE, SER,
+    //           A1,A2,A3,A4,A5,A6,A7,A8, B1,B2,B3,B4,B5,B6,B7,B8]
+    // outputs: [A1,A2,A3,A4,A5,A6,A7,A8, B1,B2,B3,B4,B5,B6,B7,B8]  (bidirectional)
+    //   stage i (0=LSB end / serial in) maps to A(i+1) and B(i+1); the serial
+    //   chain enters stage 0 and shifts toward stage 7 (= A8/B8, the serial out).
+    //   PS  (P/S):  HIGH = parallel mode, LOW = serial mode.
+    //   AS  (A/S):  HIGH = asynchronous, LOW = synchronous (parallel mode only;
+    //               serial mode is internally forced synchronous).
+    //   AB  (A/B):  HIGH → A lines are inputs, B lines are outputs;
+    //               LOW  → A lines are outputs, B lines are inputs.
+    //   AE  ("A" ENABLE): gates the A side only. When A is the output side it must
+    //               be HIGH to drive (else A outputs Hi-Z); when A is the input
+    //               side, AE LOW disables the A input → the register recirculates
+    //               (holds) instead of loading.
+    //   B side has no enable: it always drives when it is the output side and
+    //               always loads when it is the input side.
+    const [clkN, psN, asN, abN, aeN, serN] = gate.inputs;
+    const aInN = gate.inputs.slice(6, 14);   // A1..A8 as inputs
+    const bInN = gate.inputs.slice(14, 22);  // B1..B8 as inputs
+    const aOut = gate.outputs.slice(0, 8);   // A1..A8 as outputs
+    const bOut = gate.outputs.slice(8, 16);  // B1..B8 as outputs
+    const state = this._getSeqState(comp, aOut[0] + '_cd4034', { q: [0,0,0,0,0,0,0,0], prevClk: 0 });
+
+    const clk = this._readPinBit(comp, clkN);
+    const ps  = this._readPinBit(comp, psN);
+    const as  = this._readPinBit(comp, asN);
+    const ab  = this._readPinBit(comp, abN);
+    const ae  = this._readPinBit(comp, aeN);
+    const rising = (state.prevClk === 0 && clk === 1);
+
+    if (ps === 0) {
+      // SERIAL mode: shift on the rising clock edge (always synchronous).
+      if (rising) {
+        for (let i = 7; i > 0; i--) state.q[i] = state.q[i-1];
+        state.q[0] = this._readPinBit(comp, serN);
+      }
+    } else {
+      // PARALLEL mode. Input side is A (when AB=1, gated by AE) or B (when AB=0).
+      let data = null; // null → recirculate / hold
+      if (ab === 1) {
+        if (ae === 1) data = aInN.map(n => this._readPinBit(comp, n));
+        // ae===0 → A input disabled → recirculation (hold), data stays null
+      } else {
+        data = bInN.map(n => this._readPinBit(comp, n));
+      }
+      if (data) {
+        if (as === 1) {
+          state.q = data;            // asynchronous: transparent (level) load
+        } else if (rising) {
+          state.q = data;            // synchronous: load on rising clock edge
+        }
+      }
+    }
+    state.prevClk = clk;
+
+    // Drive the output side; the input side is left Hi-Z (high-impedance input).
+    let changed = false;
+    if (ab === 1) {
+      // B is the output side (always driven); A side Hi-Z.
+      if (this._drivePinsHighZ(comp, aOut)) changed = true;
+      if (this._drivePinBits(comp, bOut, state.q)) changed = true;
+    } else {
+      // A is the output side (driven only when AE=HIGH); B side Hi-Z.
+      if (this._drivePinsHighZ(comp, bOut)) changed = true;
+      if (ae === 1) {
+        if (this._drivePinBits(comp, aOut, state.q)) changed = true;
+      } else {
+        if (this._drivePinsHighZ(comp, aOut)) changed = true;
+      }
+    }
+    return changed;
+  }
+
+  _evaluateShiftReg8BitDualRank952(comp, gate) {
+    // 74x952 (National Semiconductor DM74LS952): dual-rank 8-bit TRI-STATE I/O
+    // shift register. Two 8-bit ranks sit in parallel:
+    //   Upper register "A"  — the I/O register, connected to the 8 bidirectional
+    //                         I/O pins through TRI-STATE buffers.
+    //   Lower register "B"  — the serial shift register (called "S"/"B" in the
+    //                         datasheet), with serial in Is and serial out Os.
+    // Every operation is edge-triggered on the rising CLK; the five active-LOW
+    // DIS control lines pick the mode and are independent of the clock level.
+    //
+    // Source: National Semiconductor, "DM74LS952 Dual Rank 8-Bit TRI-STATE Shift
+    //   Registers", in "National Semiconductor LS/S TTL Logic Databook" (1989),
+    //   p. 2-505..2-508 (doc TL/F/6437). [Online]. Available:
+    //   http://bitsavers.org/components/national/_dataBooks/1989_National_LS_S_TTL_Logic_Databook.pdf
+    //   Verified: Connection Diagram terminal assignment (p. 2-505) + Function
+    //   Table I (p. 2-508), read as a 300-dpi PDF page image (issues.md C4),
+    //   NOT cloned from a sibling (issues.md C2). Pin map (18-pin DIP):
+    //   1 DISo, 2 Is, 3 DISi, 4 DISTU, 5 DISTD, 6 DISs, 7 Os, 8 CLK, 9 GND,
+    //   10 I/O8, 11 I/O7, 12 I/O6, 13 I/O5, 14 I/O4, 15 I/O3, 16 I/O2, 17 I/O1,
+    //   18 VCC.
+    //
+    // inputs:  [CLK, Is, DISo, DISi, DISTU, DISTD, DISs, I/O1..I/O8]
+    // outputs: [Os, I/O1..I/O8]   — the eight I/O pins are bidirectional, so each
+    //   is listed in BOTH inputs (read the bus when the chip releases it) and
+    //   outputs (drive the bus from register A). Same convention as the CD4034.
+    const [clkN, isN, disoN, disiN, distuN, distdN, dissN] = gate.inputs;
+    const ioIn  = gate.inputs.slice(7, 15);    // I/O1..I/O8 as inputs
+    const osOut = gate.outputs[0];
+    const ioOut = gate.outputs.slice(1, 9);    // I/O1..I/O8 as outputs
+    const state = this._getSeqState(comp, osOut + '_952',
+      { A: [0,0,0,0,0,0,0,0], B: [0,0,0,0,0,0,0,0], prevClk: 0 });
+
+    const clk   = this._readPinBit(comp, clkN);
+    const diso  = this._readPinBit(comp, disoN);
+    const disi  = this._readPinBit(comp, disiN);
+    const distu = this._readPinBit(comp, distuN);
+    const distd = this._readPinBit(comp, distdN);
+    const diss  = this._readPinBit(comp, dissN);
+    const rising = (state.prevClk === 0 && clk === 1);
+
+    if (rising) {
+      const A = state.A, B = state.B;                       // pre-edge contents
+      const I = ioIn.map(n => this._readPinBit(comp, n));   // levels on I/O pins
+      const d = this._readPinBit(comp, isN);                // serial input bit
+
+      // All DIS lines are active LOW. Modes (from Function Table I):
+      const inp   = (disi  === 0);                       // input:    A ← I/O pins
+      const clear = (distu === 0 && distd === 0);        // sync clear both ranks
+      const tup   = (distu === 0 && distd === 1);        // transfer up:   A ← B
+      const tdn   = (distd === 0 && distu === 1);        // transfer down: B ← A
+      const shift = (diss  === 0 && distd === 1);         // shift B (Is→B1); a
+                                                          // transfer-down wins.
+
+      // Upper register "A". Input dominates; input + transfer-up is the "DOR"
+      // (data-OR) mode where A ← I/O OR B. Under clear, an active input still
+      // loads the I/O pins into A (only B is forced to 0).
+      const nA = new Array(8);
+      for (let i = 0; i < 8; i++) {
+        if (clear)           nA[i] = inp ? I[i] : 0;
+        else if (inp && tup) nA[i] = I[i] | B[i];       // DOR
+        else if (inp)        nA[i] = I[i];
+        else if (tup)        nA[i] = B[i];
+        else                 nA[i] = A[i];              // hold
+      }
+
+      // Lower register "B".
+      let nB;
+      if (clear)      nB = [0,0,0,0,0,0,0,0];
+      else if (tdn)   nB = A.slice();                    // transfer down A → B
+      else if (shift) nB = [d, B[0],B[1],B[2],B[3],B[4],B[5],B[6]];  // Is → B1
+      else            nB = B.slice();                    // hold
+
+      state.A = nA;
+      state.B = nB;
+    }
+    state.prevClk = clk;
+
+    let changed = false;
+    // Serial output Os = last stage of the lower shift register (B8); always driven.
+    if (this._drivePinBit(comp, osOut, state.B[7])) changed = true;
+    // I/O pins: register A drives the bus only when output-enabled (DISo LOW) and
+    // NOT in input mode (DISi HIGH — "input disable dominates over output disable").
+    // Otherwise the pins are high-impedance so an external source can drive them.
+    if (diso === 0 && disi === 1) {
+      if (this._drivePinBits(comp, ioOut, state.A)) changed = true;
+    } else {
+      if (this._drivePinsHighZ(comp, ioOut)) changed = true;
+    }
+    return changed;
+  }
+
+  _evaluateShiftReg8BitDualRank964(comp, gate) {
+    // 74x964 (SN74ALS964): dual-rank 8-bit shift register with 3-state I/O bus.
+    // Two 8-bit ranks share one rising-edge clock:
+    //   Reg 1 = the parallel I/O register, tied to the 8 bidirectional ports
+    //           A/QA..H/QH (bit 0 = A/QA … bit 7 = H/QH).
+    //   Reg 2 = the shift register: SERIN enters the A end, data moves toward the
+    //           H end, and SEROUT continuously reflects the H stage (bit 7).
+    // Active-LOW mode controls, each enabling one data path on the rising edge:
+    //   GIN  L → load Reg 1 from the I/O ports (ports act as inputs)
+    //   G2-1 L → copy Reg 2 → Reg 1
+    //   G1-2 L → copy Reg 1 → Reg 2   (takes priority over GSH)
+    //   GSH  L → shift Reg 2 (SERIN → bit0 → … → bit7)
+    // GIN and G2-1 both low load Reg 1 with the OR of the I/O ports and Reg 2.
+    // G2-1 and G1-2 both low exchange the two ranks (both read pre-edge values).
+    // Clears (active HIGH): ACLR is asynchronous (immediate, dominates); SCLR is
+    // synchronous. SCLR zeroes the Reg 2 data path, so a Reg-1 load from the I/O
+    // ports still happens while Reg 2 is cleared (function-table bottom row).
+    // OE is active LOW and gates ONLY the port outputs; SEROUT is always driven.
+    //
+    // Source: Texas Instruments, "SN54ALS963, SN54ALS964, SN74ALS963, SN74ALS964
+    //   Dual-Rank 8-Bit Shift Registers With 3-State Outputs", doc D2887, Nov 1985
+    //   revised May 1986 (Product Preview), in "The TTL Data Book, Volume 3 —
+    //   Advanced Low-Power Schottky, Advanced Schottky" (1986), pp. 2-783..2-791.
+    //   [Online]. Available:
+    //   http://bitsavers.org/components/ti/_dataBooks/1986_TI_ALS_AS_Logic_Data_Book.pdf
+    //   Verified: 'ALS964 DW/NT-package terminal assignment (p. 2-783) + 'ALS964
+    //   Function Table (p. 2-789), read as 300/400-dpi PDF page images (issues.md
+    //   C4), NOT cloned from the 74x952/963 siblings (issues.md C2). The hand-
+    //   entered stub pinout was wrong (missing pins 1-4, invented QA0..QA3) and is
+    //   corrected here. Verified 20-pin DIP map: 1 OE, 2 SERIN, 3 GIN, 4 G2-1,
+    //   5 SCLR, 6 G1-2, 7 GSH, 8 SEROUT, 9 CLK, 10 GND, 11 ACLR, 12 H/QH, 13 G/QG,
+    //   14 F/QF, 15 E/QE, 16 D/QD, 17 C/QC, 18 B/QB, 19 A/QA, 20 VCC.
+    //
+    // inputs:  [OE, GIN, G2-1, G1-2, GSH, CLK, ACLR, SCLR, SERIN,
+    //           A/QA, B/QB, C/QC, D/QD, E/QE, F/QF, G/QG, H/QH]  (ports as inputs)
+    // outputs: [SEROUT, A/QA, B/QB, C/QC, D/QD, E/QE, F/QF, G/QG, H/QH]
+    //   The eight I/O ports are bidirectional, so each is listed in BOTH inputs
+    //   (read the bus when released) and outputs (drive it from Reg 1), exactly
+    //   like the CD4034 / 74x952.
+    const [oeN, ginN, g21N, g12N, gshN, clkN, aclrN, sclrN, serN] = gate.inputs;
+    const portIn  = gate.inputs.slice(9, 17);   // A/QA..H/QH read as inputs
+    const serOut  = gate.outputs[0];
+    const portOut = gate.outputs.slice(1, 9);   // A/QA..H/QH driven as outputs
+    const state = this._getSeqState(comp, serOut + '_964',
+      { reg1: [0,0,0,0,0,0,0,0], reg2: [0,0,0,0,0,0,0,0], prevClk: 0 });
+
+    const oe   = this._readPinBit(comp, oeN);
+    const gin  = this._readPinBit(comp, ginN);
+    const g21  = this._readPinBit(comp, g21N);
+    const g12  = this._readPinBit(comp, g12N);
+    const gsh  = this._readPinBit(comp, gshN);
+    const clk  = this._readPinBit(comp, clkN);
+    const aclr = this._readPinBit(comp, aclrN);
+    const sclr = this._readPinBit(comp, sclrN);
+    const rising = (state.prevClk === 0 && clk === 1);
+
+    if (aclr === 1) {
+      // Asynchronous clear dominates and needs no clock edge.
+      state.reg1 = [0,0,0,0,0,0,0,0];
+      state.reg2 = [0,0,0,0,0,0,0,0];
+    } else if (rising) {
+      const r1 = state.reg1, r2 = state.reg2;              // pre-edge contents
+      const io = portIn.map(n => this._readPinBit(comp, n));
+      const ser = this._readPinBit(comp, serN);
+
+      // ── next Reg 2 ──
+      let n2;
+      if (sclr === 1)     n2 = [0,0,0,0,0,0,0,0];           // synchronous clear
+      else if (g12 === 0) n2 = r1.slice();                  // copy Reg 1 → Reg 2
+      else if (gsh === 0) n2 = [ser, r2[0], r2[1], r2[2], r2[3], r2[4], r2[5], r2[6]]; // shift
+      else                n2 = r2.slice();                  // hold
+
+      // ── next Reg 1 ──  (OR of the enabled sources; SCLR zeroes the Reg 2 source)
+      let n1;
+      if (gin === 1 && g21 === 1 && sclr === 0) {
+        n1 = r1.slice();                                     // hold
+      } else {
+        n1 = [0,0,0,0,0,0,0,0];
+        if (gin === 0)               for (let i = 0; i < 8; i++) n1[i] |= io[i];
+        if (g21 === 0 && sclr === 0) for (let i = 0; i < 8; i++) n1[i] |= r2[i];
+      }
+
+      state.reg1 = n1;
+      state.reg2 = n2;
+    }
+    state.prevClk = clk;
+
+    // ── drive outputs ──
+    let changed = false;
+    // SEROUT continuously reflects the H stage (Reg 2 bit 7); never 3-stated.
+    if (this._drivePinBit(comp, serOut, state.reg2[7])) changed = true;
+    // I/O ports: high-impedance while used as inputs (GIN low) or output-disabled
+    // (OE high); otherwise Reg 1 drives them.
+    if (gin === 0 || oe === 1) {
+      if (this._drivePinsHighZ(comp, portOut)) changed = true;
+    } else {
+      if (this._drivePinBits(comp, portOut, state.reg1)) changed = true;
+    }
+    return changed;
+  }
+
   _evaluateShiftReg8BitJK(comp, gate) {
-    // 74199: 8 bit shift register with J-K̄ serial input, async CLR, parallel load.
+    // 74199: 8 bit shift register with JK̄ serial input, async CLR, parallel load.
     // inputs: [CLR, CLK, J, Kn, PE, A, B, C, D, E, F, G, H]
     // outputs: [QA, QB, QC, QD, QE, QF, QG, QH]
     // CLR=0: async clear. PE=0: parallel load on rising CLK. PE=1: shift right with JK input.
@@ -2999,7 +4423,7 @@ class _ChipEvalMixin {
   // ── Chips15 evaluators ──────────────────────────────────────────────────
 
   _evaluateRam256x1OC(comp, gate) {
-    // 74206: 256×1 RAM with open-collector output.
+    // 74206: 256×1 RAM with open collector output.
     // inputs: [A0..A7, DIN, CS, WE]  outputs: [DOUT]
     // CS=0, WE=0: write; CS=0, WE=1: read (OC); CS=1: HiZ
     const bits = this._readGateInputs(comp, gate.inputs);
@@ -3179,9 +4603,9 @@ class _ChipEvalMixin {
   }
 
   _evaluateRam16x4NI(comp, gate) {
-    // 74219: 16×4 RAM with non-inverting 3-state outputs.
+    // 74219: 16×4 RAM with non inverting 3-state outputs.
     // inputs: [A0..A3, D1..D4, CS, WE]  outputs: [Q1..Q4]
-    // CS=0, WE=0: write; CS=0, WE=1: read (non-inverting); CS=1: HiZ
+    // CS=0, WE=0: write; CS=0, WE=1: read (non inverting); CS=1: HiZ
     const [a0,a1,a2,a3, d1,d2,d3,d4, cs, we] = this._readGateInputs(comp, gate.inputs);
     const addr = a0|(a1<<1)|(a2<<2)|(a3<<3);
     const state = this._getSeqState(comp, gate.outputs[0] + '_r16x4ni', { mem: {} });
@@ -3254,6 +4678,23 @@ class _ChipEvalMixin {
       } else {
         if (this._drivePinBit(comp, gate.outputs[i], bit)) changed = true;
       }
+    }
+    return changed;
+  }
+
+  _evaluateBCDDecimalHi(comp, gate) {
+    // CD4028: BCD-to-decimal / binary-to-octal decoder with ACTIVE-HIGH outputs
+    // (the active-LOW sibling is BCD_DECIMAL / 7442). inputs: [A, B, C, D]
+    // (A = LSB ... D = MSB), outputs: [Y0..Y9]. The one selected output is HIGH,
+    // all others LOW. Invalid BCD codes (10-15): every output LOW (verified vs
+    // TI/Harris CD4028B SCHS033C Table I truth table). For 3-to-8 octal use,
+    // drive A/B/C and hold D LOW: outputs 0-7 give the octal decode.
+    const [a,b,c,d] = this._readGateInputs(comp, gate.inputs);
+    const sel = a | (b << 1) | (c << 2) | (d << 3);
+    let changed = false;
+    for (let i = 0; i < 10; i++) {
+      const bit = (sel < 10 && i === sel) ? 1 : 0;
+      if (this._drivePinBit(comp, gate.outputs[i], bit)) changed = true;
     }
     return changed;
   }
@@ -3514,11 +4955,53 @@ class _ChipEvalMixin {
     return this._drivePinBits(comp, [qhName, qhnName], [qh, qh ? 0 : 1]);
   }
 
+  _evaluateShiftRegDual4Sipo4015(comp, gate) {
+    // CD4015: two independent 4-stage serial-in / parallel-out shift registers.
+    // Per register: positive-edge clock (CP), one serial Data input (D), and an
+    // active-HIGH asynchronous overriding Master Reset (MR). The level on D is
+    // loaded into Q0 on each LOW->HIGH CP transition while the stored bits move
+    // one stage along (Q0->Q1->Q2->Q3). MR=1 forces Q0..Q3 LOW regardless of CP.
+    // Verified vs TI CD54HC4015/CD74HC4015 truth table & functional diagram.
+    // inputs:  ['1CP','1D','1MR','2CP','2D','2MR']
+    // outputs: ['1Q0','1Q1','1Q2','1Q3','2Q0','2Q1','2Q2','2Q3']
+    const [cp1, d1, mr1, cp2, d2, mr2] = gate.inputs;
+    let changed = false;
+    if (this._evalSipo4Stage(comp, cp1, d1, mr1, gate.outputs.slice(0, 4))) changed = true;
+    if (this._evalSipo4Stage(comp, cp2, d2, mr2, gate.outputs.slice(4, 8))) changed = true;
+    return changed;
+  }
+
+  _evalSipo4Stage(comp, cpName, dName, mrName, qNames) {
+    // One 4015 register section. qNames = [Q0, Q1, Q2, Q3].
+    const state = this._getSeqState(comp, qNames[0],
+      { stages: [0, 0, 0, 0], prevClk: 0 });
+
+    const mr = this._readPinBit(comp, mrName);
+    if (mr === 1) {
+      // Asynchronous overriding reset: clear immediately, ignore the clock.
+      state.stages = [0, 0, 0, 0];
+      state.prevClk = this._readPinBit(comp, cpName);
+      return this._drivePinBits(comp, qNames, state.stages.slice());
+    }
+
+    const clk = this._readPinBit(comp, cpName);
+    if (state.prevClk === 0 && clk === 1) {
+      const data = this._readPinBit(comp, dName);
+      state.stages.pop();          // drop Q3 (oldest stage)
+      state.stages.unshift(data);  // D enters Q0; everything else shifts up
+    }
+    state.prevClk = clk;
+    return this._drivePinBits(comp, qNames, state.stages.slice());
+  }
+
   _evaluateReg4BitTri(comp, gate) {
-    // 74173: 4 bit D register with tri-state outputs. Synchronous CLR.
+    // 74173: 4 bit D register with tri state outputs. Synchronous CLR (default).
     // IE1=0 AND IE2=0: data enabled (latch on rising CLK edge).
-    // OE1=0 AND OE2=0: outputs enabled; otherwise HiZ (modelled as 0).
-    // CLR=1 (active HIGH, synchronous): clears register on rising CLK.
+    // OE1=0 AND OE2=0: outputs enabled; otherwise HiZ.
+    // CLR=1 (active HIGH): clears register. Synchronous by default; set
+    //   gate.asyncReset:true for the CD4076-style ASYNCHRONOUS RESET (clears
+    //   immediately, independent of the clock — verified vs TI CD4076B SCHS058C
+    //   truth table & Fig.8 logic diagram). The 74173 entry leaves the flag unset.
     // inputs: [1D, 2D, 3D, 4D, CLK, CLR, IE1, IE2, OE1, OE2]
     // outputs: [1Q, 2Q, 3Q, 4Q]
     const [d1n,d2n,d3n,d4n,clkN,clrN,ie1N,ie2N,oe1N,oe2N] = gate.inputs;
@@ -3527,8 +5010,11 @@ class _ChipEvalMixin {
       { q: [0,0,0,0], prevClk: 0 });
 
     const clk = this._readPinBit(comp, clkN);
-    if (state.prevClk === 0 && clk === 1) {
-      const clr  = this._readPinBit(comp, clrN);
+    const clr = this._readPinBit(comp, clrN);
+    if (gate.asyncReset && clr === 1) {
+      // Asynchronous active-HIGH reset: clear regardless of clock state.
+      state.q = [0,0,0,0];
+    } else if (state.prevClk === 0 && clk === 1) {
       const ie1  = this._readPinBit(comp, ie1N);
       const ie2  = this._readPinBit(comp, ie2N);
       if (clr === 1) {
@@ -3553,7 +5039,7 @@ class _ChipEvalMixin {
   }
 
   _evaluateDFFHex(comp, gate) {
-    // 74174: Hex D flip-flop with asynchronous active LOW clear.
+    // 74174: Hex D flip flop with asynchronous active LOW clear.
     // inputs: [1D, 2D, 3D, 4D, 5D, 6D, CLK, CLR]
     // outputs: [1Q, 2Q, 3Q, 4Q, 5Q, 6Q]
     const [d1n,d2n,d3n,d4n,d5n,d6n,clkN,clrN] = gate.inputs;
@@ -3584,7 +5070,7 @@ class _ChipEvalMixin {
   // ── Chips6 gate evaluators ───────────────────────────────────────────────
 
   _evaluateDFFQuad(comp, gate) {
-    // 74175: Quad D flip-flop with asynchronous active LOW clear.
+    // 74175: Quad D flip flop with asynchronous active LOW clear.
     // inputs: [1D, 2D, 3D, 4D, CLK, CLR]
     // outputs: [1Q, 1Qn, 2Q, 2Qn, 3Q, 3Qn, 4Q, 4Qn]
     const [d1n,d2n,d3n,d4n,clkN,clrN] = gate.inputs;
@@ -3617,7 +5103,10 @@ class _ChipEvalMixin {
   _evaluateCounterUpDown(comp, gate) {
     // 74191: Synchronous 4 bit up/down binary counter. Single clock.
     // CTEN=0 (active LOW): count enable. D/U=0: up, D/U=1: down.
-    // LOAD=0 (active LOW, synchronous): load A,B,C,D on rising CLK.
+    // LOAD=0 (active LOW, ASYNCHRONOUS): the outputs follow A,B,C,D immediately,
+    //   independent of the clock (TI SDLS072: "Asynchronously Presettable with
+    //   Load Control"). Fixed 2026-07-05 — this primitive previously loaded only
+    //   on the rising CLK edge, which is wrong for the '191. See issues.md C105.
     // MAX/MIN: HIGH at terminal count while CTEN=0.
     // RCO: LOW at terminal count while CTEN=0.
     // Terminal count: 15 when counting up (D/U=0), 0 when counting down (D/U=1).
@@ -3633,18 +5122,17 @@ class _ChipEvalMixin {
     const du   = this._readPinBit(comp, duN);
     const load = this._readPinBit(comp, loadN);
 
-    if (state.prevClk === 0 && clk === 1) {
-      if (load === 0) {
-        state.count = this._readPinBit(comp, aN)
-          | (this._readPinBit(comp, bN) << 1)
-          | (this._readPinBit(comp, cN) << 2)
-          | (this._readPinBit(comp, dN) << 3);
-      } else if (cten === 0) {
-        if (du === 0) {
-          state.count = (state.count + 1) & 15;
-        } else {
-          state.count = (state.count - 1 + 16) & 15;
-        }
+    if (load === 0) {
+      // Asynchronous parallel load: outputs follow A-D regardless of the clock.
+      state.count = this._readPinBit(comp, aN)
+        | (this._readPinBit(comp, bN) << 1)
+        | (this._readPinBit(comp, cN) << 2)
+        | (this._readPinBit(comp, dN) << 3);
+    } else if (state.prevClk === 0 && clk === 1 && cten === 0) {
+      if (du === 0) {
+        state.count = (state.count + 1) & 15;
+      } else {
+        state.count = (state.count - 1 + 16) & 15;
       }
     }
     state.prevClk = clk;
@@ -3705,8 +5193,182 @@ class _ChipEvalMixin {
     return changed;
   }
 
+  _evaluateCounterUpDown4029(comp, gate) {
+    // CD4029: CMOS presettable up/down counter, binary OR BCD-decade selectable.
+    // Single CLOCK. Verified against TI/Harris SCHS034C (CD4029B datasheet).
+    //   PE   (PRESET ENABLE, active HIGH, ASYNCHRONOUS): while HIGH the JAM inputs
+    //        J1-J4 are loaded into Q1-Q4 continuously, independent of the clock.
+    //   CE   (CARRY IN / CLOCK ENABLE, active LOW): LOW enables counting; HIGH (or
+    //        PE HIGH) inhibits advance. Advance happens on the POSITIVE clock edge.
+    //   U/D  (UP/DOWN): HIGH = count up, LOW = count down.
+    //   B/D  (BINARY/DECADE): HIGH = binary (0-15), LOW = BCD decade (0-9).
+    //   CARRY OUT (active LOW): normally HIGH; goes LOW at terminal count (max in
+    //        UP mode, 0 in DOWN mode) provided CARRY IN (CE) is LOW. It is purely
+    //        combinational on the current count, so it behaves like a clock-enable
+    //        ripple line for cascading (see datasheet Fig 17).
+    // Note: unlike the 74191 COUNTER_UPDOWN primitive, the load is asynchronous and
+    // active HIGH, the direction polarity is inverted, and decade mode is supported.
+    const [j1N,j2N,j3N,j4N,clkN,ceN,udN,peN,bdN] = gate.inputs;
+    const [q1Name,q2Name,q3Name,q4Name,coName] = gate.outputs;
+    const state = this._getSeqState(comp, q1Name, { count: 0, prevClk: 0 });
+
+    this._drivePinBits(comp, [q1Name,q2Name,q3Name,q4Name],
+      [state.count&1,(state.count>>1)&1,(state.count>>2)&1,(state.count>>3)&1]);
+
+    const clk = this._readPinBit(comp, clkN);
+    const ce  = this._readPinBit(comp, ceN);
+    const ud  = this._readPinBit(comp, udN);
+    const pe  = this._readPinBit(comp, peN);
+    const bd  = this._readPinBit(comp, bdN);
+
+    if (pe === 1) {
+      // Asynchronous jam load (tracks JAM inputs while PE is HIGH).
+      state.count = this._readPinBit(comp, j1N)
+        | (this._readPinBit(comp, j2N) << 1)
+        | (this._readPinBit(comp, j3N) << 2)
+        | (this._readPinBit(comp, j4N) << 3);
+    } else if (state.prevClk === 0 && clk === 1 && ce === 0) {
+      // Count on positive clock edge when enabled.
+      if (ud === 1) {            // up
+        if (bd === 1) state.count = (state.count + 1) & 15;       // binary 0-15
+        else          state.count = (state.count >= 9) ? 0 : state.count + 1; // decade 0-9
+      } else {                   // down
+        if (bd === 1) state.count = (state.count - 1 + 16) & 15;  // binary 0-15
+        else          state.count = (state.count <= 0) ? 9 : state.count - 1; // decade 0-9
+      }
+    }
+    state.prevClk = clk;
+
+    const maxCount = (bd === 1) ? 15 : 9;
+    const atTerminal = (ud === 1) ? (state.count === maxCount) : (state.count === 0);
+    const carryOut = (atTerminal && ce === 0) ? 0 : 1; // active LOW, normally HIGH
+
+    let changed = this._drivePinBits(comp, [q1Name,q2Name,q3Name,q4Name],
+      [state.count&1,(state.count>>1)&1,(state.count>>2)&1,(state.count>>3)&1]);
+    if (this._drivePinBit(comp, coName, carryOut)) changed = true;
+    return changed;
+  }
+
+  _evaluateCounterUpDownTri779(comp, gate) {
+    // 74F779: fully synchronous 8-bit up/down binary counter with one set of
+    // multiplexed 3-STATE I/O pins (the count outputs and the load inputs share
+    // the same eight pins). All actions happen on the rising clock edge; the mode
+    // is chosen by S1/S0, counting is gated by CET (active LOW), and the output
+    // buffers are gated by OE (active LOW). TC is active LOW lookahead carry.
+    //   inputs:  [CP, S1, S0, CETn, OEn, IO0..IO7]   (IO read as load inputs)
+    //   outputs: [IO0..IO7, TCn]                      (IO0 = LSB)
+    // Source: Fairchild 74F779 DS009593 function table + logic diagram (see the
+    //   chip entry header in js/chips/chips39.js for the full IEEE citation).
+    const [cpN, s1N, s0N, cetN, oeN] = gate.inputs;
+    const ioInN = gate.inputs.slice(5, 13);   // IO0..IO7 as inputs (parallel load)
+    const ioOut = gate.outputs.slice(0, 8);   // IO0..IO7 as driven outputs
+    const tcN   = gate.outputs[8];            // TC (active LOW)
+    const state = this._getSeqState(comp, ioOut[0] + '_f779', { count: 0, prevClk: 0 });
+
+    const cp  = this._readPinBit(comp, cpN);
+    const s1  = this._readPinBit(comp, s1N);
+    const s0  = this._readPinBit(comp, s0N);
+    const cet = this._readPinBit(comp, cetN);   // active LOW: 0 = count enabled
+    const oe  = this._readPinBit(comp, oeN);     // active LOW: 0 = outputs driven
+    const rising = (state.prevClk === 0 && cp === 1);
+
+    if (rising) {
+      if (s1 === 0 && s0 === 0) {
+        // Parallel load: capture the level present on each I/O pin (IO0 = LSB).
+        let v = 0;
+        for (let i = 0; i < 8; i++) v |= this._readPinBit(comp, ioInN[i]) << i;
+        state.count = v;
+      } else if (cet === 0) {
+        if (s1 === 1 && s0 === 0)      state.count = (state.count + 1) & 0xFF; // up
+        else if (s1 === 0 && s0 === 1) state.count = (state.count - 1) & 0xFF; // down
+        // S1=H,S0=H → hold (no change)
+      }
+      // CET HIGH (and not a load) → hold.
+    }
+    state.prevClk = cp;
+
+    // Terminal Count (active LOW): asserted only while counting is enabled and the
+    // counter sits at the end of its range for the active direction.
+    let tcBit = 1;
+    if (cet === 0) {
+      if (s1 === 1 && s0 === 0 && state.count === 0xFF) tcBit = 0;      // up, all 1s
+      else if (s1 === 0 && s0 === 1 && state.count === 0x00) tcBit = 0; // down, all 0s
+    }
+
+    let changed = false;
+    if (oe === 1) {
+      // OE HIGH → I/O port is high-impedance and acts as an input bus.
+      if (this._drivePinsHighZ(comp, ioOut)) changed = true;
+    } else {
+      const bits = [];
+      for (let i = 0; i < 8; i++) bits.push((state.count >> i) & 1);
+      if (this._drivePinBits(comp, ioOut, bits)) changed = true;
+    }
+    if (this._drivePinBits(comp, [tcN], [tcBit])) changed = true;
+    return changed;
+  }
+
+  _evaluateCounterProgModN4018(comp, gate) {
+    // Motorola MC4018 ("74418") Programmable Modulo-N Hexadecimal Counter.
+    // Core: 4-bit synchronous binary up counter, Q0 = LSB ... Q3 = MSB.
+    // Verified against Motorola "Programmable Modulo-N Counters", MC4316 thru
+    // MC4319 / MC4016 thru MC4019 data sheet (see chips66.js header comment).
+    //   MR  (pin 10, active LOW, ASYNCHRONOUS master reset): LOW forces count 0
+    //       and holds it (dominant over preset). Datasheet: a logic 0 on MR and
+    //       PE enters all zeros and stops counting.
+    //   PE  (pin 3, active LOW, ASYNCHRONOUS parallel load): LOW (with MR HIGH)
+    //       jams D0-D3 into the counter, independent of the clock.
+    //   Gate (pin 4, active HIGH, SYNCHRONOUS load enable): when HIGH, the rising
+    //       clock edge loads D0-D3 instead of counting up. The brief 3-page data
+    //       sheet gives no Gate truth table; the clock is ungated in the logic
+    //       diagram and Gate sits in the data/load path, so it is modeled as the
+    //       synchronous-load twin of the asynchronous PE. The exact Gate/internal-
+    //       carry cascade feedback is simplified (see issues.md).
+    //   Bus (pin 12): carry output = (count == max) AND R. Active HIGH.
+    //   R   (pin 13, active HIGH, internal ~2.2k pull-up to VCC): gates Bus.
+    //       Floating reads HIGH (carry enabled), matching the on-chip pull-up.
+    // gate.mod selects the modulus (16 for the MC4018 hex part; 10 for the
+    // MC4016 decade sibling, if added later). Defaults to 16.
+    const [clkN, peN, gateN, mrN, d0N, d1N, d2N, d3N, rN] = gate.inputs;
+    const [q0Name, q1Name, q2Name, q3Name, busName] = gate.outputs;
+    const mod = (gate.mod && gate.mod > 1) ? gate.mod : 16;
+    const state = this._getSeqState(comp, q0Name, { count: 0, prevClk: 0 });
+
+    const clk  = this._readPinBit(comp, clkN);
+    const pe   = this._readPinBit(comp, peN);
+    const gt   = this._readPinBit(comp, gateN);
+    const mr   = this._readPinBit(comp, mrN);
+    const data = this._readPinBit(comp, d0N)
+      | (this._readPinBit(comp, d1N) << 1)
+      | (this._readPinBit(comp, d2N) << 2)
+      | (this._readPinBit(comp, d3N) << 3);
+
+    if (mr === 0) {
+      // Asynchronous master reset, dominant.
+      state.count = 0;
+    } else if (pe === 0) {
+      // Asynchronous parallel load, tracks D while PE is LOW.
+      state.count = data % mod;
+    } else if (state.prevClk === 0 && clk === 1) {
+      // Rising clock edge: synchronous load when Gate HIGH, else count up.
+      if (gt === 1) state.count = data % mod;
+      else          state.count = (state.count + 1) % mod;
+    }
+    state.prevClk = clk;
+
+    // R (pin 13) has an internal pull-up: floating reads HIGH (carry enabled).
+    const vR = this._readPinVoltage(comp, rN);
+    const r  = (vR === null) ? 1 : (vR > this._specFor(comp).VTH ? 1 : 0);
+    const bus = (state.count === (mod - 1) && r === 1) ? 1 : 0;
+
+    let changed = this._drivePinBits(comp, [q0Name, q1Name, q2Name, q3Name],
+      [state.count & 1, (state.count >> 1) & 1, (state.count >> 2) & 1, (state.count >> 3) & 1]);
+    if (this._drivePinBit(comp, busName, bus)) changed = true;
+    return changed;
+  }
+
   _evaluateTriNotLo(comp, gate) {
-    // 74240-style: inverting tri-state buffer with active LOW output enable.
+    // 74240-style: inverting tri state buffer with active LOW output enable.
     // OE=0: output = NOT(A). OE=1: HiZ.
     const [aName, oeName] = gate.inputs;
     const oe = this._readPinBit(comp, oeName);
@@ -3721,26 +5383,26 @@ class _ChipEvalMixin {
     // gate.outputs: [A1..A8, B1..B8]           (indices 0-7=A, 8-15=B)
     // OE=0: enabled; OE=1: all outputs HiZ.
     // DIR=1: A→B (read A, drive B; A-side HiZ). DIR=0: B→A (read B, drive A; B-side HiZ).
+    // If chipDef.openCollector, data outputs sink only (Hi-Z on logic 1, pull to GND on 0).
     const oe  = this._readPinBit(comp, gate.inputs[17]);
     const dir = this._readPinBit(comp, gate.inputs[16]);
+    const oc  = !!(comp.chipDef && comp.chipDef.openCollector);
+    const drive = (pin, bit) => oc ? this._drivePinOC(comp, pin, bit) : this._drivePinBit(comp, pin, bit);
     let changed = false;
     if (oe !== 0) {
-      // All outputs HiZ
       if (this._drivePinsHighZ(comp, gate.outputs)) changed = true;
     } else if (dir === 1) {
-      // A→B: drive B-side, HiZ A-side
       for (let i = 0; i < 8; i++) {
         if (this._drivePinHighZ(comp, gate.outputs[i])) changed = true;
       }
       for (let i = 0; i < 8; i++) {
         const bit = this._readPinBit(comp, gate.inputs[i]);
-        if (this._drivePinBit(comp, gate.outputs[8 + i], bit)) changed = true;
+        if (drive(gate.outputs[8 + i], bit)) changed = true;
       }
     } else {
-      // B→A: drive A-side, HiZ B-side
       for (let i = 0; i < 8; i++) {
         const bit = this._readPinBit(comp, gate.inputs[8 + i]);
-        if (this._drivePinBit(comp, gate.outputs[i], bit)) changed = true;
+        if (drive(gate.outputs[i], bit)) changed = true;
       }
       for (let i = 0; i < 8; i++) {
         if (this._drivePinHighZ(comp, gate.outputs[8 + i])) changed = true;
@@ -3749,8 +5411,108 @@ class _ChipEvalMixin {
     return changed;
   }
 
+  _evaluateBusXcvr10BitDualTri(comp, gate) {
+    // 74x861 (non-inverting) / 74x862 (inverting): 10 bit bus transceiver with
+    // dual active-LOW output enables and NO direction pin. gate.invert opt-in
+    // (true => data complemented as it crosses, 74x862); defaults off so the
+    // 74x861 path is unchanged.
+    // gate.inputs:  [A1..A10, B1..B10, OEABn, OEBAn]  (0-9 A, 10-19 B, 20 OEAB, 21 OEBA)
+    // gate.outputs: [A1..A10, B1..B10]                (0-9 A, 10-19 B)
+    // Function table (TI SCBS199C, p.2):
+    //   OEAB=L OEBA=H -> A data to B bus (drive B from A; A side Hi-Z)
+    //   OEAB=H OEBA=L -> B data to A bus (drive A from B; B side Hi-Z)
+    //   OEAB=H OEBA=H -> Isolation      (both sides Hi-Z)
+    //   OEAB=L OEBA=L -> "Latch A and B (A=B)": both drivers active form a feedback
+    //     latch that holds the last word. Modeled here by re-driving both buses
+    //     with the last value that flowed through (a faithful digital approximation
+    //     of the analog bus-hold; see issues.md).
+    const inv = !!gate.invert;  // 74x862 inverting variant (opt-in; '861 leaves it off)
+    const oeAB = this._readPinBit(comp, gate.inputs[20]);
+    const oeBA = this._readPinBit(comp, gate.inputs[21]);
+    const aOut = gate.outputs.slice(0, 10);
+    const bOut = gate.outputs.slice(10, 20);
+    const state = this._getSeqState(comp, gate.outputs[0] + '_xcvr861', { latched: new Array(10).fill(0), lastDir: 'AB' });
+    let changed = false;
+    if (oeAB === 0 && oeBA !== 0) {
+      // A -> B
+      if (this._drivePinsHighZ(comp, aOut)) changed = true;
+      const aBits = [];
+      for (let i = 0; i < 10; i++) aBits.push(this._readPinBit(comp, gate.inputs[i]));
+      state.latched = aBits.slice();
+      state.lastDir = 'AB';
+      if (this._drivePinBits(comp, bOut, inv ? aBits.map(b => b ^ 1) : aBits)) changed = true;
+    } else if (oeBA === 0 && oeAB !== 0) {
+      // B -> A
+      if (this._drivePinsHighZ(comp, bOut)) changed = true;
+      const bBits = [];
+      for (let i = 0; i < 10; i++) bBits.push(this._readPinBit(comp, gate.inputs[10 + i]));
+      state.latched = bBits.slice();
+      state.lastDir = 'BA';
+      if (this._drivePinBits(comp, aOut, inv ? bBits.map(b => b ^ 1) : bBits)) changed = true;
+    } else if (oeAB === 0 && oeBA === 0) {
+      // Latch: hold last word. `latched` is the source side; the destination
+      // side held its (possibly inverted) copy. Re-drive both buses.
+      const src = state.latched;
+      const dst = inv ? src.map(b => b ^ 1) : src;
+      if (this._drivePinBits(comp, aOut, state.lastDir === 'AB' ? src : dst)) changed = true;
+      if (this._drivePinBits(comp, bOut, state.lastDir === 'AB' ? dst : src)) changed = true;
+    } else {
+      // Isolation
+      if (this._drivePinsHighZ(comp, gate.outputs)) changed = true;
+    }
+    return changed;
+  }
+
+  _evaluateBusXcvr9BitQuadOe(comp, gate) {
+    // 74x863: 9 bit non-inverting bus transceiver, 3-state, with two active-LOW
+    // output-enable pins per direction (both of a pair must be LOW to enable that
+    // direction). Source: TI, "SN54ABT863, SN74ABT863 9-Bit Bus Transceivers With
+    // 3-State Outputs", SCBS201E (Jul 1998).
+    // gate.inputs:  [A1..A9, B1..B9, OEBA1, OEBA2, OEAB1, OEAB2]
+    //   indices 0-8 A, 9-17 B, 18 OEBA1, 19 OEBA2, 20 OEAB1, 21 OEAB2
+    // gate.outputs: [A1..A9, B1..B9]  (0-8 A, 9-17 B)
+    // FUNCTION TABLE (SCBS201E p.2):
+    //   A->B enabled  when OEAB1=L and OEAB2=L
+    //   B->A enabled  when OEBA1=L and OEBA2=L
+    //   both enabled  -> "Latch A and B": both drivers active, holds the last word
+    //   neither       -> Isolation (all Hi-Z)
+    const oeba1 = this._readPinBit(comp, gate.inputs[18]);
+    const oeba2 = this._readPinBit(comp, gate.inputs[19]);
+    const oeab1 = this._readPinBit(comp, gate.inputs[20]);
+    const oeab2 = this._readPinBit(comp, gate.inputs[21]);
+    const a2b = (oeab1 === 0 && oeab2 === 0);
+    const b2a = (oeba1 === 0 && oeba2 === 0);
+    const aOut = gate.outputs.slice(0, 9);
+    const bOut = gate.outputs.slice(9, 18);
+    const state = this._getSeqState(comp, gate.outputs[0] + '_xcvr863', { latched: new Array(9).fill(0) });
+    let changed = false;
+    if (a2b && !b2a) {
+      // A -> B
+      if (this._drivePinsHighZ(comp, aOut)) changed = true;
+      const aBits = [];
+      for (let i = 0; i < 9; i++) aBits.push(this._readPinBit(comp, gate.inputs[i]));
+      state.latched = aBits.slice();
+      if (this._drivePinBits(comp, bOut, aBits)) changed = true;
+    } else if (b2a && !a2b) {
+      // B -> A
+      if (this._drivePinsHighZ(comp, bOut)) changed = true;
+      const bBits = [];
+      for (let i = 0; i < 9; i++) bBits.push(this._readPinBit(comp, gate.inputs[9 + i]));
+      state.latched = bBits.slice();
+      if (this._drivePinBits(comp, aOut, bBits)) changed = true;
+    } else if (a2b && b2a) {
+      // Latch A and B (A = B): hold last word on both buses.
+      if (this._drivePinBits(comp, aOut, state.latched)) changed = true;
+      if (this._drivePinBits(comp, bOut, state.latched)) changed = true;
+    } else {
+      // Isolation
+      if (this._drivePinsHighZ(comp, gate.outputs)) changed = true;
+    }
+    return changed;
+  }
+
   _evaluateMux2to1Tri(comp, gate) {
-    // 74257-style: 2-to-1 multiplexer with active LOW tri-state output enable.
+    // 74257-style: 2-to-1 multiplexer with active LOW tri state output enable.
     // inputs: [A, B, SEL, OE], output (single name string)
     // OE=0: SEL=0→Y=A, SEL=1→Y=B. OE=1: HiZ.
     const [aName,bName,selName,oeName] = gate.inputs;
@@ -3762,34 +5524,124 @@ class _ChipEvalMixin {
     return this._drivePinBit(comp, gate.output, sel ? b : a);
   }
 
+  _evaluateMux3BusTri(comp, gate) {
+    // Signetics 74F732 (inverting) / 74F733 (non-inverting): Quad Data
+    // Multiplexer. Three bidirectional 4-bit bus ports A, B, C share one set of
+    // select/direction controls. (S0,S1,DIR) pick a data-flow source→dest from
+    // the datasheet FUNCTION TABLE; each port has its own active-LOW Output
+    // Enable. A port with OE=HIGH is Hi-Z (input only). gate.invert => a driven
+    // destination carries the complement of the source (74F732); an enabled
+    // port with no selected source is forced HIGH (74F732) / LOW (74F733).
+    //   inputs:  [A0..A3, B0..B3, C0..C3, S0, S1, DIR, OEAn, OEBn, OECn]  (0-17)
+    //   outputs: [A0..A3, B0..B3, C0..C3]                                 (0-11)
+    // Bus index: 0=A, 1=B, 2=C (bus k uses input/output slots [k*4 .. k*4+3]).
+    const inv = !!gate.invert;
+    const s0  = this._readPinBit(comp, gate.inputs[12]);
+    const s1  = this._readPinBit(comp, gate.inputs[13]);
+    const dir = this._readPinBit(comp, gate.inputs[14]);
+    const oe  = [ this._readPinBit(comp, gate.inputs[15]),    // OEAn
+                  this._readPinBit(comp, gate.inputs[16]),    // OEBn
+                  this._readPinBit(comp, gate.inputs[17]) ];  // OECn
+
+    // Resolve source bus + destination set from (S0,S1,DIR) per FUNCTION TABLE.
+    let src, dests;
+    if (s0 === 1 && s1 === 1)      { src = 0; dests = [1, 2]; }                          // A → B and C (DIR x)
+    else if (s0 === 0 && s1 === 0) { if (dir === 0) { src = 0; dests = [2]; } else { src = 2; dests = [0]; } } // A↔C
+    else if (s0 === 0 && s1 === 1) { if (dir === 0) { src = 1; dests = [2]; } else { src = 2; dests = [1]; } } // B↔C
+    else                          { if (dir === 0) { src = 0; dests = [1]; } else { src = 1; dests = [0]; } }  // A↔B (S0=1,S1=0)
+
+    const forced = inv ? 1 : 0;
+    let changed = false;
+    for (let bus = 0; bus < 3; bus++) {
+      const outBase = bus * 4;
+      if (oe[bus] !== 0) {                          // OE HIGH → release the bus (input only)
+        for (let i = 0; i < 4; i++)
+          if (this._drivePinHighZ(comp, gate.outputs[outBase + i])) changed = true;
+      } else if (bus !== src && dests.indexOf(bus) !== -1) {  // valid destination → follow source
+        const srcBase = src * 4;
+        for (let i = 0; i < 4; i++) {
+          let bit = this._readPinBit(comp, gate.inputs[srcBase + i]);
+          if (inv) bit = bit ? 0 : 1;
+          if (this._drivePinBit(comp, gate.outputs[outBase + i], bit)) changed = true;
+        }
+      } else {                                      // enabled but no source selected → forced level
+        for (let i = 0; i < 4; i++)
+          if (this._drivePinBit(comp, gate.outputs[outBase + i], forced)) changed = true;
+      }
+    }
+    return changed;
+  }
+
   _evaluateAddressableLatch(comp, gate) {
-    // 74259: 8 bit addressable latch.
+    // 74259 / CD4099: 8 bit addressable latch.
     // inputs: [A0, A1, A2, D, G, CLR]
     // outputs: [Q0..Q7]
-    // CLR=0 (active LOW, async): clears all Q to 0.
-    // CLR=1, G=0 (active LOW enable): addressed latch follows D; others hold.
-    // CLR=1, G=1: all latches hold state.
+    // Default (active-LOW controls, e.g. 74x259 / 74x4724 HC259). Four modes,
+    // straight from the SN74LS259B / SN74HC259 function table (CLR and G both
+    // active LOW):
+    //   CLR=1, G=0: addressable latch  — addressed latch follows D; others hold.
+    //   CLR=1, G=1: memory             — all latches hold state.
+    //   CLR=0, G=0: 8-line demux       — addressed output follows D; others 0.
+    //   CLR=0, G=1: clear              — all outputs 0 (asynchronous).
+    // gate.resetActiveHigh (CD4724B, 4000-series): the two control pins invert
+    //   polarity AND the reset is GATED by write-disable, giving a true 1-of-8
+    //   demultiplexer mode. The G slot carries WRITE DISABLE (active HIGH =
+    //   inhibit writes) and the CLR slot carries RESET (active HIGH). Per the
+    //   CD4724B MODE SELECTION table:
+    //     WD=0,R=0: addressed follows D; unaddressed hold.
+    //     WD=0,R=1: addressed follows D (active-high 8-ch demux); unaddressed → 0.
+    //     WD=1,R=0: all hold.
+    //     WD=1,R=1: all reset to 0.
     const [a0N,a1N,a2N,dN,gN,clrN] = gate.inputs;
     const state = this._getSeqState(comp, gate.outputs[0],
       { q: new Array(8).fill(0) });
 
-    const clr = this._readPinBit(comp, clrN);
-    if (clr === 0) {
-      state.q.fill(0);
-    } else {
-      const g = this._readPinBit(comp, gN);
-      if (g === 0) {
-        const addr = this._readPinBit(comp, a0N)
-          | (this._readPinBit(comp, a1N) << 1)
-          | (this._readPinBit(comp, a2N) << 2);
-        state.q[addr] = this._readPinBit(comp, dN);
+    const addr = this._readPinBit(comp, a0N)
+      | (this._readPinBit(comp, a1N) << 1)
+      | (this._readPinBit(comp, a2N) << 2);
+
+    if (gate.resetActiveHigh) {
+      const wd = this._readPinBit(comp, gN);   // WRITE DISABLE, active HIGH
+      const r  = this._readPinBit(comp, clrN); // RESET, active HIGH
+      const d  = this._readPinBit(comp, dN);
+      for (let i = 0; i < 8; i++) {
+        if (i === addr) {
+          if (wd === 0)     state.q[i] = d;    // addressed latch follows data
+          else if (r === 1) state.q[i] = 0;    // WD=1,R=1: reset addressed bit
+          // else WD=1,R=0: hold
+        } else {
+          if (r === 1)      state.q[i] = 0;    // unaddressed reset when R high
+          // else hold previous state
+        }
       }
+      return this._drivePinBits(comp, gate.outputs, state.q.slice());
     }
+
+    const clr = this._readPinBit(comp, clrN);
+    const g = this._readPinBit(comp, gN);
+    if (clr === 0) {
+      // CLR active (LOW): every UNADDRESSED latch is held cleared to 0.
+      if (g === 0) {
+        // 8-line demultiplexer mode (CLR=L, G=L): the addressed output follows
+        // D while all seven others stay LOW ('259 function table, row 3). Before
+        // this fix the demux mode was broken — CLR=L forced ALL outputs to 0,
+        // so the addressed output never went HIGH even with D=1 (issues.md C116).
+        const d = this._readPinBit(comp, dN);
+        for (let i = 0; i < 8; i++) state.q[i] = (i === addr) ? d : 0;
+      } else {
+        // Clear mode (CLR=L, G=H): all outputs LOW.
+        state.q.fill(0);
+      }
+    } else if (g === 0) {
+      // Addressable-latch mode (CLR=H, G=L): addressed latch follows D, others hold.
+      state.q[addr] = this._readPinBit(comp, dN);
+    }
+    // else CLR=H, G=H: memory mode — every latch holds its stored value.
     return this._drivePinBits(comp, gate.outputs, state.q.slice());
   }
 
   _evaluateDFFOctal(comp, gate) {
-    // 74273: Octal D flip-flop with asynchronous active LOW clear.
+    // 74273: Octal D flip flop with asynchronous active LOW clear.
     // inputs: [1D..8D, CLK, CLR], outputs: [1Q..8Q]
     const dNames    = gate.inputs.slice(0, 8);
     const [clkN,clrN] = gate.inputs.slice(8);
@@ -3812,7 +5664,7 @@ class _ChipEvalMixin {
   }
 
   _evaluateDLatchOctalTri(comp, gate) {
-    // 74373/74573: Octal D transparent latch with tri-state outputs.
+    // 74373/74573: Octal D transparent latch with tri state outputs.
     // inputs: [1D..8D, LE, OE], outputs: [1Q..8Q]
     // LE=1: Q follows D (transparent). LE=0: hold.
     // OE=0 (active LOW): outputs enabled. OE=1: HiZ (0).
@@ -3834,8 +5686,53 @@ class _ChipEvalMixin {
     }
   }
 
+  _evaluateReadBackLatch(comp, gate) {
+    // 74x990 family: N-bit D-type transparent READ-BACK latch.
+    // The Q outputs are TRUE LOGIC outputs (always driven, never 3-stated) that
+    // follow the D inputs while LE is HIGH and hold when LE is LOW. The special
+    // feature is read-back: the D pins are a 3-state I/O bus. When OERB is LOW,
+    // the stored latch data is driven back onto the D pins; when OERB is HIGH,
+    // the D pins are released (input only). OERB does not affect the Q outputs or
+    // the internal latch state.
+    //   Width N = half of gate.outputs.length.
+    //   inputs:  [D0..D(N-1), LE, OERB]
+    //   outputs: [Q0..Q(N-1),  D0..D(N-1)]   (the D pins are listed again as the
+    //            read-back drive targets, the 74x870 bidirectional-pin pattern)
+    //   gate.invert === true → Q = NOT stored (reserved for the inverting 74x991;
+    //            unused by the 990). Read-back always presents the stored data.
+    const n      = gate.outputs.length / 2;
+    const dNames = gate.inputs.slice(0, n);
+    const leN    = gate.inputs[n];
+    const oerbN  = gate.inputs[n + 1];
+    const qOut   = gate.outputs.slice(0, n);
+    const dOut   = gate.outputs.slice(n, 2 * n);
+    const inv    = gate.invert === true;
+    const state  = this._getSeqState(comp, gate.outputs[0],
+      { q: new Array(n).fill(0) });
+
+    const le = this._readPinBit(comp, leN);
+    if (le === 1) {
+      for (let i = 0; i < n; i++) state.q[i] = this._readPinBit(comp, dNames[i]);
+    }
+
+    let changed = false;
+    // True logic Q outputs — always driven.
+    const qVals = inv ? state.q.map(b => b ^ 1) : state.q.slice();
+    if (this._drivePinBits(comp, qOut, qVals)) changed = true;
+
+    // Read-back: OERB LOW drives the stored byte back onto the D pins; OERB HIGH
+    // releases them so the D pins act as ordinary inputs.
+    const oerb = this._readPinBit(comp, oerbN);
+    if (oerb === 0) {
+      if (this._drivePinBits(comp, dOut, state.q.slice())) changed = true;
+    } else {
+      for (const p of dOut) if (this._drivePinHighZ(comp, p)) changed = true;
+    }
+    return changed;
+  }
+
   _evaluateDFFOctalTri(comp, gate) {
-    // 74374/74574: Octal D edge-triggered flip-flop with tri-state outputs.
+    // 74374/74574: Octal D edge triggered flip flop with tri state outputs.
     // inputs: [1D..8D, CLK, OE], outputs: [1Q..8Q]
     // Rising CLK: Q latches D.
     // OE=0 (active LOW): outputs enabled. OE=1: HiZ.
@@ -3858,23 +5755,453 @@ class _ChipEvalMixin {
     }
   }
 
+  _evaluateDFFRegTri(comp, gate) {
+    // Width-agnostic edge-triggered D register with common clock and 3-state
+    // outputs. Width N = number of outputs.
+    // 74x821 (10-bit, non-inverting) and 74x822 (10-bit, inverting) use this;
+    // the octal 374/574 keep their own primitive.
+    // inputs: [D0..D(N-1), CLK, OE], outputs: [Q0..Q(N-1)]
+    // Rising CLK: each Q latches its D (gate.invert === true → Q = NOT D, the
+    // '822). OE=0 (active LOW): drive Q. OE=1: HiZ.
+    // OE does not affect the stored state (Function Table: NC in data on hold).
+    const inv      = gate.invert === true;
+    const n        = gate.outputs.length;
+    const dNames   = gate.inputs.slice(0, n);
+    const [clkN,oeN] = gate.inputs.slice(n);
+    const state = this._getSeqState(comp, gate.outputs[0],
+      { q: new Array(n).fill(0), prevClk: 0 });
+
+    const clk = this._readPinBit(comp, clkN);
+    if (state.prevClk === 0 && clk === 1) {
+      for (let i = 0; i < n; i++) {
+        const d = this._readPinBit(comp, dNames[i]);
+        state.q[i] = inv ? (d ^ 1) : d;
+      }
+    }
+    state.prevClk = clk;
+
+    const oe = this._readPinBit(comp, oeN);
+    if (oe === 0) {
+      return this._drivePinBits(comp, gate.outputs, state.q);
+    } else {
+      return this._drivePinsHighZ(comp, gate.outputs);
+    }
+  }
+
+  _evaluateDFFRegTriClrEn(comp, gate) {
+    // Width-agnostic edge-triggered D register with async clear, clock enable,
+    // and 3-state outputs gated by one or more active-LOW output enables.
+    // Width N = number of outputs. Used by the 74x82x "bus interface" registers:
+    //   74x825 (8-bit, non-inverting, three OE), and reusable for the 9-bit 74x823.
+    // inputs: [D0..D(N-1), CLK, CLRn, ENn, OE0..OEk], outputs: [Q0..Q(N-1)]
+    // Source of behavior: Fairchild/National 54ACT/74ACT825 function table.
+    //   CLRn = 0            : async clear, internal Q -> 0 (dominant over clock/EN)
+    //   CLRn = 1, ENn = 0   : rising CLK loads D (Q = NOT D when gate.invert)
+    //   CLRn = 1, ENn = 1   : hold, clock ignored
+    //   any OE input HIGH   : outputs HiZ; all OE LOW: outputs drive Q.
+    // Output enable never affects the stored state (Function Table: internal Q
+    // holds/loads while outputs are High-Z).
+    const inv    = gate.invert === true;
+    const n      = gate.outputs.length;
+    const dNames = gate.inputs.slice(0, n);
+    const clkN   = gate.inputs[n];
+    const clrN   = gate.inputs[n + 1];
+    const enN    = gate.inputs[n + 2];
+    const oeNames = gate.inputs.slice(n + 3);
+    const state = this._getSeqState(comp, gate.outputs[0],
+      { q: new Array(n).fill(0), prevClk: 0 });
+
+    const clr = this._readPinBit(comp, clrN);
+    const clk = this._readPinBit(comp, clkN);
+    const en  = this._readPinBit(comp, enN);
+    if (clr === 0) {
+      // Asynchronous, level-sensitive clear dominates.
+      for (let i = 0; i < n; i++) state.q[i] = 0;
+    } else if (state.prevClk === 0 && clk === 1 && en === 0) {
+      for (let i = 0; i < n; i++) {
+        const d = this._readPinBit(comp, dNames[i]);
+        state.q[i] = inv ? (d ^ 1) : d;
+      }
+    }
+    state.prevClk = clk;
+
+    // Outputs drive only when every active-LOW output enable is LOW.
+    let enabled = true;
+    for (const oeN of oeNames) {
+      if (this._readPinBit(comp, oeN) !== 0) { enabled = false; break; }
+    }
+    if (enabled) {
+      return this._drivePinBits(comp, gate.outputs, state.q);
+    } else {
+      return this._drivePinsHighZ(comp, gate.outputs);
+    }
+  }
+
+  _evaluateDFFRegTriSetInv(comp, gate) {
+    // Width-agnostic positive-edge-triggered D register with async active-LOW
+    // preset and INVERTING 3-state outputs. One bank (N = number of outputs);
+    // the 74x876 is two of these driven independently.
+    // inputs: [D0..D(N-1), CLK, PREn, OEn], outputs: [Q0n..Q(N-1)]
+    // Source of behavior: TI SDAS061C function table (SN74ALS876A / SN74AS876),
+    // OUTPUT column is Q̄:
+    //   OE=L PRE=L  X  X  -> Q̄=L   (async preset forces internal Q=1)
+    //   OE=L PRE=H  ^  H  -> Q̄=L   (rising CLK loads D=1 -> Q=1)
+    //   OE=L PRE=H  ^  L  -> Q̄=H   (rising CLK loads D=0 -> Q=0)
+    //   OE=L PRE=H  L  X  -> Q̄0    (hold)
+    //   OE=H  X     X  X  -> Z      (output disabled; internal Q unaffected)
+    // The stored state is the true Q; each output pin drives NOT Q.
+    const n          = gate.outputs.length;
+    const dNames     = gate.inputs.slice(0, n);
+    const [clkN,preN,oeN] = gate.inputs.slice(n);
+    const state = this._getSeqState(comp, gate.outputs[0],
+      { q: new Array(n).fill(0), prevClk: 0 });
+
+    const pre = this._readPinBit(comp, preN);
+    const clk = this._readPinBit(comp, clkN);
+    if (pre === 0) {
+      // Asynchronous, level-sensitive preset dominates: internal Q -> 1.
+      for (let i = 0; i < n; i++) state.q[i] = 1;
+    } else if (state.prevClk === 0 && clk === 1) {
+      for (let i = 0; i < n; i++) state.q[i] = this._readPinBit(comp, dNames[i]);
+    }
+    state.prevClk = clk;
+
+    const oe = this._readPinBit(comp, oeN);
+    if (oe === 0) {
+      // Inverting outputs: drive NOT Q.
+      return this._drivePinBits(comp, gate.outputs, state.q.map(b => b ^ 1));
+    } else {
+      return this._drivePinsHighZ(comp, gate.outputs);
+    }
+  }
+
+  _evaluateDFFRegSyncClrTri(comp, gate) {
+    // Width-agnostic positive-edge-triggered D register with SYNCHRONOUS clear
+    // and 3-state outputs gated by one active-LOW output enable. Width N = number
+    // of outputs. One instance models one 4-bit bank; the dual 74x878 (true) and
+    // 74x879 (inverting) each use two of these gates.
+    // inputs: [D0..D(N-1), CLK, CLRn, OE], outputs: [Q0..Q(N-1)]
+    // Behavior from the SN74ALS878A/SN74ALS879A function table (see chips43.js
+    // header comment). state.q holds the value driven onto the pins. On the
+    // LOW->HIGH transition of CLK:
+    //   CLRn = 0 : internal register -> 0 (synchronous clear, only acts on edge)
+    //   CLRn = 1 : internal register  = D
+    // For an inverting part (gate.invert, the '879) each output pin drives the
+    // complement, so a cleared register reads HIGH and a loaded D reads NOT D.
+    // CLK not rising: Q holds. OE (OC, active LOW): OE=0 drive Q, OE=1 High-Z.
+    // OE never affects the stored state.
+    const inv    = gate.invert === true;
+    const n      = gate.outputs.length;
+    const dNames = gate.inputs.slice(0, n);
+    const clkN   = gate.inputs[n];
+    const clrN   = gate.inputs[n + 1];
+    const oeN    = gate.inputs[n + 2];
+    const state = this._getSeqState(comp, gate.outputs[0],
+      { q: new Array(n).fill(0), prevClk: 0 });
+
+    const clk = this._readPinBit(comp, clkN);
+    if (state.prevClk === 0 && clk === 1) {
+      const clr = this._readPinBit(comp, clrN);
+      if (clr === 0) {
+        // Synchronous clear: internal register -> 0. An inverting output pin
+        // (the '879) therefore reads HIGH; a true output (the '878) reads LOW.
+        for (let i = 0; i < n; i++) state.q[i] = inv ? 1 : 0;
+      } else {
+        for (let i = 0; i < n; i++) {
+          const d = this._readPinBit(comp, dNames[i]);
+          state.q[i] = inv ? (d ^ 1) : d;
+        }
+      }
+    }
+    state.prevClk = clk;
+
+    const oe = this._readPinBit(comp, oeN);
+    if (oe === 0) {
+      return this._drivePinBits(comp, gate.outputs, state.q);
+    } else {
+      return this._drivePinsHighZ(comp, gate.outputs);
+    }
+  }
+
+  _evaluateDFFRegTriClr(comp, gate) {
+    // Width-agnostic positive-edge-triggered D register with asynchronous
+    // active-LOW clear and a single active-LOW 3-state output enable. No clock
+    // enable (distinct from D_FF_REG_TRI_CLR_EN). Width N = number of outputs.
+    // Each of the two 4-bit banks of the 74x874 uses this primitive.
+    // inputs: [D0..D(N-1), CLK, CLRn, OEn], outputs: [Q0..Q(N-1)]
+    // Source of behavior: Texas Instruments SN74ALS874B function table (each
+    //   flip-flop): OE=L CLR=L -> Q=L (async clear, dominates clock); OE=L CLR=H
+    //   rising CLK -> Q=D; OE=L CLR=H no edge -> Q holds; OE=H -> outputs HiZ.
+    // gate.invert === true → Q = NOT D (the '876 inverting variant, if wired).
+    // Output enable never affects the stored state.
+    const inv    = gate.invert === true;
+    const n      = gate.outputs.length;
+    const dNames = gate.inputs.slice(0, n);
+    const clkN   = gate.inputs[n];
+    const clrN   = gate.inputs[n + 1];
+    const oeN    = gate.inputs[n + 2];
+    const state = this._getSeqState(comp, gate.outputs[0],
+      { q: new Array(n).fill(0), prevClk: 0 });
+
+    const clr = this._readPinBit(comp, clrN);
+    const clk = this._readPinBit(comp, clkN);
+    if (clr === 0) {
+      // Asynchronous, level-sensitive clear dominates the clock.
+      for (let i = 0; i < n; i++) state.q[i] = 0;
+    } else if (state.prevClk === 0 && clk === 1) {
+      for (let i = 0; i < n; i++) {
+        const d = this._readPinBit(comp, dNames[i]);
+        state.q[i] = inv ? (d ^ 1) : d;
+      }
+    }
+    state.prevClk = clk;
+
+    const oe = this._readPinBit(comp, oeN);
+    if (oe === 0) {
+      return this._drivePinBits(comp, gate.outputs, state.q);
+    } else {
+      return this._drivePinsHighZ(comp, gate.outputs);
+    }
+  }
+
+  _evaluateDLatchRegTri(comp, gate) {
+    // Width-agnostic transparent D-type LATCH bank with common latch-enable (LE)
+    // and 3-state outputs. Width N = number of outputs.
+    // 74x841 (10-bit, non-inverting) uses this; the octal 373/573 keep their own
+    // _evaluateDLatchOctalTri primitive, and a future 74x842 (inverting D) can
+    // reuse this with gate.invert.
+    // inputs: [D0..D(N-1), LE, OE], outputs: [Q0..Q(N-1)]
+    // Level-controlled (NOT edge-triggered):
+    //   LE=1 → transparent, Q follows D (Q = NOT D when gate.invert, the '842)
+    //   LE=0 → latched, Q holds its last value
+    // OE=0 (active LOW): drive Q. OE=1: HiZ.
+    // Per the SN74ALS841 Function Table, OE does not affect the internal latch:
+    // data can still be captured while the outputs are disabled.
+    const inv        = gate.invert === true;
+    const n          = gate.outputs.length;
+    const dNames     = gate.inputs.slice(0, n);
+    const [leN, oeN] = gate.inputs.slice(n);
+    const state = this._getSeqState(comp, gate.outputs[0],
+      { q: new Array(n).fill(0) });
+
+    const le = this._readPinBit(comp, leN);
+    if (le === 1) {
+      for (let i = 0; i < n; i++) {
+        const d = this._readPinBit(comp, dNames[i]);
+        state.q[i] = inv ? (d ^ 1) : d;
+      }
+    }
+
+    const oe = this._readPinBit(comp, oeN);
+    if (oe === 0) {
+      return this._drivePinBits(comp, gate.outputs, state.q);
+    } else {
+      return this._drivePinsHighZ(comp, gate.outputs);
+    }
+  }
+
+  _evaluateRegReadback996(comp, gate) {
+    // 74x996: 8-bit D-type edge-triggered read-back latch with 3-state I/O.
+    // Source of behavior: TI SN54ALS996/SN74ALS996 "8-Bit D-Type Edge-Triggered
+    //   Read-Back Latches" SDAS098B, description + logic diagram, page 1-2.
+    // The eight D pins are BIDIRECTIONAL (bus-structured): normally inputs, but
+    // driven with the stored byte during a read-back. So each D name appears in
+    // both gate.inputs (to sense external data) and gate.outputs (to drive it).
+    //   inputs:  [1D..8D, ENn, RDn, CLK, CLRn, TC, OEn]  (0-7 D, 8 EN, 9 RD,
+    //            10 CLK, 11 CLR, 12 T/C, 13 OE)
+    //   outputs: [1Q..8Q, 1D..8D]                        (0-7 Q, 8-15 D read-back)
+    // Function (all enables active LOW):
+    //   CLRn = 0            : async clear, internal register -> 0 (overrides all)
+    //   CLRn = 1, ENn = 0   : rising CLK loads the D pins into the register
+    //   ENn  = 1            : write disabled AND read-back disabled; CLK ignored
+    //   Q outputs: T/C = 1 -> Q = stored data; T/C = 0 -> Q = inverted stored.
+    //   OEn = 1            : Q pins high-Z (does not affect stored state).
+    //   ENn = 0 AND RDn = 0: drive the stored (true) byte back onto the D pins;
+    //     otherwise the D drivers are high-Z so the pins act as data inputs.
+    //   Read-back presents true stored data, unaffected by T/C (per logic diagram:
+    //   the read-back buffer taps the flip-flop Q ahead of the T/C polarity XOR).
+    const dNames = gate.inputs.slice(0, 8);
+    const enN    = gate.inputs[8];
+    const rdN    = gate.inputs[9];
+    const clkN   = gate.inputs[10];
+    const clrN   = gate.inputs[11];
+    const tcN    = gate.inputs[12];
+    const oeN    = gate.inputs[13];
+    const qOut   = gate.outputs.slice(0, 8);
+    const dOut   = gate.outputs.slice(8, 16);
+    const state = this._getSeqState(comp, gate.outputs[0],
+      { q: new Array(8).fill(0), prevClk: 0 });
+
+    const clr = this._readPinBit(comp, clrN);
+    const en  = this._readPinBit(comp, enN);
+    const clk = this._readPinBit(comp, clkN);
+    if (clr === 0) {
+      // Asynchronous, level-sensitive clear dominates the clock.
+      for (let i = 0; i < 8; i++) state.q[i] = 0;
+    } else if (state.prevClk === 0 && clk === 1 && en === 0) {
+      for (let i = 0; i < 8; i++) state.q[i] = this._readPinBit(comp, dNames[i]);
+    }
+    state.prevClk = clk;
+
+    let changed = false;
+
+    // Q outputs: polarity set by T/C, released to high-Z by OE.
+    const tc = this._readPinBit(comp, tcN);
+    const oe = this._readPinBit(comp, oeN);
+    const qBits = tc === 1 ? state.q.slice() : state.q.map(b => b ^ 1);
+    if (oe === 0) {
+      if (this._drivePinBits(comp, qOut, qBits)) changed = true;
+    } else {
+      if (this._drivePinsHighZ(comp, qOut)) changed = true;
+    }
+
+    // Read-back onto the D bus: only when both EN and RD are LOW.
+    const rd = this._readPinBit(comp, rdN);
+    if (en === 0 && rd === 0) {
+      if (this._drivePinBits(comp, dOut, state.q.slice())) changed = true;
+    } else {
+      if (this._drivePinsHighZ(comp, dOut)) changed = true;
+    }
+    return changed;
+  }
+
+  _evaluateLatchReadbackBidirTri(comp, gate) {
+    // Width-agnostic TRANSPARENT D-type READ-BACK latch with a true BIDIRECTIONAL
+    // read-back path. Models the TI ALS read-back-latch family as drawn on the
+    // datasheet: SN74ALS990 (8-bit), SN74ALS994 (10-bit). This is the level-
+    // controlled twin of the edge-triggered 74x996 (_evaluateRegReadback996
+    // above) and shares that part's 3-state I/O read-back convention.
+    // (Distinct from LATCH_READBACK_TRI, which a sibling models Q-side-only with
+    // an OEn/CLR contract and no read-back onto D — see that primitive.)
+    //
+    // Unlike the 74x841 (D_LATCH_REG_TRI): the Q outputs here ALWAYS drive
+    // (true logic outputs, never Hi-Z) and the enable pin does not gate Q.
+    // Instead the D pins are BIDIRECTIONAL: when OERB (Output-Enable Read-Back,
+    // active LOW) is taken LOW the stored word is driven BACK onto the D pins so
+    // a CPU can read the held value off the same data bus it was captured from.
+    // Each D name therefore appears in both gate.inputs (sense) and gate.outputs
+    // (drive during read-back).
+    // Source: TI, "SN74ALS994 10-Bit D-Type Transparent Read-Back Latch",
+    //   SDAS237A (Oct 1984, rev. Jan 1995), description + logic diagram, page 1.
+    //   inputs:  [D0..D(N-1), LE, OERB]     (D pins are the bidir data bus)
+    //   outputs: [Q0..Q(N-1), D0..D(N-1)]   (Q always driven; D driven only
+    //                                        during read-back)
+    // Level-controlled, NOT edge-triggered:
+    //   LE=1   -> transparent, Q follows D
+    //   LE=0   -> latched, Q holds its last value
+    //   OERB=0 -> drive the stored word back onto the D pins (read-back)
+    //   OERB=1 -> D drivers Hi-Z, so the D pins act as plain inputs
+    // OERB does not affect the internal latch (data is still captured while
+    // read-back is active). With OERB tied HIGH this is a plain N-bit
+    // transparent latch with permanently-enabled true outputs. gate.invert
+    // (opt-in) complements the stored data for an inverting sibling.
+    const inv          = gate.invert === true;
+    const n            = gate.outputs.length / 2;
+    const dNames       = gate.inputs.slice(0, n);
+    const [leN, oerbN] = gate.inputs.slice(n);
+    const qOut         = gate.outputs.slice(0, n);
+    const dOut         = gate.outputs.slice(n, 2 * n);
+    const state = this._getSeqState(comp, gate.outputs[0],
+      { q: new Array(n).fill(0) });
+
+    const le = this._readPinBit(comp, leN);
+    if (le === 1) {
+      for (let i = 0; i < n; i++) {
+        const d = this._readPinBit(comp, dNames[i]);
+        state.q[i] = inv ? (d ^ 1) : d;
+      }
+    }
+
+    let changed = false;
+    // True logic outputs: Q always drives the stored word.
+    if (this._drivePinBits(comp, qOut, state.q.slice())) changed = true;
+    // Read-back path onto the D I/O pins.
+    const oerb = this._readPinBit(comp, oerbN);
+    if (oerb === 0) {
+      if (this._drivePinBits(comp, dOut, state.q.slice())) changed = true;
+    } else {
+      if (this._drivePinsHighZ(comp, dOut)) changed = true;
+    }
+    return changed;
+  }
+
+  _evaluateDiagScanReg818(comp, gate) {
+    // 74x818 / CY29FCT818T / Am29818: 8-bit diagnostic scan register.
+    // Two 8-bit registers linked by a MODE-selected multiplexer:
+    //   - Pipeline register P0..P7  → drives Y0..Y7 through the OE tri-state buffer.
+    //   - Shadow register  S0..S7  → serial scan chain (SDI in, SDO = S7 out).
+    // Two independent clocks (DCLK for the shadow reg, PCLK for the pipeline reg)
+    // and a MODE input choosing the data paths. Function table (datasheet, page 2):
+    //   MODE=L, DCLK↑        : shadow serial shift, S0←SDI, Si←Si-1     (SDO=S7)
+    //   MODE=L, PCLK↑        : pipeline load from D inputs, Pi←Di
+    //   MODE=H, SDI=L, DCLK↑ : shadow load from Y outputs, Si←Yi (=Pi)
+    //   MODE=H, SDI=H, DCLK↑ : shadow hold
+    //   MODE=H, PCLK↑        : pipeline load from shadow, Pi←Si
+    // OE (active LOW) enables Y0..Y7; SDO (=S7) is always driven.
+    // inputs: [OEn, DCLK, PCLK, MODE, SDI, D0..D7]
+    // outputs: [SDO, Y0..Y7]
+    const [oeN, dclkN, pclkN, modeN, sdiN] = gate.inputs.slice(0, 5);
+    const dNames = gate.inputs.slice(5, 13);
+    const state = this._getSeqState(comp, gate.outputs[0],
+      { s: new Array(8).fill(0), p: new Array(8).fill(0), prevDclk: 0, prevPclk: 0 });
+
+    const mode = this._readPinBit(comp, modeN);
+    const sdi  = this._readPinBit(comp, sdiN);
+    const dclk = this._readPinBit(comp, dclkN);
+    const pclk = this._readPinBit(comp, pclkN);
+    // Snapshot pre-edge register contents so DCLK and PCLK edges that land in the
+    // same evaluation both use the old values (the two clocks are independent).
+    const oldS = state.s.slice();
+    const oldP = state.p.slice();
+
+    if (state.prevDclk === 0 && dclk === 1) {
+      if (mode === 0) {
+        state.s = [sdi, ...oldS.slice(0, 7)];   // S0←SDI, Si←Si-1
+      } else if (sdi === 0) {
+        state.s = oldP.slice();                 // Si←Yi (= pipeline Pi)
+      }                                         // MODE=H, SDI=H → hold
+    }
+    state.prevDclk = dclk;
+
+    if (state.prevPclk === 0 && pclk === 1) {
+      if (mode === 0) {
+        state.p = dNames.map((n) => this._readPinBit(comp, n));   // Pi←Di
+      } else {
+        state.p = oldS.slice();                                   // Pi←Si
+      }
+    }
+    state.prevPclk = pclk;
+
+    let changed = this._drivePinBit(comp, gate.outputs[0], state.s[7]);  // SDO = S7
+    const oe = this._readPinBit(comp, oeN);
+    if (oe === 0) {
+      if (this._drivePinBits(comp, gate.outputs.slice(1, 9), state.p)) changed = true;
+    } else {
+      if (this._drivePinsHighZ(comp, gate.outputs.slice(1, 9))) changed = true;
+    }
+    return changed;
+  }
+
   _evaluateTriBufferDualOE(comp, gate) {
-    // 74541-style: non-inverting tri-state buffer with two active LOW OE inputs.
+    // 74541-style: tri state buffer with two active LOW OE inputs.
     // inputs: [A, OE1, OE2], output (single name string)
     // OE1=0 AND OE2=0: Y=A. Otherwise: HiZ.
+    // gate.invert === true → Y = NOT A when enabled (74x828 inverting variant;
+    // the two OEs are the datasheet's NOR-combined OE0/OE1, enabled only when
+    // both are LOW).
     const [aName,oe1Name,oe2Name] = gate.inputs;
     const oe1 = this._readPinBit(comp, oe1Name);
     const oe2 = this._readPinBit(comp, oe2Name);
     if (!(oe1 === 0 && oe2 === 0)) return this._drivePinHighZ(comp, gate.output);
     const a = this._readPinBit(comp, aName);
-    return this._drivePinBit(comp, gate.output, a);
+    return this._drivePinBit(comp, gate.output, (gate.invert === true) ? (a ^ 1) : a);
   }
 
   _evaluateTriBufferSelInv(comp, gate) {
-    // 74x8541-style: selectable inverting/non-inverting tri-state buffer.
+    // 74x8541-style: selectable inverting/non inverting tri state buffer.
     // inputs: [A, OE1, INV] OE1 active LOW; INV selects polarity (1=invert, 0=non-invert).
     // output: single pin Y
-    // OE1=0, INV=0: Y = A (non-inverting).  OE1=0, INV=1: Y = NOT A.  OE1=1: HiZ.
+    // OE1=0, INV=0: Y = A (non inverting).  OE1=0, INV=1: Y = NOT A.  OE1=1: HiZ.
     const [aName, oe1Name, invName] = gate.inputs;
     const oe1 = this._readPinBit(comp, oe1Name);
     if (oe1 !== 0) return this._drivePinHighZ(comp, gate.output);
@@ -3889,7 +6216,7 @@ class _ChipEvalMixin {
     // Output register (OR): captures SR on rising RCLK. Drives QA..QH.
     // SRCLR=0 (active LOW): async clears SR (OR unchanged until RCLK).
     // OE=0 (active LOW): QA..QH driven from OR. OE=1: HiZ.
-    // QHs always reflects SR[7] (last shift stage; not tri-stated).
+    // QHs always reflects SR[7] (last shift stage; not tri stated).
     // inputs: [SER, SRCLK, RCLK, SRCLR, OE]
     // outputs: [QA, QB, QC, QD, QE, QF, QG, QH, QHs]
     const [serN,srclkN,rclkN,srclrN,oeN] = gate.inputs;
@@ -3924,7 +6251,7 @@ class _ChipEvalMixin {
     } else {
       changed = this._drivePinsHighZ(comp, gate.outputs.slice(0, 8));
     }
-    // QHs = last stage of shift register (always active, not tri-stated)
+    // QHs = last stage of shift register (always active, not tri stated)
     if (this._drivePinBit(comp, gate.outputs[8], state.sr[7])) changed = true;
     return changed;
   }
@@ -4034,7 +6361,7 @@ class _ChipEvalMixin {
   }
 
   _evaluateFifo16x4SyncOC(comp, gate) {
-    // 74227: 64 bit synchronous FIFO (16×4) with open-collector outputs, IR/OR flags.
+    // 74227: 64 bit synchronous FIFO (16×4) with open collector outputs, IR/OR flags.
     // inputs: [DIN0..DIN3, WR_CLK, RD_CLK, WR_EN, RD_EN]
     // outputs: [DOUT0..DOUT3, EF, FF, IR, OR]
     const bits = this._readGateInputs(comp, gate.inputs);
@@ -4061,7 +6388,7 @@ class _ChipEvalMixin {
   }
 
   _evaluateFifo16x4OC(comp, gate) {
-    // 74228: 64 bit synchronous FIFO (16×4) with open-collector outputs, EF/FF only.
+    // 74228: 64 bit synchronous FIFO (16×4) with open collector outputs, EF/FF only.
     // inputs: [DIN0..DIN3, WR_CLK, RD_CLK, WR_EN, RD_EN]
     // outputs: [DOUT0..DOUT3, EF, FF]
     const bits = this._readGateInputs(comp, gate.inputs);
@@ -4126,8 +6453,101 @@ class _ChipEvalMixin {
     return changed;
   }
 
+  _evaluateLatch4BitTriRst(comp, gate) {
+    // One independent 4-bit transparent latch of the CD4508 (dual 4-bit latch).
+    // Each latch has an active-HIGH STROBE (transparent enable), an active-HIGH
+    // RESET (clears the stored data), and an active-HIGH OUTPUT DISABLE that puts
+    // the four outputs into the high-impedance (3-state) state for bus use.
+    //   inputs:  [D0, D1, D2, D3, STROBE, DISABLE, RESET]
+    //   outputs: [Q0, Q1, Q2, Q3]
+    // Truth table (TI CD4508B SCHS070B, Fig. 7 — RESET/DISABLE/STROBE/D → Q):
+    //   DISABLE=1            -> Q = Hi-Z (dominant; "X 1 X X | Z")
+    //   else RESET=1         -> Q = 0   (latch cleared, regardless of STROBE)
+    //   else STROBE=1        -> transparent: Q follows D
+    //   else (STROBE=0)      -> hold last latched value
+    // DISABLE only gates the output buffer, so RESET still clears the internal
+    // latch even while the outputs are disabled — the state is updated first,
+    // then the output stage is gated by DISABLE (matches every truth-table row).
+    const [d0, d1, d2, d3, strobe, disable, reset] =
+      this._readGateInputs(comp, gate.inputs);
+    const state = this._getSeqState(comp, gate.outputs[0], { q: [0, 0, 0, 0] });
+    if (reset === 1) {
+      state.q = [0, 0, 0, 0];
+    } else if (strobe === 1) {
+      state.q = [d0, d1, d2, d3];
+    }
+    if (disable === 1) {
+      return this._drivePinsHighZ(comp, gate.outputs);
+    }
+    return this._drivePinBits(comp, gate.outputs, state.q);
+  }
+
+  _evaluateLatch4BitTri873(comp, gate) {
+    // One independent 4-bit transparent latch section of the 74x873 (dual
+    // 4-bit D-type latch with 3-state outputs). Unlike the CD4508
+    // (LATCH_4BIT_TRI_RST) both control pins here are ACTIVE-LOW, matching the
+    // 74x873 function table (TI SN74ALS873B, SDAS036D, "FUNCTION TABLE (each
+    // latch)"):
+    //   OE̅  CLR̅  LE  D  | Q
+    //   L   L    X   X  | L    (clear dominates: Q forced low, independent of LE)
+    //   L   H    H   H  | H    (transparent: Q follows D)
+    //   L   H    H   L  | L
+    //   L   H    L   X  | Q0   (hold last latched value)
+    //   H   X    X   X  | Z    (output disabled: high impedance)
+    //   inputs:  [D0, D1, D2, D3, LE, OEn, CLRn]
+    //   outputs: [Q0, Q1, Q2, Q3]
+    // CLR̅ clears the internal latch even while OE̅ is high (output disabled),
+    // so the state is updated first and the output stage is gated by OE̅ last.
+    const [d0, d1, d2, d3, le, oen, clrn] =
+      this._readGateInputs(comp, gate.inputs);
+    const state = this._getSeqState(comp, gate.outputs[0], { q: [0, 0, 0, 0] });
+    if (clrn === 0) {
+      state.q = [0, 0, 0, 0];
+    } else if (le === 1) {
+      state.q = [d0, d1, d2, d3];
+    }
+    if (oen === 1) {
+      return this._drivePinsHighZ(comp, gate.outputs);
+    }
+    return this._drivePinBits(comp, gate.outputs, state.q);
+  }
+
+  _evaluateLatch4BitTriInv880(comp, gate) {
+    // One independent 4-bit transparent latch section of the 74x880 (dual
+    // 4-bit D latch, INVERTING 3-state outputs). This is the inverting-output
+    // sibling of the 74x873 (LATCH_4BIT_TRI_873): identical package and control
+    // pins, but the outputs are Q̄ (complement of the stored data) and the
+    // asynchronous input is a PRESET, not a clear.
+    // TI SN74ALS880A/SN74AS880 "FUNCTION TABLE (each latch)" (doc D2661):
+    //   OC̅  PRE̅  ENABLE C  D | Q̄
+    //   L   L    X         X | L    (preset dominates: Q̄ forced LOW, independent of C)
+    //   L   H    H         H | L    (transparent: Q̄ follows D inverted)
+    //   L   H    H         L | H
+    //   L   H    L         X | Q̄0   (hold last latched value)
+    //   H   X    X         X | Z    (output disabled: high impedance)
+    //   inputs:  [D1, D2, D3, D4, LE(=ENABLE C), OEn(=OC̅), PREn(=PRE̅)]
+    //   outputs: [Q1n, Q2n, Q3n, Q4n]   (the Q̄ terminals)
+    // PRE̅ presets the internal register (true Q -> 1) so the inverting Q̄
+    // outputs go LOW; it dominates the latch enable. PRE̅ acts on the stored
+    // state even while OC̅ disables the output buffer, so — matching the 873
+    // model — the state is updated first and the output stage is gated by OC̅ last.
+    const [d1, d2, d3, d4, le, oen, pren] =
+      this._readGateInputs(comp, gate.inputs);
+    // state.qbar holds the value driven to the Q̄ terminals.
+    const state = this._getSeqState(comp, gate.outputs[0], { qbar: [1, 1, 1, 1] });
+    if (pren === 0) {
+      state.qbar = [0, 0, 0, 0];
+    } else if (le === 1) {
+      state.qbar = [d1 ? 0 : 1, d2 ? 0 : 1, d3 ? 0 : 1, d4 ? 0 : 1];
+    }
+    if (oen === 1) {
+      return this._drivePinsHighZ(comp, gate.outputs);
+    }
+    return this._drivePinBits(comp, gate.outputs, state.qbar);
+  }
+
   _evaluateTriNotHi(comp, gate) {
-    // Inverting tri-state buffer with active HIGH output enable.
+    // Inverting tri state buffer with active HIGH output enable.
     // OE=1: output = NOT(A). OE=0: HiZ.
     const [aName, oeName] = gate.inputs;
     const oe = this._readPinBit(comp, oeName);
@@ -4137,7 +6557,7 @@ class _ChipEvalMixin {
   }
 
   _evaluateDecoder3to8Hi(comp, gate) {
-    // 74238: 3-to-8 decoder, active HIGH outputs.
+    // 74238: 3 to 8 decoder, active HIGH outputs.
     // inputs: [A0, A1, A2, E3, E1n, E2n]
     // outputs: [Y0..Y7]
     // Enabled when E3=1 AND E1n=0 AND E2n=0. Selected output HIGH; others LOW.
@@ -4163,11 +6583,14 @@ class _ChipEvalMixin {
 
   _evaluateDecoder2to4Hi(comp, gate) {
     // 74239: 2-to-4 decoder, active HIGH outputs.
-    // inputs: [A0, A1, E]  E=1 enables
+    // inputs: [A0, A1, En]  enable is active LOW per the datasheet (same G̅
+    // as the 74139); pin names ending in 'n' read inverted, matching the
+    // suffix convention used by the JK and VCO evaluators.
     // outputs: [Y0..Y3]
-    // Selected output HIGH; others LOW. Disabled: all LOW.
+    // Selected output HIGH; others LOW. Disabled (En=1): all LOW.
     const [aName, bName, eName] = gate.inputs;
-    const enabled = this._readPinBit(comp, eName) === 1;
+    const eBit = this._readPinBit(comp, eName);
+    const enabled = eName.endsWith('n') ? eBit === 0 : eBit === 1;
     const a = this._readPinBit(comp, aName);
     const b = this._readPinBit(comp, bName);
     const selectedIndex = a | (b << 1);
@@ -4180,7 +6603,7 @@ class _ChipEvalMixin {
   }
 
   _evaluateDec3To8LatchHi(comp, gate) {
-    // 74237: 3-to-8 decoder with address latch, active HIGH outputs.
+    // 74237: 3 to 8 decoder with address latch, active HIGH outputs.
     // inputs: [A0, A1, A2, E1n, E2, LE]
     // outputs: [Y0..Y7]
     // LE=1 (transparent): address passes through. LE=0: address latched.
@@ -4206,7 +6629,7 @@ class _ChipEvalMixin {
   }
 
   _evaluateTransceiver4Bit(comp, gate) {
-    // 74243: 4 bit non-inverting bus transceiver with separate direction controls.
+    // 74243: 4 bit non inverting bus transceiver with separate direction controls.
     // inputs: [A1,B1,A2,B2,A3,B3,A4,B4, GABn, GBAn]
     // outputs: [A1,B1,A2,B2,A3,B3,A4,B4]
     // GABn=0: A→B enabled. GBAn=0: B→A enabled. Both=1: HiZ.
@@ -4268,7 +6691,7 @@ class _ChipEvalMixin {
   }
 
   _evaluateMux16to1Tri(comp, gate) {
-    // 74250: 16-to-1 mux with tri-state complemented output W.
+    // 74250: 16-to-1 mux with tri state complemented output W.
     // inputs: [E1..E16, A, B, C, D, OE]
     // OE=0: enabled; W = NOT(selected data). OE=1: W HiZ.
     const bits = this._readGateInputs(comp, gate.inputs);
@@ -4280,7 +6703,7 @@ class _ChipEvalMixin {
   }
 
   _evaluateMux8to1Tri(comp, gate) {
-    // 74251: 8-to-1 mux with tri-state outputs Y (true) and W (complemented).
+    // 74251: 8-to-1 mux with tri state outputs Y (true) and W (complemented).
     // inputs: [D0..D7, A, B, C, Gn]
     // Gn=0: enabled. Gn=1: Y and W HiZ.
     const bits = this._readGateInputs(comp, gate.inputs);
@@ -4296,8 +6719,28 @@ class _ChipEvalMixin {
     return this._drivePinBits(comp, gate.outputs, [data, data ? 0 : 1]);
   }
 
+  _evaluateMux8to1TriInh(comp, gate) {
+    // CD4512: 8-channel data selector with a single NON-inverting 3-state
+    // output, a separate active-HIGH INHIBIT, and a separate active-HIGH
+    // 3-STATE DISABLE. Distinct from MUX_8TO1_TRI (the 74251), which has
+    // complementary Y/W outputs and only one Gn enable.
+    // inputs: [D0..D7, A, B, C, INHIBIT, DISABLE]   (A=LSB select)
+    // output (single name string): SEL OUTPUT
+    // Per TI CD4512B (SCHS073C) truth table:
+    //   DISABLE=1            -> high-impedance (dominant)
+    //   DISABLE=0, INHIBIT=1 -> output driven LOW (0)
+    //   DISABLE=0, INHIBIT=0 -> output = D[A | B<<1 | C<<2]
+    const bits = this._readGateInputs(comp, gate.inputs);
+    const inh = bits[11];
+    const dis = bits[12];
+    if (dis !== 0) return this._drivePinHighZ(comp, gate.output);
+    if (inh !== 0) return this._drivePinBit(comp, gate.output, 0);
+    const sel = bits[8] | (bits[9] << 1) | (bits[10] << 2);
+    return this._drivePinBit(comp, gate.output, bits[sel]);
+  }
+
   _evaluateMux4to1Tri(comp, gate) {
-    // 74253: single 4-to-1 mux section with tri-state output.
+    // 74253: single 4-to-1 mux section with tri state output.
     // inputs: [C0, C1, C2, C3, S0, S1, Gn], output (single name string)
     // Gn=0: enabled; output = selected data. Gn=1: HiZ.
     const [c0,c1,c2,c3,s0,s1,gn] = this._readGateInputs(comp, gate.inputs);
@@ -4308,7 +6751,7 @@ class _ChipEvalMixin {
   }
 
   _evaluateDemux2to4Tri(comp, gate) {
-    // 74255: dual 1-of-4 demultiplexer/decoder with tri-state inverting outputs.
+    // 74255: dual 1-of-4 demultiplexer/decoder with tri state inverting outputs.
     // inputs: [S0, S1, Gn, C]
     // outputs: [Y0n, Y1n, Y2n, Y3n]
     // Gn=0 AND C=0: decoded output LOW, rest HIGH. Otherwise HiZ.
@@ -4361,7 +6804,7 @@ class _ChipEvalMixin {
   }
 
   _evaluateMux2to1InvTri(comp, gate) {
-    // 74258: single 2-to-1 mux section with inverting tri-state output.
+    // 74258: single 2-to-1 mux section with inverting tri state output.
     // inputs: [A, B, S, OEn], output (single name string)
     // OEn=0: enabled; output = NOT(S ? B : A). OEn=1: HiZ.
     const [aName,bName,sName,oenName] = gate.inputs;
@@ -4393,6 +6836,80 @@ class _ChipEvalMixin {
     return changed;
   }
 
+  _evaluateMult2x2_4554(comp, gate) {
+    // CD4554 / MC14554B: 2-bit by 2-bit parallel binary multiplier.
+    // Source: Motorola, "MC14554B — 2-Bit by 2-Bit Parallel Binary Multiplier",
+    //   MC14554B/D, Rev 3 (1994). [Online]. Available (page images):
+    //   https://www.alldatasheet.com/datasheet-pdf/pdf/3687/MOTOROLA/MC14554B.html
+    //   Verified: terminal assignment, EQUATIONS + worked example (page 1) and the
+    //   gate-level LOGIC DIAGRAM with the MULTIPLIER CELL detail (page 3), read as
+    //   rendered PDF page images (issues.md C4), NOT cloned from MULT_2X4BIT (C2).
+    //
+    // Function: S = (X x Y) + K + M, with X=X1X0, Y=Y1Y0 the 2-bit operands,
+    // K=K1K0 and M=M2M1M0 the cascade/add inputs, output S3S2S1S0 plus carry C0.
+    // Each of the four MULTIPLIER CELLs is a full adder of {Xi*Yj, M, K}:
+    //   S = (Xi*Yj) ^ M ^ K,  C = majority(Xi*Yj, M, K).
+    // Array wiring traced from the page-3 logic diagram (cell partial-product
+    // weights TR=X0Y0:1, TL=X0Y1:2, BR=X1Y0:2, BL=X1Y1:4):
+    //   TR: a = X0Y0 + M0 + K0    -> S0,   carry -> TL.K
+    //   TL: b = X0Y1 + M1 + TR.C  -> TL.S, carry -> C0 (pin 4 output)
+    //   BR: d = X1Y0 + TL.S + K1  -> S1,   carry -> BL.K
+    //   BL: e = X1Y1 + M2 + BR.C  -> S2,   carry -> S3 (=C1, pin 6)
+    // C0 is the top-row weight-4 carry, brought out for expansion; the datasheet
+    // note "C0 connected to M2 for this size multiplier" is the EXTERNAL wiring a
+    // user makes for a standalone 2x2 (M2 = weight-4 addend into BL). The chip
+    // itself leaves C0 and M2 as independent pins, so this model is pure
+    // combinational (no internal feedback). Verified vs the datasheet example
+    // X=2,Y=3,K=1,M=2 -> S=1001 (=9): a=1(S0=1,c=0) b=1(TLs=1,C0=0)
+    // d=2(S1=0,c=1) e=2(S2=0,S3=1) -> S3..S0 = 1001. (Only divergence: A1
+    // no-propagation-delay idealization; settled outputs are exact.)
+    // inputs:  [X0, X1, Y0, Y1, K0, K1, M0, M1, M2]
+    // outputs: [S0, S1, S2, S3, C0]
+    const [x0, x1, y0, y1, k0, k1, m0, m1, m2] = this._readGateInputs(comp, gate.inputs);
+    const a = (x0 & y0) + m0 + k0;          const s0 = a & 1,  cTR = a >> 1;
+    const b = (x0 & y1) + m1 + cTR;         const sTL = b & 1, c0  = b >> 1;
+    const d = (x1 & y0) + sTL + k1;         const s1 = d & 1,  cBR = d >> 1;
+    const e = (x1 & y1) + m2 + cBR;         const s2 = e & 1,  s3  = e >> 1;
+    let changed = false;
+    if (this._drivePinBit(comp, gate.outputs[0], s0)) changed = true;
+    if (this._drivePinBit(comp, gate.outputs[1], s1)) changed = true;
+    if (this._drivePinBit(comp, gate.outputs[2], s2)) changed = true;
+    if (this._drivePinBit(comp, gate.outputs[3], s3)) changed = true;
+    if (this._drivePinBit(comp, gate.outputs[4], c0)) changed = true;
+    return changed;
+  }
+
+  // ── Block 70 evaluators ──────────────────────────────────────────────────
+
+  _evaluateEeprom2kx8(comp, gate) {
+    // AT28C16 / 28C16: 2K × 8 EEPROM with bidirectional I/O.
+    // gate.inputs:  [A0..A10 (11), IO0..IO7 (8), CE, OE, WE]
+    // gate.outputs: [IO0..IO7]
+    // Standby  (CE=1):             IO → Hi-Z
+    // Write    (CE=0, OE=1, WE=0): latch IO bus → mem[addr], IO → Hi-Z
+    // Read     (CE=0, OE=0, WE=1): drive mem[addr] → IO
+    // Disabled (CE=0, OE=1, WE=1): IO → Hi-Z (no write)
+    const bits = this._readGateInputs(comp, gate.inputs);
+    const addr = bits[0]  | (bits[1]  << 1)  | (bits[2]  << 2)  | (bits[3]  << 3)  |
+                 (bits[4]  << 4)  | (bits[5]  << 5)  | (bits[6]  << 6)  | (bits[7]  << 7)  |
+                 (bits[8]  << 8)  | (bits[9]  << 9)  | (bits[10] << 10);
+    const ioIn = bits.slice(11, 19);
+    const ce = bits[19], oe = bits[20], we = bits[21];
+
+    if (ce !== 0) return this._drivePinsHighZ(comp, gate.outputs);
+
+    const state = this._getSeqState(comp, gate.outputs[0] + '_eeprom2k', { mem: {} });
+
+    if (oe !== 0 && we === 0) {
+      state.mem[addr] = [...ioIn];
+      return this._drivePinsHighZ(comp, gate.outputs);
+    }
+    if (oe === 0 && we !== 0) {
+      return this._drivePinBits(comp, gate.outputs, state.mem[addr] || [0,0,0,0,0,0,0,0]);
+    }
+    return this._drivePinsHighZ(comp, gate.outputs);
+  }
+
 }
 
 for (const _name of Object.getOwnPropertyNames(_ChipEvalMixin.prototype)) {
@@ -4416,7 +6933,7 @@ function _evaluateBufferComp_fn(comp, gate) {
 }
 
 function _evaluateDLatchHexTri_fn(comp, gate) {
-  // 74268: hex D-type latch with tri-state output.
+  // 74268: hex D type latch with tri state output.
   // inputs: [1D,2D,3D,4D,5D,6D, G, OEn]
   // outputs: [1Q,2Q,3Q,4Q,5Q,6Q]
   const bits = this._readGateInputs(comp, gate.inputs);
@@ -4480,7 +6997,7 @@ function _evaluateCounter8BitBidir_fn(comp, gate) {
 
 
 function _evaluateMult4x4BitTri_fn(comp, gate) {
-  // 74274: 4×4 bit multiplier with tri-state output.
+  // 74274: 4×4 bit multiplier with tri state output.
   // inputs: [X0,X1,X2,X3, Y0,Y1,Y2,Y3, OEn]
   // outputs: [P0..P7]
   const bits = this._readGateInputs(comp, gate.inputs);
@@ -4505,15 +7022,15 @@ function _evaluateWallaceTree7Bit_fn(comp, gate) {
   // 74275: 7 bit slice Wallace tree.
   // inputs: [W0,W1,W2,W3, X0,X1, Y0]
   // outputs: [S0,S1,S2,S3, C2,C3, Y1]
-  // Implements carry-save adder tree for 4+2+1 inputs per column.
+  // Implements carry save adder tree for 4+2+1 inputs per column.
   // This is a simplified but functionally correct model:
   // For a 4 bit slice position, compute partial product sums.
   // W0-W3: 4 partial product bits at this weight
   // X0-X1: 2 partial product bits at next weight
-  // Y0: carry-in from previous slice at this weight
+  // Y0: carry in from previous slice at this weight
   // S0-S3: sum outputs
   // C2,C3: carry outputs
-  // Y1: carry-out to next slice
+  // Y1: carry out to next slice
   const [w0,w1,w2,w3, x0,x1, y0] = this._readGateInputs(comp, gate.inputs);
   // First CSA: (W0, W1, W2) → S_a (sum), C_a (carry)
   const sumA = w0 ^ w1 ^ w2;
@@ -4652,6 +7169,34 @@ function _evaluateParity9BitSimple_fn(comp, gate) {
   return changed;
 }
 
+function _evaluateParity9BitInh_fn(comp, gate) {
+  // CD40101: CMOS 9-bit (8 data + 1 parity) parity generator/checker with INHIBIT.
+  // inputs:  [D1,D2,D3,D4,D5,D6,D7,D8,D9, INHIBIT]
+  // outputs: [EVEN, ODD]
+  // Like the 74280 (PARITY_9BIT_SIMPLE) but with an active-HIGH INHIBIT: per the
+  // RCA/Intersil CD40101BMS datasheet, when INHIBIT = logical "1" both the EVEN and
+  // ODD outputs are forced to logical "0". With INHIBIT LOW, EVEN = 1 when the number
+  // of HIGH data inputs (D1..D9) is even, ODD = 1 when it is odd (always complementary
+  // for 9 inputs). A separate primitive (not PARITY_9BIT_SIMPLE) so the 9th term is a
+  // real data bit and the inhibit is excluded from the parity sum.
+  const bits = this._readGateInputs(comp, gate.inputs);
+  const inh = bits[9];
+  const ones = bits.slice(0, 9).reduce((sum, b) => sum + b, 0);
+  const parity = ones & 1; // 1 = odd number of ones
+  let even, odd;
+  if (inh === 1) {
+    even = 0;
+    odd = 0;
+  } else {
+    even = parity ? 0 : 1; // EVEN = 1 when even count
+    odd  = parity ? 1 : 0; // ODD  = 1 when odd count
+  }
+  let changed = false;
+  if (this._drivePinBit(comp, gate.outputs[0], even)) changed = true;
+  if (this._drivePinBit(comp, gate.outputs[1], odd)) changed = true;
+  return changed;
+}
+
 function _evaluateAccumulator4Bit_fn(comp, gate) {
   // 74281: 4 bit parallel binary accumulator with ALU function select.
   // inputs: [B0,B1,B2,B3, M0,M1,M2,M3, S0,S1,S2,S3, Cn, CLRn, CLK]
@@ -4705,7 +7250,7 @@ function _evaluateAccumulator4Bit_fn(comp, gate) {
 }
 
 function _evaluateCarryLookaheadSel_fn(comp, gate) {
-  // 74282: look-ahead carry generator with selectable carry inputs.
+  // 74282: look ahead carry generator with selectable carry inputs.
   // inputs: [P0,G0,P1,G1,P2,G2,P3,G3, Cn, SEL, P_in, G_in]
   // outputs: [Cn4, Cn8, Cn12, P, G]
   // SEL=0: use Cn as carry input; SEL=1: use P_in/G_in cascade
@@ -4770,6 +7315,7 @@ chipEvaluators._evaluateJKFFQuadSepClk   = _evaluateJKFFQuadSepClk_fn;
 chipEvaluators._evaluatePriorityReg4Bit  = _evaluatePriorityReg4Bit_fn;
 chipEvaluators._evaluateSRLatchNorNand   = _evaluateSRLatchNorNand_fn;
 chipEvaluators._evaluateParity9BitSimple = _evaluateParity9BitSimple_fn;
+chipEvaluators._evaluateParity9BitInh = _evaluateParity9BitInh_fn;
 chipEvaluators._evaluateAccumulator4Bit  = _evaluateAccumulator4Bit_fn;
 chipEvaluators._evaluateCarryLookaheadSel = _evaluateCarryLookaheadSel_fn;
 chipEvaluators._evaluateMult4x4BitHi     = _evaluateMult4x4BitHi_fn;
@@ -4797,7 +7343,7 @@ function _evaluateParity9BitPE_fn(comp, gate) {
 
 
 function _evaluateRam16x4OcInv_fn(comp, gate) {
-  // 74289: 16×4 static RAM, open-collector, inverted outputs.
+  // 74289: 16×4 static RAM, open collector, inverted outputs.
   // inputs: [A0,A1,A2,A3,CSn,WEn,D0,D1,D2,D3]
   // outputs: [Q0n,Q1n,Q2n,Q3n]
   const bits = this._readGateInputs(comp, gate.inputs);
@@ -4807,12 +7353,12 @@ function _evaluateRam16x4OcInv_fn(comp, gate) {
   const addr = bits[0] | (bits[1]<<1) | (bits[2]<<2) | (bits[3]<<3);
   let changed = false;
   if (csn !== 0) {
-    // Not selected: outputs float high (open-collector not driven → HiZ / pulled up)
+    // Not selected: outputs float high (open collector not driven → HiZ / pulled up)
     for (const op of gate.outputs) { if (this._drivePinHighZ(comp, op)) changed = true; }
     return changed;
   }
   if (wen === 0) {
-    // Write: store data (non-inverted)
+    // Write: store data (non inverted)
     const d = bits[6] | (bits[7]<<1) | (bits[8]<<2) | (bits[9]<<3);
     comp.state.ram[addr] = d & 0xF;
   }
@@ -4918,6 +7464,145 @@ function _evaluateFreqDivProg12Bit_fn(comp, gate) {
   return changed;
 }
 
+function _evaluateFreqDivProg4059_fn(comp, gate) {
+  // CD4059A: CMOS Programmable Divide-by-"N" Counter (24-pin).
+  // Source: Texas Instruments / Harris, "CD4059A Types — CMOS Programmable
+  //   Divide-by-'N' Counter", SCHS109B (rev. June 2003). [Online]. Available:
+  //   https://www.ti.com/lit/ds/symlink/cd4059a.pdf  Verified: Table I (Mode
+  //   Select), "HOW TO PRESET THE CD4059A" eqs. (1)/(2) with worked examples
+  //   A/B/C, Fig.1 (total count of 3) and Fig.5 (functional block diagram),
+  //   read as 300-dpi PDF page images (issues.md C4).
+  //
+  // inputs:  [CLK, LE, Ka, Kb, Kc, J1..J16]
+  // outputs: [OUT]
+  //
+  // The chip emits one clock-wide output pulse every N input clocks. N is set by
+  // the Mode-Select inputs Ka/Kb/Kc (which fix the modulus M of the first
+  // counting section and the modulus of the last section, per Table I) and the
+  // 16 jam inputs grouped into five decade values:
+  //   N = M * (1000*D5 + 100*D4 + 10*D3 + D2) + D1      (eq. 1, MODE = M)
+  // The first-section modulus M and which jam inputs carry the units decade D1
+  // and the thousands decade D5 both depend on the mode (J1 = LSB of each group):
+  //   Ka Kb Kc   M    D1 (units)      D5 (thousands)   last section
+  //    1  1  1    2   J1              J2,J3,J4         ÷8
+  //    0  1  1    4   J1,J2           J3,J4            ÷4
+  //    1  0  1    5   J1,J2,J3        J4               ÷2
+  //    0  0  1    8   J1,J2,J3        J4               ÷2
+  //    1  1  0   10   J1,J2,J3,J4     (none → 0)       ÷1
+  //    X  0  0   MASTER PRESET (counter held loaded, not counting)
+  // D2=J5..J8, D3=J9..J12, D4=J13..J16 in every counting mode (the three
+  // cascaded ÷10 intermediate decades).
+  const bits = this._readGateInputs(comp, gate.inputs);
+  const clk = bits[0], le = bits[1], ka = bits[2], kb = bits[3], kc = bits[4];
+  const J = (i) => bits[4 + i];                 // J(i) for i = 1..16 (bits[5..20])
+  const grp = (lo, hi) => { let v = 0, p = 0; for (let i = lo; i <= hi; i++) v |= (J(i) << p++); return v; };
+
+  const masterPreset = (kb === 0 && kc === 0);  // Table I: Kb=0,Kc=0 (Ka X)
+  let M, D1, D5;
+  if      (ka === 1 && kb === 1 && kc === 1) { M = 2;  D1 = grp(1, 1); D5 = grp(2, 4); }
+  else if (ka === 0 && kb === 1 && kc === 1) { M = 4;  D1 = grp(1, 2); D5 = grp(3, 4); }
+  else if (ka === 1 && kb === 0 && kc === 1) { M = 5;  D1 = grp(1, 3); D5 = grp(4, 4); }
+  else if (ka === 0 && kb === 0 && kc === 1) { M = 8;  D1 = grp(1, 3); D5 = grp(4, 4); }
+  else if (ka === 1 && kb === 1 && kc === 0) { M = 10; D1 = grp(1, 4); D5 = 0;         }
+  else                                       { M = 10; D1 = 0;         D5 = 0;         } // master preset / undefined
+  const D2 = grp(5, 8), D3 = grp(9, 12), D4 = grp(13, 16);
+  const N = M * (1000 * D5 + 100 * D4 + 10 * D3 + D2) + D1;
+
+  if (!comp.state) comp.state = { cnt: 0, out: 0, prevClk: clk };
+  let changed = false;
+
+  if (masterPreset) {
+    // Master-preset state: the counter sits jam-loaded and does not count; the
+    // output stays low until a real counting mode is selected.
+    comp.state.cnt = 0;
+    comp.state.out = 0;
+  } else if (comp.state.prevClk === 0 && clk === 1) {  // CD4059 counts on the rising clock edge
+    // A non-latched output pulse is exactly one clock period wide, so the pulse
+    // raised on the previous terminal count is cleared on the next rising edge.
+    if (comp.state.out === 1 && le === 0) comp.state.out = 0;
+    comp.state.cnt++;
+    if (N >= 1 && comp.state.cnt >= N) {
+      comp.state.cnt = 0;
+      comp.state.out = 1;                              // one clock-wide pulse every N clocks (Fig.1)
+    }
+    // LE high latches OUT high once a pulse occurs; it is released (above) on the
+    // first rising edge after LE returns low (datasheet: "remain high until the
+    // latch input returns to 0"). Simplification: release is edge-synced, not the
+    // instantaneous level release of real silicon (engine has no propagation
+    // delay — issues.md A1).
+  }
+  comp.state.prevClk = clk;
+
+  if (this._drivePinBit(comp, gate.outputs[0], comp.state.out)) changed = true;
+  return changed;
+}
+
+function _evaluateFreqDivProg4536_fn(comp, gate) {
+  // CD4536B: CMOS Programmable Timer (16-pin). Modeled core = the externally-
+  // clocked programmable frequency divider with the variable-pulse-width one-shot
+  // bypassed (the datasheet's "ground MONO IN through 10kOhm or higher" mode, which
+  // "disables the one-shot circuit and connects the decoder directly to the
+  // DECODE OUT terminal"). The on-chip RC oscillator (IN1/OUT1/OUT2 + RS,CT,RT) and
+  // the variable monostable pulse width (MONO IN to VDD via RT,CT) are NOT modeled:
+  // 74Sim has no free-running RC-oscillator timebase (issues.md A3/A9). So IN1 must
+  // be driven by an external clock and DECODE OUT is the raw divided clock.
+  //
+  // Source: Intersil/Harris, "CD4536BMS — CMOS Programmable Timer", File No. 3345
+  //   (December 1992). [Online]. Verified: Pinout (TOP VIEW) + Functional Diagram
+  //   p.1, Description p.1, and Logic Diagram Fig.1 (24 ripple stages FF1..FF24,
+  //   1-of-16 decoder on the last 16 stages, 8-BYPASS, A/B/C/D BCD select),
+  //   read as PDF page images (issues.md C4).
+  //
+  // inputs:  [IN1, CLOCK_INHIBIT, BYPASS8, RESET, SET, A, B, C, D]
+  // outputs: [DECODE_OUT]
+  //
+  // The chip has 24 ripple-binary stages. The 1-of-16 decoder selects one of the
+  // LAST 16 stages (stages 9..24) via the BCD code A(LSB)..D(MSB). A logic 1 on
+  // 8-BYPASS bypasses the first 8 stages so stage 9 becomes the first counter
+  // stage. Because tapping bit k of a free-running binary counter is exactly a
+  // divide-by-2^(k+1), the full 24-bit counter always advances and the bypass just
+  // relocates the output tap by 8 bits:
+  //   BYPASS8=0 -> DECODE OUT = bit (8+n) of count  (stage 9..24 => /2^9 .. /2^24)
+  //   BYPASS8=1 -> DECODE OUT = bit  (n)  of count  (stage 9 acts as stage 1 => /2)
+  // with n = A + 2B + 4C + 8D, n in 0..15.
+  const [clkN, ciN, bypN, rstN, setN, aN, bN, cN, dN] = gate.inputs;
+  const MASK = 0xFFFFFF;                              // 24 stages -> wrap at 2^24
+  const state = this._getSeqState(comp, gate.outputs[0], { count: 0, prevClk: 0 });
+
+  const rst = this._readPinBit(comp, rstN);
+  const set = this._readPinBit(comp, setN);
+  const ci  = this._readPinBit(comp, ciN);
+  const clk = this._readPinBit(comp, clkN);
+
+  if (rst === 1) {
+    // Active-HIGH RESET clears all stages asynchronously. RESET dominates SET here;
+    // the real part's RESET+SET+8-BYPASS combo is the fast-test mode (counter split
+    // into three 8-stage sections), which is not modeled.
+    state.count = 0;
+    state.prevClk = clk;
+  } else if (set === 1) {
+    // Active-HIGH SET asynchronously sets all stages (DECODE OUT high regardless of tap).
+    state.count = MASK;
+    state.prevClk = clk;
+  } else {
+    // Ripple counter advances on the falling edge of IN1 (CD4000 ripple convention,
+    // as in the CD4020/4040). CLOCK INHIBIT high freezes the count.
+    if (ci === 0 && state.prevClk === 1 && clk === 0) {
+      state.count = (state.count + 1) & MASK;
+    }
+    state.prevClk = clk;
+  }
+
+  const n = this._readPinBit(comp, aN)
+          | (this._readPinBit(comp, bN) << 1)
+          | (this._readPinBit(comp, cN) << 2)
+          | (this._readPinBit(comp, dN) << 3);
+  const byp = this._readPinBit(comp, bypN);
+  const bit = byp === 1 ? n : (8 + n);
+  const out = (state.count >> bit) & 1;
+  return this._drivePinBit(comp, gate.outputs[0], out);
+}
+
 function _evaluateCounter4BitDiv_fn(comp, gate) {
   // 74293: 4 bit binary counter with separate ÷2 (CLK_A→QA) and ÷8 (CLK_B→QB,QC,QD) sections.
   // inputs: [CLK_A, CLK_B, R01, R02]
@@ -4953,7 +7638,7 @@ function _evaluateCounter4BitDiv_fn(comp, gate) {
 }
 
 function _evaluateShiftReg4BitBidirTri_fn(comp, gate) {
-  // 74295: 4 bit bidirectional shift register with tri-state outputs.
+  // 74295: 4 bit bidirectional shift register with tri state outputs.
   // inputs: [SER, A, B, C, D, MODE, CLK, OEn]
   // outputs: [QA, QB, QC, QD]
   // MODE=0: shift right (QA←SER, QB←QA,...); MODE=1: parallel load (QA←A,...).
@@ -4985,32 +7670,47 @@ function _evaluateShiftReg4BitBidirTri_fn(comp, gate) {
   return changed;
 }
 
-function _evaluatePllFilter_fn(comp, gate) {
-  // 74297: Digital PLL filter simplified stub.
-  // inputs: [CLK_IN, REF, K1,K2,K3,K4, N1,N2,N3,N4, V_IN]
-  // outputs: [CLK_OUT, UP_DN]
-  // Stub: CLK_OUT = CLK_IN through a ÷K divider; UP_DN = phase compare of REF vs CLK_OUT.
+function _evaluateShiftReg4BitUnivTri_fn(comp, gate) {
+  // CD40104B / HEF40104B / MC14104B: 4-bit bidirectional UNIVERSAL shift register
+  // with three-state outputs. Distinct from the 74295 SHIFT_REG_4BIT_BIDIR_TRI
+  // primitive (which has only ONE shift direction + load via a single MODE pin)
+  // and from the 74194-style SHIFT_REG_4BIT_BIDIR (4 modes but mode 00 = HOLD and
+  // no tri-state). The 40104B is the universal register WITH tri-state outputs
+  // whose mode 00 is a SYNCHRONOUS CLEAR (it has no separate reset pin — that is
+  // the sibling 40194B).
+  //   inputs:  [SR, SL, D0, D1, D2, D3, S0, S1, CLK, OE]
+  //   outputs: [Q0, Q1, Q2, Q3]   (Q0 = first stage, Q3 = last stage)
+  // Mode (S1,S0): 00 → synchronous clear (reg→0); 01 → shift right
+  //   (SR enters Q0, data moves Q0→Q1→Q2→Q3); 10 → shift left (SL enters Q3,
+  //   data moves Q3→Q2→Q1→Q0); 11 → parallel load (D0..D3).
+  // All actions occur on the positive CLOCK edge. OUTPUT ENABLE is active HIGH:
+  // OE=0 → all outputs high-impedance; OE=1 → outputs driven.
+  // Source: see CD40104 block header in js/chips/chips134.js
+  // (SGS-Thomson HCC/HCF40104B/40194B, June 1989).
   const bits = this._readGateInputs(comp, gate.inputs);
-  const clkIn = bits[0], ref = bits[1];
-  const k = 1 + (bits[2] | (bits[3]<<1) | (bits[4]<<2) | (bits[5]<<3));
-  if (!comp.state) comp.state = { cnt: 0, out: 0, prevClk: clkIn, prevRef: 1, phase: 0 };
+  const [sr, sl, d0, d1, d2, d3, s0, s1, clk, oe] = bits;
+  if (!comp.state) comp.state = { reg: 0, prevClk: 0 };
   let changed = false;
 
-  // Divide CLK_IN by k
-  if (comp.state.prevClk === 1 && clkIn === 0) {
-    comp.state.cnt++;
-    if (comp.state.cnt >= k) {
-      comp.state.cnt = 0;
-      comp.state.out ^= 1;
-      // Phase accumulate: if out rising and ref is 1, in phase; else drift
-      if (comp.state.out === 1) comp.state.phase += (ref ? 0 : 1);
+  if (comp.state.prevClk === 0 && clk === 1) {
+    const mode = (s1 << 1) | s0;
+    const cur = comp.state.reg;
+    switch (mode) {
+      case 0: comp.state.reg = 0; break;                                  // synchronous clear
+      case 1: comp.state.reg = ((cur << 1) | sr) & 0xF; break;            // shift right: SR→Q0
+      case 2: comp.state.reg = ((cur >> 1) | (sl << 3)) & 0xF; break;     // shift left: SL→Q3
+      case 3: comp.state.reg = (d0 | (d1<<1) | (d2<<2) | (d3<<3)) & 0xF; break; // parallel load
     }
   }
-  comp.state.prevClk = clkIn;
+  comp.state.prevClk = clk;
 
-  const upDn = (comp.state.phase & 1);
-  if (this._drivePinBit(comp, gate.outputs[0], comp.state.out)) changed = true;
-  if (this._drivePinBit(comp, gate.outputs[1], upDn))           changed = true;
+  if (oe === 0) {
+    for (const op of gate.outputs) { if (this._drivePinHighZ(comp, op)) changed = true; }
+    return changed;
+  }
+  for (let i = 0; i < 4; i++) {
+    if (this._drivePinBit(comp, gate.outputs[i], (comp.state.reg >> i) & 1)) changed = true;
+  }
   return changed;
 }
 
@@ -5039,14 +7739,14 @@ function _evaluateMuxQuad2to1Stored_fn(comp, gate) {
 }
 
 function _evaluateShiftReg8BitUnivTri_fn(comp, gate) {
-  // 74299: 8 bit universal bidirectional shift/storage register, tri-state.
+  // 74299: 8 bit universal bidirectional shift/storage register, tri state.
   // inputs: [S0,S1, SR,SL, OEAn,OEBn, QA,QB,QC,QD,QE,QF,QG,QH, CLK]
   //   S0,S1: 00=hold, 01=shift right, 10=shift left, 11=parallel load
   //   SR: serial input for right-shift (into QH end)
   //   SL: serial input for left-shift (into QA end)
   //   QA-QH are also parallel data inputs during load (S1S0=11)
   //   OEAn/OEBn: enable outputs (both must be 0 to output)
-  //   In parallel-load mode (11), I/O pins are inputs; tri-state the outputs so
+  //   In parallel-load mode (11), I/O pins are inputs; tri state the outputs so
   //   external drivers can set the pin values before clock edge.
   // outputs: [QA,QB,QC,QD,QE,QF,QG,QH]
   const bits = this._readGateInputs(comp, gate.inputs);
@@ -5089,10 +7789,13 @@ function _evaluateShiftReg8BitUnivTri_fn(comp, gate) {
   return changed;
 }
 
-function _evaluateRam256x1OC_fn(comp, gate) {
-  // 74300/74301/74302: 256×1 static RAM, open-collector output.
+function _evaluateRam256x1OCN_fn(comp, gate) {
+  // 74300/74301/74302: 256×1 static RAM, open collector output.
   // inputs: [A0,A1,A2,A3,A4,A5,A6,A7, WEn, CSn, DI]
   // outputs: [DO]
+  // NOTE: distinct gate type from RAM_256X1_OC (74206), whose inputs end
+  // [DIN, CS, WE] — sharing one evaluator name made the 74206 misread WE as
+  // data and corrupt its memory on every read.
   const bits = this._readGateInputs(comp, gate.inputs);
   const wen = bits[8], csn = bits[9], di = bits[10];
   if (!comp.state) comp.state = {};
@@ -5113,7 +7816,8 @@ function _evaluateRam256x1OC_fn(comp, gate) {
   const byteIdx = addr >> 3;
   const bitIdx  = addr & 7;
   const val = (comp.state.ram[byteIdx] >> bitIdx) & 1;
-  if (this._drivePinBit(comp, gate.outputs[0], val)) changed = true;
+  // Open collector output: HIGH releases (external pull-up), LOW sinks.
+  if (this._drivePinOC(comp, gate.outputs[0], val)) changed = true;
   return changed;
 }
 
@@ -5152,12 +7856,14 @@ chipEvaluators._evaluateRam16x4OcInv        = _evaluateRam16x4OcInv_fn;
 chipEvaluators._evaluateCounterDecadeDiv    = _evaluateCounterDecadeDiv_fn;
 chipEvaluators._evaluateFreqDivProg         = _evaluateFreqDivProg_fn;
 chipEvaluators._evaluateFreqDivProg12Bit    = _evaluateFreqDivProg12Bit_fn;
+chipEvaluators._evaluateFreqDivProg4059     = _evaluateFreqDivProg4059_fn;
+chipEvaluators._evaluateFreqDivProg4536     = _evaluateFreqDivProg4536_fn;
 chipEvaluators._evaluateCounter4BitDiv      = _evaluateCounter4BitDiv_fn;
 chipEvaluators._evaluateShiftReg4BitBidirTri = _evaluateShiftReg4BitBidirTri_fn;
-chipEvaluators._evaluatePllFilter           = _evaluatePllFilter_fn;
+chipEvaluators._evaluateShiftReg4BitUnivTri  = _evaluateShiftReg4BitUnivTri_fn;
 chipEvaluators._evaluateMuxQuad2to1Stored   = _evaluateMuxQuad2to1Stored_fn;
 chipEvaluators._evaluateShiftReg8BitUnivTri = _evaluateShiftReg8BitUnivTri_fn;
-chipEvaluators._evaluateRam256x1OC          = _evaluateRam256x1OC_fn;
+chipEvaluators._evaluateRam256x1OCN         = _evaluateRam256x1OCN_fn;
 chipEvaluators._evaluateClkDiv2Oct          = _evaluateClkDiv2Oct_fn;
 
 // ── Block 20 evaluator functions ─────────────────────────────────────────────
@@ -5207,7 +7913,7 @@ function _evaluateBusXcvr8BitGtl_fn(comp, gate) {
 }
 
 function _evaluateRam1024x1OC_fn(comp, gate) {
-  // 74309/74314/74315: 1024×1 RAM, open-collector.
+  // 74309/74314/74315: 1024×1 RAM, open collector.
   // inputs: [A0..A9, WEn, CSn, DI]
   // outputs: [DO]
   const bits = this._readGateInputs(comp, gate.inputs);
@@ -5234,7 +7940,7 @@ function _evaluateRam1024x1OC_fn(comp, gate) {
 }
 
 function _evaluateBufferOctInvStTri_fn(comp, gate) {
-  // 74310: Octal inverting buffer, Schmitt trigger inputs, tri-state.
+  // 74310: Octal inverting buffer, Schmitt trigger inputs, tri state.
   // inputs: [A1..A8, OE1n, OE2n]
   // outputs: [Y1..Y8]
   // OE1n=0 → enables lower 4; OE2n=0 → enables upper 4; each when 0.
@@ -5408,7 +8114,7 @@ function _evaluateRam32x8OC_fn(comp, gate) {
 }
 
 function _evaluateRam16x4OC_fn(comp, gate) {
-  // 74319: 16×4 RAM, OC. Non-inverted outputs (unlike 74289).
+  // 74319: 16×4 RAM, OC. Non inverted outputs (unlike 74289).
   // inputs: [A0..A3, CSn, WEn, D0..D3]
   // outputs: [Q0..Q3]
   const bits = this._readGateInputs(comp, gate.inputs);
@@ -5478,7 +8184,7 @@ chipEvaluators._evaluateCrystalOscDiv       = _evaluateCrystalOscDiv_fn;
 // ── Block 21 Evaluator Functions ─────────────────────────────────────────────
 
 function _evaluateShiftReg8BitSignExt_fn(comp, gate) {
-  // 74322: 8 bit shift register with sign extend, tri-state.
+  // 74322: 8 bit shift register with sign extend, tri state.
   // inputs: [S, D0-D7, SER, OEn, CLK]
   //   S=0: parallel load, S=1: shift right (sign extend MSB).
   //   SER: serial input (only used when S=0 for serial operation on some versions;
@@ -5518,7 +8224,7 @@ function _evaluateShiftReg8BitBidirClrTri_fn(comp, gate) {
   //          QA_I,QB_I,QC_I,QD_I,QE_I,QF_I,QG_I,QH_I, CLK]
   //   Mode: 00=hold, 01=shift right, 10=shift left, 11=parallel load.
   //   CLRn=0: synchronous clear on rising edge.
-  //   OEAn/OEBn: tri-state enables (both 0 to output).
+  //   OEAn/OEBn: tri state enables (both 0 to output).
   // outputs: [QA,QB,QC,QD,QE,QF,QG,QH]
   const bits = this._readGateInputs(comp, gate.inputs);
   const [s0,s1,sr,sl,oeAn,oeBn,clrn,
@@ -5557,103 +8263,113 @@ function _evaluateShiftReg8BitBidirClrTri_fn(comp, gate) {
   return changed;
 }
 
+// Voltage-controlled square-wave oscillator (shared by all VCO chips).
+// Phase counter advances by this.dt/period each tick; output toggles at the
+// half-period boundary. When EN is inactive, phase freezes and output holds
+// LOW. (PLL chips were removed from the catalog rather than stubbed — see
+// js/Simplifications.md §2 "Note on PLL parts".)
+function _vcoTick_fn(comp, key, vinVolt, rngBit, enActive) {
+  const state = this._getSeqState(comp, key, { phase: 0, q: 0 });
+  if (!enActive) { state.q = 0; return 0; }
+  // 0V → 10 Hz, VCC → 1 kHz. RNG=1 multiplies frequency by 10 (up to ~10 kHz,
+  // which under-samples at dt=1ms but is still useful as a coarse range bit).
+  // If VIN is null/floating, default to 100 Hz so the chip blinks usefully
+  // without any analog driver attached.
+  let freq;
+  if (vinVolt !== null && vinVolt !== undefined) {
+    const v = Math.max(0, Math.min(VCC_VOLTAGE, vinVolt));
+    freq = 10 + (v / VCC_VOLTAGE) * (1000 - 10);
+  } else {
+    freq = 100;
+  }
+  if (rngBit === 1) freq *= 10;
+  const period = 1 / freq;
+  let phase = state.phase + this.dt / period;
+  if (phase >= 1) phase -= Math.floor(phase);
+  state.phase = phase;
+  state.q = (phase < 0.5) ? 1 : 0;
+  return state.q;
+}
+
+// Shared per-channel VCO gate (74x124 and the 74x624 629 family).
+// inputs: [EN, FREQ, RNG]   outputs: [Y, Yn]
+// EN: null/absent → free running; name ending in 'n' (OEn) → active LOW
+// (matching the JK evaluators' suffix convention); otherwise active HIGH.
+// FREQ/RNG: null/absent → defaults (100 Hz, range off) inside _vcoTick.
+function _evaluateVco124_fn(comp, gate) {
+  const [enName, freqName, rngName] = gate.inputs;
+  const [outName, outnName] = gate.outputs;
+  let enActive = true;
+  if (enName) {
+    const bit = this._readPinBit(comp, enName);
+    enActive = enName.endsWith('n') ? bit === 0 : bit === 1;
+  }
+  const vFreq = freqName ? this._readPinVoltage(comp, freqName) : null;
+  const rng   = rngName ? this._readPinBit(comp, rngName) : 0;
+  const q = this._vcoTick(comp, outName, vFreq, rng, enActive);
+  let changed = false;
+  if (this._drivePinBit(comp, outName,  q))         changed = true;
+  if (this._drivePinBit(comp, outnName, q ? 0 : 1)) changed = true;
+  return changed;
+}
+
+// 74x324: single VCO with EN. EN active HIGH (matches existing gate convention).
+// inputs: [EN, VIN, RNG]   outputs: [OUT, OUTn]
 function _evaluateVcoSingleEn_fn(comp, gate) {
-  // 74324: VCO (analog). Stub: OUT=EN, OUTn=!EN.
-  const bits = this._readGateInputs(comp, gate.inputs);
-  const en = bits[0];
+  const [enName, vinName, rngName] = gate.inputs;
+  const [outName, outnName] = gate.outputs;
+  const en  = this._readPinBit(comp, enName);
+  const vIn = this._readPinVoltage(comp, vinName);
+  const rng = this._readPinBit(comp, rngName);
+  const q = this._vcoTick(comp, outName, vIn, rng, en === 1);
   let changed = false;
-  if (this._drivePinBit(comp, gate.outputs[0], en)) changed = true;       // OUT
-  if (this._drivePinBit(comp, gate.outputs[1], en ? 0 : 1)) changed = true; // OUTn
+  if (this._drivePinBit(comp, outName,  q))         changed = true;
+  if (this._drivePinBit(comp, outnName, q ? 0 : 1)) changed = true;
   return changed;
 }
 
+// 74x325 / 74x327: dual VCO, no enable (always running).
+// inputs: [VIN1, RNG1, VIN2, RNG2]   outputs: [OUT1, OUT1n, OUT2, OUT2n]
 function _evaluateVcoDual_fn(comp, gate) {
-  // 74325/74327: Dual VCO. Stub: OUT1=VIN1, OUT1n=!VIN1, OUT2=VIN2, OUT2n=!VIN2.
-  const bits = this._readGateInputs(comp, gate.inputs);
-  const [vin1, vin2] = bits;
+  const [v1n, r1n, v2n, r2n] = gate.inputs;
+  const [o1, o1n, o2, o2n] = gate.outputs;
+  const v1 = this._readPinVoltage(comp, v1n);
+  const r1 = this._readPinBit(comp, r1n);
+  const v2 = this._readPinVoltage(comp, v2n);
+  const r2 = this._readPinBit(comp, r2n);
+  const q1 = this._vcoTick(comp, o1, v1, r1, true);
+  const q2 = this._vcoTick(comp, o2, v2, r2, true);
   let changed = false;
-  if (this._drivePinBit(comp, gate.outputs[0], vin1)) changed = true;
-  if (this._drivePinBit(comp, gate.outputs[1], vin1 ? 0 : 1)) changed = true;
-  if (this._drivePinBit(comp, gate.outputs[2], vin2)) changed = true;
-  if (this._drivePinBit(comp, gate.outputs[3], vin2 ? 0 : 1)) changed = true;
+  if (this._drivePinBit(comp, o1,  q1))         changed = true;
+  if (this._drivePinBit(comp, o1n, q1 ? 0 : 1)) changed = true;
+  if (this._drivePinBit(comp, o2,  q2))         changed = true;
+  if (this._drivePinBit(comp, o2n, q2 ? 0 : 1)) changed = true;
   return changed;
 }
 
+// 74x326: dual VCO with per-channel EN. EN active HIGH.
+// inputs: [EN1, VIN1, RNG1, EN2, VIN2, RNG2]   outputs: [OUT1, OUT1n, OUT2, OUT2n]
 function _evaluateVcoDualEn_fn(comp, gate) {
-  // 74326: Dual VCO with enable. Stub: when EN=1 → OUT=VIN, else OUT=0.
-  // inputs: [EN1, VIN1, EN2, VIN2]
-  const bits = this._readGateInputs(comp, gate.inputs);
-  const [en1, vin1, en2, vin2] = bits;
+  const [e1n, v1n, r1n, e2n, v2n, r2n] = gate.inputs;
+  const [o1, o1n, o2, o2n] = gate.outputs;
+  const en1 = this._readPinBit(comp, e1n);
+  const en2 = this._readPinBit(comp, e2n);
+  const v1  = this._readPinVoltage(comp, v1n);
+  const v2  = this._readPinVoltage(comp, v2n);
+  const r1  = this._readPinBit(comp, r1n);
+  const r2  = this._readPinBit(comp, r2n);
+  const q1 = this._vcoTick(comp, o1, v1, r1, en1 === 1);
+  const q2 = this._vcoTick(comp, o2, v2, r2, en2 === 1);
   let changed = false;
-  const o1 = en1 ? vin1 : 0;
-  const o2 = en2 ? vin2 : 0;
-  if (this._drivePinBit(comp, gate.outputs[0], o1)) changed = true;
-  if (this._drivePinBit(comp, gate.outputs[1], o1 ? 0 : 1)) changed = true;
-  if (this._drivePinBit(comp, gate.outputs[2], o2)) changed = true;
-  if (this._drivePinBit(comp, gate.outputs[3], o2 ? 0 : 1)) changed = true;
-  return changed;
-}
-
-function _evaluatePla12in6outTri_fn(comp, gate) {
-  // 74330/74334/74336: PLA stub all outputs = 0 (not programmed).
-  // inputs: [OEn, I0..I11]
-  // outputs: [F0..F5]
-  const bits = this._readGateInputs(comp, gate.inputs);
-  const oen = bits[0];
-  let changed = false;
-  if (oen !== 0) {
-    for (const op of gate.outputs) { if (this._drivePinHighZ(comp, op)) changed = true; }
-    return changed;
-  }
-  for (const op of gate.outputs) { if (this._drivePinBit(comp, op, 0)) changed = true; }
-  return changed;
-}
-
-function _evaluatePla12in6outOC_fn(comp, gate) {
-  // 74331/74336: PLA OC stub all outputs = 0 when OEn=0.
-  // inputs: [OEn, I0..I11]
-  // outputs: [F0..F5]
-  const bits = this._readGateInputs(comp, gate.inputs);
-  const oen = bits[0];
-  let changed = false;
-  if (oen !== 0) {
-    for (const op of gate.outputs) { if (this._drivePinHighZ(comp, op)) changed = true; }
-    return changed;
-  }
-  for (const op of gate.outputs) { if (this._drivePinBit(comp, op, 0)) changed = true; }
-  return changed;
-}
-
-function _evaluatePla12in6outSregTri_fn(comp, gate) {
-  // 74333/74335: PLA with state registers + clock. Stub: OEn=0 → all outputs 0.
-  // inputs: [OEn, CLK, I0..I11]
-  // outputs: [F0..F5]
-  const bits = this._readGateInputs(comp, gate.inputs);
-  const oen = bits[0];
-  let changed = false;
-  if (oen !== 0) {
-    for (const op of gate.outputs) { if (this._drivePinHighZ(comp, op)) changed = true; }
-    return changed;
-  }
-  for (const op of gate.outputs) { if (this._drivePinBit(comp, op, 0)) changed = true; }
-  return changed;
-}
-
-function _evaluatePla12in6outSregOC_fn(comp, gate) {
-  // 74335: PLA OC with state registers. Stub: OEn=0 → all outputs 0.
-  const bits = this._readGateInputs(comp, gate.inputs);
-  const oen = bits[0];
-  let changed = false;
-  if (oen !== 0) {
-    for (const op of gate.outputs) { if (this._drivePinHighZ(comp, op)) changed = true; }
-    return changed;
-  }
-  for (const op of gate.outputs) { if (this._drivePinBit(comp, op, 0)) changed = true; }
+  if (this._drivePinBit(comp, o1,  q1))         changed = true;
+  if (this._drivePinBit(comp, o1n, q1 ? 0 : 1)) changed = true;
+  if (this._drivePinBit(comp, o2,  q2))         changed = true;
+  if (this._drivePinBit(comp, o2n, q2 ? 0 : 1)) changed = true;
   return changed;
 }
 
 function _evaluateClkDriverQuadTri_fn(comp, gate) {
-  // 74337: Quad clock driver, tri-state.
+  // 74337: Quad clock driver, tri state.
   // inputs: [OE1n,CLK1, OE2n,CLK2, OE3n,CLK3, OE4n,CLK4]
   // outputs: [OUT1,OUT1n, OUT2,OUT2n, OUT3,OUT3n, OUT4,OUT4n]
   const bits = this._readGateInputs(comp, gate.inputs);
@@ -5674,7 +8390,7 @@ function _evaluateClkDriverQuadTri_fn(comp, gate) {
 }
 
 function _evaluateBufferOctStTri_fn(comp, gate) {
-  // 74341/74344: Octal buffer, non-inverting, Schmitt, tri-state.
+  // 74341/74344: Octal buffer, non inverting, Schmitt, tri state.
   // inputs: [A1..A8, OE1n, OE2n]
   // outputs: [Y1..Y8]
   // OE1n controls Y1-Y4, OE2n controls Y5-Y8.
@@ -5701,13 +8417,11 @@ function _evaluateBufferOctStTri_fn(comp, gate) {
 // ── Assign Block 21 evaluators to CircuitSimulator.prototype ─────────────────
 chipEvaluators._evaluateShiftReg8BitSignExt    = _evaluateShiftReg8BitSignExt_fn;
 chipEvaluators._evaluateShiftReg8BitBidirClrTri= _evaluateShiftReg8BitBidirClrTri_fn;
+chipEvaluators._vcoTick                        = _vcoTick_fn;
+chipEvaluators._evaluateVco124                 = _evaluateVco124_fn;
 chipEvaluators._evaluateVcoSingleEn            = _evaluateVcoSingleEn_fn;
 chipEvaluators._evaluateVcoDual                = _evaluateVcoDual_fn;
 chipEvaluators._evaluateVcoDualEn              = _evaluateVcoDualEn_fn;
-chipEvaluators._evaluatePla12in6outTri         = _evaluatePla12in6outTri_fn;
-chipEvaluators._evaluatePla12in6outOC          = _evaluatePla12in6outOC_fn;
-chipEvaluators._evaluatePla12in6outSregTri     = _evaluatePla12in6outSregTri_fn;
-chipEvaluators._evaluatePla12in6outSregOC      = _evaluatePla12in6outSregOC_fn;
 chipEvaluators._evaluateClkDriverQuadTri       = _evaluateClkDriverQuadTri_fn;
 chipEvaluators._evaluateBufferOctStTri         = _evaluateBufferOctStTri_fn;
 
@@ -5715,7 +8429,7 @@ chipEvaluators._evaluateBufferOctStTri         = _evaluateBufferOctStTri_fn;
 // ── Block 22 Evaluator Functions ─────────────────────────────────────────────
 
 function _evaluatePriorityEnc8to3Tri_fn(comp, gate) {
-  // 74348: 8-to-3 priority encoder, tri-state.
+  // 74348: 8 to 3 priority encoder, tri state.
   // inputs: [I0,I1,I2,I3,I4,I5,I6,I7, EIn]
   // outputs: [A0n, A1n, A2n, GS, EO]
   // Inputs active low (I=0 means asserted). Priority: I7 > I6 > ... > I0.
@@ -5748,7 +8462,7 @@ function _evaluatePriorityEnc8to3Tri_fn(comp, gate) {
 }
 
 function _evaluateShifter4BitTri_fn(comp, gate) {
-  // 74350: 4 bit shifter with tri-state outputs.
+  // 74350: 4 bit shifter with tri state outputs.
   // inputs: [S0, S1, DIR, D0, D1, D2, D3, OEn]
   // outputs: [Y0, Y1, Y2, Y3]
   // S0,S1: shift amount (0-3 bits). DIR=0: right-shift, DIR=1: left-shift.
@@ -5769,7 +8483,7 @@ function _evaluateShifter4BitTri_fn(comp, gate) {
 }
 
 function _evaluateMux8to1ComplTri_fn(comp, gate) {
-  // 74351: 8→1 mux with complementary tri-state outputs.
+  // 74351: 8→1 mux with complementary tri state outputs.
   // inputs: [D0..D7, S0, S1, S2, Gn]
   // outputs: [W, Wn]
   const bits = this._readGateInputs(comp, gate.inputs);
@@ -5799,7 +8513,7 @@ function _evaluateMux4to1Inv_fn(comp, gate) {
 }
 
 function _evaluateMux4to1TriInv_fn(comp, gate) {
-  // 74353: single 4→1 mux section with inverting tri-state output.
+  // 74353: single 4→1 mux section with inverting tri state output.
   // inputs: [C0, C1, C2, C3, A, B, Gn], output (single string)
   // Gn=0: Y = NOT(selected), enabled. Gn=1: HiZ.
   const [c0,c1,c2,c3,a,b,gn] = this._readGateInputs(comp, gate.inputs);
@@ -5810,7 +8524,7 @@ function _evaluateMux4to1TriInv_fn(comp, gate) {
 }
 
 function _evaluateMux8to1LatchTri_fn(comp, gate) {
-  // 74354/74355: 8→1 mux with transparent latch + tri-state complementary outputs.
+  // 74354/74355: 8→1 mux with transparent latch + tri state complementary outputs.
   // inputs: [I0..I7, S0, S1, S2, LE, OEn]
   // outputs: [W, Wn]
   const bits = this._readGateInputs(comp, gate.inputs);
@@ -5830,7 +8544,7 @@ function _evaluateMux8to1LatchTri_fn(comp, gate) {
 }
 
 function _evaluateMux8to1RegTri_fn(comp, gate) {
-  // 74356/74357: 8→1 mux with edge-triggered register + tri-state complementary outputs.
+  // 74356/74357: 8→1 mux with edge triggered register + tri state complementary outputs.
   // inputs: [I0..I7, S0, S1, S2, CLK, OEn]
   // outputs: [W, Wn]
   const bits = this._readGateInputs(comp, gate.inputs);
@@ -5878,12 +8592,59 @@ function _evaluateClk4PhaseGen_fn(comp, gate) {
 }
 
 function _evaluateBufferHexTri_fn(comp, gate) {
-  // 74365: Hex buffer, non-inverting, tri-state.
-  // inputs: [A1..A6, G1n, G2n]
+  // 74365: Hex buffer, non inverting, tri state.
+  // inputs: [A1..A6, G1n, G2n]      (both enables active-LOW, applied to all 6)
   // outputs: [Y1..Y6]
+  //
+  // CD4503B split-disable mode (gate.splitDisable === true):
+  //   inputs: [A1..A6, DIS_A, DIS_B]
+  //   - The CD4503 has TWO independent disable controls, each ACTIVE HIGH:
+  //       DIS A (HIGH) → buffers 1-4 (outputs[0..3]) go high-impedance (Z).
+  //       DIS B (HIGH) → buffers 5-6 (outputs[4..5]) go high-impedance (Z).
+  //   - otherwise: Yn = An  (non-inverting buffer).
+  //   This differs from the bare 74365 in two ways the plain primitive cannot
+  //   express: the enables are active HIGH, and they gate DIFFERENT groups of
+  //   buffers (4 + 2) rather than all six together. Gated behind the opt-in flag
+  //   so the 74365 entries (flag unset) keep their original combined active-LOW
+  //   path. Truth table (CD4503B datasheet SCHS068C):
+  //     Dn DIS(A/B) | Qn      0 0 | 0      1 0 | 1      X 1 | Z
   const bits = this._readGateInputs(comp, gate.inputs);
-  const g1n = bits[6], g2n = bits[7];
   let changed = false;
+  if (gate.splitDisable) {
+    const disA = bits[6], disB = bits[7];
+    for (let i = 0; i < 6; i++) {
+      const dis = (i < 4) ? disA : disB;
+      if (dis !== 0) {
+        if (this._drivePinHighZ(comp, gate.outputs[i])) changed = true;
+      } else {
+        if (this._drivePinBit(comp, gate.outputs[i], bits[i])) changed = true;
+      }
+    }
+    return changed;
+  }
+  // 74367 split-enable mode (gate.splitEnable === true):
+  //   inputs: [A1..A6, G1n, G2n]   (both enables active-LOW, SPLIT 4+2)
+  //   - 1G (G1n) enables the first FOUR buffers: outputs[0..3] (Y1-Y4).
+  //   - 2G (G2n) enables the last TWO buffers:   outputs[4..5] (Y5-Y6).
+  //   Each group tri-states independently when its enable is HIGH; otherwise
+  //   Yn = An (non-inverting). This is the '367A split, distinct from the '365A
+  //   combined enable below (EITHER enable HIGH tri-states all six). The 74365
+  //   leaves this flag unset and keeps the combined path. Truth table (TI SDLS102
+  //   '367A logic diagram, verified as PDF page images — issues.md C4):
+  //     1G An | Yn(1-4)     0 0 | 0     0 1 | 1     1 X | Z    (2G governs Y5-Y6)
+  if (gate.splitEnable) {
+    const g1n = bits[6], g2n = bits[7];
+    for (let i = 0; i < 6; i++) {
+      const en = (i < 4) ? g1n : g2n;   // active-LOW: HIGH → tri-state
+      if (en !== 0) {
+        if (this._drivePinHighZ(comp, gate.outputs[i])) changed = true;
+      } else {
+        if (this._drivePinBit(comp, gate.outputs[i], bits[i])) changed = true;
+      }
+    }
+    return changed;
+  }
+  const g1n = bits[6], g2n = bits[7];
   if (g1n !== 0 || g2n !== 0) {
     for (const op of gate.outputs) { if (this._drivePinHighZ(comp, op)) changed = true; }
     return changed;
@@ -5895,12 +8656,62 @@ function _evaluateBufferHexTri_fn(comp, gate) {
 }
 
 function _evaluateBufferHexInvTri_fn(comp, gate) {
-  // 74366: Hex buffer, inverting, tri-state.
+  // 74366: Hex buffer, inverting, tri state.
   // inputs: [A1..A6, G1n, G2n]
   // outputs: [Y1..Y6]
+  //
+  // CD4502B strobed-hex-inverter mode (gate.strobedInhibit === true):
+  //   inputs: [A1..A6, OUTPUT_DISABLE, INHIBIT]
+  //   - OUTPUT DISABLE (active HIGH) → all six outputs high-impedance (Z).
+  //   - INHIBIT (active HIGH, with DISABLE low) → all six outputs forced LOW (0),
+  //     NOT high-impedance. This "strobe" behavior is what distinguishes the
+  //     CD4502 from a plain 74366 tri-state enable; the bare enable cannot
+  //     express it, so it is gated behind the opt-in flag (74366 entries leave
+  //     the flag unset and keep their original active-LOW combined-enable path).
+  //   - otherwise: Qn = NOT(Dn).
+  //   Truth table (CD4502B datasheet SCHS067B):
+  //     DISABLE INHIBIT Dn | Qn      0 0 0 | 1     0 0 1 | 0
+  //                                  0 1 X | 0     1 X X | Z
   const bits = this._readGateInputs(comp, gate.inputs);
-  const g1n = bits[6], g2n = bits[7];
   let changed = false;
+  if (gate.strobedInhibit) {
+    const disable = bits[6], inhibit = bits[7];
+    if (disable !== 0) {
+      for (const op of gate.outputs) { if (this._drivePinHighZ(comp, op)) changed = true; }
+      return changed;
+    }
+    if (inhibit !== 0) {
+      for (const op of gate.outputs) { if (this._drivePinBit(comp, op, 0)) changed = true; }
+      return changed;
+    }
+    for (let i = 0; i < 6; i++) {
+      if (this._drivePinBit(comp, gate.outputs[i], bits[i] ^ 1)) changed = true;
+    }
+    return changed;
+  }
+  // 74368 split-enable mode (gate.splitEnable === true):
+  //   inputs: [A1..A6, G1n, G2n]   (both enables active-LOW, SPLIT 4+2)
+  //   - 1G (G1n) enables the first FOUR inverters: outputs[0..3] (Y1-Y4).
+  //   - 2G (G2n) enables the last TWO inverters:   outputs[4..5] (Y5-Y6).
+  //   Each group tri-states independently when its enable is HIGH; otherwise
+  //   Yn = NOT(An). This is the '367A/'368A split, distinct from the '365A/'366A
+  //   combined enable below (where EITHER enable HIGH tri-states all six). The
+  //   74366 leaves this flag unset and keeps the combined path. Truth table
+  //   (TI SDLS102 '368A logic diagram, verified as PDF page images — issues.md C4):
+  //     1G An | Yn(1-4)     0 0 | 1     0 1 | 0     1 X | Z    (2G governs Y5-Y6)
+  if (gate.splitEnable) {
+    const g1n = bits[6], g2n = bits[7];
+    for (let i = 0; i < 6; i++) {
+      const en = (i < 4) ? g1n : g2n;   // active-LOW: HIGH → tri-state
+      if (en !== 0) {
+        if (this._drivePinHighZ(comp, gate.outputs[i])) changed = true;
+      } else {
+        if (this._drivePinBit(comp, gate.outputs[i], bits[i] ^ 1)) changed = true;
+      }
+    }
+    return changed;
+  }
+  const g1n = bits[6], g2n = bits[7];
   if (g1n !== 0 || g2n !== 0) {
     for (const op of gate.outputs) { if (this._drivePinHighZ(comp, op)) changed = true; }
     return changed;
@@ -5952,8 +8763,40 @@ function _evaluateDLatchQuadCompl_fn(comp, gate) {
   return changed;
 }
 
+function _evaluateDLatchQuad4042_fn(comp, gate) {
+  // CD4042: Quad clocked "D" latch with complementary Q/Qn outputs and a
+  // single common CLOCK gated by a POLARITY input (no per-latch enable pins,
+  // so the 74375 D_LATCH_QUAD_COMPL primitive does not fit — see issues.md).
+  // inputs:  [D1, D2, D3, D4, CLOCK, POLARITY]
+  // outputs: [Q1, Q1n, Q2, Q2n, Q3, Q3n, Q4, Q4n]
+  // Truth table (TI CD4042B SCHS040D, Fig. 1):
+  //   POLARITY=0: latches transparent while CLOCK=0; data latched on CLOCK 0→1.
+  //   POLARITY=1: latches transparent while CLOCK=1; data latched on CLOCK 1→0.
+  // i.e. transparent (Q follows D) when CLOCK == POLARITY; hold otherwise.
+  const bits = this._readGateInputs(comp, gate.inputs);
+  const [d1, d2, d3, d4, clk, pol] = bits;
+  if (!comp.state) comp.state = { q: [0, 0, 0, 0] };
+  if (clk === pol) {
+    comp.state.q[0] = d1;
+    comp.state.q[1] = d2;
+    comp.state.q[2] = d3;
+    comp.state.q[3] = d4;
+  }
+  const [q1, q2, q3, q4] = comp.state.q;
+  let changed = false;
+  if (this._drivePinBit(comp, gate.outputs[0], q1))     changed = true;
+  if (this._drivePinBit(comp, gate.outputs[1], q1 ^ 1)) changed = true;
+  if (this._drivePinBit(comp, gate.outputs[2], q2))     changed = true;
+  if (this._drivePinBit(comp, gate.outputs[3], q2 ^ 1)) changed = true;
+  if (this._drivePinBit(comp, gate.outputs[4], q3))     changed = true;
+  if (this._drivePinBit(comp, gate.outputs[5], q3 ^ 1)) changed = true;
+  if (this._drivePinBit(comp, gate.outputs[6], q4))     changed = true;
+  if (this._drivePinBit(comp, gate.outputs[7], q4 ^ 1)) changed = true;
+  return changed;
+}
+
 function _evaluateJkNotFfQuad_fn(comp, gate) {
-  // 74376: Quad J-NOT-K flip-flop (K=~J internally). Shared CLK and CLRn.
+  // 74376: Quad J-NOT-K flip flop (K=~J internally). Shared CLK and CLRn.
   // inputs: [1J, 2J, 3J, 4J, CLK, CLRn]
   // outputs: [1Q, 1Qn, 2Q, 2Qn, 3Q, 3Qn, 4Q, 4Qn]
   // CLRn=0: all Q→0. Rising CLK: Q →  J (since K=~J: sets if J=1, resets if J=0).
@@ -6021,6 +8864,42 @@ function _evaluateDFfHexCe_fn(comp, gate) {
   return changed;
 }
 
+function _evaluateDFf9BitClrCeTri_fn(comp, gate) {
+  // 74823: 9-bit bus-interface D register with async clear, clock enable, and
+  // 3-state outputs. Source-verified function table (SN74AS823, all active LOW):
+  //   OEn  CLRn  CEN  CLK   D | Q
+  //    L    L    X    X     X | L      (async clear dominates)
+  //    L    H    L    rise  H | H      (CEN low: load D on rising edge)
+  //    L    H    L    rise  L | L
+  //    L    H    H    X     X | hold   (CEN high: clock disabled, latch)
+  //    H    X    X    X     X | Z      (output control; internal FFs unaffected)
+  // inputs:  [OEn, CLRn, CEN, CLK, D0..D8]   outputs: [Q0..Q8]
+  const bits = this._readGateInputs(comp, gate.inputs);
+  const oen  = bits[0];
+  const clrn = bits[1];
+  const cen  = bits[2];
+  const clk  = bits[3];
+  const ds   = bits.slice(4, 13);
+  if (!comp.state) comp.state = { q: new Array(9).fill(0), prevClk: clk };
+  if (clrn === 0) {
+    // Asynchronous clear: holds outputs LOW regardless of clock.
+    comp.state.q = new Array(9).fill(0);
+  } else if (comp.state.prevClk === 0 && clk === 1 && cen === 0) {
+    comp.state.q = ds.slice();
+  }
+  comp.state.prevClk = clk;
+  let changed = false;
+  if (oen !== 0) {
+    // Output control places the bus pins in high-impedance; FF state is kept.
+    for (const op of gate.outputs) { if (this._drivePinHighZ(comp, op)) changed = true; }
+    return changed;
+  }
+  for (let i = 0; i < 9; i++) {
+    if (this._drivePinBit(comp, gate.outputs[i], comp.state.q[i])) changed = true;
+  }
+  return changed;
+}
+
 function _evaluateDFfQuadCeCompl_fn(comp, gate) {
   // 74379: 4 bit register with clock enable and complementary outputs.
   // inputs: [D1, D2, D3, D4, CLK, En]  (En active LOW)
@@ -6042,7 +8921,7 @@ function _evaluateDFfQuadCeCompl_fn(comp, gate) {
 }
 
 function _evaluateMultiFuncReg8Bit_fn(comp, gate) {
-  // 74380: 8 bit multifunction register. Simplified: D-FF with tri-state.
+  // 74380: 8 bit multifunction register. Simplified: D-FF with tri state.
   // inputs: [D1..D8, CLK, S0, S1, S2, OEn]
   // outputs: [Q1..Q8]
   // For simulation purposes: when OEn=0, outputs Q on rising CLK.
@@ -6133,7 +9012,7 @@ function _evaluateAlu4Bit382_fn(comp, gate) {
 }
 
 function _evaluateDFfOctalOc_fn(comp, gate) {
-  // 74383: 8 bit register, open-collector. Same as D_FF_OCTAL (74273) but OC outputs.
+  // 74383: 8 bit register, open collector. Same as D_FF_OCTAL (74273) but OC outputs.
   // inputs: [D1..D8, CLK, CLRn], outputs: [Q1..Q8]
   const bits = this._readGateInputs(comp, gate.inputs);
   const ds   = bits.slice(0, 8);
@@ -6145,9 +9024,14 @@ function _evaluateDFfOctalOc_fn(comp, gate) {
     if (comp.state.prevClk === 0 && clk === 1) comp.state.q = ds.slice();
     comp.state.prevClk = clk;
   }
+  const isOC = comp.chipDef && comp.chipDef.openCollector;
   let changed = false;
   for (let i = 0; i < 8; i++) {
-    if (this._drivePinBit(comp, gate.outputs[i], comp.state.q[i])) changed = true;
+    if (isOC) {
+      if (this._drivePinOC(comp, gate.outputs[i], comp.state.q[i])) changed = true;
+    } else {
+      if (this._drivePinBit(comp, gate.outputs[i], comp.state.q[i])) changed = true;
+    }
   }
   return changed;
 }
@@ -6199,9 +9083,11 @@ function _evaluateSerialAdderQuad_fn(comp, gate) {
 
 // ── Assign Block 23 evaluators to CircuitSimulator.prototype ─────────────────
 chipEvaluators._evaluateDLatchQuadCompl   = _evaluateDLatchQuadCompl_fn;
+chipEvaluators._evaluateDLatchQuad4042    = _evaluateDLatchQuad4042_fn;
 chipEvaluators._evaluateJkNotFfQuad       = _evaluateJkNotFfQuad_fn;
 chipEvaluators._evaluateDFfOctalCe        = _evaluateDFfOctalCe_fn;
 chipEvaluators._evaluateDFfHexCe          = _evaluateDFfHexCe_fn;
+chipEvaluators._evaluateDFf9BitClrCeTri   = _evaluateDFf9BitClrCeTri_fn;
 chipEvaluators._evaluateDFfQuadCeCompl    = _evaluateDFfQuadCeCompl_fn;
 chipEvaluators._evaluateMultiFuncReg8Bit  = _evaluateMultiFuncReg8Bit_fn;
 chipEvaluators._evaluateAlu4Bit381        = _evaluateAlu4Bit381_fn;
@@ -6210,11 +9096,114 @@ chipEvaluators._evaluateDFfOctalOc        = _evaluateDFfOctalOc_fn;
 chipEvaluators._evaluateMultiplier8x1     = _evaluateMultiplier8x1_fn;
 chipEvaluators._evaluateSerialAdderQuad   = _evaluateSerialAdderQuad_fn;
 
+// ── CD4032B / CD4038B triple serial adder ────────────────────────────────────
+// Three independent serial full adders sharing one CLOCK and one CARRY-RESET.
+// Each adder adds two serial bit streams A,B (LSB first) plus the carry stored
+// from the previous bit; an INVERT command complements the SUM OUTPUT (used to
+// build a complemented / 2's-complement subtract result). Distinct from the
+// 74385 SERIAL_ADDER_QUAD primitive, which models subtract by inverting the B
+// *input* — that corrupts the carry chain, has no CARRY-RESET, and is quad.
+//
+// Source: SGS-Thomson Microelectronics, "HCC/HCF4032B HCC/HCF4038B Triple
+//   Serial Adders", doc 5-2677 (June 1989). [Online]. Available:
+//   https://www.sm0vpo.com/_pdf/CD/CD_4032.pdf. Verified: PIN CONNECTIONS +
+//   FUNCTIONAL DIAGRAM (p.1-2) and LOGIC/TIMING DIAGRAM (p.3), read as rendered
+//   PDF page images (issues.md C4). Behaviour: "Each adder has ... an INVERT
+//   command signal. When the command signal is a logical 1, the sum is
+//   complemented." / "The carry is only added at the positive-going clock
+//   transition for the HCC/HCF4032B" (4038B = negative-going). CARRY-RESET HIGH
+//   forces the carry to 0 for the start of the next word.
+//
+// inputs:  [A1,B1,INV1, A2,B2,INV2, A3,B3,INV3, CARRY_RESET, CLOCK]
+// outputs: [SUM1,SUM2,SUM3]
+function _evaluateSerialAdderTriple4032_fn(comp, gate) {
+  const bits = this._readGateInputs(comp, gate.inputs);
+  const cr  = bits[9];   // CARRY RESET (active HIGH)
+  const clk = bits[10];  // CLOCK (4032B: carry latched on positive edge)
+  if (!comp.state) comp.state = { carry: [0, 0, 0], prevClk: clk };
+  let changed = false;
+
+  // Carry flip-flops update on the rising clock edge (carry from the previous
+  // bit position is what the *current* SUM uses; this edge captures the carry
+  // OUT for the next bit). CARRY-RESET HIGH clears the carry instead.
+  if (comp.state.prevClk === 0 && clk === 1) {
+    for (let i = 0; i < 3; i++) {
+      if (cr) { comp.state.carry[i] = 0; continue; }
+      const a = bits[i * 3];
+      const b = bits[i * 3 + 1];
+      const c = comp.state.carry[i];
+      comp.state.carry[i] = (a & b) | (a & c) | (b & c); // carry-out = majority
+    }
+  }
+  comp.state.prevClk = clk;
+
+  // SUM is combinational: A XOR B XOR carry_in, then complemented by INVERT.
+  for (let i = 0; i < 3; i++) {
+    const a   = bits[i * 3];
+    const b   = bits[i * 3 + 1];
+    const inv = bits[i * 3 + 2];
+    const sum = a ^ b ^ comp.state.carry[i] ^ inv;
+    if (this._drivePinBit(comp, gate.outputs[i], sum)) changed = true;
+  }
+  return changed;
+}
+chipEvaluators._evaluateSerialAdderTriple4032 = _evaluateSerialAdderTriple4032_fn;
+
+// ── CD4038B triple serial adder (negative-going clock sibling of the CD4032B) ─
+// Identical function to SERIAL_ADDER_TRIPLE_4032 except the carry flip-flops
+// latch on the FALLING clock edge. Kept as a separate primitive so the CD4032
+// (positive edge) and CD4038 (negative edge) entries are each self-contained and
+// neither agent's work depends on a shared flag mid-flight.
+//
+// Source: SGS-Thomson Microelectronics, "HCC/HCF4032B HCC/HCF4038B Triple
+//   Serial Adders", drawing s-2677 (June 1989). [Online]. Available:
+//   https://www.sm0vpo.com/_pdf/CD/CD_4032.pdf. Verified: DESCRIPTION + PIN
+//   CONNECTIONS + FUNCTIONAL DIAGRAM (p.1-2) and the 4038B LOGIC/TIMING DIAGRAM
+//   (p.4), read as rendered PDF page images (issues.md C4). Key behaviour: "The
+//   carry is only added at ... the negative-going clock for the HCC/HCF4038B";
+//   "When the [INVERT] command signal is a logical 1, the sum is complemented";
+//   data enters LSB first; CARRY-RESET HIGH one bit before the first bit of the
+//   next word forces the carry to 0.
+//
+// inputs:  [A1,B1,INV1, A2,B2,INV2, A3,B3,INV3, CARRY_RESET, CLOCK]
+// outputs: [SUM1,SUM2,SUM3]
+function _evaluateSerialAdderTriple4038_fn(comp, gate) {
+  const bits = this._readGateInputs(comp, gate.inputs);
+  const cr  = bits[9];   // CARRY RESET (active HIGH)
+  const clk = bits[10];  // CLOCK (4038B: carry latched on the NEGATIVE edge)
+  if (!comp.state) comp.state = { carry: [0, 0, 0], prevClk: clk };
+  let changed = false;
+
+  // Carry flip-flops update on the FALLING clock edge. CARRY-RESET HIGH clears
+  // the carry instead of latching the carry-out.
+  if (comp.state.prevClk === 1 && clk === 0) {
+    for (let i = 0; i < 3; i++) {
+      if (cr) { comp.state.carry[i] = 0; continue; }
+      const a = bits[i * 3];
+      const b = bits[i * 3 + 1];
+      const c = comp.state.carry[i];
+      comp.state.carry[i] = (a & b) | (a & c) | (b & c); // carry-out = majority
+    }
+  }
+  comp.state.prevClk = clk;
+
+  // SUM is combinational: A XOR B XOR carry_in, then complemented by INVERT.
+  for (let i = 0; i < 3; i++) {
+    const a   = bits[i * 3];
+    const b   = bits[i * 3 + 1];
+    const inv = bits[i * 3 + 2];
+    const sum = a ^ b ^ comp.state.carry[i] ^ inv;
+    if (this._drivePinBit(comp, gate.outputs[i], sum)) changed = true;
+  }
+  return changed;
+}
+chipEvaluators._evaluateSerialAdderTriple4038 = _evaluateSerialAdderTriple4038_fn;
+
 // ── Block 24 Evaluator Functions ─────────────────────────────────────────────
 
 
 function _evaluateDFfQuadTriCompl_fn(comp, gate) {
-  // 74388: 4 bit D-FF with tri-state outputs and complementary Q/Qn.
+  // 74388: 4 bit D-FF with tri state outputs and complementary Q/Qn.
   // inputs: [D1,D2,D3,D4,CLK,OEn]
   // outputs: [Q1,Q1n,Q2,Q2n,Q3,Q3n,Q4,Q4n]
   // OEn=1 → Q and Qn all HiZ (no conflict, they float).
@@ -6307,7 +9296,7 @@ function _evaluateCounter4BitDual_fn(comp, gate) {
 }
 
 function _evaluateShiftReg4BitTri_fn(comp, gate) {
-  // 74395: 4 bit cascadable shift register, tri-state.
+  // 74395: 4 bit cascadable shift register, tri state.
   // inputs: [SER, A, B, C, D, SRn, CLK, CLRn, OEn]
   // outputs: [QA, QB, QC, QD, QDn]
   // SRn=0 → shift mode; SRn=1 → parallel load.
@@ -6356,13 +9345,18 @@ function _evaluateDFfOctalOcPar_fn(comp, gate) {
   const clk = bits[7];
   const d = bits.slice(0, 7);
   if (!comp.state) comp.state = { q: new Uint8Array(7), prevClk: clk };
+  const isOC = comp.chipDef && comp.chipDef.openCollector;
   let changed = false;
   if (comp.state.prevClk === 0 && clk === 1) {
     for (let i = 0; i < 7; i++) comp.state.q[i] = d[i];
   }
   comp.state.prevClk = clk;
   for (let i = 0; i < 7; i++) {
-    if (this._drivePinBit(comp, gate.outputs[i], comp.state.q[i])) changed = true;
+    if (isOC) {
+      if (this._drivePinOC(comp, gate.outputs[i], comp.state.q[i])) changed = true;
+    } else {
+      if (this._drivePinBit(comp, gate.outputs[i], comp.state.q[i])) changed = true;
+    }
   }
   return changed;
 }
@@ -6392,18 +9386,12 @@ function _evaluateMuxQuad2to1StoredCompl_fn(comp, gate) {
 }
 
 function _evaluateCrc16Bit_fn(comp, gate) {
-  // 74401: CRC generator/checker stub.
-  // inputs: [CLK, DATA, SYNn, RESn, P2, P1, CEn]
-  // outputs: [ERR, SO, STS, DR, COR]
-  // Complex internal polynomial logic; simplified: outputs 0 unless driven.
-  const bits = this._readGateInputs(comp, gate.inputs);
-  const resn = bits[3];
+  // 74401: CRC generator/checker stub (9401 equivalent).
+  // inputs: [CP, D, S0, S1, S2, CWE, P, MR]
+  // outputs: [Q, ER]
+  // Full operation requires the selected polynomial division; the simplified
+  // stub drives both outputs LOW (no detected error, zero remainder).
   let changed = false;
-  if (!resn) {
-    for (const op of gate.outputs) { if (this._drivePinBit(comp, op, 0)) changed = true; }
-    return changed;
-  }
-  // Stub: just drive all outputs low
   for (const op of gate.outputs) { if (this._drivePinBit(comp, op, 0)) changed = true; }
   return changed;
 }
@@ -6419,7 +9407,7 @@ function _evaluatePolyChecker_fn(comp, gate) {
 }
 
 function _evaluateFifo16x4Tri_fn(comp, gate) {
-  // 74403: 16×4 FIFO with tri-state outputs.
+  // 74403: 16×4 FIFO with tri state outputs.
   // inputs: [DIN0..DIN3, WR_CLK, RD_CLK, WR_EN, RD_EN, OEn]
   // outputs: [DOUT0..DOUT3, EF, FF, IR, OR]
   const bits = this._readGateInputs(comp, gate.inputs);
@@ -6462,7 +9450,7 @@ function _evaluateFifo16x4Tri_fn(comp, gate) {
 }
 
 function _evaluateDecoder3to8Inv_fn(comp, gate) {
-  // 74405: 3-to-8 decoder (Intel 8205), active LOW outputs.
+  // 74405: 3 to 8 decoder (Intel 8205), active LOW outputs.
   // inputs: [A0, A1, A2, E0n, E1n, E2]
   // outputs: [Y0n..Y7n]
   // Enable: E0n=0 AND E1n=0 AND E2=1 → enabled.
@@ -6479,7 +9467,7 @@ function _evaluateDecoder3to8Inv_fn(comp, gate) {
 }
 
 function _evaluateDataAccessReg8Bit_fn(comp, gate) {
-  // 74407: Data access register, 8 bit, tri-state.
+  // 74407: Data access register, 8 bit, tri state.
   // inputs: [D0..D7, CLK, OEn, LD, CLRn]
   // outputs: [Q0..Q7]
   // CLRn=0 → async clear. LD=1+rising CLK → load D. OEn=1 → HiZ.
@@ -6505,7 +9493,7 @@ function _evaluateDataAccessReg8Bit_fn(comp, gate) {
 }
 
 function _evaluateRam16x4RegTri_fn(comp, gate) {
-  // 74410: 16×4 RAM with output register, tri-state.
+  // 74410: 16×4 RAM with output register, tri state.
   // inputs: [A0..A3, DI0..DI3, WEn, OEn, CLK, CSn]
   // outputs: [DO0..DO3]
   // CSn=1 → HiZ. WEn=0 → write. Rising CLK → output register captures RAM[addr].
@@ -6533,7 +9521,7 @@ function _evaluateRam16x4RegTri_fn(comp, gate) {
 }
 
 function _evaluateMultimodeLatch8Bit_fn(comp, gate) {
-  // 74412: Multi-mode 8 bit latch (Intel 8212/3212 equiv), tri-state.
+  // 74412: Multi-mode 8 bit latch (Intel 8212/3212 equiv), tri state.
   // inputs: [DS1, DI0..DI7, STB, MD, OEn, DS2n]
   // outputs: [DO0..DO7, INT]
   // DS1=1 AND DS2n=0 → device selected.
@@ -6634,7 +9622,7 @@ function _evaluateIntrPriorityCtrl_fn(comp, gate) {
 }
 
 function _evaluateBusXcvr4BitTri_fn(comp, gate) {
-  // 74416: 4 bit Bus Transceiver, tri-state
+  // 74416: 4 bit Bus Transceiver, tri state
   // inputs: OEn, DIR, A1..A4   outputs: B1..B4
   // OEn=1 → HiZ; DIR=0 → A→B non-inv; DIR=1 → stub HiZ
   const bits = this._readGateInputs(comp, gate.inputs);
@@ -6702,7 +9690,7 @@ function _evaluateClkGenTwophase_fn(comp, gate) {
 }
 
 function _evaluateBufferQuadTriNlow_fn(comp, gate) {
-  // 74425: Quad Buffer, active LOW individual enables, tri-state
+  // 74425: Quad Buffer, active LOW individual enables, tri state
   // inputs: A1,E1n, A2,E2n, A3,E3n, A4,E4n   outputs: Y1..Y4
   const bits = this._readGateInputs(comp, gate.inputs);
   let changed = false;
@@ -6718,7 +9706,7 @@ function _evaluateBufferQuadTriNlow_fn(comp, gate) {
 }
 
 function _evaluateBufferQuadTriNhigh_fn(comp, gate) {
-  // 74426: Quad Buffer, active HIGH individual enables, tri-state
+  // 74426: Quad Buffer, active HIGH individual enables, tri state
   // inputs: A1,E1, A2,E2, A3,E3, A4,E4   outputs: Y1..Y4
   const bits = this._readGateInputs(comp, gate.inputs);
   let changed = false;
@@ -6734,7 +9722,7 @@ function _evaluateBufferQuadTriNhigh_fn(comp, gate) {
 }
 
 function _evaluateFifo64x4Tri_fn(comp, gate) {
-  // 74433: 64×4 FIFO with tri-state outputs
+  // 74433: 64×4 FIFO with tri state outputs
   // inputs: DIN0..DIN3, WR_CLK, RD_CLK, WR_EN, RD_EN, OEn
   // outputs: DOUT0..DOUT3, EF, FF
   const bits = this._readGateInputs(comp, gate.inputs);
@@ -6793,13 +9781,18 @@ function _evaluateBusXcvrQuadTriOc_fn(comp, gate) {
   // inputs: OE1n, OE2n, DIR, A1..A4   outputs: B1..B4
   const bits = this._readGateInputs(comp, gate.inputs);
   const OE1n = bits[0], OE2n = bits[1], DIR = bits[2];
+  const isOC = comp.chipDef && comp.chipDef.openCollector;
   let changed = false;
   if (OE1n !== 0 || OE2n !== 0 || DIR !== 0) {
     for (const pin of gate.outputs) { if (this._drivePinHighZ(comp, pin)) changed = true; }
     return changed;
   }
   for (let i = 0; i < 4; i++) {
-    if (this._drivePinBit(comp, gate.outputs[i], bits[3+i])) changed = true;
+    if (isOC) {
+      if (this._drivePinOC(comp, gate.outputs[i], bits[3+i])) changed = true;
+    } else {
+      if (this._drivePinBit(comp, gate.outputs[i], bits[3+i])) changed = true;
+    }
   }
   return changed;
 }
@@ -6809,19 +9802,25 @@ function _evaluateBusXcvrQuadInvOc_fn(comp, gate) {
   // inputs: OE1n, OE2n, DIR, A1..A4   outputs: B1..B4
   const bits = this._readGateInputs(comp, gate.inputs);
   const OE1n = bits[0], OE2n = bits[1], DIR = bits[2];
+  const isOC = comp.chipDef && comp.chipDef.openCollector;
   let changed = false;
   if (OE1n !== 0 || OE2n !== 0 || DIR !== 0) {
     for (const pin of gate.outputs) { if (this._drivePinHighZ(comp, pin)) changed = true; }
     return changed;
   }
   for (let i = 0; i < 4; i++) {
-    if (this._drivePinBit(comp, gate.outputs[i], bits[3+i] ? 0 : 1)) changed = true;
+    const out = bits[3+i] ? 0 : 1;
+    if (isOC) {
+      if (this._drivePinOC(comp, gate.outputs[i], out)) changed = true;
+    } else {
+      if (this._drivePinBit(comp, gate.outputs[i], out)) changed = true;
+    }
   }
   return changed;
 }
 
 function _evaluateBusXcvrQuadTri_fn(comp, gate) {
-  // 74442: Quad Bus Transceiver, tri-state outputs
+  // 74442: Quad Bus Transceiver, tri state outputs
   // inputs: OE1n, OE2n, DIR, A1..A4   outputs: B1..B4
   const bits = this._readGateInputs(comp, gate.inputs);
   const OE1n = bits[0], OE2n = bits[1], DIR = bits[2];
@@ -6837,7 +9836,7 @@ function _evaluateBusXcvrQuadTri_fn(comp, gate) {
 }
 
 function _evaluateBusXcvrQuadInvTri_fn(comp, gate) {
-  // 74443: Quad Inverting Bus Transceiver, tri-state outputs
+  // 74443: Quad Inverting Bus Transceiver, tri state outputs
   // inputs: OE1n, OE2n, DIR, A1..A4   outputs: B1..B4
   const bits = this._readGateInputs(comp, gate.inputs);
   const OE1n = bits[0], OE2n = bits[1], DIR = bits[2];
@@ -6853,7 +9852,7 @@ function _evaluateBusXcvrQuadInvTri_fn(comp, gate) {
 }
 
 function _evaluateBusXcvrQuadMixTri_fn(comp, gate) {
-  // 74444: Quad Mixed Bus Transceiver, tri-state outputs
+  // 74444: Quad Mixed Bus Transceiver, tri state outputs
   // DIR=0 → A→B non-inv; DIR=1 → stub HiZ
   const bits = this._readGateInputs(comp, gate.inputs);
   const OE1n = bits[0], OE2n = bits[1], DIR = bits[2];
@@ -7004,7 +10003,7 @@ function _evaluateCounterDecadeUpdownDual_fn(comp, gate) {
 }
 
 function _evaluateBufferOctalParityInv_fn(comp, gate) {
-  // 74F455: Octal buffer with parity, inverting outputs, tri-state.
+  // 74F455: Octal buffer with parity, inverting outputs, tri state.
   // inputs: [A0..A7, OEn, EP]  outputs: [Y0..Y7, PERR]
   // OEn=1 → all outputs HiZ.
   // EP=0: even parity. EP=1: odd parity. PERR=1 when parity error detected.
@@ -7030,7 +10029,7 @@ function _evaluateBufferOctalParityInv_fn(comp, gate) {
 }
 
 function _evaluateBufferOctalParity_fn(comp, gate) {
-  // 74F456: Octal buffer with parity, non-inverting outputs, tri-state.
+  // 74F456: Octal buffer with parity, non inverting outputs, tri state.
   // inputs: [A0..A7, OEn, EP]  outputs: [Y0..Y7, PERR]
   const bits = this._readGateInputs(comp, gate.inputs);
   const oen = bits[8], ep = bits[9];
@@ -7041,7 +10040,7 @@ function _evaluateBufferOctalParity_fn(comp, gate) {
   }
   let ones = 0;
   for (let i = 0; i < 8; i++) ones += bits[i];
-  // Drive non-inverted data outputs
+  // Drive non inverted data outputs
   for (let i = 0; i < 8; i++) {
     if (this._drivePinBit(comp, gate.outputs[i], bits[i])) changed = true;
   }
@@ -7089,7 +10088,7 @@ function _evaluateComparator10Bit_fn(comp, gate) {
 }
 
 function _evaluateCounter8BitPreset_fn(comp, gate) {
-  // 74461: 8 bit presettable binary counter, tri-state outputs.
+  // 74461: 8 bit presettable binary counter, tri state outputs.
   // inputs: [CLK, CLRn, LOADn, ENP, ENT, OEn, P0..P7]
   // outputs: [Q1..Q7, RCO]  (note: Q0 not exposed, Q7 MSB; actual bit order Q1..Q7 = bits 1..7)
   // Actually outputs: [Q1,Q2,Q3,Q4,Q5,Q6,Q7,RCO] where bit i corresponds to count bit i.
@@ -7156,7 +10155,7 @@ function _evaluateFiberOpticRx_fn(comp, gate) {
 }
 
 function _evaluateBufferOctalTri_fn(comp, gate) {
-  // 74465/74467: Octal buffer, non-inverting, tri-state
+  // 74465/74467: Octal buffer, non inverting, tri state
   // inputs: [A1..A8, G1n, G2n]  outputs: [Y1..Y8]
   const bits = this._readGateInputs(comp, gate.inputs);
   const g1n = bits[8], g2n = bits[9];
@@ -7172,7 +10171,7 @@ function _evaluateBufferOctalTri_fn(comp, gate) {
 }
 
 function _evaluateBufferOctalInvTri_fn(comp, gate) {
-  // 74466/74468: Octal buffer, inverting outputs, tri-state
+  // 74466/74468: Octal buffer, inverting outputs, tri state
   // inputs: [A1..A8, G1n, G2n]  outputs: [Y1..Y8]
   const bits = this._readGateInputs(comp, gate.inputs);
   const g1n = bits[8], g2n = bits[9];
@@ -7234,6 +10233,65 @@ chipEvaluators._evaluateBufferOctalTri       = _evaluateBufferOctalTri_fn;
 chipEvaluators._evaluateBufferOctalInvTri    = _evaluateBufferOctalInvTri_fn;
 chipEvaluators._evaluateCounter8BitUpdownSync = _evaluateCounter8BitUpdownSync_fn;
 
+// 74x867 (async clear) / 74x869 (sync clear): synchronous 8-bit up/down counter.
+// Control is an S1/S0 mode select, NOT discrete load/clear/direction pins:
+//   Mode = 2*S1 + S0 -> 0 = Clear, 1 = Count down, 2 = Load, 3 = Count up.
+// ENPn and ENTn are both active-LOW and must both be LOW to count. RCOn is
+// active-LOW; ENT (not ENP) feeds it forward, and it pulses LOW at terminal
+// count in the active direction (255 counting up, 0 counting down) for cascading.
+// Outputs are plain totem-pole (no output-enable / 3-state on this family).
+// gate.syncClear true => clear is synchronous (the '869); default async (the '867).
+// Source: Texas Instruments, "SN54AS867/869, SN74ALS867A, SN74ALS869,
+//   SN74AS867/869 Synchronous 8-Bit Up/Down Counters", SDAS115C (Dec 1982,
+//   rev Jan 1995). [Online]. Available:
+//   https://www.ti.com/lit/ds/symlink/sn74als867a.pdf. Verified: function table
+//   (S1/S0), cascading description (ENT feeds RCO; both ENP/ENT low to count;
+//   RCO low at 0 down / 255 up), and 'AS867 logic symbol (async 0R clear),
+//   pages 1-4, read as PDF page images.
+function _evaluateCounter8BitSync867_fn(comp, gate) {
+  // inputs:  [S0, S1, A, B, C, D, E, F, G, H, ENPn, ENTn, CLK]
+  // outputs: [QA, QB, QC, QD, QE, QF, QG, QH, RCOn]
+  if (!comp.state) comp.state = {};
+  if (comp.state.cnt === undefined) { comp.state.cnt = 0; comp.state.clkLast = 0; }
+  const bits = this._readGateInputs(comp, gate.inputs);
+  const s0 = bits[0], s1 = bits[1];
+  const d = bits[2] | (bits[3] << 1) | (bits[4] << 2) | (bits[5] << 3) |
+            (bits[6] << 4) | (bits[7] << 5) | (bits[8] << 6) | (bits[9] << 7);
+  const enpn = bits[10], entn = bits[11], clk = bits[12];
+  const mode = (s1 << 1) | s0; // 0 clear, 1 down, 2 load, 3 up
+  const syncClear = !!gate.syncClear;
+
+  // Asynchronous clear ('867): mode 0 forces zero immediately, independent of CLK.
+  if (mode === 0 && !syncClear) comp.state.cnt = 0;
+
+  const rising = (clk === 1 && comp.state.clkLast === 0);
+  if (rising) {
+    if (mode === 0) {                 // Clear
+      if (syncClear) comp.state.cnt = 0;  // '869: clears on the clock edge
+    } else if (mode === 2) {          // Load D inputs (synchronous)
+      comp.state.cnt = d & 0xFF;
+    } else if (enpn === 0 && entn === 0) {
+      if (mode === 3) comp.state.cnt = (comp.state.cnt + 1) & 0xFF;        // up
+      else if (mode === 1) comp.state.cnt = (comp.state.cnt + 255) & 0xFF; // down
+    }
+  }
+  comp.state.clkLast = clk;
+
+  const c = comp.state.cnt;
+  // RCOn active-LOW: gated by ENT, asserted at terminal count in active direction.
+  const rcoActive = (entn === 0) &&
+    ((mode === 3 && c === 0xFF) || (mode === 1 && c === 0x00));
+  const rcon = rcoActive ? 0 : 1;
+  const outBits = [(c >> 0) & 1, (c >> 1) & 1, (c >> 2) & 1, (c >> 3) & 1,
+                   (c >> 4) & 1, (c >> 5) & 1, (c >> 6) & 1, (c >> 7) & 1, rcon];
+  let changed = false;
+  for (let i = 0; i < gate.outputs.length; i++) {
+    if (this._drivePinBit(comp, gate.outputs[i], outBits[i])) changed = true;
+  }
+  return changed;
+}
+chipEvaluators._evaluateCounter8BitSync867 = _evaluateCounter8BitSync867_fn;
+
 // ─── Block 28 evaluators ─────────────────────────────────────────────────────
 
 // 74480: Burst Error Recovery (stub)
@@ -7255,7 +10313,7 @@ function _evaluateControlSlice4Bit_fn(comp, gate) {
   return changed;
 }
 
-// 74484: BCD-to-Binary Converter
+// 74484: BCD to Binary Converter
 // inputs: A1 B1 C1 D1 A2 B2 C2 D2 OEn
 // outputs: Y0-Y6 (7 bit binary = ones + tens*10, 0-99)
 function _evaluateBcdToBin_fn(comp, gate) {
@@ -7374,53 +10432,47 @@ function _evaluateShiftReg8BitBidi_fn(comp, gate) {
   return changed;
 }
 
-// 74500: 6 bit Flash ADC (stub)
+// Shared linear ADC eval used by 74500 and 74505. Conversion is treated as
+// instantaneous CLK/STARTn handshake is not stepped, output tracks VIN
+// continuously. EOC/CC are held HIGH ("ready"). When OEn is HIGH the data
+// outputs go HiZ; EOC/CC are still driven.
+function _evaluateAdcLinear(comp, gate, bits) {
+  const vin  = this._readPinVoltage(comp, 'VIN');
+  let   vref = this._readPinVoltage(comp, 'VREF');
+  if (!(vref > 0)) vref = VCC_VOLTAGE;
+  const v    = (vin === undefined) ? 0 : vin;
+
+  const fullScale = (1 << bits) - 1;
+  let code = Math.round((v / vref) * fullScale);
+  if (code < 0) code = 0;
+  if (code > fullScale) code = fullScale;
+
+  const oeDisabled = this._readPinBit(comp, 'OEn') === 1;
+  let changed = false;
+
+  for (let i = 0; i < bits; i++) {
+    const pin = 'D' + i;
+    if (oeDisabled) {
+      if (this._drivePinHighZ(comp, pin)) changed = true;
+    } else {
+      if (this._drivePinBit(comp, pin, (code >> i) & 1)) changed = true;
+    }
+  }
+
+  const donePin = gate.outputs.find(p => p === 'EOC' || p === 'CC');
+  if (donePin && this._drivePinBit(comp, donePin, 1)) changed = true;
+
+  return changed;
+}
+
+// 74500: 6 bit Flash ADC. Simplified: code = round((VIN/VREF) * 63).
 function _evaluateAdc6BitFlash_fn(comp, gate) {
-  let changed = false;
-  for (const p of gate.outputs) {
-    if (this._drivePinBit(comp, p, 0)) changed = true;
-  }
-  return changed;
+  return _evaluateAdcLinear.call(this, comp, gate, 6);
 }
 
-// 74502: 8 bit SAR (stub)
-function _evaluateSar8Bit_fn(comp, gate) {
-  let changed = false;
-  for (const p of gate.outputs) {
-    const bit = (p === 'EOC' || p === 'SC') ? 1 : 0;
-    if (this._drivePinBit(comp, p, bit)) changed = true;
-  }
-  return changed;
-}
-
-// 74503: 8 bit SAR with expansion (stub)
-function _evaluateSar8BitExp_fn(comp, gate) {
-  let changed = false;
-  for (const p of gate.outputs) {
-    const bit = (p === 'EOC' || p === 'EXP') ? 1 : 0;
-    if (this._drivePinBit(comp, p, bit)) changed = true;
-  }
-  return changed;
-}
-
-// 74504: 12 bit SAR with expansion (stub)
-function _evaluateSar12BitExp_fn(comp, gate) {
-  let changed = false;
-  for (const p of gate.outputs) {
-    const bit = (p === 'EOC' || p === 'EXP') ? 1 : 0;
-    if (this._drivePinBit(comp, p, bit)) changed = true;
-  }
-  return changed;
-}
-
-// 74505: 8 bit SAR ADC (stub)
+// 74505: 8 bit SAR ADC. Simplified: code = round((VIN/VREF) * 255).
 function _evaluateAdc8BitSar_fn(comp, gate) {
-  let changed = false;
-  for (const p of gate.outputs) {
-    const bit = (p === 'EOC') ? 1 : 0;
-    if (this._drivePinBit(comp, p, bit)) changed = true;
-  }
-  return changed;
+  return _evaluateAdcLinear.call(this, comp, gate, 8);
 }
 
 // 74508: 8 bit Multiplier (8x8 two's complement, lower 6 bits out)
@@ -7487,9 +10539,6 @@ chipEvaluators._evaluateBinToBcd          = _evaluateBinToBcd_fn;
 chipEvaluators._evaluateCounter10BitUpdown = _evaluateCounter10BitUpdown_fn;
 chipEvaluators._evaluateShiftReg8BitBidi  = _evaluateShiftReg8BitBidi_fn;
 chipEvaluators._evaluateAdc6BitFlash      = _evaluateAdc6BitFlash_fn;
-chipEvaluators._evaluateSar8Bit           = _evaluateSar8Bit_fn;
-chipEvaluators._evaluateSar8BitExp        = _evaluateSar8BitExp_fn;
-chipEvaluators._evaluateSar12BitExp       = _evaluateSar12BitExp_fn;
 chipEvaluators._evaluateAdc8BitSar        = _evaluateAdc8BitSar_fn;
 chipEvaluators._evaluateMultiplier8Bit    = _evaluateMultiplier8Bit_fn;
 chipEvaluators._evaluateDecoderProg2to4   = _evaluateDecoderProg2to4_fn;
@@ -7498,12 +10547,13 @@ chipEvaluators._evaluateMultiplier16Bit   = _evaluateMultiplier16Bit_fn;
 // ── Block 29 evaluators ───────────────────────────────────────────────────────
 
 function _evaluateCmp8BitOc_fn(comp, gate) {
-  // 74518/74519: 8 bit identity comparator, open-collector
+  // 74518/74519: 8 bit identity comparator, open collector
   // inputs: G1n, A0-A7, B0-B7
   // G1n=1 → EQn=HiZ; equal→EQn=0; unequal→EQn=1
   const bits = this._readGateInputs(comp, gate.inputs);
   const g1n = bits[0];
   const eqnPin = gate.outputs[0];
+  const isOC = comp.chipDef && comp.chipDef.openCollector;
   let changed = false;
   if (g1n) {
     if (this._drivePinHighZ(comp, eqnPin)) changed = true;
@@ -7513,12 +10563,16 @@ function _evaluateCmp8BitOc_fn(comp, gate) {
   for (let i = 0; i < 8; i++) aVal |= (bits[1 + i] << i);
   for (let i = 0; i < 8; i++) bVal |= (bits[9 + i] << i);
   const eqn = (aVal === bVal) ? 0 : 1;
-  if (this._drivePinBit(comp, eqnPin, eqn)) changed = true;
+  if (isOC) {
+    if (this._drivePinOC(comp, eqnPin, eqn)) changed = true;
+  } else {
+    if (this._drivePinBit(comp, eqnPin, eqn)) changed = true;
+  }
   return changed;
 }
 
 function _evaluateCmp8BitInv_fn(comp, gate) {
-  // 74520/74521: 8 bit inverting comparator, tri-state
+  // 74520/74521: 8 bit inverting comparator, tri state
   // inputs: G1n, A0-A7, B0-B7
   // G1n=1 → EQ=HiZ; equal→EQ=1; unequal→EQ=0
   const bits = this._readGateInputs(comp, gate.inputs);
@@ -7544,6 +10598,7 @@ function _evaluateCmp8BitInvOc_fn(comp, gate) {
   const bits = this._readGateInputs(comp, gate.inputs);
   const g1n = bits[0];
   const eqPin = gate.outputs[0];
+  const isOC = comp.chipDef && comp.chipDef.openCollector;
   let changed = false;
   if (g1n) {
     if (this._drivePinHighZ(comp, eqPin)) changed = true;
@@ -7553,7 +10608,11 @@ function _evaluateCmp8BitInvOc_fn(comp, gate) {
   for (let i = 0; i < 8; i++) aVal |= (bits[1 + i] << i);
   for (let i = 0; i < 8; i++) bVal |= (bits[9 + i] << i);
   const eq = (aVal === bVal) ? 1 : 0;
-  if (this._drivePinBit(comp, eqPin, eq)) changed = true;
+  if (isOC) {
+    if (this._drivePinOC(comp, eqPin, eq)) changed = true;
+  } else {
+    if (this._drivePinBit(comp, eqPin, eq)) changed = true;
+  }
   return changed;
 }
 
@@ -7564,6 +10623,7 @@ function _evaluateCmp8BitRegOc_fn(comp, gate) {
   if (!comp.state) comp.state = { prevClk: 0, eqn: 1 };
   const bits = this._readGateInputs(comp, gate.inputs);
   const clk = bits[0];
+  const isOC = comp.chipDef && comp.chipDef.openCollector;
   let changed = false;
   const eqnPin = gate.outputs[0];
   if (clk && !comp.state.prevClk) {
@@ -7573,58 +10633,16 @@ function _evaluateCmp8BitRegOc_fn(comp, gate) {
     comp.state.eqn = (aVal === bVal) ? 0 : 1;
   }
   comp.state.prevClk = clk;
-  if (this._drivePinBit(comp, eqnPin, comp.state.eqn)) changed = true;
-  return changed;
-}
-
-function _evaluateCmp16BitProg_fn(comp, gate) {
-  // 74526: 16 bit fuse-programmable identity comparator (stub always matches when enabled)
-  // inputs: G1n, A0-A15
-  // G1n=1 → EQn=HiZ; otherwise EQn=0 (match)
-  const bits = this._readGateInputs(comp, gate.inputs);
-  const g1n = bits[0];
-  const eqnPin = gate.outputs[0];
-  let changed = false;
-  if (g1n) {
-    if (this._drivePinHighZ(comp, eqnPin)) changed = true;
-    return changed;
+  if (isOC) {
+    if (this._drivePinOC(comp, eqnPin, comp.state.eqn)) changed = true;
+  } else {
+    if (this._drivePinBit(comp, eqnPin, comp.state.eqn)) changed = true;
   }
-  if (this._drivePinBit(comp, eqnPin, 0)) changed = true;
-  return changed;
-}
-
-function _evaluateCmp12BitProg_fn(comp, gate) {
-  // 74527: 8+4 bit fuse-programmable identity comparator (stub always matches when enabled)
-  // inputs: G1n, A0-A11, B8-B11
-  const bits = this._readGateInputs(comp, gate.inputs);
-  const g1n = bits[0];
-  const eqnPin = gate.outputs[0];
-  let changed = false;
-  if (g1n) {
-    if (this._drivePinHighZ(comp, eqnPin)) changed = true;
-    return changed;
-  }
-  if (this._drivePinBit(comp, eqnPin, 0)) changed = true;
-  return changed;
-}
-
-function _evaluateCmp12BitOc_fn(comp, gate) {
-  // 74528: 12 bit fuse-programmable identity comparator, OC (stub always matches when enabled)
-  // inputs: G1n, A0-A11
-  const bits = this._readGateInputs(comp, gate.inputs);
-  const g1n = bits[0];
-  const eqnPin = gate.outputs[0];
-  let changed = false;
-  if (g1n) {
-    if (this._drivePinHighZ(comp, eqnPin)) changed = true;
-    return changed;
-  }
-  if (this._drivePinBit(comp, eqnPin, 0)) changed = true;
   return changed;
 }
 
 function _evaluateLatchOctalTri_fn(comp, gate) {
-  // 74531: Octal transparent latch, tri-state
+  // 74531: Octal transparent latch, tri state
   // inputs: OEn, LE, D0-D7
   // OEn=1 → Q[0-7]=HiZ; LE=1 → transparent (Q=D); LE=0 → hold
   if (!comp.state) comp.state = { q: new Array(8).fill(0) };
@@ -7646,7 +10664,7 @@ function _evaluateLatchOctalTri_fn(comp, gate) {
 }
 
 function _evaluateRegOctalTri_fn(comp, gate) {
-  // 74532: Octal D-type register, tri-state
+  // 74532: Octal D type register, tri state
   // inputs: OEn, CLK, D0-D7
   // On rising CLK: capture D→Q; OEn=1 → Q=HiZ
   if (!comp.state) comp.state = { prevClk: 0, q: new Array(8).fill(0) };
@@ -7669,7 +10687,7 @@ function _evaluateRegOctalTri_fn(comp, gate) {
 }
 
 function _evaluateLatchOctalInvTri_fn(comp, gate) {
-  // 74533/74535: Octal transparent latch inverting, tri-state
+  // 74533/74535: Octal transparent latch inverting, tri state
   // inputs: OEn, LE, D0-D7
   // OEn=1 → Qn=HiZ; LE=1 → transparent (Qn=NOT(D)); LE=0 → hold
   if (!comp.state) comp.state = { q: new Array(8).fill(1) };
@@ -7690,8 +10708,55 @@ function _evaluateLatchOctalInvTri_fn(comp, gate) {
   return changed;
 }
 
+function _evaluateLatchReadbackInv_fn(comp, gate) {
+  // 74x991: 8-bit D-type transparent read-back latch, inverting outputs.
+  // inputs:  [OERBn, LE, D0..D7]              (OERBn active LOW)
+  // outputs: [Q0n..Q7n, D0..D7]
+  //   Q0n..Q7n : true logic (always-driven) INVERTING outputs — Qn = NOT(stored).
+  //   D0..D7   : the shared 3-state read-back I/O bus (same pins as the D inputs).
+  //
+  // The '991 is a read-back latch: unlike a '533/'535 (LATCH_OCTAL_INV_TRI), the
+  // 3-state control does NOT gate the Q outputs — those are always driven. Instead
+  // OERBn gates a read-back buffer that pushes the stored byte back onto the D data
+  // bus. This is the part's defining feature, so it is modeled directly using the
+  // engine's bidirectional-pin support (same mechanism the octal transceivers use).
+  //
+  //   LE   HIGH  → latch transparent: capture D0..D7.
+  //   LE   LOW   → hold.
+  //   Qn         = NOT(stored)                 (always driven).
+  //   OERBn LOW  → drive the stored TRUE byte back onto D0..D7 (read-back).
+  //   OERBn HIGH → release D0..D7 (read-back buffer Hi-Z; D0..D7 act as inputs).
+  //
+  // Read-back presents the TRUE stored value (what was written in), matching the
+  // '990/'992 datasheet definition of read-back; only the Q outputs are inverted.
+  // Driving read-back onto D0..D7 while an external source also drives them is a
+  // bus conflict on real hardware — the datasheet warns against it — so a caller
+  // should release the D bus before asserting OERBn LOW, exactly as in silicon.
+  if (!comp.state) comp.state = { q: new Array(8).fill(0) };
+  const bits = this._readGateInputs(comp, gate.inputs);
+  const oerbn = bits[0];
+  const le    = bits[1];
+  let changed = false;
+  if (le) {
+    for (let i = 0; i < 8; i++) comp.state.q[i] = bits[2 + i];
+  }
+  // Q outputs: inverting, always driven.
+  for (let i = 0; i < 8; i++) {
+    if (this._drivePinBit(comp, gate.outputs[i], comp.state.q[i] ^ 1)) changed = true;
+  }
+  // Read-back bus: true data onto D0..D7 when OERBn LOW, else released.
+  for (let i = 0; i < 8; i++) {
+    if (!oerbn) {
+      if (this._drivePinBit(comp, gate.outputs[8 + i], comp.state.q[i])) changed = true;
+    } else {
+      if (this._drivePinHighZ(comp, gate.outputs[8 + i])) changed = true;
+    }
+  }
+  return changed;
+}
+
 function _evaluateRegOctalInvTri_fn(comp, gate) {
-  // 74534/74536: Octal D-type register inverting, tri-state
+  // 74534/74536: Octal D type register inverting, tri state
   // inputs: OEn, CLK, D0-D7
   // On rising CLK: capture NOT(D)→Qn; OEn=1 → Qn=HiZ
   if (!comp.state) comp.state = { prevClk: 0, q: new Array(8).fill(1) };
@@ -7714,7 +10779,7 @@ function _evaluateRegOctalInvTri_fn(comp, gate) {
 }
 
 function _evaluateBcdDecimalDecTri_fn(comp, gate) {
-  // 74537: BCD to decimal decoder, tri-state
+  // 74537: BCD to decimal decoder, tri state
   // inputs: OEn, A (LSB), B, C, D (MSB)
   // OEn=1 → Y[0-9]=HiZ; decode BCD(D,C,B,A); Y[val]=1, others=0 (val 0-9); val>=10 → all=0
   const bits = this._readGateInputs(comp, gate.inputs);
@@ -7737,19 +10802,17 @@ chipEvaluators._evaluateCmp8BitOc         = _evaluateCmp8BitOc_fn;
 chipEvaluators._evaluateCmp8BitInv        = _evaluateCmp8BitInv_fn;
 chipEvaluators._evaluateCmp8BitInvOc      = _evaluateCmp8BitInvOc_fn;
 chipEvaluators._evaluateCmp8BitRegOc      = _evaluateCmp8BitRegOc_fn;
-chipEvaluators._evaluateCmp16BitProg      = _evaluateCmp16BitProg_fn;
-chipEvaluators._evaluateCmp12BitProg      = _evaluateCmp12BitProg_fn;
-chipEvaluators._evaluateCmp12BitOc        = _evaluateCmp12BitOc_fn;
 chipEvaluators._evaluateLatchOctalTri     = _evaluateLatchOctalTri_fn;
 chipEvaluators._evaluateRegOctalTri       = _evaluateRegOctalTri_fn;
 chipEvaluators._evaluateLatchOctalInvTri  = _evaluateLatchOctalInvTri_fn;
+chipEvaluators._evaluateLatchReadbackInv  = _evaluateLatchReadbackInv_fn;
 chipEvaluators._evaluateRegOctalInvTri    = _evaluateRegOctalInvTri_fn;
 chipEvaluators._evaluateBcdDecimalDecTri  = _evaluateBcdDecimalDecTri_fn;
 
 // ── Block 30 evaluators ───────────────────────────────────────────────────────
 
 function _evaluateDecoder3to8Tri_fn(comp, gate) {
-  // 74538: 3-to-8 decoder, tri-state
+  // 74538: 3 to 8 decoder, tri state
   // inputs: A, B, C, G1, G2An, G2Bn, OEn
   // OEn=1 → all HiZ; enabled when G1=1 AND G2An=0 AND G2Bn=0
   // Outputs active HIGH (one Y=1, rest=0) when enabled
@@ -7771,7 +10834,7 @@ function _evaluateDecoder3to8Tri_fn(comp, gate) {
 }
 
 function _evaluateDecoder2to4Tri_fn(comp, gate) {
-  // 74539: 2-to-4 decoder, tri-state (one half)
+  // 74539: 2-to-4 decoder, tri state (one half)
   // inputs: OEn, G, A0, A1
   // OEn=1 → all HiZ; G=0 → all 0; else Y[sel]=1, others=0 (active HIGH)
   const bits = this._readGateInputs(comp, gate.inputs);
@@ -7791,31 +10854,36 @@ function _evaluateDecoder2to4Tri_fn(comp, gate) {
 }
 
 function _evaluateBufOctalInvTri_fn(comp, gate) {
-  // 74540: Octal buffer, inverting, tri-state
-  // inputs: OEn, A0-A7; outputs: Y0-Y7 = NOT(A)
+  // 74540: Octal buffer/line driver, inverting, 3-state.
+  // inputs: OE1, OE2, A1-A8; outputs: Y1-Y8 = NOT(A).
+  // 3-state control is a 2-input NOR (TI SDAS025D, p.2): outputs drive only when
+  // BOTH OE1 and OE2 are LOW; if either is HIGH all eight go high impedance.
   const bits = this._readGateInputs(comp, gate.inputs);
-  const oen = bits[0];
+  const disabled = bits[0] || bits[1];
   let changed = false;
   for (let i = 0; i < 8; i++) {
-    if (oen) {
+    if (disabled) {
       if (this._drivePinHighZ(comp, gate.outputs[i])) changed = true;
     } else {
-      if (this._drivePinBit(comp, gate.outputs[i], bits[1 + i] ^ 1)) changed = true;
+      if (this._drivePinBit(comp, gate.outputs[i], bits[2 + i] ^ 1)) changed = true;
     }
   }
   return changed;
 }
 
 function _evaluateTransceiverOctalReg_fn(comp, gate) {
-  // 74543/74546: Octal registered transceiver, non-inverting
+  // 74543/74546/74615/74646/74647: Octal registered transceiver, non inverting
   // inputs: OEABn, OEBAn, LEAB, LEBA, CLK, DIR, A0-A7, B0-B7
   // On rising CLK: if DIR=1 latch AB-side (A→regAB), if DIR=0 latch BA-side (B→regBA)
   // DIR=1: drive B from regAB if !OEABn; DIR=0: drive A from regBA if !OEBAn
+  // If chipDef.openCollector, data outputs sink only.
   if (!comp.state) comp.state = { prevClk: 0, regAB: new Array(8).fill(0), regBA: new Array(8).fill(0) };
   const bits = this._readGateInputs(comp, gate.inputs);
-  const oeabn = bits[0], oeban = bits[1], leab = bits[2], leba = bits[3], clk = bits[4], dir = bits[5];
+  const oeabn = bits[0], oeban = bits[1], clk = bits[4], dir = bits[5];
   const aVals = bits.slice(6, 14);
   const bVals = bits.slice(14, 22);
+  const oc = !!(comp.chipDef && comp.chipDef.openCollector);
+  const drive = (pin, bit) => oc ? this._drivePinOC(comp, pin, bit) : this._drivePinBit(comp, pin, bit);
   let changed = false;
   if (clk && !comp.state.prevClk) {
     if (dir) { for (let i = 0; i < 8; i++) comp.state.regAB[i] = aVals[i]; }
@@ -7823,19 +10891,17 @@ function _evaluateTransceiverOctalReg_fn(comp, gate) {
   }
   comp.state.prevClk = clk;
   if (dir) {
-    // A→B direction: only drive B outputs; leave A pins alone (they are inputs)
     for (let i = 0; i < 8; i++) {
       if (!oeabn) {
-        if (this._drivePinBit(comp, gate.outputs[8 + i], comp.state.regAB[i])) changed = true;
+        if (drive(gate.outputs[8 + i], comp.state.regAB[i])) changed = true;
       } else {
         if (this._drivePinHighZ(comp, gate.outputs[8 + i])) changed = true;
       }
     }
   } else {
-    // B→A direction: only drive A outputs; leave B pins alone (they are inputs)
     for (let i = 0; i < 8; i++) {
       if (!oeban) {
-        if (this._drivePinBit(comp, gate.outputs[i], comp.state.regBA[i])) changed = true;
+        if (drive(gate.outputs[i], comp.state.regBA[i])) changed = true;
       } else {
         if (this._drivePinHighZ(comp, gate.outputs[i])) changed = true;
       }
@@ -7845,13 +10911,16 @@ function _evaluateTransceiverOctalReg_fn(comp, gate) {
 }
 
 function _evaluateTransceiverOctalRegInv_fn(comp, gate) {
-  // 74544: Octal registered transceiver, inverting
-  // Same as TRANSCEIVER_OCTAL_REG but outputs are inverted
+  // 74544/74614/74648/74649: Octal registered transceiver, inverting
+  // Same as TRANSCEIVER_OCTAL_REG but outputs are inverted.
+  // If chipDef.openCollector, data outputs sink only.
   if (!comp.state) comp.state = { prevClk: 0, regAB: new Array(8).fill(0), regBA: new Array(8).fill(0) };
   const bits = this._readGateInputs(comp, gate.inputs);
-  const oeabn = bits[0], oeban = bits[1], leab = bits[2], leba = bits[3], clk = bits[4], dir = bits[5];
+  const oeabn = bits[0], oeban = bits[1], clk = bits[4], dir = bits[5];
   const aVals = bits.slice(6, 14);
   const bVals = bits.slice(14, 22);
+  const oc = !!(comp.chipDef && comp.chipDef.openCollector);
+  const drive = (pin, bit) => oc ? this._drivePinOC(comp, pin, bit) : this._drivePinBit(comp, pin, bit);
   let changed = false;
   if (clk && !comp.state.prevClk) {
     if (dir) { for (let i = 0; i < 8; i++) comp.state.regAB[i] = aVals[i]; }
@@ -7861,7 +10930,7 @@ function _evaluateTransceiverOctalRegInv_fn(comp, gate) {
   if (dir) {
     for (let i = 0; i < 8; i++) {
       if (!oeabn) {
-        if (this._drivePinBit(comp, gate.outputs[8 + i], comp.state.regAB[i] ^ 1)) changed = true;
+        if (drive(gate.outputs[8 + i], comp.state.regAB[i] ^ 1)) changed = true;
       } else {
         if (this._drivePinHighZ(comp, gate.outputs[8 + i])) changed = true;
       }
@@ -7869,7 +10938,7 @@ function _evaluateTransceiverOctalRegInv_fn(comp, gate) {
   } else {
     for (let i = 0; i < 8; i++) {
       if (!oeban) {
-        if (this._drivePinBit(comp, gate.outputs[i], comp.state.regBA[i] ^ 1)) changed = true;
+        if (drive(gate.outputs[i], comp.state.regBA[i] ^ 1)) changed = true;
       } else {
         if (this._drivePinHighZ(comp, gate.outputs[i])) changed = true;
       }
@@ -7879,7 +10948,7 @@ function _evaluateTransceiverOctalRegInv_fn(comp, gate) {
 }
 
 function _evaluateTransceiverOctalLatch_fn(comp, gate) {
-  // 74547 (LS): Octal latched transceiver, non-inverting
+  // 74547 (LS): Octal latched transceiver, non inverting
   // inputs: OEABn, OEBAn, LEAB, LEBA, DIR, A0-A7, B0-B7
   // LEAB=1 → latch AB-side (A→regAB); LEBA=1 → latch BA-side (B→regBA)
   if (!comp.state) comp.state = { regAB: new Array(8).fill(0), regBA: new Array(8).fill(0) };
@@ -7912,8 +10981,49 @@ function _evaluateTransceiverOctalLatch_fn(comp, gate) {
   return changed;
 }
 
+function _evaluateTransceiverOctalLatchSel_fn(comp, gate) {
+  // 74x956 (SN74BCT956): Octal bus transceiver + latch, single OE, real-time/stored select.
+  // The latch version of the 'BCT646 registered transceiver.
+  // inputs:  OEn, DIR, LEAB, LEBA, SAB, SBA, A0-A7 (=A1..A8), B0-B7 (=B1..B8)
+  // outputs: A0-A7 (=A1..A8), B0-B7 (=B1..B8)   (bidir pins; undriven side is Hi-Z)
+  // Latches (transparent): LEAB HIGH → latchAB follows A, LOW → holds; LEBA likewise for B.
+  //   (Datasheet: "data ... is stored in the latches when the ... latch-enable ... is low.")
+  // Direction / enable: OEn LOW = transceiver; DIR HIGH → drive B (A is input),
+  //   DIR LOW → drive A (B is input). OEn HIGH → isolation, both sides Hi-Z.
+  // Select mux (per direction): SAB LOW → B gets real-time A, HIGH → B gets latched A;
+  //   SBA LOW → A gets real-time B, HIGH → A gets latched B.
+  // Source: TI SCBS088A FUNCTION TABLE + Figure 1, verified as PDF page images.
+  if (!comp.state) comp.state = { latchAB: new Array(8).fill(0), latchBA: new Array(8).fill(0) };
+  const bits = this._readGateInputs(comp, gate.inputs);
+  const oen = bits[0], dir = bits[1], leab = bits[2], leba = bits[3], sab = bits[4], sba = bits[5];
+  const aVals = bits.slice(6, 14);
+  const bVals = bits.slice(14, 22);
+  let changed = false;
+  // Input latches are always enabled; capture while the latch is transparent (LE HIGH).
+  if (leab) { for (let i = 0; i < 8; i++) comp.state.latchAB[i] = aVals[i]; }
+  if (leba) { for (let i = 0; i < 8; i++) comp.state.latchBA[i] = bVals[i]; }
+  for (let i = 0; i < 8; i++) {
+    if (oen) {
+      // Isolation: release both buses.
+      if (this._drivePinHighZ(comp, gate.outputs[i])) changed = true;
+      if (this._drivePinHighZ(comp, gate.outputs[8 + i])) changed = true;
+    } else if (dir) {
+      // A → B: B outputs, A released.
+      const bOut = sab ? comp.state.latchAB[i] : aVals[i];
+      if (this._drivePinBit(comp, gate.outputs[8 + i], bOut)) changed = true;
+      if (this._drivePinHighZ(comp, gate.outputs[i])) changed = true;
+    } else {
+      // B → A: A outputs, B released.
+      const aOut = sba ? comp.state.latchBA[i] : bVals[i];
+      if (this._drivePinBit(comp, gate.outputs[i], aOut)) changed = true;
+      if (this._drivePinHighZ(comp, gate.outputs[8 + i])) changed = true;
+    }
+  }
+  return changed;
+}
+
 function _evaluateDecoder3to8LatchAck_fn(comp, gate) {
-  // 74F547: 3-to-8 decoder with address latch and acknowledge output (stub)
+  // 74F547: 3 to 8 decoder with address latch and acknowledge output (stub)
   // inputs: A0, A1, A2, STB, G
   // outputs: Y0-Y7, ACK
   // STB=1 latches address; G=1 enables output; ACK=1 when enabled
@@ -7959,7 +11069,7 @@ function _evaluateReg8BitPipeline_fn(comp, gate) {
 }
 
 function _evaluateDecoder3to8Ack_fn(comp, gate) {
-  // 74F548: 3-to-8 decoder with acknowledge output (no latch)
+  // 74F548: 3 to 8 decoder with acknowledge output (no latch)
   // inputs: A0, A1, A2, G
   // outputs: Y0-Y7, ACK
   // G=1 → decode; ACK=G
@@ -8015,7 +11125,7 @@ function _evaluateMultiplier8BitTc_fn(comp, gate) {
 }
 
 function _evaluateCounterSyncDecadeTri_fn(comp, gate) {
-  // 74560: Synchronous 4 bit decade counter with tri-state outputs
+  // 74560: Synchronous 4 bit decade counter with tri state outputs
   // inputs: CLRn, CLK, ENP, LOAD, ENT, A, B, C, D, OEn
   // outputs: QA, QB, QC, QD, RCO
   // CLRn=0 → sync clear; LOAD=0 → load; ENP&ENT → count; OEn=1 → Q=HiZ
@@ -8046,7 +11156,7 @@ function _evaluateCounterSyncDecadeTri_fn(comp, gate) {
 }
 
 function _evaluateCounterSyncBinTri_fn(comp, gate) {
-  // 74561: Synchronous 4 bit binary counter with tri-state outputs
+  // 74561: Synchronous 4 bit binary counter with tri state outputs
   // inputs: CLRn, CLK, ENP, LOAD, ENT, A, B, C, D, OEn
   // outputs: QA, QB, QC, QD, RCO
   if (!comp.state) comp.state = { prevClk: 0, q: 0 };
@@ -8081,6 +11191,7 @@ chipEvaluators._evaluateBufOctalInvTri         = _evaluateBufOctalInvTri_fn;
 chipEvaluators._evaluateTransceiverOctalReg    = _evaluateTransceiverOctalReg_fn;
 chipEvaluators._evaluateTransceiverOctalRegInv = _evaluateTransceiverOctalRegInv_fn;
 chipEvaluators._evaluateTransceiverOctalLatch  = _evaluateTransceiverOctalLatch_fn;
+chipEvaluators._evaluateTransceiverOctalLatchSel = _evaluateTransceiverOctalLatchSel_fn;
 chipEvaluators._evaluateDecoder3to8LatchAck    = _evaluateDecoder3to8LatchAck_fn;
 chipEvaluators._evaluateReg8BitPipeline        = _evaluateReg8BitPipeline_fn;
 chipEvaluators._evaluateDecoder3to8Ack         = _evaluateDecoder3to8Ack_fn;
@@ -8127,7 +11238,7 @@ function _evaluateTransceiverOctalLatchInv_fn(comp, gate) {
 }
 
 function _evaluateCounterSyncDecadeUpdownTri_fn(comp, gate) {
-  // 74568: Synchronous 4 bit decade up/down counter with tri-state outputs
+  // 74568: Synchronous 4 bit decade up/down counter with tri state outputs
   // inputs: CLRn, CLK, U_Dn, ENP, A, B, C, D, ENT, LOAD, OEn
   // outputs: QA, QB, QC, QD, RCO
   // CLRn=0 → sync clear; LOAD=0 → load; U_Dn=1→count up, 0→count down
@@ -8164,7 +11275,7 @@ function _evaluateCounterSyncDecadeUpdownTri_fn(comp, gate) {
 }
 
 function _evaluateCounterSyncBinUpdownTri_fn(comp, gate) {
-  // 74569: Synchronous 4 bit binary up/down counter with tri-state outputs
+  // 74569: Synchronous 4 bit binary up/down counter with tri state outputs
   // inputs: CLRn, CLK, U_Dn, ENP, A, B, C, D, ENT, LOAD, OEn
   // outputs: QA, QB, QC, QD, RCO
   if (!comp.state) comp.state = { prevClk: 0, q: 0 };
@@ -8200,7 +11311,7 @@ function _evaluateCounterSyncBinUpdownTri_fn(comp, gate) {
 
 
 function _evaluateRegOctalSynclrTri_fn(comp, gate) {
-  // 74575: Octal D-type FF with synchronous clear, tri-state
+  // 74575: Octal D type FF with synchronous clear, tri state
   // inputs: OEn, CLRn, CLK, D0-D7
   // On rising CLK: if !CLRn → clear; else capture D→Q; OEn=1 → Q=HiZ
   if (!comp.state) comp.state = { prevClk: 0, q: new Array(8).fill(0) };
@@ -8226,7 +11337,7 @@ function _evaluateRegOctalSynclrTri_fn(comp, gate) {
 }
 
 function _evaluateRegOctalSynclrInvTri_fn(comp, gate) {
-  // 74577: Octal D-type FF with synchronous clear, inverting outputs, tri-state
+  // 74577: Octal D type FF with synchronous clear, inverting outputs, tri state
   // inputs: OEn, CLRn, CLK, D0-D7
   // On rising CLK: if !CLRn → set Qn=1 (cleared Q=0 → inverted Qn=1); else capture NOT(D)→Qn
   if (!comp.state) comp.state = { prevClk: 0, q: new Array(8).fill(1) };
@@ -8251,8 +11362,102 @@ function _evaluateRegOctalSynclrInvTri_fn(comp, gate) {
   return changed;
 }
 
+function _evaluateBusFf9BitTri_fn(comp, gate) {
+  // 74823 (non-inverting) / 74824 (inverting): 9 bit bus-interface D flip-flop with
+  // asynchronous clear, active-LOW clock enable, and 3-state outputs.
+  // inputs:  OEn, CLRn, CLKENn, CLK, D0..D8   (13 inputs)
+  // outputs: Q0..Q8                            (9 outputs)
+  // gate.invert === true → SN74AS824A: registered Q = NOT(D); otherwise Q = D.
+  // Per the function table: CLRn LOW forces every Q LOW asynchronously (independent of
+  // the clock); CLKENn HIGH inhibits the clock (hold Q0); on a CLK low-to-high edge with
+  // CLKENn LOW the data is captured; OEn HIGH places the outputs in Hi-Z without
+  // disturbing the stored data.
+  const inv = gate.invert === true;
+  if (!comp.state) comp.state = { prevClk: 0, q: new Array(9).fill(0) };
+  const bits = this._readGateInputs(comp, gate.inputs);
+  const oen = bits[0], clrn = bits[1], clken = bits[2], clk = bits[3];
+  let changed = false;
+  if (!clrn) {
+    for (let i = 0; i < 9; i++) comp.state.q[i] = 0;          // async clear → Q = LOW
+  } else if (clk && !comp.state.prevClk && !clken) {
+    for (let i = 0; i < 9; i++) comp.state.q[i] = inv ? (bits[4 + i] ^ 1) : bits[4 + i];
+  }
+  comp.state.prevClk = clk;
+  for (let i = 0; i < 9; i++) {
+    if (oen) {
+      if (this._drivePinHighZ(comp, gate.outputs[i])) changed = true;
+    } else {
+      if (this._drivePinBit(comp, gate.outputs[i], comp.state.q[i])) changed = true;
+    }
+  }
+  return changed;
+}
+
+function _evaluateBusFf10BitTri_fn(comp, gate) {
+  // 74F1821 / 74F821: 10 bit bus-interface D flip-flop with a common buffered clock,
+  // a common active-LOW output enable, and 3-state true outputs. No clear, no clock
+  // enable — the plain 10-bit register of the F-series bus-interface family.
+  // inputs:  OEn, CLK, D0..D9   (12 inputs)
+  // outputs: Q0..Q9             (10 outputs)
+  // gate.invert === true → inverting sibling: registered Q = NOT(D); otherwise Q = D.
+  // Per the 74F821 function table: on a CLK low-to-high transition the data is captured;
+  // holding CLK HIGH or LOW (no edge) holds the stored data; OEn HIGH floats the outputs
+  // (Hi-Z) without disturbing the flip-flop contents; OEn LOW presents the stored data.
+  const inv = gate.invert === true;
+  if (!comp.state) comp.state = { prevClk: 0, q: new Array(10).fill(0) };
+  const bits = this._readGateInputs(comp, gate.inputs);
+  const oen = bits[0], clk = bits[1];
+  let changed = false;
+  if (clk && !comp.state.prevClk) {
+    for (let i = 0; i < 10; i++) comp.state.q[i] = inv ? (bits[2 + i] ^ 1) : bits[2 + i];
+  }
+  comp.state.prevClk = clk;
+  for (let i = 0; i < 10; i++) {
+    if (oen) {
+      if (this._drivePinHighZ(comp, gate.outputs[i])) changed = true;
+    } else {
+      if (this._drivePinBit(comp, gate.outputs[i], comp.state.q[i])) changed = true;
+    }
+  }
+  return changed;
+}
+
+function _evaluateBusFf8Bit3OeTri_fn(comp, gate) {
+  // 74825 (non-inverting) / 74826 (inverting): 8 bit bus-interface D flip-flop with
+  // asynchronous clear, active-LOW clock enable, and 3-state outputs gated by THREE
+  // active-LOW output enables (OE1n, OE2n, OE3n) for multi-master bus control.
+  // inputs:  OE1n, OE2n, OE3n, CLRn, CLKENn, CLK, D0..D7   (14 inputs)
+  // outputs: Q0..Q7                                          (8 outputs)
+  // gate.invert === true → 74826 (registered Q = NOT(D)); otherwise Q = D (74825).
+  // Per the datasheet function table: CLRn LOW forces every Q LOW asynchronously
+  // (dominates the clock); CLKENn HIGH inhibits the clock (hold); on a CLK
+  // low-to-high edge with CLKENn LOW the data is captured; the outputs go to Hi-Z
+  // unless all three output enables are LOW, without disturbing the stored data.
+  const inv = gate.invert === true;
+  if (!comp.state) comp.state = { prevClk: 0, q: new Array(8).fill(0) };
+  const bits = this._readGateInputs(comp, gate.inputs);
+  const oe1 = bits[0], oe2 = bits[1], oe3 = bits[2];
+  const clrn = bits[3], clken = bits[4], clk = bits[5];
+  const hiZ = oe1 || oe2 || oe3;               // any OEn HIGH → outputs float
+  let changed = false;
+  if (!clrn) {
+    for (let i = 0; i < 8; i++) comp.state.q[i] = 0;          // async clear → Q = LOW
+  } else if (clk && !comp.state.prevClk && !clken) {
+    for (let i = 0; i < 8; i++) comp.state.q[i] = inv ? (bits[6 + i] ^ 1) : bits[6 + i];
+  }
+  comp.state.prevClk = clk;
+  for (let i = 0; i < 8; i++) {
+    if (hiZ) {
+      if (this._drivePinHighZ(comp, gate.outputs[i])) changed = true;
+    } else {
+      if (this._drivePinBit(comp, gate.outputs[i], comp.state.q[i])) changed = true;
+    }
+  }
+  return changed;
+}
+
 function _evaluateCounter8BitBidirTri_fn(comp, gate) {
-  // 74579: 8 bit bidirectional synchronous binary counter with tri-state outputs
+  // 74579: 8 bit bidirectional synchronous binary counter with tri state outputs
   // inputs: CLK, ENT, ENP, U_Dn, LOAD, OEn, A0-A7
   // outputs: A0-A7 (bidirectional), TC
   // U_Dn=1→up, 0→down; LOAD=0→load; OEn=1→Q=HiZ
@@ -8347,6 +11552,9 @@ chipEvaluators._evaluateCounterSyncDecadeUpdownTri  = _evaluateCounterSyncDecade
 chipEvaluators._evaluateCounterSyncBinUpdownTri     = _evaluateCounterSyncBinUpdownTri_fn;
 chipEvaluators._evaluateRegOctalSynclrTri           = _evaluateRegOctalSynclrTri_fn;
 chipEvaluators._evaluateRegOctalSynclrInvTri        = _evaluateRegOctalSynclrInvTri_fn;
+chipEvaluators._evaluateBusFf9BitTri                = _evaluateBusFf9BitTri_fn;
+chipEvaluators._evaluateBusFf10BitTri               = _evaluateBusFf10BitTri_fn;
+chipEvaluators._evaluateBusFf8Bit3OeTri             = _evaluateBusFf8Bit3OeTri_fn;
 chipEvaluators._evaluateCounter8BitBidirTri         = _evaluateCounter8BitBidirTri_fn;
 chipEvaluators._evaluateAluBcd4Bit                  = _evaluateAluBcd4Bit_fn;
 chipEvaluators._evaluateAdderBcd4Bit                = _evaluateAdderBcd4Bit_fn;
@@ -8354,7 +11562,7 @@ chipEvaluators._evaluateAdderBcd4Bit                = _evaluateAdderBcd4Bit_fn;
 // ── Block 32 evaluators ──────────────────────────────────────────────────────
 
 function _evaluateShiftReg8BitLatchTri_fn(comp, gate) {
-  // 74589: 8 bit serial-in shift register with input latch, tri-state QH output.
+  // 74589: 8 bit serial in shift register with input latch, tri state QH output.
   // Input latch: D0-D7 transparent while RCK=1; latched when RCK=0.
   // CKEN=0: clock enabled; CKEN=1: shift clock inhibited.
   // On rising SRCK (when CKEN=0): SER enters at QA (bit0), shifts toward QH (bit7).
@@ -8394,7 +11602,7 @@ function _evaluateShiftReg8BitLatchTri_fn(comp, gate) {
 }
 
 function _evaluateCounter8BitRegOutTri_fn(comp, gate) {
-  // 74590/74591: 8 bit binary counter with separate output register, tri-state.
+  // 74590/74591: 8 bit binary counter with separate output register, tri state.
   // CCLKn: counter clock, active LOW (rising edge = falling CCLKn).
   // CCLR=0: async clear counter. RCLR=0: async clear output register.
   // Rising RCLK: latch counter value into output register.
@@ -8429,19 +11637,30 @@ function _evaluateCounter8BitRegOutTri_fn(comp, gate) {
   state.prevRCLK = rclk;
 
   const oen = this._readPinBit(comp, oenN);
+  const isOC = !!(comp.chipDef && comp.chipDef.openCollector);
   let changed = false;
   if (oen === 0) {
-    changed = this._drivePinBits(comp, gate.outputs.slice(0, 8), state.reg);
+    if (isOC) {
+      changed = this._drivePinBitsOC(comp, gate.outputs.slice(0, 8), state.reg);
+    } else {
+      changed = this._drivePinBits(comp, gate.outputs.slice(0, 8), state.reg);
+    }
   } else {
     changed = this._drivePinsHighZ(comp, gate.outputs.slice(0, 8));
   }
   // RC = ripple carry: high when counter is at max (255)
-  if (this._drivePinBit(comp, gate.outputs[8], state.count === 255 ? 1 : 0)) changed = true;
+  const rcBit = state.count === 255 ? 1 : 0;
+  if (isOC) {
+    if (this._drivePinOC(comp, gate.outputs[8], rcBit)) changed = true;
+  } else {
+    if (this._drivePinBit(comp, gate.outputs[8], rcBit)) changed = true;
+  }
   return changed;
 }
 
 function _evaluateCounter8BitRegOutOc_fn(comp, gate) {
-  // 74591: Same as 74590 but OC reuse the same logic (OC modeled same as TRI here)
+  // 74591: OC variant. The shared TRI evaluator branches on chipDef.openCollector,
+  // so this thin wrapper just delegates.
   return _evaluateCounter8BitRegOutTri_fn.call(this, comp, gate);
 }
 
@@ -8489,7 +11708,7 @@ function _evaluateCounter8BitRegIn_fn(comp, gate) {
 }
 
 function _evaluateCounter8BitRegInTri_fn(comp, gate) {
-  // 74593: Like 74592 but with tri-state output on D0-D7 bidirectional bus.
+  // 74593: Like 74592 but with tri state output on D0-D7 bidirectional bus.
   // When OEn=0: drives D0-D7 from counter value.
   // inputs: [CCK, CCLR, RCK, CKEN, OEn, D0..D7]
   // outputs: [D0..D7, RC]
@@ -8590,49 +11809,53 @@ function _evaluateShiftReg8BitLatchBuf_fn(comp, gate) {
 }
 
 function _evaluateShiftReg8BitPisoLatch_fn(comp, gate) {
-  // 74597: 8 bit parallel-in serial-out shift register with input latches.
-  // D0-D7 latched into input register on rising RCK.
-  // SHLD=0: async parallel load from input latch into shift register.
-  // SHLD=1 + rising SRCK: shift right (SER enters at bit0, QH=bit7 is output).
-  // QG and QH are outputs; QH is the serial output.
-  // inputs: [SER, SRCK, RCK, SHLD, D0..D7]
-  // outputs: [QH]
-  const [serN, srckN, rckN, shldN, d0N, d1N, d2N, d3N, d4N, d5N, d6N, d7N] = gate.inputs;
+  // 74x597: 8-bit parallel-in / serial-out shift register with an input storage latch.
+  // A-H captured into the storage latch on the rising edge of RCK.
+  // SRCLR=0  (active low): direct/async clear of the shift register (overrides load + shift).
+  // SRLOAD=0 (active low): direct/async load of the storage latch into the shift register.
+  // SRCLR=1 & SRLOAD=1 & rising SRCK: shift (SER enters stage A=bit0, stage H=bit7 exits at QHs).
+  // QHs = bit7 = the only serial output (datasheet label QH').
+  // inputs:  [SER, SRCK, RCK, SRLOAD, SRCLR, A, B, C, D, E, F, G, H]
+  // outputs: [QHs]
+  const [serN, srckN, rckN, srloadN, srclrN,
+         aN, bN, cN, dN, eN, fN, gN, hN] = gate.inputs;
   const [qhName] = gate.outputs;
   const state = this._getSeqState(comp, qhName,
     { sr: new Array(8).fill(0), latch: new Array(8).fill(0),
       prevSRCK: 0, prevRCK: 0 });
 
-  // Input latch: capture on rising RCK
+  // Input storage latch: capture A-H on rising RCK
   const rck = this._readPinBit(comp, rckN);
   if (state.prevRCK === 0 && rck === 1) {
-    const dNames = [d0N, d1N, d2N, d3N, d4N, d5N, d6N, d7N];
+    const dNames = [aN, bN, cN, dN, eN, fN, gN, hN];
     for (let i = 0; i < 8; i++) state.latch[i] = this._readPinBit(comp, dNames[i]);
   }
   state.prevRCK = rck;
 
-  // SHLD=0: async parallel load from latch
-  const shld = this._readPinBit(comp, shldN);
-  if (shld === 0) {
-    state.sr = state.latch.slice();
-  } else {
-    // SHLD=1: shift on rising SRCK
-    const srck = this._readPinBit(comp, srckN);
-    if (state.prevSRCK === 0 && srck === 1) {
-      const ser = this._readPinBit(comp, serN);
-      // Shift right: bit0 gets SER, bit1 gets old bit0, ..., bit7 gets old bit6
-      state.sr.pop();
-      state.sr.unshift(ser);
-    }
-    state.prevSRCK = this._readPinBit(comp, srckN);
-  }
+  const srclr  = this._readPinBit(comp, srclrN);
+  const srload = this._readPinBit(comp, srloadN);
+  const srck   = this._readPinBit(comp, srckN);
 
-  // QH = bit7 (MSB end of shift chain)
+  if (srclr === 0) {
+    // Direct overriding clear (async) — dominates load and shift
+    state.sr = new Array(8).fill(0);
+  } else if (srload === 0) {
+    // Direct overriding load from the storage latch (async)
+    state.sr = state.latch.slice();
+  } else if (state.prevSRCK === 0 && srck === 1) {
+    // Shift on rising SRCK: bit0 gets SER, bit1 gets old bit0, ..., bit7 gets old bit6
+    const ser = this._readPinBit(comp, serN);
+    state.sr.pop();
+    state.sr.unshift(ser);
+  }
+  state.prevSRCK = srck;
+
+  // QHs = bit7 (stage H = serial output end of the chain)
   return this._drivePinBit(comp, qhName, state.sr[7]);
 }
 
 function _evaluateShiftReg8BitSelTri_fn(comp, gate) {
-  // 74598: 8 bit shift register, selectable PI/PO, input latches, tri-state.
+  // 74598: 8 bit shift register, selectable PI/PO, input latches, tri state.
   // D0-D7 latched on rising RCK.
   // S1/S0 mode select (on rising CLK):
   //   00: hold; 01: shift right (SER→bit0); 10: parallel load from latch; 11: parallel out
@@ -8742,31 +11965,32 @@ chipEvaluators._evaluateMemCycleCtrl          = _evaluateMemCycleCtrl_fn;
 // ── Block 33 evaluators ───────────────────────────────────────────────────
 
 function _evaluateTransceiver8BitInv_fn(comp, gate) {
-  // 74620/622/638/640: Octal bidirectional bus transceiver, inverting outputs.
+  // 74620/622/638/640/642/644: Octal bidirectional bus transceiver, inverting outputs.
   // gate.inputs: [A1..A8, B1..B8, DIR, OEn]  (indices 0-7=A, 8-15=B, 16=DIR, 17=OEn)
   // gate.outputs: [A1..A8, B1..B8]           (indices 0-7=A, 8-15=B)
   // OEn=0: enabled; OEn=1: all outputs HiZ.
   // DIR=1: A→/B (read A-side, drive inverted B-side; A-side HiZ).
   // DIR=0: B→/A (read B-side, drive inverted A-side; B-side HiZ).
+  // If chipDef.openCollector, data outputs sink only.
   const oe  = this._readPinBit(comp, gate.inputs[17]);
   const dir = this._readPinBit(comp, gate.inputs[16]);
+  const oc  = !!(comp.chipDef && comp.chipDef.openCollector);
+  const drive = (pin, bit) => oc ? this._drivePinOC(comp, pin, bit) : this._drivePinBit(comp, pin, bit);
   let changed = false;
   if (oe !== 0) {
     if (this._drivePinsHighZ(comp, gate.outputs)) changed = true;
   } else if (dir === 1) {
-    // A→/B: drive inverted B-side, HiZ A-side
     for (let i = 0; i < 8; i++) {
       if (this._drivePinHighZ(comp, gate.outputs[i])) changed = true;
     }
     for (let i = 0; i < 8; i++) {
       const bit = this._readPinBit(comp, gate.inputs[i]) ^ 1;
-      if (this._drivePinBit(comp, gate.outputs[8 + i], bit)) changed = true;
+      if (drive(gate.outputs[8 + i], bit)) changed = true;
     }
   } else {
-    // B→/A: drive inverted A-side, HiZ B-side
     for (let i = 0; i < 8; i++) {
       const bit = this._readPinBit(comp, gate.inputs[8 + i]) ^ 1;
-      if (this._drivePinBit(comp, gate.outputs[i], bit)) changed = true;
+      if (drive(gate.outputs[i], bit)) changed = true;
     }
     for (let i = 0; i < 8; i++) {
       if (this._drivePinHighZ(comp, gate.outputs[8 + i])) changed = true;
@@ -8803,7 +12027,7 @@ function _evaluateParityBufferStub_fn(comp, gate) {
 chipEvaluators._evaluateParityBufferStub = _evaluateParityBufferStub_fn;
 
 function _evaluateLatch8BitTri_fn(comp, gate) {
-  // 74666: 8 bit D-type transparent read-back latch, non-inverting, tri-state.
+  // 74666: 8 bit D type transparent read-back latch, non inverting, tri state.
   // inputs: [D0..D7, LE, OEn, CLR]
   // outputs: [Q0..Q7]
   // CLR=0 → async clear all Q to 0.
@@ -8831,8 +12055,84 @@ function _evaluateLatch8BitTri_fn(comp, gate) {
 
 chipEvaluators._evaluateLatch8BitTri = _evaluateLatch8BitTri_fn;
 
+function _evaluateLatchTransTri_fn(comp, gate) {
+  // Width-agnostic non-inverting D-type transparent latch with 3-state outputs.
+  // No clear line. This is the 74x841/'1841 (10-bit) function; the bit count comes
+  // from gate.outputs.length so 8/9-bit siblings can share it.
+  //   inputs:  [OEn, LE, D0..D(n-1)]     outputs: [Q0..Q(n-1)]
+  // Function table (SN74ALS841, TI SDAS059C, page 2):
+  //   OEn LOW,  LE HIGH → transparent: Q follows D.
+  //   OEn LOW,  LE LOW  → hold the last sampled word (Q0).
+  //   OEn HIGH          → Q outputs high-impedance; stored state is untouched
+  //                       ("OE does not affect the internal operation of the latches").
+  const n     = gate.outputs.length;
+  const state = this._getSeqState(comp, gate.outputs[0], { q: new Array(n).fill(0) });
+  const bits  = this._readGateInputs(comp, gate.inputs);
+  const oen = bits[0];
+  const le  = bits[1];
+  const d   = bits.slice(2, 2 + n);
+  let changed = false;
+  if (le) {
+    for (let i = 0; i < n; i++) state.q[i] = d[i];
+  }
+  for (let i = 0; i < n; i++) {
+    if (oen) {
+      if (this._drivePinHighZ(comp, gate.outputs[i])) changed = true;
+    } else {
+      if (this._drivePinBit(comp, gate.outputs[i], state.q[i])) changed = true;
+    }
+  }
+  return changed;
+}
+
+chipEvaluators._evaluateLatchTransTri = _evaluateLatchTransTri_fn;
+
+function _evaluateLatchReadbackTri_fn(comp, gate) {
+  // Width-agnostic D-type transparent read-back latch with 3-state outputs and an
+  // asynchronous active-LOW clear. This is the wide sibling of LATCH_8BIT_TRI /
+  // LATCH_8BIT_INV_TRI (74x666/667): the SN74ALS99x read-back latch family.
+  // Used by the 9-bit '992 (non-inverting) / '993 (inverting) 24-pin parts; the
+  // bit count comes from gate.outputs.length so the 8/10-bit siblings can share it.
+  //   inputs:  [D0..D(n-1), LE, OEn, CLRn]     outputs: [Q0..Q(n-1)]
+  //   gate.invert === true → inverting outputs (the '993/'991/'995).
+  //     CLRn LOW  → internal latch cleared to 0 (async, dominates LE)
+  //     LE   HIGH → transparent, latch follows D
+  //     LE   LOW  → hold last stored word
+  //     OEn  HIGH → Q outputs high-impedance; stored state is untouched
+  //     OEn  LOW  → drive Q = stored bit (complemented when gate.invert)
+  // NOTE: the separate read-back enable (OERB) that drives the stored word back
+  // onto the D bus is NOT modeled — the D pins are unidirectional inputs in this
+  // engine, so read-back onto them would need bidirectional I/O ports. The Q-side
+  // behavior above is faithful; only the read-back path is omitted (issues.md C88).
+  const n     = gate.outputs.length;
+  const inv   = gate.invert === true;
+  const state = this._getSeqState(comp, gate.outputs[0], { q: new Array(n).fill(0) });
+  const bits  = this._readGateInputs(comp, gate.inputs);
+  const d    = bits.slice(0, n);
+  const le   = bits[n];
+  const oen  = bits[n + 1];
+  const clrn = bits[n + 2];
+  let changed = false;
+  if (!clrn) {
+    state.q.fill(0);
+  } else if (le) {
+    for (let i = 0; i < n; i++) state.q[i] = d[i];
+  }
+  for (let i = 0; i < n; i++) {
+    if (oen) {
+      if (this._drivePinHighZ(comp, gate.outputs[i])) changed = true;
+    } else {
+      const q = inv ? (state.q[i] ^ 1) : state.q[i];
+      if (this._drivePinBit(comp, gate.outputs[i], q)) changed = true;
+    }
+  }
+  return changed;
+}
+
+chipEvaluators._evaluateLatchReadbackTri = _evaluateLatchReadbackTri_fn;
+
 function _evaluateLatch8BitInvTri_fn(comp, gate) {
-  // 74667: 8 bit D-type transparent read-back latch, inverting, tri-state.
+  // 74667: 8 bit D type transparent read-back latch, inverting, tri state.
   // Same as 74666 but outputs are inverted (~D when transparent, ~latched when held).
   // inputs: [D0..D7, LE, OEn, CLR]
   // outputs: [Q0..Q7]
@@ -8857,6 +12157,213 @@ function _evaluateLatch8BitInvTri_fn(comp, gate) {
 }
 
 chipEvaluators._evaluateLatch8BitInvTri = _evaluateLatch8BitInvTri_fn;
+
+function _evaluateLatch10BitReadbackInv_fn(comp, gate) {
+  // 74x995: 10-bit inverting D-type transparent read-back latch.
+  //
+  // Architecture (per the SN74ALS990/992 family datasheets — the 995-specific
+  // datasheet is obsolete/unavailable, see the chip entry's header comment):
+  //   * LE (latch enable) HIGH  → transparent: internal latch follows D0..D9.
+  //     LE LOW → hold the last sampled word.
+  //   * Q0n..Q9n are dedicated TRUE-LOGIC outputs (always driven, never 3-state)
+  //     that present the INVERTED stored word. Unlike a 373-style latch, the
+  //     single control pin does NOT 3-state these — the 10-bit part has no room
+  //     for a separate output-enable pin.
+  //   * OERB (read-back output enable, active LOW) is the only 3-state control.
+  //     OERB LOW drives the stored word back onto the bidirectional D0..D9 bus;
+  //     OERB HIGH releases D0..D9 (Hi-Z) so they act as inputs. Read-back presents
+  //     the stored (non-inverted) value, matching the verified 990 read-back path
+  //     ("the data present at the output of the data latches"); only the dedicated
+  //     Q outputs invert. OERB does not affect the internal latch.
+  //
+  // inputs:  [OERB, D0..D9, LE]
+  // outputs: [Q0n..Q9n, D0..D9]   (Q outputs + read-back drivers on the D bus)
+  const oerbN     = gate.inputs[0];
+  const dNames    = gate.inputs.slice(1, 11);   // D0..D9 as inputs
+  const leN       = gate.inputs[11];
+  const qNames    = gate.outputs.slice(0, 10);  // Q0n..Q9n
+  const dOutNames = gate.outputs.slice(10, 20); // D0..D9 as read-back drivers
+  const state = this._getSeqState(comp, qNames[0], { q: new Array(10).fill(0) });
+
+  // Transparent sample while LE HIGH.
+  const le = this._readPinBit(comp, leN);
+  if (le === 1) {
+    for (let i = 0; i < 10; i++) state.q[i] = this._readPinBit(comp, dNames[i]);
+  }
+
+  let changed = false;
+  // Dedicated Q outputs: inverted stored word, always driven.
+  for (let i = 0; i < 10; i++) {
+    if (this._drivePinBit(comp, qNames[i], state.q[i] ? 0 : 1)) changed = true;
+  }
+  // Read-back onto the D bus: OERB LOW drives stored word; OERB HIGH → Hi-Z.
+  const oerb = this._readPinBit(comp, oerbN);
+  for (let i = 0; i < 10; i++) {
+    if (oerb === 0) {
+      if (this._drivePinBit(comp, dOutNames[i], state.q[i])) changed = true;
+    } else {
+      if (this._drivePinHighZ(comp, dOutNames[i])) changed = true;
+    }
+  }
+  return changed;
+}
+
+chipEvaluators._evaluateLatch10BitReadbackInv = _evaluateLatch10BitReadbackInv_fn;
+
+function _evaluateLatch9BitPreClrTri_fn(comp, gate) {
+  // 74843 / 74844: 9-bit bus-interface transparent D latch with async preset,
+  // async clear, and 3-state outputs. Source-verified function table
+  // (SN74ALS843, PRE/CLR/OE all active LOW, non-inverting data):
+  //   PRE  CLR  OE  LE  D | Q
+  //    L   X    L   X   X | H     (async preset dominates)
+  //    H   L    L   X   X | L     (async clear)
+  //    H   H    L   H   L | L     (LE high: transparent, Q follows D)
+  //    H   H    L   H   H | H
+  //    H   H    L   L   X | Q0    (LE low: latched, hold)
+  //    X   X    H   X   X | Z     (output disabled; latch state unaffected)
+  // gate.invert === true selects the inverting-output '844: the latch core is
+  // identical (same PRE/CLR/LE behavior on the internal bit), only the output
+  // buffer inverts. So on the '844 preset drives Q LOW, clear drives Q HIGH, and
+  // while transparent Q = NOT D. state.q always holds the internal (non-inverted)
+  // bit so the inversion never affects hold/preset/clear state, only the drive.
+  // inputs:  [D0..D8, LE, OEn, CLRn, PREn]   outputs: [Q0..Q8]
+  const inv   = gate.invert === true;
+  const state = this._getSeqState(comp, gate.outputs[0], { q: new Array(9).fill(0) });
+  const bits = this._readGateInputs(comp, gate.inputs);
+  const d    = bits.slice(0, 9);
+  const le   = bits[9];
+  const oen  = bits[10];
+  const clrn = bits[11];
+  const pren = bits[12];
+  let changed = false;
+  if (!pren) {
+    state.q.fill(1);        // preset dominates clear
+  } else if (!clrn) {
+    state.q.fill(0);
+  } else if (le) {
+    for (let i = 0; i < 9; i++) state.q[i] = d[i];
+  }
+  for (let i = 0; i < 9; i++) {
+    if (oen) {
+      if (this._drivePinHighZ(comp, gate.outputs[i])) changed = true;
+    } else {
+      const q = inv ? (state.q[i] ^ 1) : state.q[i];
+      if (this._drivePinBit(comp, gate.outputs[i], q)) changed = true;
+    }
+  }
+  return changed;
+}
+
+chipEvaluators._evaluateLatch9BitPreClrTri = _evaluateLatch9BitPreClrTri_fn;
+
+function _evaluateLatch9BitReadbackTri_fn(comp, gate) {
+  // 74x992: 9-bit D-type transparent READ-BACK latch, non-inverting, 3-state.
+  // Source-verified function (SN74ALS992, all controls active LOW):
+  //   CLR  OEQ  OERB  LE  D | Q       D pins
+  //    L    X    X    X   X | L        (async clear: latch -> 0)
+  //    H    L    H    H   d | d        (LE high: transparent, Q follows D)
+  //    H    L    H    L   X | Q0       (LE low: latched, hold)
+  //    H    H    X    X   X | Z         Q outputs disabled by OEQ (state kept)
+  //    H    X    L    X   X | -        stored word driven back onto the D pins
+  //    H    X    H    X   X | -        D pins released (act as data inputs)
+  // Two independent 3-state controls: OEQ gates the true Q outputs; OERB gates a
+  // read-back path that drives the *latched* word back onto the shared D bus.
+  // Neither OE alters the stored bits. The nine D pins are bidirectional: while
+  // OERB is HIGH they are data inputs; while OERB is LOW the chip sources them.
+  // Per the datasheet timing note read-back is intended while the latch holds
+  // (LE low), so the read-back drive and the latch's own input never fight.
+  //
+  // gate.inputs:  [D0..D8 (0-8), LE (9), OEQn (10), OERBn (11), CLRn (12)]
+  // gate.outputs: [Q0..Q8 (0-8), D0..D8 (9-17)]   (D repeated: read-back drive)
+  const state = this._getSeqState(comp, gate.outputs[0], { q: new Array(9).fill(0) });
+  const bits  = this._readGateInputs(comp, gate.inputs);
+  const d     = bits.slice(0, 9);
+  const le    = bits[9];
+  const oeqn  = bits[10];
+  const oerbn = bits[11];
+  const clrn  = bits[12];
+  let changed = false;
+  if (!clrn) {
+    state.q.fill(0);
+  } else if (le) {
+    for (let i = 0; i < 9; i++) state.q[i] = d[i];
+  }
+  // True Q outputs (outputs[0..8]), gated by OEQ.
+  for (let i = 0; i < 9; i++) {
+    if (oeqn) {
+      if (this._drivePinHighZ(comp, gate.outputs[i])) changed = true;
+    } else {
+      if (this._drivePinBit(comp, gate.outputs[i], state.q[i])) changed = true;
+    }
+  }
+  // Read-back onto the D pins (outputs[9..17]), gated by OERB.
+  for (let i = 0; i < 9; i++) {
+    if (oerbn) {
+      if (this._drivePinHighZ(comp, gate.outputs[9 + i])) changed = true;
+    } else {
+      if (this._drivePinBit(comp, gate.outputs[9 + i], state.q[i])) changed = true;
+    }
+  }
+  return changed;
+}
+
+chipEvaluators._evaluateLatch9BitReadbackTri = _evaluateLatch9BitReadbackTri_fn;
+
+function _evaluateLatch8BitPreClrOc3Tri_fn(comp, gate) {
+  // 74845 / 74846: 8-bit bus-interface transparent D latch with async preset,
+  // async clear, three separate output-control pins, and 3-state outputs.
+  // Source-verified function table (SN74ALS845, non-inverting data):
+  //   PRE  CLR  OC1 OC2 OC3  C   D | Q
+  //    L    H    L   L   L   X   X | H     (async preset dominates)
+  //    H    L    L   L   L   X   X | L     (async clear)
+  //    L    L    L   L   L   X   X | H     (both low → preset condition, H)
+  //    H    H    L   L   L   H   L | L     (C high: transparent, Q follows D)
+  //    H    H    L   L   L   H   H | H
+  //    H    H    L   L   L   L   X | Q0    (C low: latched, hold)
+  //    X    X    H   X   X   X   X | Z     (any OC high → outputs disabled)
+  //    X    X    X   H   X   X   X | Z
+  //    X    X    X   X   H   X   X | Z
+  // C is the latch-enable (level-sensitive, active HIGH) — this part is a
+  // transparent latch, not an edge-triggered flip-flop. Outputs are enabled only
+  // when all three output controls are LOW; any HIGH forces Hi-Z. The three OC
+  // pins let three bus masters each veto the drive independently.
+  // gate.invert === true selects the inverting '846. Per the Am29846 function
+  // table the inversion applies ONLY to the transparent data path (internal Q =
+  // NOT D), NOT to the asynchronous controls: preset still forces the outputs
+  // HIGH and clear still forces them LOW, exactly as on the non-inverting '845.
+  // So state.q holds the final OUTPUT-domain value and only the D-capture step
+  // is inverted. For invert === false this is identical to the plain '845.
+  // inputs: [D0..D7, LE, OC1, OC2, OC3, CLRn, PREn]   outputs: [Q0..Q7]
+  const inv   = gate.invert === true;
+  const state = this._getSeqState(comp, gate.outputs[0], { q: new Array(8).fill(0) });
+  const bits  = this._readGateInputs(comp, gate.inputs);
+  const d    = bits.slice(0, 8);
+  const le   = bits[8];
+  const oc1  = bits[9];
+  const oc2  = bits[10];
+  const oc3  = bits[11];
+  const clrn = bits[12];
+  const pren = bits[13];
+  const disabled = oc1 || oc2 || oc3;
+  let changed = false;
+  if (!pren) {
+    state.q.fill(1);        // preset dominates clear → outputs HIGH (not inverted)
+  } else if (!clrn) {
+    state.q.fill(0);        // clear → outputs LOW (not inverted)
+  } else if (le) {
+    for (let i = 0; i < 8; i++) state.q[i] = inv ? (d[i] ^ 1) : d[i];
+  }
+  for (let i = 0; i < 8; i++) {
+    if (disabled) {
+      if (this._drivePinHighZ(comp, gate.outputs[i])) changed = true;
+    } else {
+      if (this._drivePinBit(comp, gate.outputs[i], state.q[i])) changed = true;
+    }
+  }
+  return changed;
+}
+
+chipEvaluators._evaluateLatch8BitPreClrOc3Tri = _evaluateLatch8BitPreClrOc3Tri_fn;
 
 function _evaluateShiftReg16BitStub_fn(comp, gate) {
   // 74673/674/675/676: 16 bit shift register (various serial/parallel configs).
@@ -8884,12 +12391,145 @@ chipEvaluators._evaluateAddrComp16BitStub = _evaluateAddrComp16BitStub_fn;
 
 // ── Block 36 evaluators ───────────────────────────────────────────────────────
 
-function _evaluateAcc4BitStub_fn(comp, gate) {
-  // 74681: 4 bit parallel binary accumulator, tri-state outputs.
-  // Complex ALU/accumulator stub drives all outputs HiZ.
+function _evaluateAcc4Bit681_fn(comp, gate) {
+  // 74x681: 4-bit parallel binary accumulator with 3-state I/O.
+  // Full datasheet citation lives in the chips36.js '74x681' entry header.
+  //
+  // Architecture (TI SN54LS681/SN74LS681, function tables 1/2/3):
+  //   • A REGISTER  — 4-bit storage (QA), one ALU operand.
+  //   • B SHIFT REGISTER — 4-bit storage/shift/accumulator (QB), other operand.
+  //   • ALU — 16 arithmetic (M=L, Table 1) + 16 logic (M=H, Table 2) functions of
+  //     QA and QB, selected by AS2..AS0 and carry-in Cn (active HIGH).
+  //   • Four bidirectional I/O ports carry the ALU result F out, or load word A/B in.
+  //   • RS2..RS0 pick one of eight register modes each rising clock edge (Table 3).
+  //
+  // gate.inputs (15):  [CLK, RS2, RS1, RS0, AS2, AS1, AS0, M, Cn,
+  //                     LI/RO, RI/LO, I/O0, I/O1, I/O2, I/O3]
+  // gate.outputs (9):  [I/O0, I/O1, I/O2, I/O3, Cn+4, G, P, LI/RO, RI/LO]
+  const [clkN, rs2N, rs1N, rs0N, as2N, as1N, as0N, mN, cnN,
+         liroN, riloN, io0N, io1N, io2N, io3N] = gate.inputs;
+  const [oIo0, oIo1, oIo2, oIo3, oCn4, oG, oP, oLiro, oRilo] = gate.outputs;
+
+  const state = this._getSeqState(comp, oCn4, { A: [0,0,0,0], B: [0,0,0,0], prevClk: 0 });
+
+  const rs = this._readPinBit(comp, rs0N) | (this._readPinBit(comp, rs1N) << 1) | (this._readPinBit(comp, rs2N) << 2);
+  const as = this._readPinBit(comp, as0N) | (this._readPinBit(comp, as1N) << 1) | (this._readPinBit(comp, as2N) << 2);
+  const m   = this._readPinBit(comp, mN);
+  const cn  = this._readPinBit(comp, cnN);
+  const clk = this._readPinBit(comp, clkN);
+
+  // ── ALU: combinational function of the A and B REGISTER contents ──────────
+  // (not of the external I/O pins). Both modes reduce to "operand-word + Cn":
+  //   arithmetic (Table 1): F = combination(A,B) + Cn, ripple carry → Cn+4.
+  //   logic (Table 2): F = perbit_logic(A,B) + Cn (the datasheet's "PLUS 1"
+  //   column IS the same adder incrementing the logic word — e.g. AS=000 gives
+  //   0000 → 0001 when Cn=H, AS=011 gives 1111 → 0000 with carry out).
+  const alu = (A, B) => {
+    let base; // operand combination BEFORE the Cn increment (may exceed 15)
+    if (m === 0) {                         // arithmetic, Table 1
+      const nA = (~A) & 15, nB = (~B) & 15;
+      switch (as) {
+        case 0:  base = 15;     break;     // -1 (+carry): Fj=H at Cn=L, L at Cn=H
+        case 1:  base = B + nA; break;     // B MINUS A   (= B + ~A + carry)
+        case 2:  base = A + nB; break;     // A MINUS B
+        case 3:  base = A + B;  break;     // A PLUS B
+        case 4:  base = B;      break;     // B   (+1 with carry)
+        case 5:  base = nB;     break;     // B̄  (+1)
+        case 6:  base = A;      break;     // A   (+1)
+        default: base = nA;     break;     // Ā  (+1)
+      }
+    } else {                               // logic, Table 2 (per-bit word)
+      let W = 0;
+      for (let i = 0; i < 4; i++) {
+        const a = (A >> i) & 1, b = (B >> i) & 1;
+        let w;
+        switch (as) {
+          case 0:  w = 0;             break; // L
+          case 1:  w = a ^ b;         break; // XOR
+          case 2:  w = (a ^ b) ? 0 : 1; break; // XNOR
+          case 3:  w = 1;             break; // H
+          case 4:  w = a & b;         break; // AND
+          case 5:  w = (a | b) ? 0 : 1; break; // NOR
+          case 6:  w = (a & b) ? 0 : 1; break; // NAND
+          default: w = a | b;         break; // OR
+        }
+        W |= (w << i);
+      }
+      base = W;
+    }
+    const sum = base + cn;                 // Cn active-HIGH adds 1
+    const F   = sum & 15;
+    const cn4 = (sum >> 4) & 1;            // Cn+4 carry out (active HIGH)
+    // Carry look-ahead terms for the '182 generator (active-LOW pins):
+    //   G = group generates a carry independent of Cn; P = a carry-in propagates.
+    const gbar = (base >= 16) ? 0 : 1;
+    const pbar = ((base & 15) === 15) ? 0 : 1;
+    return { Fbits: [F & 1, (F >> 1) & 1, (F >> 2) & 1, (F >> 3) & 1], cn4, gbar, pbar };
+  };
+
+  const Aval = state.A[0] | (state.A[1] << 1) | (state.A[2] << 2) | (state.A[3] << 3);
+  const Bval = state.B[0] | (state.B[1] << 1) | (state.B[2] << 2) | (state.B[3] << 3);
+  const pre  = alu(Aval, Bval);            // ALU result BEFORE this clock edge
+
+  // ── Register update on the LOW→HIGH clock edge (Table 3) ──────────────────
+  // Shift modes: LEFT shifts QB toward QB0 (serial in at QB3 from LI/RO, out at
+  // QB0→RI/LO); RIGHT shifts toward QB3 (serial in at QB0 from RI/LO, out at
+  // QB3→LI/RO). The ARITH variants hold QB3 (sign) instead of overwriting it.
+  // (Exact serial-fill of the arith shifts is read from a low-quality 1985
+  // databook scan — see issues.md B4 — but the core LOAD/ACCUM/HOLD modes and
+  // the full 16+16 ALU are unambiguous.)
+  if (state.prevClk === 0 && clk === 1) {
+    const io = [ this._readPinBit(comp, io0N), this._readPinBit(comp, io1N),
+                 this._readPinBit(comp, io2N), this._readPinBit(comp, io3N) ];
+    const li = this._readPinBit(comp, liroN);   // serial in on LI/RO (left shift)
+    const ri = this._readPinBit(comp, riloN);   // serial in on RI/LO (right shift)
+    const F  = pre.Fbits;
+    const b  = state.B;
+    switch (rs) {
+      case 0:  state.B = F.slice();                break; // ACCUM: B ← ALU result
+      case 1:  state.B = io.slice();               break; // LOAD B ← I/O bus
+      case 2:  state.B = [b[1], b[2], b[3], li];   break; // LEFT SHIFT LOGICAL
+      case 3:  state.B = [b[1], b[2], li,  b[3]];  break; // LEFT SHIFT ARITH (QB3 held)
+      case 4:  state.B = [ri,  b[0], b[1], b[2]];  break; // RIGHT SHIFT LOGICAL
+      case 5:  state.B = [ri,  b[0], b[1], b[3]];  break; // RIGHT SHIFT ARITH (QB3 held)
+      case 6:  /* HOLD: A and B unchanged */       break;
+      default: state.A = io.slice();               break; // LOAD A ← I/O bus (rs=7)
+    }
+  }
+  state.prevClk = clk;
+
+  // ── Outputs reflect the (possibly updated) register contents ──────────────
+  const A2  = state.A[0] | (state.A[1] << 1) | (state.A[2] << 2) | (state.A[3] << 3);
+  const B2  = state.B[0] | (state.B[1] << 1) | (state.B[2] << 2) | (state.B[3] << 3);
+  const out = alu(A2, B2);
+
   let changed = false;
-  for (const op of gate.outputs) {
-    if (this._drivePinHighZ(comp, op)) changed = true;
+  // The four I/O ports drive the ALU result F, EXCEPT in the two load modes
+  // (LOAD B, LOAD A) where they are inputs → released to Hi-Z.
+  const ioPins = [oIo0, oIo1, oIo2, oIo3];
+  if (rs === 1 || rs === 7) {
+    if (this._drivePinsHighZ(comp, ioPins)) changed = true;
+  } else {
+    if (this._drivePinBits(comp, ioPins, out.Fbits)) changed = true;
+  }
+
+  // Cn+4 / G̅ / P̅ are combinational carry outputs, always driven.
+  if (this._drivePinBit(comp, oCn4, out.cn4))  changed = true;
+  if (this._drivePinBit(comp, oG,   out.gbar)) changed = true;
+  if (this._drivePinBit(comp, oP,   out.pbar)) changed = true;
+
+  // Serial ports carry the register end-bit during a shift; else released.
+  const leftShift  = (rs === 2 || rs === 3);
+  const rightShift = (rs === 4 || rs === 5);
+  if (leftShift) {
+    if (this._drivePinBit(comp, oRilo, state.B[0])) changed = true;
+    if (this._drivePinHighZ(comp, oLiro)) changed = true;
+  } else if (rightShift) {
+    if (this._drivePinBit(comp, oLiro, state.B[3])) changed = true;
+    if (this._drivePinHighZ(comp, oRilo)) changed = true;
+  } else {
+    if (this._drivePinHighZ(comp, oLiro)) changed = true;
+    if (this._drivePinHighZ(comp, oRilo)) changed = true;
   }
   return changed;
 }
@@ -9001,94 +12641,258 @@ function _evaluateCounterLatchMuxStub_fn(comp, gate) {
   return changed;
 }
 
-chipEvaluators._evaluateAcc4BitStub           = _evaluateAcc4BitStub_fn;
+chipEvaluators._evaluateAcc4Bit681            = _evaluateAcc4Bit681_fn;
 chipEvaluators._evaluateComparator8BitPq      = _evaluateComparator8BitPq_fn;
 chipEvaluators._evaluateComparator8BitPqEn    = _evaluateComparator8BitPqEn_fn;
 chipEvaluators._evaluateComparator8BitEq      = _evaluateComparator8BitEq_fn;
 chipEvaluators._evaluateCounterLatchMuxStub   = _evaluateCounterLatchMuxStub_fn;
+chipEvaluators._evaluateCounterRegMuxTri      = _evaluateCounterRegMuxTri_fn;
+chipEvaluators._evaluateCounterUpdownRegMuxTri = _evaluateCounterUpdownRegMuxTri_fn;
+
+function _evaluateCounterRegMuxTri_fn(comp, gate) {
+  // 74x690 family: synchronous up-counter + 4-bit output register + quad 2:1
+  //   multiplexer driving shared 3-state Q outputs. Verified vs TI D2423
+  //   (SN74LS690..693), 1988 TTL Logic Data Book pp. 2-1139..2-1146.
+  //   gate.mod  = counter modulus (10 = '690 decade, 16 = '691 binary).
+  //   gate.syncClear = true makes BOTH clears synchronous: CCLR to CCK and
+  //     RCLR to RCK ('692/'693). Default (false) = both async ('690/'691).
+  //     Per ST M54/74HC690-693 datasheet (March 1993) p.1-2: the counter and
+  //     register clears track the family together — synchronous for HC692/HC693,
+  //     asynchronous for HC690/HC691.
+  // inputs:  [CCLR, CCK, A, B, C, D, ENP, ENT, RCLR, RCK, LOAD, G, R/C]
+  // outputs: [QA, QB, QC, QD, RCO]   (QA = LSB, A = LSB data input)
+  const [cclrN,cckN,aN,bN,cN,dN,enpN,entN,rclrN,rckN,loadN,gN,rcN] = gate.inputs;
+  const [qaN,qbN,qcN,qdN,rcoN] = gate.outputs;
+  const mod = gate.mod || 10;
+  const state = this._getSeqState(comp, qaN,
+    { count: 0, reg: 0, prevCCK: 0, prevRCK: 0 });
+
+  const cclr = this._readPinBit(comp, cclrN);
+  const cck  = this._readPinBit(comp, cckN);
+  const rclr = this._readPinBit(comp, rclrN);
+  const rck  = this._readPinBit(comp, rckN);
+
+  // Snapshot the count as it stands on entry. The register captures this
+  // pre-update value, so when CCK and RCK are tied the register lags the
+  // counter by one clock (datasheet Note 2).
+  const oldCount = state.count;
+
+  // ── Output register ──────────────────────────────────────────────────────
+  // RCLR active LOW clears the register. On '690/'691 that clear is
+  // asynchronous (immediate); on '692/'693 (syncClear) it is synchronous to
+  // the rising RCK edge, like the counter clear. Otherwise the register loads
+  // the counter value on the rising RCK edge.
+  if (rclr === 0 && !gate.syncClear) {
+    state.reg = 0;
+  } else if (state.prevRCK === 0 && rck === 1) {
+    state.reg = (rclr === 0) ? 0 : oldCount;
+  }
+
+  // ── Counter ──────────────────────────────────────────────────────────────
+  // CCLR active LOW: asynchronous clear on '690/'691, synchronous on '693.
+  if (cclr === 0 && !gate.syncClear) {
+    state.count = 0;
+  } else if (state.prevCCK === 0 && cck === 1) {
+    if (cclr === 0) {                       // synchronous clear ('693)
+      state.count = 0;
+    } else if (this._readPinBit(comp, loadN) === 0) {
+      // Synchronous parallel load — overrides counting, independent of enables.
+      state.count = this._readPinBit(comp, aN)
+        | (this._readPinBit(comp, bN) << 1)
+        | (this._readPinBit(comp, cN) << 2)
+        | (this._readPinBit(comp, dN) << 3);
+    } else if (this._readPinBit(comp, enpN) === 1 &&
+               this._readPinBit(comp, entN) === 1) {
+      // Count up; wrap at the modulus.
+      state.count = (state.count >= mod - 1) ? 0 : state.count + 1;
+    }
+  }
+  state.prevCCK = cck;
+  state.prevRCK = rck;
+
+  // ── Ripple carry: active HIGH at terminal count while ENT is HIGH ─────────
+  const ent = this._readPinBit(comp, entN);
+  const rco = (state.count === mod - 1 && ent === 1) ? 1 : 0;
+
+  // ── Quad 2:1 output MUX + 3-state gating ─────────────────────────────────
+  // R/C LOW → live counter; R/C HIGH → stored register. G active LOW enables.
+  const sel = (this._readPinBit(comp, rcN) === 1) ? state.reg : state.count;
+  let changed = false;
+  if (this._readPinBit(comp, gN) === 0) {
+    if (this._drivePinBits(comp, [qaN,qbN,qcN,qdN],
+        [sel & 1, (sel >> 1) & 1, (sel >> 2) & 1, (sel >> 3) & 1])) changed = true;
+  } else {
+    for (const op of [qaN,qbN,qcN,qdN]) {
+      if (this._drivePinHighZ(comp, op)) changed = true;
+    }
+  }
+  if (this._drivePinBit(comp, rcoN, rco)) changed = true;
+  return changed;
+}
+
+function _evaluateCounterUpdownRegMuxTri_fn(comp, gate) {
+  // 74x696/697/698/699 family: synchronous UP/DOWN counter + 4-bit output
+  //   register + quad 2:1 multiplexer driving shared 3-state Q outputs.
+  //   Verified vs TI SDLS199 (SN54/74LS696/697/699), Jan 1981 rev. Mar 1988:
+  //   terminal assignment + description + positive-logic logic diagrams +
+  //   IEC logic symbols, page 1-2, read as rendered ~150-dpi PDF page images.
+  //   Note the family-wide ACTIVE-LOW pins (overbars in the datasheet):
+  //   ENP, ENT and RCO are active LOW, and cascading ties RCO -> ENT.
+  //   This differs from the up-only 74x690 (COUNTER_REG_MUX_TRI), so it is a
+  //   separate primitive rather than a flag on that one.
+  //   gate.mod  = counter modulus (10 = '696 decade, 16 = '697/'699 binary).
+  //   gate.syncClear = true makes CCLR synchronous ('698/'699); the '696/'697
+  //                    leave it default (asynchronous direct clear).
+  // inputs:  [UD, CCK, A, B, C, D, ENP, ENT, CCLR, RCK, LOAD, G, RC]
+  // outputs: [QA, QB, QC, QD, RCO]   (QA = LSB, A = LSB data input)
+  const [udN,cckN,aN,bN,cN,dN,enpN,entN,cclrN,rckN,loadN,gN,rcN] = gate.inputs;
+  const [qaN,qbN,qcN,qdN,rcoN] = gate.outputs;
+  const mod = gate.mod || 16;
+  const state = this._getSeqState(comp, qaN,
+    { count: 0, reg: 0, prevCCK: 0, prevRCK: 0 });
+
+  const cclr = this._readPinBit(comp, cclrN);   // active LOW
+  const cck  = this._readPinBit(comp, cckN);
+  const rck  = this._readPinBit(comp, rckN);
+
+  // Snapshot the count on entry. The register captures this pre-update value,
+  // so when CCK and RCK are tied the register lags the counter by one clock
+  // (datasheet Note 2).
+  const oldCount = state.count;
+
+  // ── Output register ──────────────────────────────────────────────────────
+  // No register clear on this family (the '690 RCLR pin is replaced by U/D).
+  // On the rising RCK edge the register snapshots the current count.
+  if (state.prevRCK === 0 && rck === 1) {
+    state.reg = oldCount;
+  }
+
+  // ── Counter ──────────────────────────────────────────────────────────────
+  // CCLR active LOW: asynchronous on '696/'697, synchronous on '698/'699.
+  if (cclr === 0 && !gate.syncClear) {
+    state.count = 0;
+  } else if (state.prevCCK === 0 && cck === 1) {
+    if (cclr === 0) {                       // synchronous clear ('698/'699)
+      state.count = 0;
+    } else if (this._readPinBit(comp, loadN) === 0) {
+      // Synchronous parallel load (LOAD active LOW) — overrides counting.
+      state.count = this._readPinBit(comp, aN)
+        | (this._readPinBit(comp, bN) << 1)
+        | (this._readPinBit(comp, cN) << 2)
+        | (this._readPinBit(comp, dN) << 3);
+    } else if (this._readPinBit(comp, enpN) === 0 &&
+               this._readPinBit(comp, entN) === 0) {
+      // Both enables active LOW -> count. U/D HIGH = up, LOW = down.
+      if (this._readPinBit(comp, udN) === 1) {
+        state.count = (state.count >= mod - 1) ? 0 : state.count + 1;
+      } else {
+        state.count = (state.count <= 0) ? mod - 1 : state.count - 1;
+      }
+    }
+  }
+  state.prevCCK = cck;
+  state.prevRCK = rck;
+
+  // ── Ripple carry RCO (active LOW): asserted at terminal count while ENT is
+  //   active (LOW). Terminal count is max when counting up, 0 when down. ──────
+  const entActive = (this._readPinBit(comp, entN) === 0);
+  const up = (this._readPinBit(comp, udN) === 1);
+  const atTerminal = up ? (state.count === mod - 1) : (state.count === 0);
+  const rco = (atTerminal && entActive) ? 0 : 1;   // active LOW
+
+  // ── Quad 2:1 output MUX + 3-state gating ─────────────────────────────────
+  // R/C HIGH -> stored register; LOW -> live counter. G active LOW enables.
+  const sel = (this._readPinBit(comp, rcN) === 1) ? state.reg : state.count;
+  let changed = false;
+  if (this._readPinBit(comp, gN) === 0) {
+    if (this._drivePinBits(comp, [qaN,qbN,qcN,qdN],
+        [sel & 1, (sel >> 1) & 1, (sel >> 2) & 1, (sel >> 3) & 1])) changed = true;
+  } else {
+    for (const op of [qaN,qbN,qcN,qdN]) {
+      if (this._drivePinHighZ(comp, op)) changed = true;
+    }
+  }
+  if (this._drivePinBit(comp, rcoN, rco)) changed = true;
+  return changed;
+}
+
+chipEvaluators._evaluateDualCtr16RegTri = _evaluateDualCtr16RegTri_fn;
+
+function _evaluateDualCtr16RegTri_fn(comp, gate) {
+  // 74x8154: dual 16-bit binary counter with a 32-bit storage register read out
+  //   8 bits at a time onto a shared 3-state Y bus.
+  //   Verified vs TI SN74LV8154 SCLS589B (Aug 2004, rev. May 2020): Pin
+  //   Functions (Table 1), Function Table (Table 2), Functional Block Diagram
+  //   (Fig. in 8.2), and Detailed Description 8.1/8.3, read as 200-dpi PDF page
+  //   images (issues.md C4). Behaviour modeled:
+  //   • Two independent 16-bit up-counters: counter A on the rising CLKA edge,
+  //     counter B on the rising CLKB edge, but B counts only while CLKBEN is LOW
+  //     (active-LOW clock enable). Tie RCOA->CLKBEN with CLKA/CLKB common to make
+  //     one 32-bit counter.
+  //   • CCLR (active LOW) asynchronously clears BOTH counters to zero. It does
+  //     not touch the storage register.
+  //   • RCLK rising edge snapshots both counters into the 32-bit storage
+  //     register (held until the next RCLK edge).
+  //   • RCOA (active LOW) = LOW when counter A is at full count (0xFFFF), i.e.
+  //     ready to overflow on the next CLKA. Decoded from the LIVE counter A.
+  //   • Output bus reads the STORED register one byte at a time via four
+  //     active-LOW gates (Table 2): GAL->A low byte, GAU->A high byte,
+  //     GBL->B low byte, GBU->B high byte. With all four HIGH the Y bus is Hi-Z.
+  // inputs:  [CLKA, CLKB, CLKBEN, CCLR, RCLK, GAL, GAU, GBL, GBU]
+  // outputs: [Y0..Y7, RCOA]   (Y0 = byte LSB)
+  const [clkaN,clkbN,clkbenN,cclrN,rclkN,galN,gauN,gblN,gbuN] = gate.inputs;
+  const yN  = gate.outputs.slice(0, 8);
+  const rcoaN = gate.outputs[8];
+  const state = this._getSeqState(comp, yN[0],
+    { ca: 0, cb: 0, ra: 0, rb: 0, prevCLKA: 0, prevCLKB: 0, prevRCLK: 0 });
+
+  const cclr   = this._readPinBit(comp, cclrN);    // active LOW
+  const clka   = this._readPinBit(comp, clkaN);
+  const clkb   = this._readPinBit(comp, clkbN);
+  const clkben = this._readPinBit(comp, clkbenN);  // active LOW enable
+  const rclk   = this._readPinBit(comp, rclkN);
+
+  // Snapshot the counters as they stand on entry. The storage register captures
+  // this pre-update value, so when a count clock and RCLK are tied the register
+  // lags the counter by one clock.
+  const oldCa = state.ca, oldCb = state.cb;
+  if (state.prevRCLK === 0 && rclk === 1) { state.ra = oldCa; state.rb = oldCb; }
+
+  // Counters. CCLR (async, active LOW) dominates.
+  if (cclr === 0) {
+    state.ca = 0;
+    state.cb = 0;
+  } else {
+    if (state.prevCLKA === 0 && clka === 1) state.ca = (state.ca + 1) & 0xFFFF;
+    if (clkben === 0 && state.prevCLKB === 0 && clkb === 1)
+      state.cb = (state.cb + 1) & 0xFFFF;
+  }
+  state.prevCLKA = clka;
+  state.prevCLKB = clkb;
+  state.prevRCLK = rclk;
+
+  // RCOA active LOW at counter-A full count.
+  const rcoa = (state.ca === 0xFFFF) ? 0 : 1;
+
+  // Byte select from the STORED register (active-LOW gates, Table 2 priority).
+  let val = null;
+  if      (this._readPinBit(comp, galN) === 0) val = state.ra & 0xFF;
+  else if (this._readPinBit(comp, gauN) === 0) val = (state.ra >> 8) & 0xFF;
+  else if (this._readPinBit(comp, gblN) === 0) val = state.rb & 0xFF;
+  else if (this._readPinBit(comp, gbuN) === 0) val = (state.rb >> 8) & 0xFF;
+
+  let changed = false;
+  if (val === null) {
+    for (const op of yN) if (this._drivePinHighZ(comp, op)) changed = true;
+  } else {
+    if (this._drivePinBits(comp, yN,
+        [0,1,2,3,4,5,6,7].map(i => (val >> i) & 1))) changed = true;
+  }
+  if (this._drivePinBit(comp, rcoaN, rcoa)) changed = true;
+  return changed;
+}
 
 // ── Block 37 evaluators ─────────────────────────────────────────────────────
-
-function _evaluatePll7046_fn(comp, gate) {
-  // 74x7046: PLL with VCO and lock detector (CD74HC7046A family).
-  // inputs:  [COMPi, INH, C1A, C1B, VCOi, R1, R2, SIGi]
-  // outputs: [PCout, PC1, VCOo, DEMo, PC2, PC3]
-  //
-  // PCout = edge-triggered frequency/phase comparator (PC2-type):
-  //         1 when SIGi leads COMPi, 0 when COMPi leads, 0 on simultaneous
-  // PC1   = SIGi XOR COMPi  (XOR phase comparator)
-  // VCOo  = SIGi when INH=0, else 0
-  // DEMo  = SIGi when INH=0, else 0  (demodulator output mirrors VCOo)
-  // PC2   = !(SIGi XOR COMPi)  (XNOR complement of PC1)
-  // PC3   = 1 when SIGi === COMPi  (lock detector)
-  const bits = this._readGateInputs(comp, gate.inputs);
-  const [compIn, inh, , , , , , sigIn] = bits;
-  if (!comp.state) comp.state = { prevSig: 0, prevComp: 0, pcout: 0 };
-  let changed = false;
-
-  const risingSig  = comp.state.prevSig  === 0 && sigIn  === 1;
-  const risingComp = comp.state.prevComp === 0 && compIn === 1;
-  if (risingSig  && !risingComp) comp.state.pcout = 1;
-  if (risingComp && !risingSig)  comp.state.pcout = 0;
-  if (risingSig  &&  risingComp) comp.state.pcout = 0;
-  comp.state.prevSig  = sigIn;
-  comp.state.prevComp = compIn;
-
-  const pc1   = sigIn ^ compIn;
-  const pc2   = pc1 ^ 1;
-  const vcoO  = inh ? 0 : sigIn;
-  const pc3   = (sigIn === compIn) ? 1 : 0;
-
-  if (this._drivePinBit(comp, gate.outputs[0], comp.state.pcout)) changed = true; // PCout
-  if (this._drivePinBit(comp, gate.outputs[1], pc1))              changed = true; // PC1
-  if (this._drivePinBit(comp, gate.outputs[2], vcoO))             changed = true; // VCOo
-  if (this._drivePinBit(comp, gate.outputs[3], vcoO))             changed = true; // DEMo
-  if (this._drivePinBit(comp, gate.outputs[4], pc2))              changed = true; // PC2
-  if (this._drivePinBit(comp, gate.outputs[5], pc3))              changed = true; // PC3
-  return changed;
-}
-
-chipEvaluators._evaluatePll7046 = _evaluatePll7046_fn;
-
-
-function _evaluatePll9046_fn(comp, gate) {
-  // 74x9046: PLL with band-gap controlled VCO (CD74HC7046A family reference).
-  // inputs:  [COMPin, INH, C1A, C1B, VCOin, DEMin, R1, R2, SIGin]
-  // outputs: [PC1out, PC2out, VCOout, PC3out, LD]
-  //
-  // PC1out  = SIGin XOR COMPin  (XOR phase comparator)
-  // PC2out  = edge-triggered frequency/phase comparator: 1 when SIGin leads,
-  //           0 when COMPin leads, 0 when both edges coincide
-  // VCOout  = SIGin when INH=0, else 0  (loop model: VCO tracks signal)
-  // PC3out  = !(SIGin XOR COMPin)  (XNOR / PC1 complement)
-  // LD      = 1 when SIGin === COMPin (lock detect)
-  const bits = this._readGateInputs(comp, gate.inputs);
-  const [compIn, inh, , , , , , , sigIn] = bits;
-  if (!comp.state) comp.state = { prevSig: 0, prevComp: 0, pc2: 0 };
-  let changed = false;
-
-  const risingSig  = comp.state.prevSig  === 0 && sigIn  === 1;
-  const risingComp = comp.state.prevComp === 0 && compIn === 1;
-  if (risingSig  && !risingComp) comp.state.pc2 = 1;
-  if (risingComp && !risingSig)  comp.state.pc2 = 0;
-  if (risingSig  &&  risingComp) comp.state.pc2 = 0;
-  comp.state.prevSig  = sigIn;
-  comp.state.prevComp = compIn;
-
-  const pc1    = sigIn ^ compIn;
-  const pc3    = pc1 ^ 1;
-  const vcoOut = inh ? 0 : sigIn;
-  const ld     = (sigIn === compIn) ? 1 : 0;
-
-  if (this._drivePinBit(comp, gate.outputs[0], pc1))            changed = true;
-  if (this._drivePinBit(comp, gate.outputs[1], comp.state.pc2)) changed = true;
-  if (this._drivePinBit(comp, gate.outputs[2], vcoOut))         changed = true;
-  if (this._drivePinBit(comp, gate.outputs[3], pc3))            changed = true;
-  if (this._drivePinBit(comp, gate.outputs[4], ld))             changed = true;
-  return changed;
-}
-
-chipEvaluators._evaluatePll9046 = _evaluatePll9046_fn;
 
 function _evaluateJtagAsp_fn(comp, gate) {
   // 74x8996: Multidrop-addressable JTAG ASP (BYP-controlled routing model).
@@ -9120,6 +12924,68 @@ function _evaluateJtagAsp_fn(comp, gate) {
 
 chipEvaluators._evaluateJtagAsp = _evaluateJtagAsp_fn;
 
+function _evaluateCounterProgRippleOsc_fn(comp, gate) {
+  // 74x9323 / 74HC6323A: programmable ripple counter with oscillator, 3-state.
+  // Source: Nexperia 74HC6323A datasheet, Rev. 4 (2018), Fig. 3 (logic diagram),
+  //   Table 2 (pin description), Table 3 (function table). See chips65.js header.
+  // inputs:  [X1, MR, S1, S2]   outputs: [OUT, X2]
+  //
+  // X1 is the clock (or one crystal terminal). The counter advances on each
+  //   negative-going (falling) edge of X1 — modeled as a 3-bit binary up-count.
+  // MR (pin 5, active LOW): LOW resets the counter, stops the oscillator, and
+  //   forces OUT to high-Z. Datasheet Fig. 3 shows internal pull-ups on MR, S1,
+  //   and S2, so an unconnected one of these reads HIGH (inactive / divide-by-8).
+  // X2 (pin 6) = oscillator output = NAND(X1, MR): inactive (HIGH) while MR=LOW,
+  //   otherwise the inverse of X1 (matches the VOH X2 test conditions, page 5).
+  // OUT (pin 1), per Table 3: S1=0,S2=0 → fi (follows the clock);
+  //   S1=0,S2=1 → fi/2 (Q0); S1=1,S2=0 → fi/4 (Q1); S1=1,S2=1 → fi/8 (Q2).
+  const [x1Name, mrName, s1Name, s2Name] = gate.inputs;
+  const [outName, x2Name] = gate.outputs;
+
+  // Read a pin honoring its internal pull-up: an unconnected net reads HIGH.
+  const readPullup = (name) => {
+    const pin = comp.getPinByName(name);
+    const net = pin ? this.netlist.findNetByHole(pin.holeId) : null;
+    return net ? this._readPinBit(comp, name) : 1;
+  };
+
+  const x1 = this._readPinBit(comp, x1Name);
+  const mr = readPullup(mrName); // active LOW, pulled up
+  const s1 = readPullup(s1Name); // pulled up
+  const s2 = readPullup(s2Name); // pulled up
+
+  const state = this._getSeqState(comp, outName, { q0: 0, q1: 0, q2: 0, prevX1: 1 });
+
+  if (mr === 0) {
+    state.q0 = state.q1 = state.q2 = 0;
+  } else if (state.prevX1 === 1 && x1 === 0) {
+    // Falling edge of X1 → advance the 3-bit ripple counter.
+    const next = ((state.q0 | (state.q1 << 1) | (state.q2 << 2)) + 1) & 7;
+    state.q0 = next & 1; state.q1 = (next >> 1) & 1; state.q2 = (next >> 2) & 1;
+  }
+  state.prevX1 = x1;
+
+  // X2 oscillator output = NAND(X1, MR).
+  const x2 = (mr === 1 && x1 === 1) ? 0 : 1;
+
+  let outBit;
+  if (s1 === 0 && s2 === 0)      outBit = x1;        // divide by 1
+  else if (s1 === 0 && s2 === 1) outBit = state.q0;  // divide by 2
+  else if (s1 === 1 && s2 === 0) outBit = state.q1;  // divide by 4
+  else                          outBit = state.q2;   // divide by 8
+
+  let changed = false;
+  if (mr === 0) {
+    if (this._drivePinHighZ(comp, outName)) changed = true; // 3-state on reset
+  } else {
+    if (this._drivePinBit(comp, outName, outBit)) changed = true;
+  }
+  if (this._drivePinBit(comp, x2Name, x2)) changed = true;
+  return changed;
+}
+
+chipEvaluators._evaluateCounterProgRippleOsc = _evaluateCounterProgRippleOsc_fn;
+
 function _evaluateGenericStub_fn(comp, gate) {
   // Generic stub: drives all outputs HiZ (for complex chips not yet modeled).
   let changed = false;
@@ -9130,7 +12996,7 @@ function _evaluateGenericStub_fn(comp, gate) {
 }
 
 function _evaluateMuxQuint2to1_fn(comp, gate) {
-  // 74711: Five 2-to-1 multiplexers, tri-state outputs.
+  // 74711: Five 2-to-1 multiplexers, tri state outputs.
   // inputs: [A0,B0, A1,B1, A2,B2, A3,B3, A4,B4, SEL, OEn]  (12 inputs)
   // outputs: [Y0, Y1, Y2, Y3, Y4]
   // OEn=HIGH → all Y HiZ.
@@ -9150,8 +13016,127 @@ function _evaluateMuxQuint2to1_fn(comp, gate) {
   return changed;
 }
 
+function _evaluateMuxQuint3to1_fn(comp, gate) {
+  // 74712: Five 3-to-1 multiplexers, common select S0/S1, true (non-inverting)
+  // totem-pole outputs — no output enable, no invert control (those are 'F711 only).
+  // inputs: [S0, S1, D0a,D0b,D0c, D1a,D1b,D1c, D2a,D2b,D2c, D3a,D3b,D3c, D4a,D4b,D4c]
+  // outputs: [Q0, Q1, Q2, Q3, Q4]
+  // FUNCTION TABLE (Signetics FAST Data Manual, 'F712, p.6-676):
+  //   S1=0,S0=0 → Qn = a ;  S1=0,S0=1 → Qn = b ;  S1=1,S0=x → Qn = c.
+  // S1 dominates: when S1 is HIGH the c input wins regardless of S0 (no unused code).
+  const bits = this._readGateInputs(comp, gate.inputs);
+  const s0 = bits[0];
+  const s1 = bits[1];
+  let changed = false;
+  for (let i = 0; i < 5; i++) {
+    const base = 2 + 3 * i;          // a=base, b=base+1, c=base+2
+    const bit = s1 ? bits[base + 2] : (s0 ? bits[base + 1] : bits[base]);
+    if (this._drivePinBit(comp, gate.outputs[i], bit)) changed = true;
+  }
+  return changed;
+}
+
+function _evaluateMuxHexUniversal_fn(comp, gate) {
+  // SN54ALS857/SN74ALS857: hextuple ("hex") 2-to-1 UNIVERSAL multiplexer with
+  // 3-state outputs. Per channel i the part selects one operand bit, optionally
+  // complements it (COMP), and drives Yi; a shared OPER=0 pin reports whether the
+  // selected operand is all-zero (zero detect). Source function table (page 2):
+  //   COMP S1 S0 | Y     | OPER=0
+  //    L   L  L  | A     | H if all A inputs L
+  //    L   L  H  | B     | H if all B inputs L
+  //    L   H  L  | A·B   | Z
+  //    L   H  H  | L     | L
+  //    H   L  L  | /A    | H if all A inputs L
+  //    H   L  H  | /B    | H if all B inputs L
+  //    H   H  L  | /(A·B)| Z
+  //    H   H  H  | Z     | Z
+  // inputs:  [S0,S1,COMP, 1A,1B, 2A,2B, 3A,3B, 4A,4B, 5A,5B, 6A,6B]  (15)
+  // outputs: [1Y,2Y,3Y,4Y,5Y,6Y, OPER0]                              (7)
+  const b   = this._readGateInputs(comp, gate.inputs);
+  const s0  = b[0], s1 = b[1], cmp = b[2];
+  const A   = [b[3], b[5], b[7], b[9],  b[11], b[13]];
+  const B   = [b[4], b[6], b[8], b[10], b[12], b[14]];
+  const oper = gate.outputs[6];
+  let changed = false;
+
+  // Disable: COMP=S0=S1=H places every output (the six Y and OPER=0) in Hi-Z.
+  if (cmp === 1 && s1 === 1 && s0 === 1) {
+    for (const op of gate.outputs) if (this._drivePinHighZ(comp, op)) changed = true;
+    return changed;
+  }
+
+  // Per-channel operand select, then optional complement.
+  for (let i = 0; i < 6; i++) {
+    let d;
+    if (s1 === 0 && s0 === 0)      d = A[i];           // select A
+    else if (s1 === 0 && s0 === 1) d = B[i];           // select B
+    else if (s1 === 1 && s0 === 0) d = A[i] & B[i];    // AND mask (A·B)
+    else                           d = 0;              // S1=S0=H, COMP=L: force L
+    const y = cmp === 1 ? (d ^ 1) : d;
+    if (this._drivePinBit(comp, gate.outputs[i], y)) changed = true;
+  }
+
+  // OPER=0 zero-detect. HIGH iff every bit of the selected operand is LOW.
+  if (s1 === 0) {
+    const ops = (s0 === 0) ? A : B;
+    const allLow = ops.every(v => v === 0) ? 1 : 0;
+    if (this._drivePinBit(comp, oper, allLow)) changed = true;
+  } else if (s0 === 1) {
+    // S1=H,S0=H,COMP=L (the disable case COMP=H is handled above): OPER=0 = L.
+    if (this._drivePinBit(comp, oper, 0)) changed = true;
+  } else {
+    // AND modes (S1=H,S0=L): OPER=0 is Hi-Z.
+    if (this._drivePinHighZ(comp, oper)) changed = true;
+  }
+  return changed;
+}
+
+function _evaluateMux3in4bitDcOe(comp, gate) {
+  // Signetics 8264 (the "733" three-bus mux): 3-input, 4-bit digital multiplexer
+  // with a Data Complement input and an output-enable code. Each output bit fn
+  // selects the same bit from one of three 4-bit buses A/B/C (or a forced 0),
+  // optionally inverts it, then drives it through a bare-collector output stage.
+  // Function table (Signetics 8263/64 datasheet, page 563):
+  //   S0 S1 | selected   |   DC=L → out = selected ;  DC=H → out = /selected
+  //    H  H |  An
+  //    L  H |  Bn
+  //    H  L |  Cn
+  //    L  L |  0  (forced)
+  //   Output Enable (8264): outputs active only while OE1·OE2·OE3 are all HIGH.
+  //   When the enable code is not satisfied every output sits at logic 1 (the
+  //   bare-collector transistor is off and an external pull-up holds the line
+  //   HIGH); we drive a hard 1 to represent that pulled-up disabled state.
+  // inputs:  [A0,A1,A2,A3, B0,B1,B2,B3, C0,C1,C2,C3, S0,S1, DC, OE1,OE2,OE3] (18)
+  // outputs: [Y0,Y1,Y2,Y3]  (= datasheet f0..f3)
+  const b   = this._readGateInputs(comp, gate.inputs);
+  const A   = [b[0], b[1], b[2], b[3]];
+  const B   = [b[4], b[5], b[6], b[7]];
+  const C   = [b[8], b[9], b[10], b[11]];
+  const s0  = b[12], s1 = b[13], dc = b[14];
+  const enabled = (b[15] === 1) && (b[16] === 1) && (b[17] === 1);
+  let changed = false;
+  for (let i = 0; i < 4; i++) {
+    let out;
+    if (!enabled) {
+      out = 1; // disabled: bare-collector off, line pulled HIGH
+    } else {
+      let sel;
+      if      (s0 === 1 && s1 === 1) sel = A[i];
+      else if (s0 === 0 && s1 === 1) sel = B[i];
+      else if (s0 === 1 && s1 === 0) sel = C[i];
+      else                          sel = 0; // S0=L,S1=L → forced 0
+      out = (dc === 1) ? (sel ^ 1) : sel;
+    }
+    if (this._drivePinBit(comp, gate.outputs[i], out)) changed = true;
+  }
+  return changed;
+}
+
 chipEvaluators._evaluateGenericStub     = _evaluateGenericStub_fn;
+chipEvaluators._evaluateMux3in4bitDcOe  = _evaluateMux3in4bitDcOe;
 chipEvaluators._evaluateMuxQuint2to1    = _evaluateMuxQuint2to1_fn;
+chipEvaluators._evaluateMuxQuint3to1    = _evaluateMuxQuint3to1_fn;
+chipEvaluators._evaluateMuxHexUniversal = _evaluateMuxHexUniversal_fn;
 
 // ── Block 67 555 Timer ──────────────────────────────────────────────────
 
@@ -9163,8 +13148,8 @@ function _evaluateTimer555_fn(comp, gate) {
   //     producing reference voltages at 2/3 VCC and 1/3 VCC.
   //   - Upper comparator: THRESH (pin 6) vs upper reference (2/3 VCC or CTRL)
   //   - Lower comparator: TRIG (pin 2) vs lower reference (1/3 VCC or CTRL/2)
-  //   - SR flip-flop: SET when TRIG < lower ref, RESET when THRESH > upper ref
-  //   - DISCH (pin 7): open-collector NPN, ON (sinking to GND) when output LOW
+  //   - SR flip flop: SET when TRIG < lower ref, RESET when THRESH > upper ref
+  //   - DISCH (pin 7): open collector NPN, ON (sinking to GND) when output LOW
   //   - RESETn (pin 4): active LOW, forces output LOW and DISCH ON
   //   - CTRL (pin 5): overrides the 2/3 VCC reference; lower ref = CTRL/2
   //
@@ -9187,7 +13172,7 @@ function _evaluateTimer555_fn(comp, gate) {
   // RESETn is digital (active LOW)
   const resetn = this._readPinBit(comp, resetName);
 
-  // Internal SR flip-flop state
+  // Internal SR flip flop state
   const state = this._getSeqState(comp, outName, { q: 0 });
 
   if (resetn === 0) {
@@ -9210,10 +13195,10 @@ function _evaluateTimer555_fn(comp, gate) {
 
   let changed = false;
 
-  // Drive OUT pin: push-pull, HIGH (5V) when q=1, LOW (0V) when q=0
+  // Drive OUT pin: push pull, HIGH (5V) when q=1, LOW (0V) when q=0
   if (this._drivePinBit(comp, outName, state.q)) changed = true;
 
-  // Drive DISCH pin: open-collector behavior
+  // Drive DISCH pin: open collector behavior
   //   q=1 (output HIGH) → DISCH is high-impedance (capacitor can charge)
   //   q=0 (output LOW)  → DISCH sinks to GND (capacitor discharges)
   if (state.q) {
@@ -9278,10 +13263,77 @@ function _evaluateTimer558Section_fn(comp, gate) {
 
 chipEvaluators._evaluateTimer558Section = _evaluateTimer558Section_fn;
 
+// ── Retriggerable monostable with external RC (74x123, CD4538) ───────────
+// Same physics as the 555 in monostable mode (see _evaluateTimer555_fn): the
+// chip holds the timing capacitor discharged while idle, releases it on a
+// trigger edge, and watches the cap voltage charge through the external R
+// until it crosses 2/3 VCC, at which point the pulse ends.
+//
+// Wiring convention (also stated in each chip's user-facing guide):
+//   - C from CEXT pin to GND
+//   - R from CEXT pin to VCC
+//   - REXT pin on the chip is documentation-only; not read by the simulator.
+//
+// Pulse width emerges from the MNA solver (~0.7·R·C) — no formula in code.
+//
+// Trigger semantics: rising edge on B while A=LOW, OR falling edge on A while
+// B=HIGH. CLR=LOW aborts and forces idle.
+//
+// Retrigger: a new trigger edge while pulsing re-asserts the latch. Because
+// the cap is mid-charge (not discharged on retrigger like real silicon), the
+// pulse ends slightly sooner than a full R·C cycle after retrigger. Accepted
+// inaccuracy.
+function _evaluateMonostableRC_fn(comp, gate) {
+  const [aName, bName, clrName, cextName] = gate.inputs;
+  const [qName, qnName] = gate.outputs;
 
+  const a   = this._readPinBit(comp, aName);
+  const b   = this._readPinBit(comp, bName);
+  const clr = this._readPinBit(comp, clrName);
+
+  const state = this._getSeqState(comp, qName,
+    { q: 0, prevA: 1, prevB: 0 });
+
+  // Default reset is active LOW (74x123, CD4538). Some parts (e.g. CD4047
+  // EXTERNAL RESET) use an active-HIGH reset; gate.resetActiveHigh flips it.
+  // With active-HIGH reset an unconnected reset pin (reads 0) means "not
+  // reset", which is the sensible breadboard default.
+  const resetActive = gate.resetActiveHigh ? (clr === 1) : (clr === 0);
+
+  if (resetActive) {
+    state.q = 0;
+  } else {
+    const triggerEdge =
+      (b === 1 && state.prevB === 0 && a === 0) ||
+      (a === 0 && state.prevA === 1 && b === 1);
+    if (triggerEdge) {
+      state.q = 1;
+    } else if (state.q === 1) {
+      const v = this._readPinVoltage(comp, cextName);
+      if (v !== null && v > (VCC_VOLTAGE * 2 / 3)) {
+        state.q = 0;
+      }
+    }
+  }
+  state.prevA = a;
+  state.prevB = b;
+
+  let changed = false;
+  if (this._drivePinBit(comp, qName, state.q)) changed = true;
+  if (this._drivePinBit(comp, qnName, state.q ? 0 : 1)) changed = true;
+  // CEXT: SINK when idle (cap held discharged), HiZ while pulsing (charges through R).
+  if (state.q) {
+    if (this._drivePinHighZ(comp, cextName)) changed = true;
+  } else {
+    if (this._drivePinSink(comp, cextName)) changed = true;
+  }
+  return changed;
+}
+
+chipEvaluators._evaluateMonostableRC = _evaluateMonostableRC_fn;
 
 function _evaluateShiftRegLatch4094_fn(comp, gate) {
-  // CD74x4094: 8 bit shift register with storage latch and tri-state outputs.
+  // CD74x4094: 8 bit shift register with storage latch and tri state outputs.
   // inputs: [D, CLK, STR, OE]
   // outputs: [Q1..Q8, QS1, QS2]
   // Rising CLK: shift data in (D enters at index 0, shifts toward index 7).
@@ -9322,8 +13374,74 @@ function _evaluateShiftRegLatch4094_fn(comp, gate) {
   return changed;
 }
 
+function _evaluateDualRankShift962_fn(comp, gate) {
+  // DM74LS962: dual-rank 8-bit TRI-STATE shift register.
+  // Two 8-bit ranks share one clock:
+  //   Reg A  = upper parallel I/O register (bit i tied to I/O pin i)
+  //   Reg B  = lower serial shift register (serial in IS -> serial out OS)
+  // Six control inputs, ALL active LOW (asserted at logic 0). They gate,
+  // independently, what happens to each rank on the RISING clock edge:
+  //   DISI  (Input disable)     asserted -> Reg A loads from the I/O pins.
+  //   DISTU (Transfer-up dis.)  asserted -> Reg A loads from Reg B.
+  //   DISTD (Transfer-down dis.)asserted -> Reg B loads from Reg A.
+  //   DISS  (Shift disable)     asserted -> Reg B shifts one bit (IS -> B1 -> ... -> B8).
+  //   DISO  (Output disable)    asserted -> I/O pins drive out Reg A (TRI-STATE enable).
+  // Combinations are legal and act simultaneously on the same edge, so:
+  //   DISTU+DISTD asserted  = EXCHANGE (A<->B swap).
+  //   When Reg A is also loading from the I/O pins (DISI asserted), the value
+  //   written picks up the "Data-ORing" (DOR) term: bit = I/O OR (other rank).
+  // Priority per the function table (Table I): a rank that is being loaded from
+  // another rank ignores the shift for that edge (DISTD dominates DISS on Reg B;
+  // DISI dominates DISO on the pins). OS is a plain (non-TRI-STATE) output that
+  // always reflects the last shift stage B8.
+  // inputs:  [CLK, IS, DISO, DISI, DISTU, DISTD, DISS, IO1..IO8]
+  // outputs: [OS, IO1..IO8]
+  const [clkN, isN, disoN, disiN, distuN, distdN, dissN] = gate.inputs;
+  const ioIn = gate.inputs.slice(7, 15);   // IO1..IO8 read side
+  const ioOut = gate.outputs.slice(1, 9);  // IO1..IO8 drive side
+  const osN = gate.outputs[0];
+
+  const state = this._getSeqState(comp, gate.outputs[0],
+    { a: new Array(8).fill(0), b: new Array(8).fill(0), prevCLK: 0 });
+
+  const clk   = this._readPinBit(comp, clkN);
+  const inA   = this._readPinBit(comp, disiN)  === 0; // load Reg A from I/O pins
+  const outEn = this._readPinBit(comp, disoN)  === 0 && !inA; // drive pins from Reg A
+  const tu    = this._readPinBit(comp, distuN) === 0; // Reg A <- Reg B
+  const td    = this._readPinBit(comp, distdN) === 0; // Reg B <- Reg A
+  const sh    = this._readPinBit(comp, dissN)  === 0; // shift Reg B
+
+  if (state.prevCLK === 0 && clk === 1) {
+    const io = ioIn.map(n => this._readPinBit(comp, n)); // I/O pins as inputs at the edge
+    const is = this._readPinBit(comp, isN);
+    const a0 = state.a.slice(), b0 = state.b.slice(); // snapshot: exchange reads both old ranks
+    // Reg A next state.
+    if (tu && inA)      for (let i = 0; i < 8; i++) state.a[i] = io[i] | b0[i]; // transfer-up + DOR
+    else if (tu)        for (let i = 0; i < 8; i++) state.a[i] = b0[i];
+    else if (inA)       for (let i = 0; i < 8; i++) state.a[i] = io[i];
+    // else Reg A holds.
+    // Reg B next state (transfer-down dominates shift).
+    if (td) {
+      if (inA) for (let i = 0; i < 8; i++) state.b[i] = io[i] | a0[i]; // transfer-down + DOR
+      else     for (let i = 0; i < 8; i++) state.b[i] = a0[i];
+    } else if (sh) {
+      state.b = [is, b0[0], b0[1], b0[2], b0[3], b0[4], b0[5], b0[6]];
+    }
+    // else Reg B holds.
+  }
+  state.prevCLK = clk;
+
+  let changed = false;
+  if (outEn) { if (this._drivePinBits(comp, ioOut, state.a)) changed = true; }
+  else       { if (this._drivePinsHighZ(comp, ioOut)) changed = true; }
+  if (this._drivePinBit(comp, osN, state.b[7])) changed = true; // OS = B8, always driven
+  return changed;
+}
+
+chipEvaluators._evaluateDualRankShift962 = _evaluateDualRankShift962_fn;
+
 function _evaluateDLatchOctalTriInv_fn(comp, gate) {
-  // 74x4301: Octal D transparent latch with inverting tri-state outputs.
+  // 74x4301: Octal D transparent latch with inverting tri state outputs.
   // inputs: [D1..D8, LE, OEn], outputs: [Q1n..Q8n]
   // LE=1: Q follows ~D (transparent). LE=0: hold.
   // OEn=0 (active LOW): outputs enabled. OEn=1: HiZ.
@@ -9346,7 +13464,7 @@ function _evaluateDLatchOctalTriInv_fn(comp, gate) {
 }
 
 function _evaluateDFFOctalTriInv_fn(comp, gate) {
-  // 74x4303: Octal D edge-triggered flip-flop with inverting tri-state outputs.
+  // 74x4303: Octal D edge triggered flip flop with inverting tri state outputs.
   // inputs: [D1..D8, CLK, OEn], outputs: [Q1n..Q8n]
   // Rising CLK: Q latches ~D.
   // OEn=0 (active LOW): outputs enabled. OEn=1: HiZ.
@@ -9420,8 +13538,83 @@ function _evaluateCounterBcdUpdownCd_fn(comp, gate) {
   return changed;
 }
 
+function _evaluateBcdDivNDown4522_fn(comp, gate) {
+  // CD4522B: programmable BCD divide-by-N down counter.
+  // inputs:  [CL, CI, PE, MR, CF, P0, P1, P2, P3]
+  // outputs: [Q0, Q1, Q2, Q3, ZERO]  (ZERO = the decoded-"0" output, pin 12)
+  //
+  // Behaviour, from the CD4522B datasheet TRUTH TABLES (TI/Harris SCHS079C, p.1):
+  //   MR=1 ............... asynchronous Reset, count -> 0 (highest priority)
+  //   PE=1 ............... asynchronous Preset, count <- P0..P3 (BCD jam load)
+  //   CI=1 ............... No Count (clock inhibit)
+  //   CL static (0 or 1), CI=0, PE=0, MR=0 ... No Count
+  //   CL positive edge (CI=0) .... Count Down
+  //   CI negative edge (CL=1) .... Count Down
+  // "Logic edge-clocked design   increments on positive Clock transition or on
+  //  negative Clock Inhibit transition" (datasheet Features). It is a DOWN counter,
+  //  so each such edge decrements the BCD count (0 wraps to 9).
+  //
+  // Cascade Feedback (CF, pin 13): for single-stage divide-by-N the datasheet says
+  // tie the "0" output to PE and hold CF HIGH. CF gates both counting and the "0"
+  // decode so stages chain "without the need for external gating" (datasheet
+  // Description): CF=1 enables counting and ZERO = (count==0 AND CF). Feeding a
+  // lower stage's ZERO into a higher stage's CF makes the higher stage step only
+  // when the lower stage is at zero, and ANDs the decoded-zero up the chain. For a
+  // lone chip CF must be tied HIGH or it will never count   that matches hardware.
+  // CF only affects multi-stage cascades; in the common single-stage hookup CF=1
+  // always, so this choice is behaviourally identical to ungated counting there.
+  //
+  // Source: Texas Instruments (data sheet acquired from Harris Semiconductor),
+  //   "CD4522B Types   CMOS Programmable BCD Divide-by-'N' Counter", SCHS079C
+  //   (Rev. October 2003). [Online]. Available:
+  //   https://www.ti.com/lit/ds/symlink/cd4522b.pdf. Verified: TERMINAL ASSIGNMENT
+  //   (p.5) + FUNCTIONAL DIAGRAM, TRUTH TABLES and OUTPUTS (count->Q0..Q3) table
+  //   (p.1-2) + Description (p.1), read as 300-dpi PDF page images (issues.md C4).
+  //   Pinout (DIP-16): Q3=1 P3=2 PE=3 CI=4 P0=5 CL=6 Q0=7 VSS=8 Q1=9 MR=10 P1=11
+  //   "0"=12 CF=13 P2=14 Q2=15 VDD=16. Q0=LSB BCD. Not cloned from a sibling
+  //   (issues.md C2): the hinted FREQ_DIV_PROG primitive is the 74292 (single
+  //   toggling OUT, /(N+1), no BCD outputs / preset / inhibit / CF / MR) and does
+  //   not fit, so this dedicated primitive was added.
+  const [clN, ciN, peN, mrN, cfN, p0N, p1N, p2N, p3N] = gate.inputs;
+  const [q0, q1, q2, q3, zeroN] = gate.outputs;
+  const state = this._getSeqState(comp, q0, { count: 0, prevClk: 0, prevCi: 0 });
+
+  const cl = this._readPinBit(comp, clN);
+  const ci = this._readPinBit(comp, ciN);
+  const cf = this._readPinBit(comp, cfN);
+
+  const mr = this._readPinBit(comp, mrN);
+  if (mr === 1) {
+    state.count = 0;
+  } else {
+    const pe = this._readPinBit(comp, peN);
+    if (pe === 1) {
+      let p = this._readPinBit(comp, p0N) | (this._readPinBit(comp, p1N) << 1) |
+        (this._readPinBit(comp, p2N) << 2) | (this._readPinBit(comp, p3N) << 3);
+      if (p > 9) p = 9; // invalid BCD preset clamped to the top decade digit
+      state.count = p;
+    } else {
+      // Count down on a positive CLOCK edge (CI low) OR a negative CLOCK INHIBIT
+      // edge (CLOCK high). Counting is enabled only while Cascade Feedback is HIGH.
+      const clockEdge = (state.prevClk === 0 && cl === 1 && ci === 0);
+      const inhibitEdge = (state.prevCi === 1 && ci === 0 && cl === 1);
+      if (cf === 1 && (clockEdge || inhibitEdge)) {
+        state.count = (state.count - 1 + 10) % 10;
+      }
+    }
+  }
+  state.prevClk = cl;
+  state.prevCi = ci;
+
+  const zero = (state.count === 0 && cf === 1) ? 1 : 0;
+  let changed = this._drivePinBits(comp, [q0, q1, q2, q3],
+    [state.count & 1, (state.count >> 1) & 1, (state.count >> 2) & 1, (state.count >> 3) & 1]);
+  if (this._drivePinBit(comp, zeroN, zero)) changed = true;
+  return changed;
+}
+
 function _evaluateBcd7seg4511_fn(comp, gate) {
-  // CD74x4511: BCD to 7-segment latch/decoder/driver (active HIGH, common cathode).
+  // CD74x4511: BCD to 7 segment latch/decoder/driver (active HIGH, common cathode).
   // inputs: [A, B, C, D, LE, BIn, LTn]
   // outputs: [a, b, c, d, e, f, g]
   // LTn=LOW: all segments ON (lamp test, highest priority).
@@ -9445,7 +13638,10 @@ function _evaluateBcd7seg4511_fn(comp, gate) {
   } else if (bi === 0) {
     segs = [0, 0, 0, 0, 0, 0, 0]; // blank: all OFF
   } else {
-    // BCD → 7-segment (active HIGH outputs for common cathode)
+    // BCD → 7 segment (active HIGH outputs for common cathode)
+    // Per the CD4511B TRUTH TABLE (TI SCHS072B, p.4): the CD4511 uses the classic
+    // "tail-less" font — 6 has NO top bar (segment a off) and 9 has NO bottom bar
+    // (segment d off). This differs from the CD4543's tailed 6/9.
     //           a  b  c  d  e  f  g
     const T = [
       /* 0 */ [1, 1, 1, 1, 1, 1, 0],
@@ -9454,10 +13650,10 @@ function _evaluateBcd7seg4511_fn(comp, gate) {
       /* 3 */ [1, 1, 1, 1, 0, 0, 1],
       /* 4 */ [0, 1, 1, 0, 0, 1, 1],
       /* 5 */ [1, 0, 1, 1, 0, 1, 1],
-      /* 6 */ [1, 0, 1, 1, 1, 1, 1],
+      /* 6 */ [0, 0, 1, 1, 1, 1, 1],
       /* 7 */ [1, 1, 1, 0, 0, 0, 0],
       /* 8 */ [1, 1, 1, 1, 1, 1, 1],
-      /* 9 */ [1, 1, 1, 1, 0, 1, 1],
+      /* 9 */ [1, 1, 1, 0, 0, 1, 1],
     ];
     segs = (state.bcd <= 9) ? T[state.bcd] : [0, 0, 0, 0, 0, 0, 0];
   }
@@ -9466,7 +13662,7 @@ function _evaluateBcd7seg4511_fn(comp, gate) {
 }
 
 function _evaluateBcd7seg4543_fn(comp, gate) {
-  // CD4543: BCD to 7-segment latch/decoder/driver (common-anode or common-cathode).
+  // CD4543: BCD to 7 segment latch/decoder/driver (common-anode or common-cathode).
   // inputs: [A, B, C, D, LE, BL, Ph]
   // outputs: [a, b, c, d, e, f, g]
   // LE=LOW: transparent (outputs follow BCD input in real time).
@@ -9491,7 +13687,7 @@ function _evaluateBcd7seg4543_fn(comp, gate) {
   if (bl === 1) {
     segs = [0, 0, 0, 0, 0, 0, 0]; // blanking: all segments off (active HIGH blank)
   } else {
-    // BCD → 7-segment (active HIGH reference table, same as CD4511)
+    // BCD → 7 segment (active HIGH reference table, same as CD4511)
     //           a  b  c  d  e  f  g
     const T = [
       /* 0 */ [1, 1, 1, 1, 1, 1, 0],
@@ -9514,15 +13710,224 @@ function _evaluateBcd7seg4543_fn(comp, gate) {
   return this._drivePinBits(comp, gate.outputs, segs);
 }
 
+function _evaluateBcd7seg4543hc_fn(comp, gate) {
+  // 74x4543 / CD74HC4543 / CD4543B: BCD-to-7-segment latch/decoder/driver for LCDs.
+  // inputs:  [A, B, C, D, LD, BI, PH]   A=2^0(LSB) .. D=2^3(MSB)
+  // outputs: [a, b, c, d, e, f, g]
+  //
+  // Latch-DISABLE polarity is the OPPOSITE of the existing BCD_7SEG_4543 primitive,
+  // which is why this part gets its own evaluator instead of reusing it. Per the
+  // datasheet function table, LD=HIGH makes the latch transparent (the BCD value is
+  // loaded/follows the inputs) and LD=LOW holds the last value loaded while LD was
+  // HIGH. BI=HIGH blanks (all segments off). PH=HIGH inverts every segment output
+  // (common-anode LED, or one half of the LCD square-wave drive); PH=LOW gives
+  // active-HIGH segments (common-cathode LED). Codes 10-15 blank.
+  //
+  // Source: Texas Instruments (Harris Semiconductor), "CD74HC4543 High-Speed CMOS
+  //   Logic BCD-to-7-Segment Latch/Decoder/Driver for LCDs", SCHS217B (Feb 1998,
+  //   rev. Jul 2003). [Online]. Available:
+  //   https://www.ti.com/lit/ds/symlink/cd74hc4543.pdf. Verified: pinout (TOP VIEW,
+  //   page 1) and FUNCTION TABLE (page 2), read as rendered PDF page images (C4):
+  //   LD=H transparent / LD=L hold ("Depends on BCD code previously applied when
+  //   LD = high"), BI=H blank, PH=H "Inverse of Above", codes 10-15 blank.
+  // Source: Texas Instruments (Harris Semiconductor), "CD4543B Types — CMOS
+  //   BCD-to-Seven-Segment Latch/Decoder/Driver For Liquid-Crystal Displays",
+  //   SCHS086D (rev. Apr 2004). [Online]. Available:
+  //   https://www.ti.com/lit/ds/symlink/cd4543b.pdf. Verified: TERMINAL ASSIGNMENT
+  //   (page 1) and "TRUTH TABLE FOR CD4543B" (page 5), read as rendered PDF page
+  //   images — identical pinout and behaviour to the HC part; "Depends upon the BCD
+  //   code previously applied when LD=1", "Inverse of Output Combinations Above"
+  //   for Ph=1. Both sources agree, so either confirms the model.
+  const [aN, bN, cN, dN, ldN, biN, phN] = gate.inputs;
+  const state = this._getSeqState(comp, gate.outputs[0], { bcd: 0 });
+
+  const ld = this._readPinBit(comp, ldN);
+  if (ld === 1) {
+    // LD HIGH: latch transparent — capture the current BCD code.
+    state.bcd = this._readPinBit(comp, aN) | (this._readPinBit(comp, bN) << 1) |
+      (this._readPinBit(comp, cN) << 2) | (this._readPinBit(comp, dN) << 3);
+  }
+  // LD LOW: hold state.bcd unchanged.
+
+  const bi = this._readPinBit(comp, biN);
+  const ph = this._readPinBit(comp, phN);
+
+  let segs;
+  if (bi === 1) {
+    segs = [0, 0, 0, 0, 0, 0, 0]; // BI HIGH: blank (all segments off)
+  } else {
+    // BCD → 7 segment, active-HIGH reference (PH=LOW). Codes 10-15 blank.
+    //           a  b  c  d  e  f  g
+    const T = [
+      /* 0 */ [1, 1, 1, 1, 1, 1, 0],
+      /* 1 */ [0, 1, 1, 0, 0, 0, 0],
+      /* 2 */ [1, 1, 0, 1, 1, 0, 1],
+      /* 3 */ [1, 1, 1, 1, 0, 0, 1],
+      /* 4 */ [0, 1, 1, 0, 0, 1, 1],
+      /* 5 */ [1, 0, 1, 1, 0, 1, 1],
+      /* 6 */ [1, 0, 1, 1, 1, 1, 1],
+      /* 7 */ [1, 1, 1, 0, 0, 0, 0],
+      /* 8 */ [1, 1, 1, 1, 1, 1, 1],
+      /* 9 */ [1, 1, 1, 1, 0, 1, 1],
+    ];
+    segs = (state.bcd <= 9) ? T[state.bcd] : [0, 0, 0, 0, 0, 0, 0];
+  }
+
+  // PH HIGH inverts all outputs (common-anode LED, or LCD anti-phase drive).
+  if (ph === 1) segs = segs.map(b => b ^ 1);
+
+  return this._drivePinBits(comp, gate.outputs, segs);
+}
+
+function _evaluateBcd7seg4055_fn(comp, gate) {
+  // CD4055B: BCD-to-7-segment LCD decoder/driver with a DISPLAY-FREQUENCY output.
+  // inputs:  [A, B, C, D, DF]            A=2^0 (LSB) .. D=2^3 (MSB); DF = DISPLAY FREQUENCY IN
+  // outputs: [a, b, c, d, e, f, g, DFO]  DFO = DISPLAY FREQUENCY OUT
+  //
+  // Purely combinational — there is NO input latch/strobe (that is the sibling
+  // CD4056B) and NO blanking input. All sixteen input codes are decoded: 0-9
+  // plus L, H, P, A, "-" and a blank position.
+  //
+  // DF (DISPLAY FREQUENCY) sets output polarity exactly the way the CD4543 Ph pin
+  // does (TI/Harris SCHS048C, page 1): when DF is LOW the segments SELECTED by the
+  // BCD code drive HIGH (active-HIGH, e.g. common-cathode LED use); when DF is HIGH
+  // every segment bit is inverted so a selected segment drives LOW. On real silicon
+  // a square wave on DF makes selected segments swing 180 degrees out of phase with
+  // DF (and unselected segments in phase) to AC-drive a liquid-crystal display;
+  // 74Sim resolves DF as a static level, so only the static HIGH/LOW polarity is
+  // modeled (the square-wave / AC-across-glass LCD behavior is not — see issues.md
+  // A3 and the chip note). DFO is a buffered copy of DF IN (on hardware a
+  // level-shifted backplane drive used to cascade to a CD4054B); modeled as DFO=DF.
+  //
+  // Source: Texas Instruments (data sheet acquired from Harris Semiconductor),
+  //   "CD4054B, CD4055B, CD4056B Types — CMOS Liquid-Crystal Display Drivers,
+  //   High-Voltage Types (20-Volt Rating)", SCHS048C (Revised October 2003).
+  //   [Online]. Available: https://www.ti.com/lit/ds/symlink/cd4054b.pdf. Verified:
+  //   "TRUTH TABLE FOR CD4055B and CD4056B" (16 codes, segments a-g + display char)
+  //   and the DF polarity text on page 1, read as 300-dpi PDF page images.
+  const [aN, bN, cN, dN, dfN] = gate.inputs;
+  const bcd = this._readPinBit(comp, aN) | (this._readPinBit(comp, bN) << 1) |
+    (this._readPinBit(comp, cN) << 2) | (this._readPinBit(comp, dN) << 3);
+  const df = this._readPinBit(comp, dfN);
+
+  // BCD -> 7 segment, active-HIGH reference (DF=LOW). Verified vs SCHS048C truth
+  // table.   a  b  c  d  e  f  g
+  const T = [
+    /*  0       */ [1, 1, 1, 1, 1, 1, 0],
+    /*  1       */ [0, 1, 1, 0, 0, 0, 0],
+    /*  2       */ [1, 1, 0, 1, 1, 0, 1],
+    /*  3       */ [1, 1, 1, 1, 0, 0, 1],
+    /*  4       */ [0, 1, 1, 0, 0, 1, 1],
+    /*  5       */ [1, 0, 1, 1, 0, 1, 1],
+    /*  6       */ [1, 0, 1, 1, 1, 1, 1],
+    /*  7       */ [1, 1, 1, 0, 0, 0, 0],
+    /*  8       */ [1, 1, 1, 1, 1, 1, 1],
+    /*  9       */ [1, 1, 1, 1, 0, 1, 1],
+    /* 10 "L"   */ [0, 0, 0, 1, 1, 1, 0],
+    /* 11 "H"   */ [0, 1, 1, 0, 1, 1, 1],
+    /* 12 "P"   */ [1, 1, 0, 0, 1, 1, 1],
+    /* 13 "A"   */ [1, 1, 1, 0, 1, 1, 1],
+    /* 14 "-"   */ [0, 0, 0, 0, 0, 0, 1],
+    /* 15 blank */ [0, 0, 0, 0, 0, 0, 0],
+  ];
+  let segs = T[bcd].slice();
+
+  // DF=HIGH inverts every segment output (active-LOW selection).
+  if (df === 1) segs = segs.map(b => b ^ 1);
+
+  // DFO = buffered DISPLAY FREQUENCY IN (same phase).
+  return this._drivePinBits(comp, gate.outputs, [...segs, df]);
+}
+
+function _evaluateBcd7seg4056_fn(comp, gate) {
+  // CD4056B: BCD-to-7-segment decoder/driver with a STROBED LATCH and a
+  // DISPLAY-FREQUENCY (DF) phase input, for liquid-crystal (and DC) displays.
+  // The sibling of the CD4055B above; same full 16-code decode, but the CD4056B
+  // adds an input STROBE latch (and has NO DISPLAY-FREQUENCY OUTPUT pin).
+  //
+  // inputs:  [A, B, C, D, ST, DF]   A=2^0 (LSB) .. D=2^3 (MSB)
+  // outputs: [a, b, c, d, e, f, g]
+  //
+  // STROBE (ST): HIGH = transparent (the latch follows the BCD inputs);
+  //   LOW = data latched, decoded segments hold. This is the OPPOSITE polarity
+  //   to the CD4543 LE (which is LOW=transparent), so the CD4056B gets its own
+  //   primitive instead of reusing _evaluateBcd7seg4543. (Datasheet page 1:
+  //   "data is transferred from input to output by placing a high voltage level
+  //   at the strobe input. A low voltage level at the strobe input latches the
+  //   data"; cf. the CD4054B truth table ST=1 -> follow, ST=0 -> hold.)
+  // DISPLAY FREQUENCY (DF): each output = decoded_segment XOR DF.
+  //   DF=0 -> a selected segment drives HIGH; DF=1 -> a selected segment drives
+  //   LOW. A square wave on DF gives the AC drive a real LCD needs (selected
+  //   segment 180 deg out of phase with DF, non-selected in phase). 74Sim
+  //   resolves nets to DC levels and has only idealized clocks (A3), so DF is
+  //   modeled as a STATIC invert (same simplification as the CD4543 Ph pin and
+  //   the CD4055B DF above; see issues.md). In DC-display use (DF tied LOW/HIGH)
+  //   this is exact.
+  // Full decode of all 16 input codes: 0-9, then L, H, P, A, -, blank for codes
+  //   10-15 -- unlike the CD4511/CD4543, which blank codes 10-15.
+  //
+  // Source: Texas Instruments (data sheet acquired from Harris Semiconductor),
+  //   "CD4054B, CD4055B, CD4056B Types — CMOS Liquid-Crystal Display Drivers,
+  //   High-Voltage Types (20-Volt Rating)", SCHS048C (Revised October 2003).
+  //   [Online]. Available: https://www.ti.com/lit/ds/symlink/cd4056b.pdf.
+  //   Verified: "CD4056B Terminal Assignment" (92CS-24487) + "Fig.3 CD4056B
+  //   functional diagram" + "TRUTH TABLE FOR CD4055B and CD4056B", read as
+  //   300-dpi PDF page images. NOT cloned from the CD4543 (issues.md C2).
+  const [aN, bN, cN, dN, stN, dfN] = gate.inputs;
+  const state = this._getSeqState(comp, gate.outputs[0], { bcd: 0 });
+
+  const st = this._readPinBit(comp, stN);
+  if (st === 1) {
+    state.bcd = this._readPinBit(comp, aN) | (this._readPinBit(comp, bN) << 1) |
+      (this._readPinBit(comp, cN) << 2) | (this._readPinBit(comp, dN) << 3);
+  }
+
+  const df = this._readPinBit(comp, dfN);
+
+  // BCD -> 7 segment, active-HIGH reference (DF=LOW). Verified vs SCHS048C truth
+  // table.            a  b  c  d  e  f  g
+  const T = [
+    /*  0       */ [1, 1, 1, 1, 1, 1, 0],
+    /*  1       */ [0, 1, 1, 0, 0, 0, 0],
+    /*  2       */ [1, 1, 0, 1, 1, 0, 1],
+    /*  3       */ [1, 1, 1, 1, 0, 0, 1],
+    /*  4       */ [0, 1, 1, 0, 0, 1, 1],
+    /*  5       */ [1, 0, 1, 1, 0, 1, 1],
+    /*  6       */ [1, 0, 1, 1, 1, 1, 1],
+    /*  7       */ [1, 1, 1, 0, 0, 0, 0],
+    /*  8       */ [1, 1, 1, 1, 1, 1, 1],
+    /*  9       */ [1, 1, 1, 1, 0, 1, 1],
+    /* 10 "L"   */ [0, 0, 0, 1, 1, 1, 0],
+    /* 11 "H"   */ [0, 1, 1, 0, 1, 1, 1],
+    /* 12 "P"   */ [1, 1, 0, 0, 1, 1, 1],
+    /* 13 "A"   */ [1, 1, 1, 0, 1, 1, 1],
+    /* 14 "-"   */ [0, 0, 0, 0, 0, 0, 1],
+    /* 15 blank */ [0, 0, 0, 0, 0, 0, 0],
+  ];
+  let segs = T[state.bcd & 0x0f].slice();
+
+  // DF=HIGH inverts every segment output (static model of the phase drive).
+  if (df === 1) segs = segs.map(b => b ^ 1);
+
+  return this._drivePinBits(comp, gate.outputs, segs);
+}
+
 function _evaluateDec4to16LatchHi_fn(comp, gate) {
   // CD74x4514: 4-to-16 decoder with input latches, active HIGH outputs.
   // inputs: [A, B, C, D, LE, ENn]
   // outputs: [Y0..Y15]
   // LE=LOW: address transparent. LE=HIGH: address latched.
   // ENn=LOW: enabled (selected output HIGH). ENn=HIGH: all outputs LOW.
+  //
+  // gate.strobeActiveHigh: the original CMOS CD4514B uses a STROBE pin whose
+  // transparent/latched sense is the OPPOSITE of the default LE here — STROBE
+  // HIGH is transparent, and data is held on the STROBE 1->0 transition (per
+  // the TI CD4514B SCHS074A datasheet). Set this flag so the latch-input bit is
+  // inverted before the transparent-when-0 logic below applies. Default (flag
+  // absent) preserves the existing 74x4514/74x4515 active-LOW-transparent LE.
   const state = this._getSeqState(comp, gate.outputs[0], { addr: 0 });
   const bits = this._readGateInputs(comp, gate.inputs);
-  const le = bits[4];
+  const le = gate.strobeActiveHigh ? (bits[4] ? 0 : 1) : bits[4];
   const en = bits[5];
 
   if (le === 0) {
@@ -9548,9 +13953,16 @@ function _evaluateDec4to16LatchLo_fn(comp, gate) {
   // outputs: [Y0n..Y15n]
   // LE=LOW: address transparent. LE=HIGH: address latched.
   // ENn=LOW: enabled (selected output LOW, others HIGH). ENn=HIGH: all outputs HIGH.
+  //
+  // gate.strobeActiveHigh: the original CMOS CD4515B uses a STROBE pin whose
+  // transparent/latched sense is the OPPOSITE of the default LE here — STROBE
+  // HIGH is transparent, and data is held on the STROBE 1->0 transition (per
+  // the TI CD4515B SCHS074A datasheet). Set this flag so the latch-input bit is
+  // inverted before the transparent-when-0 logic below applies. Default (flag
+  // absent) preserves the existing 74x4515 active-LOW-transparent LE.
   const state = this._getSeqState(comp, gate.outputs[0], { addr: 0 });
   const bits = this._readGateInputs(comp, gate.inputs);
-  const le = bits[4];
+  const le = gate.strobeActiveHigh ? (bits[4] ? 0 : 1) : bits[4];
   const en = bits[5];
 
   if (le === 0) {
@@ -9573,8 +13985,15 @@ function _evaluateDec4to16LatchLo_fn(comp, gate) {
 function _evaluateCounterBinUpdownCd_fn(comp, gate) {
   // CD74x4516: Presettable synchronous 4 bit binary up/down counter.
   // Same interface as 4510 but binary (0-15).
+  // gate.carryActiveLow: true models the real CD4516B/CD4510B (and the
+  //   74HC4516) in which CARRY IN and CARRY OUT are ACTIVE LOW — counting is
+  //   enabled while CARRY IN is LOW, and CARRY OUT pulses LOW at terminal
+  //   count. Defaults false (the legacy active-HIGH behavior of the existing
+  //   74x4516 entry — left unchanged so that part is undisturbed).
   const [cpN, udN, peN, ciN, mrN, p0N, p1N, p2N, p3N] = gate.inputs;
   const [q0, q1, q2, q3, coN] = gate.outputs;
+  const carryActiveLow = !!gate.carryActiveLow;
+  const carryAsserted = (raw) => carryActiveLow ? (raw === 0) : (raw === 1);
   const state = this._getSeqState(comp, q0, { count: 0, prevClk: 0 });
 
   const mr = this._readPinBit(comp, mrN);
@@ -9587,8 +14006,8 @@ function _evaluateCounterBinUpdownCd_fn(comp, gate) {
         (this._readPinBit(comp, p2N) << 2) | (this._readPinBit(comp, p3N) << 3);
     } else {
       const clk = this._readPinBit(comp, cpN);
-      const ci = this._readPinBit(comp, ciN);
-      if (state.prevClk === 0 && clk === 1 && ci === 1) {
+      const ciEn = carryAsserted(this._readPinBit(comp, ciN));
+      if (state.prevClk === 0 && clk === 1 && ciEn) {
         const ud = this._readPinBit(comp, udN);
         if (ud === 1) state.count = (state.count + 1) & 0xF;
         else state.count = (state.count - 1 + 16) & 0xF;
@@ -9597,10 +14016,10 @@ function _evaluateCounterBinUpdownCd_fn(comp, gate) {
     }
   }
 
-  const ci = this._readPinBit(comp, ciN);
+  const ciEn = carryAsserted(this._readPinBit(comp, ciN));
   const ud = this._readPinBit(comp, udN);
   const terminal = (ud === 1) ? 15 : 0;
-  const co = (ci === 1 && state.count === terminal) ? 0 : 1;
+  const co = (ciEn && state.count === terminal) ? 0 : 1;
   let changed = this._drivePinBits(comp, [q0, q1, q2, q3],
     [state.count & 1, (state.count >> 1) & 1, (state.count >> 2) & 1, (state.count >> 3) & 1]);
   if (this._drivePinBit(comp, coN, co)) changed = true;
@@ -9667,8 +14086,12 @@ function _evaluateCounterGatedBin_fn(comp, gate) {
 }
 
 chipEvaluators._evaluateCounterBcdUpdownCd = _evaluateCounterBcdUpdownCd_fn;
+chipEvaluators._evaluateBcdDivNDown4522    = _evaluateBcdDivNDown4522_fn;
 chipEvaluators._evaluateBcd7seg4511        = _evaluateBcd7seg4511_fn;
 chipEvaluators._evaluateBcd7seg4543        = _evaluateBcd7seg4543_fn;
+chipEvaluators._evaluateBcd7seg4543hc      = _evaluateBcd7seg4543hc_fn;
+chipEvaluators._evaluateBcd7seg4055        = _evaluateBcd7seg4055_fn;
+chipEvaluators._evaluateBcd7seg4056        = _evaluateBcd7seg4056_fn;
 chipEvaluators._evaluateDec4to16LatchHi    = _evaluateDec4to16LatchHi_fn;
 chipEvaluators._evaluateDec4to16LatchLo    = _evaluateDec4to16LatchLo_fn;
 chipEvaluators._evaluateCounterBinUpdownCd = _evaluateCounterBinUpdownCd_fn;
@@ -9679,7 +14102,7 @@ chipEvaluators._evaluateCounterGatedBin    = _evaluateCounterGatedBin_fn;
 // ── NEW GATE TYPE IMPLEMENTATIONS ─────────────────────────────────────────
 
 function _evaluateDFFActHi_fn(comp, gate) {
-  // CD4013 D flip-flop with active HIGH set and reset
+  // CD4013 D flip flop with active HIGH set and reset
   const [dN, clkN, setN, rstN] = gate.inputs;
   const [qN, qnN] = gate.outputs;
   const state = this._getSeqState(comp, qN, { q: 0, prevClk: 0 });
@@ -9736,6 +14159,114 @@ function _evaluateShiftReg8BitPisoCd_fn(comp, gate) {
   return this._drivePinBits(comp, [q5N, q6N, q7N], [q5, q6, q7]);
 }
 
+function _evaluateShiftReg8BitPisoCd4021_fn(comp, gate) {
+  // CD4021 8-stage ASYNCHRONOUS-load PISO shift register.
+  // Differs from the CD4014 (SHIFT_REG_8BIT_PISO_CD) on two points verified
+  // against the TI/Harris CD4014B/CD4021B datasheet (SCHS024C, Fig. 2 logic
+  // diagram + Terminal Diagram, read as PDF page images — see issues.md C4):
+  //   1. Parallel entry is ASYNCHRONOUS: while PARALLEL/SERIAL CONTROL (PS) is
+  //      HIGH the parallel data is jammed straight into the register, the
+  //      internal stage clock is "forced", and no CLOCK edge is needed.
+  //   2. The brought-out stages are Q6/Q7/Q8 (the last stage Q8 is the main
+  //      serial output) — bits 5/6/7 — NOT the 5/6/7 stages of the CD4014.
+  // inputs:  [CLK, PS, SER, P1, P2, P3, P4, P5, P6, P7, P8]
+  // outputs: [Q6, Q7, Q8]
+  const [clkN, psN, serN, p1N, p2N, p3N, p4N, p5N, p6N, p7N, p8N] = gate.inputs;
+  const [q6N, q7N, q8N] = gate.outputs;
+  const state = this._getSeqState(comp, q8N, { reg: 0, prevClk: 0 });
+
+  const clk = this._readPinBit(comp, clkN);
+  const ps = this._readPinBit(comp, psN);
+  if (ps === 1) {
+    // Asynchronous jam-load: continuously track the parallel inputs while
+    // PARALLEL/SERIAL CONTROL is HIGH, independent of the clock line.
+    const p1 = this._readPinBit(comp, p1N);
+    const p2 = this._readPinBit(comp, p2N);
+    const p3 = this._readPinBit(comp, p3N);
+    const p4 = this._readPinBit(comp, p4N);
+    const p5 = this._readPinBit(comp, p5N);
+    const p6 = this._readPinBit(comp, p6N);
+    const p7 = this._readPinBit(comp, p7N);
+    const p8 = this._readPinBit(comp, p8N);
+    state.reg = (p8 << 7) | (p7 << 6) | (p6 << 5) | (p5 << 4) | (p4 << 3) | (p3 << 2) | (p2 << 1) | p1;
+  } else if (state.prevClk === 0 && clk === 1) {
+    // Serial shift on the rising clock edge (PS LOW). New serial bit enters
+    // stage 1; stage 8 (Q8) shifts out first.
+    const ser = this._readPinBit(comp, serN);
+    state.reg = ((state.reg << 1) | ser) & 0xFF;
+  }
+  state.prevClk = clk;
+
+  const q6 = (state.reg >> 5) & 1;
+  const q7 = (state.reg >> 6) & 1;
+  const q8 = (state.reg >> 7) & 1;
+  return this._drivePinBits(comp, [q6N, q7N, q8N], [q6, q7, q8]);
+}
+
+function _evaluateShiftRegMuxLatch835_fn(comp, gate) {
+  // 74F835 — 8-bit shift register with 2:1 mux-in, latched "B" inputs, serial out.
+  // The datasheet describes the part purely as a composite of three standard FAST
+  // building blocks (no separate truth table is printed): "Combines the 'F373, two
+  // 'F157s, and the 'F166 functions in one package." Polarities below are taken
+  // from those constituent parts:
+  //   • 'F373 octal transparent latch  → all eight "B" inputs pass through a latch
+  //     gated by LE: LE HIGH = transparent (latch follows DnB), LE LOW = hold.
+  //   • two 'F157 octal 2:1 muxes       → per bit, SEL LOW selects DnA, SEL HIGH
+  //     selects the latched DnB (the 'F157 select: LOW→A, HIGH→B; non-inverting).
+  //   • 'F166 8-bit PISO shift register → on the rising CP edge, PE LOW (active-LOW
+  //     Parallel Enable) synchronously loads the eight muxed bits into stages 0..7;
+  //     PE HIGH shifts toward stage 7, the serial input SER entering stage 0. Stage
+  //     7 is the only brought-out stage and is the serial output Q7.
+  // Source verified against Philips Components-Signetics, "8-Bit Shift Register with
+  // 2:1 Mux-In, Latched 'B' Inputs, and Serial Out" (74F835), doc 853-0615, Jan 8
+  // 1990 (1990 Signetics FAST Supplement, p.174-176), read as rendered PDF page
+  // images — see header comment on the chip entry. The latch is level-sensitive and
+  // updates asynchronously, independent of CP.
+  // inputs:  [PEn, CP, SEL, LE, SER,
+  //           D0A,D1A,D2A,D3A,D4A,D5A,D6A,D7A,
+  //           D0B,D1B,D2B,D3B,D4B,D5B,D6B,D7B]
+  // outputs: [Q7]
+  const [peN, cpN, selN, leN, serN,
+         d0aN, d1aN, d2aN, d3aN, d4aN, d5aN, d6aN, d7aN,
+         d0bN, d1bN, d2bN, d3bN, d4bN, d5bN, d6bN, d7bN] = gate.inputs;
+  const [q7N] = gate.outputs;
+  const state = this._getSeqState(comp, q7N, { reg: 0, bLatch: 0, prevClk: 0 });
+
+  const aPins = [d0aN, d1aN, d2aN, d3aN, d4aN, d5aN, d6aN, d7aN];
+  const bPins = [d0bN, d1bN, d2bN, d3bN, d4bN, d5bN, d6bN, d7bN];
+
+  // 'F373 transparent latch on the B bank — level-sensitive, async to CP.
+  const le = this._readPinBit(comp, leN);
+  if (le === 1) {
+    let b = 0;
+    for (let n = 0; n < 8; n++) b |= this._readPinBit(comp, bPins[n]) << n;
+    state.bLatch = b;
+  }
+
+  // 'F157 octal 2:1 mux: SEL LOW → A bank, SEL HIGH → latched B bank.
+  const sel = this._readPinBit(comp, selN);
+  let mux = 0;
+  for (let n = 0; n < 8; n++) {
+    const bit = sel === 1 ? (state.bLatch >> n) & 1 : this._readPinBit(comp, aPins[n]);
+    mux |= bit << n;
+  }
+
+  // 'F166 register: rising CP edge loads (PE LOW) or shifts (PE HIGH).
+  const cp = this._readPinBit(comp, cpN);
+  if (state.prevClk === 0 && cp === 1) {
+    const pe = this._readPinBit(comp, peN);
+    if (pe === 0) {
+      state.reg = mux & 0xFF;
+    } else {
+      const ser = this._readPinBit(comp, serN);
+      state.reg = ((state.reg << 1) | ser) & 0xFF; // stage0←SER, stage_n←stage_(n-1)
+    }
+  }
+  state.prevClk = cp;
+
+  return this._drivePinBits(comp, [q7N], [(state.reg >> 7) & 1]);
+}
+
 function _evaluateShiftReg4BitSipo_fn(comp, gate) {
   // CD4015 4-stage SIPO shift register
   // inputs: [D, CLK, RST]
@@ -9765,18 +14296,414 @@ function _evaluateShiftReg4BitSipo_fn(comp, gate) {
   ]);
 }
 
-function _evaluateBilateralSwitch_fn(comp, gate) {
-  // CD4016 bilateral analog switch
-  // inputs: [X, EN], output: Y (singular)
-  const [xN, enN] = gate.inputs;
-  const yN = gate.output;
-  const en = this._readPinBit(comp, enN);
-  if (en === 1) {
-    const x = this._readPinBit(comp, xN);
-    return this._drivePinBit(comp, yN, x);
-  } else {
-    return this._drivePinHighZ(comp, yN);
+function _evaluateShiftReg18Bit4006_fn(comp, gate) {
+  // CD4006B — 18-stage static shift register, four independent sections.
+  // Verified against SYC Semiconductores' second-source CD4006 datasheet,
+  // "CMOS 18-Stage Static Register" (TI/RCA-format part), Pinout (CD4006BM
+  // TOP VIEW) + Functional Diagram, read as a rendered PDF page image
+  // (issues.md C4 — the TI cd4006b.pdf URL 404s, and text summaries of these
+  // scans hallucinate). The functional diagram shows:
+  //   • Section 1: D1 → 4-stage → D1+4 (pin 13). Its output also feeds an
+  //     extra LATCH → D1+4' (pin 2), the same data delayed one HALF clock
+  //     cycle to ease cascading when clock edges are slow.
+  //   • Section 2: D2 → 4-stage (tap = D2+4, pin 11) → +1 stage → D2+5 (pin 12).
+  //   • Section 3: D3 → 4-stage → D3+4 (pin 10).
+  //   • Section 4: D4 → 4-stage (tap = D4+4, pin 8) → +1 stage → D4+5 (pin 9).
+  // A single common CLOCK drives every stage. "Data are shifted to the next
+  // stages on NEGATIVE-going transitions of the clock" — i.e. the FALLING
+  // edge (datasheet Description). The D1+4' latch is the opposite phase, so it
+  // updates on the RISING edge (half a cycle after D1+4 changes).
+  // inputs:  [D1, D2, D3, D4, CLOCK]
+  // outputs: [D1+4, D1+4', D2+4, D2+5, D3+4, D4+4, D4+5]
+  const [d1N, d2N, d3N, d4N, clkN] = gate.inputs;
+  const [o1_4N, o1_4pN, o2_4N, o2_5N, o3_4N, o4_4N, o4_5N] = gate.outputs;
+  const state = this._getSeqState(comp, o1_4N, {
+    s1: [0, 0, 0, 0],        // section 1: 4 stages
+    s2: [0, 0, 0, 0, 0],     // section 2: 5 stages (tap at index 3)
+    s3: [0, 0, 0, 0],        // section 3: 4 stages
+    s4: [0, 0, 0, 0, 0],     // section 4: 5 stages (tap at index 3)
+    latch: 0,                // D1+4' half-cycle latch
+    prevClk: 0,
+  });
+
+  const clk = this._readPinBit(comp, clkN);
+  // shiftIn: arr[0] takes the new bit, everything else moves one stage along.
+  const shiftIn = (arr, din) => { for (let i = arr.length - 1; i > 0; i--) arr[i] = arr[i - 1]; arr[0] = din; };
+
+  if (state.prevClk === 1 && clk === 0) {
+    // Falling edge: every section advances one stage.
+    shiftIn(state.s1, this._readPinBit(comp, d1N));
+    shiftIn(state.s2, this._readPinBit(comp, d2N));
+    shiftIn(state.s3, this._readPinBit(comp, d3N));
+    shiftIn(state.s4, this._readPinBit(comp, d4N));
+  } else if (state.prevClk === 0 && clk === 1) {
+    // Rising edge: the D1+4' latch captures the current D1+4 (= s1 last stage),
+    // delaying it one half clock cycle relative to D1+4 itself.
+    state.latch = state.s1[3];
   }
+  state.prevClk = clk;
+
+  return this._drivePinBits(comp,
+    [o1_4N, o1_4pN, o2_4N, o2_5N, o3_4N, o4_4N, o4_5N],
+    [state.s1[3], state.latch, state.s2[3], state.s2[4], state.s3[3], state.s4[3], state.s4[4]]);
+}
+
+function _evaluateShiftReg64Bit4031_fn(comp, gate) {
+  // CD4031B — CMOS 64-stage static shift register (serial-in / serial-out), with
+  // a 2:1 input data-source select, a half-stage delayed data output, and a
+  // delayed clock output for cascading.
+  // Source: Texas Instruments (data sheet acquired from Harris Semiconductor),
+  //   "CD4031B Types — CMOS 64-Stage Static Shift Register", SCHS036B
+  //   (Revised July 2003). [Online]. Available:
+  //   https://www.ti.com/lit/ds/symlink/cd4031b.pdf. Verified: FUNCTIONAL DIAGRAM,
+  //   INPUT CONTROL CIRCUIT TRUTH TABLE, TYPICAL STAGE TRUTH TABLE, and the
+  //   Q'/Terminal-5 truth table, read as 400-dpi rendered PDF page images
+  //   (issues.md C4), not cloned from a sibling (issues.md C2).
+  // inputs:  [DI1, DI2, CLK, MODE]
+  // outputs: [Q, QBAR, QP, CLD]
+  //   Datasheet facts encoded:
+  //   • 64 D-type master/slave stages. The bit selected for stage 1 shifts one
+  //     stage toward the output on each POSITIVE (rising) CL edge — TYPICAL STAGE
+  //     TRUTH TABLE ("Data → Data+1" on the rising edge). Fully static: a stopped
+  //     clock holds the pattern.
+  //   • MODE CONTROL selects the bit entering stage 1 (INPUT CONTROL CIRCUIT
+  //     TRUTH TABLE): MODE=0 → DI1 (DATA IN 1, pin 15); MODE=1 → DI2 (DATA IN 2 /
+  //     RECIRCULATE, pin 1).
+  //   • Q (pin 6) = stage-64 output (Data+64); QBAR (pin 7) = its complement.
+  //   • QP = Q' (pin 5) from the extra "1/2 stage", a D-type master-only flip-flop
+  //     that captures the stage-64 value on the NEGATIVE (falling) CL edge — the
+  //     Q'/Terminal-5 truth table shows "Data+64 → Data+64½" on the falling edge —
+  //     so Q' is the Q data delayed by half a clock (for slow-edge cascading).
+  //   • CLD = CL_D (pin 9), the delayed clock output used to cascade packages with
+  //     reduced clock drive. In 74Sim's zero-delay engine (issues.md A1) it carries
+  //     the same logic level as CL IN, which is the correct functional model — the
+  //     real part adds only propagation delay, not a logic change.
+  const [di1N, di2N, clkN, modeN] = gate.inputs;
+  const [qN, qbarN, qpN, cldN] = gate.outputs;
+  const state = this._getSeqState(comp, qN, {
+    stages: new Array(64).fill(0),  // stages[0] = stage 1 (input end) … stages[63] = stage 64 (Q)
+    half: 0,                        // 1/2 stage output (Q')
+    prevClk: 0,
+  });
+  const clk = this._readPinBit(comp, clkN);
+  if (state.prevClk === 0 && clk === 1) {
+    // Rising edge: shift one stage toward the output; stage 1 takes the
+    // MODE-selected input bit.
+    const din = this._readPinBit(comp, modeN) === 1
+      ? this._readPinBit(comp, di2N)
+      : this._readPinBit(comp, di1N);
+    for (let i = 63; i > 0; i--) state.stages[i] = state.stages[i - 1];
+    state.stages[0] = din;
+  } else if (state.prevClk === 1 && clk === 0) {
+    // Falling edge: the 1/2 stage captures the stage-64 output (Q' = Data+64½).
+    state.half = state.stages[63];
+  }
+  state.prevClk = clk;
+  const q = state.stages[63];
+  return this._drivePinBits(comp, [qN, qbarN, qpN, cldN],
+    [q, q ^ 1, state.half, clk]);
+}
+
+function _evaluateBilateralSwitch_fn(comp, gate) {
+  // CD4016 / CD4066 / 4316 family quad bilateral analog switch channel.
+  // gate.inputs:  [X, Y, EN]
+  // gate.outputs: [X, Y]  (legacy; ignored — channel is purely passive now)
+  // EN=1: stamp a fixed on-resistance between X and Y so the MNA solver
+  //   passes any analog voltage between them (no rail snapping).
+  // EN=0: clear the coupling so the two terminals are electrically isolated.
+  const [xN, yN, enN] = gate.inputs;
+  const en = this._readPinBit(comp, enN);
+  const gateKey = 'bsw:' + xN + '|' + yN;
+  const R_ON = (comp.chipDef && comp.chipDef.onResistance) || 200;
+  if (en === 1) {
+    return this._coupleChipPins(comp, gateKey, xN, yN, R_ON);
+  }
+  return this._uncoupleChipPins(comp, gateKey);
+}
+
+function _evaluateAnalogMux8_fn(comp, gate) {
+  // CD4051 8:1 analog mux/demux. Common = Z (override with gate.common,
+  // e.g. 'COM' on the 74x4851); channels = Y0..Y7.
+  // INH=1 disconnects all channels; otherwise the channel indexed by
+  // (C<<2)|(B<<1)|A is coupled to the common node through onResistance.
+  const [aN, bN, cN, inhN] = gate.inputs;
+  const common = gate.common || 'Z';
+  const inh = this._readPinBit(comp, inhN);
+  const sel = (this._readPinBit(comp, cN) << 2)
+            | (this._readPinBit(comp, bN) << 1)
+            |  this._readPinBit(comp, aN);
+  const R_ON = (comp.chipDef && comp.chipDef.onResistance) || 125;
+  const yPins = ['Y0','Y1','Y2','Y3','Y4','Y5','Y6','Y7'];
+  let changed = false;
+  for (let i = 0; i < 8; i++) {
+    const key = 'mux8:' + yPins[i];
+    if (inh === 0 && i === sel) {
+      if (this._coupleChipPins(comp, key, common, yPins[i], R_ON)) changed = true;
+    } else {
+      if (this._uncoupleChipPins(comp, key)) changed = true;
+    }
+  }
+  return changed;
+}
+
+function _evaluateAnalogMux16_fn(comp, gate) {
+  // CD4067 16:1 analog mux/demux. Common = Z; channels = Y0..Y15.
+  // INH=1 disconnects all channels; otherwise the channel indexed by
+  // (D<<3)|(C<<2)|(B<<1)|A is coupled to Z through onResistance.
+  const [aN, bN, cN, dN, inhN] = gate.inputs;
+  const inh = this._readPinBit(comp, inhN);
+  const sel = (this._readPinBit(comp, dN) << 3)
+            | (this._readPinBit(comp, cN) << 2)
+            | (this._readPinBit(comp, bN) << 1)
+            |  this._readPinBit(comp, aN);
+  const R_ON = (comp.chipDef && comp.chipDef.onResistance) || 125;
+  let changed = false;
+  for (let i = 0; i < 16; i++) {
+    const yName = 'Y' + i;
+    const key = 'mux16:' + yName;
+    if (inh === 0 && i === sel) {
+      if (this._coupleChipPins(comp, key, 'Z', yName, R_ON)) changed = true;
+    } else {
+      if (this._uncoupleChipPins(comp, key)) changed = true;
+    }
+  }
+  return changed;
+}
+
+function _evaluateAnalogMuxDual4_fn(comp, gate) {
+  // CD4052 dual 4:1 analog mux/demux. Two sections share A/B/INH:
+  //   X section: XZ ↔ Xn   Y section: YZ ↔ Yn  for n = (B<<1)|A.
+  const [aN, bN, inhN] = gate.inputs;
+  const inh = this._readPinBit(comp, inhN);
+  const sel = (this._readPinBit(comp, bN) << 1) | this._readPinBit(comp, aN);
+  const R_ON = (comp.chipDef && comp.chipDef.onResistance) || 125;
+  const xPins = ['X0','X1','X2','X3'];
+  const yPins = ['Y0','Y1','Y2','Y3'];
+  let changed = false;
+  for (let i = 0; i < 4; i++) {
+    const xKey = 'muxX:' + xPins[i];
+    const yKey = 'muxY:' + yPins[i];
+    if (inh === 0 && i === sel) {
+      if (this._coupleChipPins(comp, xKey, 'XZ', xPins[i], R_ON)) changed = true;
+      if (this._coupleChipPins(comp, yKey, 'YZ', yPins[i], R_ON)) changed = true;
+    } else {
+      if (this._uncoupleChipPins(comp, xKey)) changed = true;
+      if (this._uncoupleChipPins(comp, yKey)) changed = true;
+    }
+  }
+  return changed;
+}
+
+function _evaluateAnalogMuxDual4_4852_fn(comp, gate) {
+  // SN74HC4852 dual 4:1 analog mux/demux. Functionally a 4052 (same decode),
+  // but the two sections use this part's own pin labels:
+  //   section 1: 1Z ↔ 1Y(n)   section 2: 2Z ↔ 2Y(n)  for n = (B<<1)|A.
+  // INH=1 opens every channel in both sections (both commons float).
+  // Source: TI SN74HC4852, SCLS573A, Table 4-1 "Function Table" —
+  //   INH/B/A select 1Yn,2Yn together; A=LSB, B=MSB; INH=H -> None.
+  const [aN, bN, inhN] = gate.inputs;
+  const inh = this._readPinBit(comp, inhN);
+  const sel = (this._readPinBit(comp, bN) << 1) | this._readPinBit(comp, aN);
+  const R_ON = (comp.chipDef && comp.chipDef.onResistance) || 125;
+  let changed = false;
+  for (let i = 0; i < 4; i++) {
+    const ch1 = '1Y' + i;
+    const ch2 = '2Y' + i;
+    const k1 = 'mux4852-1:' + ch1;
+    const k2 = 'mux4852-2:' + ch2;
+    if (inh === 0 && i === sel) {
+      if (this._coupleChipPins(comp, k1, '1Z', ch1, R_ON)) changed = true;
+      if (this._coupleChipPins(comp, k2, '2Z', ch2, R_ON)) changed = true;
+    } else {
+      if (this._uncoupleChipPins(comp, k1)) changed = true;
+      if (this._uncoupleChipPins(comp, k2)) changed = true;
+    }
+  }
+  return changed;
+}
+
+function _evaluateAnalogMuxDual8_fn(comp, gate) {
+  // CD4097 differential (dual) 8:1 analog mux/demux. Two independent
+  // 8-channel sections share a common 3-bit address A/B/C and one INHIBIT:
+  //   X section: XZ ↔ Xn   Y section: YZ ↔ Yn  for n = (C<<2)|(B<<1)|A.
+  // INH=1 opens all channels in both sections (both commons float).
+  // Source: TI CD4067B/CD4097B (SCHS052D) Table 4-2 "CD4097 TRUTH TABLE" —
+  //   A=LSB, C=MSB select 0X/0Y..7X/7Y; inh=1 -> None.
+  const [aN, bN, cN, inhN] = gate.inputs;
+  const inh = this._readPinBit(comp, inhN);
+  const sel = (this._readPinBit(comp, cN) << 2)
+            | (this._readPinBit(comp, bN) << 1)
+            |  this._readPinBit(comp, aN);
+  const R_ON = (comp.chipDef && comp.chipDef.onResistance) || 125;
+  let changed = false;
+  for (let i = 0; i < 8; i++) {
+    const xName = 'X' + i;
+    const yName = 'Y' + i;
+    const xKey = 'mux8X:' + xName;
+    const yKey = 'mux8Y:' + yName;
+    if (inh === 0 && i === sel) {
+      if (this._coupleChipPins(comp, xKey, 'XZ', xName, R_ON)) changed = true;
+      if (this._coupleChipPins(comp, yKey, 'YZ', yName, R_ON)) changed = true;
+    } else {
+      if (this._uncoupleChipPins(comp, xKey)) changed = true;
+      if (this._uncoupleChipPins(comp, yKey)) changed = true;
+    }
+  }
+  return changed;
+}
+
+function _evaluateAnalogMuxTriple2_fn(comp, gate) {
+  // CD4053 triple 2:1 analog mux (three independent SPDT switches).
+  // Section A: ZA ↔ Y0A (A=0) or Y1A (A=1)
+  // Section B: ZB ↔ Y0B (B=0) or Y1B (B=1)
+  // Section C: ZC ↔ Y0C (C=0) or Y1C (C=1)
+  // INH=1 opens all three sections.
+  const [aN, bN, cN, inhN] = gate.inputs;
+  const inh = this._readPinBit(comp, inhN);
+  const R_ON = (comp.chipDef && comp.chipDef.onResistance) || 125;
+  const sections = [
+    { sel: aN, common: 'ZA', y0: 'Y0A', y1: 'Y1A', tag: 'A' },
+    { sel: bN, common: 'ZB', y0: 'Y0B', y1: 'Y1B', tag: 'B' },
+    { sel: cN, common: 'ZC', y0: 'Y0C', y1: 'Y1C', tag: 'C' },
+  ];
+  let changed = false;
+  for (const s of sections) {
+    const bit = this._readPinBit(comp, s.sel);
+    const k0 = 'mux3:' + s.tag + ':0';
+    const k1 = 'mux3:' + s.tag + ':1';
+    if (inh !== 0) {
+      if (this._uncoupleChipPins(comp, k0)) changed = true;
+      if (this._uncoupleChipPins(comp, k1)) changed = true;
+      continue;
+    }
+    if (bit === 0) {
+      if (this._coupleChipPins(comp, k0, s.common, s.y0, R_ON)) changed = true;
+      if (this._uncoupleChipPins(comp, k1)) changed = true;
+    } else {
+      if (this._uncoupleChipPins(comp, k0)) changed = true;
+      if (this._coupleChipPins(comp, k1, s.common, s.y1, R_ON)) changed = true;
+    }
+  }
+  return changed;
+}
+
+function _evaluateAnalogMux8Latch_fn(comp, gate) {
+  // CD74HC4351 8-channel analog mux/demux WITH an address latch.
+  // Channels A0..A7 are bidirectional transmission gates; the addressed one is
+  // resistively coupled to the common COM. Select = (S2<<2)|(S1<<1)|S0, captured
+  // by a level-sensitive latch: LE HIGH = transparent (follows S0..S2), LE LOW =
+  // hold last address. Two enables: device is enabled only when E1 is LOW AND
+  // E2 is HIGH; otherwise every switch is open ("None"). See the per-chip
+  // citation in js/chips/chips59.js for the datasheet reference.
+  // inputs: [S0, S1, S2, LE, E1, E2]
+  const [s0N, s1N, s2N, leN, e1N, e2N] = gate.inputs;
+  if (!comp.state) comp.state = { sel: 0 };
+  const le = this._readPinBit(comp, leN);
+  if (le === 1) {
+    comp.state.sel = (this._readPinBit(comp, s2N) << 2)
+                   | (this._readPinBit(comp, s1N) << 1)
+                   |  this._readPinBit(comp, s0N);
+  }
+  const enabled = (this._readPinBit(comp, e1N) === 0)
+               && (this._readPinBit(comp, e2N) === 1);
+  const sel = comp.state.sel;
+  const R_ON = (comp.chipDef && comp.chipDef.onResistance) || 125;
+  let changed = false;
+  for (let i = 0; i < 8; i++) {
+    const ch = 'A' + i;
+    const key = 'mux8L:' + ch;
+    if (enabled && i === sel) {
+      if (this._coupleChipPins(comp, key, 'COM', ch, R_ON)) changed = true;
+    } else {
+      if (this._uncoupleChipPins(comp, key)) changed = true;
+    }
+  }
+  return changed;
+}
+
+function _evaluateAnalogMuxDual4Latch_fn(comp, gate) {
+  // CD74HC4352 DUAL 4-channel analog mux/demux WITH a shared address latch.
+  // Two independent transmission-gate banks, A and B, switch together off one
+  // 2-bit select: the addressed A channel is coupled to common ACOM and the
+  // matching B channel to common BCOM. Select = (S1<<1)|S0, captured by a
+  // level-sensitive latch: LE HIGH = transparent (follows S0/S1), LE LOW = hold
+  // the last address. Two enables: device is enabled only when E1 is LOW AND E2
+  // is HIGH; otherwise every switch is open ("None"). See the per-chip citation
+  // in js/chips/chips59.js for the datasheet reference. Mirrors the single-bank
+  // ANALOG_MUX_8_LATCH (CD74HC4351) on the same die.
+  // inputs: [S0, S1, LE, E1, E2]
+  const [s0N, s1N, leN, e1N, e2N] = gate.inputs;
+  if (!comp.state) comp.state = { sel: 0 };
+  const le = this._readPinBit(comp, leN);
+  if (le === 1) {
+    comp.state.sel = (this._readPinBit(comp, s1N) << 1)
+                   |  this._readPinBit(comp, s0N);
+  }
+  const enabled = (this._readPinBit(comp, e1N) === 0)
+               && (this._readPinBit(comp, e2N) === 1);
+  const sel = comp.state.sel;
+  const R_ON = (comp.chipDef && comp.chipDef.onResistance) || 100;
+  let changed = false;
+  for (let i = 0; i < 4; i++) {
+    const aCh = 'A' + i;
+    const bCh = 'B' + i;
+    const aKey = 'mux4LA:' + aCh;
+    const bKey = 'mux4LB:' + bCh;
+    if (enabled && i === sel) {
+      if (this._coupleChipPins(comp, aKey, 'ACOM', aCh, R_ON)) changed = true;
+      if (this._coupleChipPins(comp, bKey, 'BCOM', bCh, R_ON)) changed = true;
+    } else {
+      if (this._uncoupleChipPins(comp, aKey)) changed = true;
+      if (this._uncoupleChipPins(comp, bKey)) changed = true;
+    }
+  }
+  return changed;
+}
+
+function _evaluateAnalogMuxTriple2Latch_fn(comp, gate) {
+  // CD74HC4353 TRIPLE 2-channel analog mux/demux WITH an address latch.
+  // Three independent SPDT transmission-gate sections X, Y, Z, each switched by
+  // its own select bit (A->X, B->Y, C->Z). Within a section the common node is
+  // resistively coupled to channel 0 (select LOW) or channel 1 (select HIGH).
+  // The three selects are captured together by one level-sensitive latch: LE
+  // HIGH = transparent (follows A/B/C), LE LOW = hold the last address. Two
+  // enables: the device is enabled only when E1 is LOW AND E2 is HIGH;
+  // otherwise every switch is open ("None"). Functionally a 4053 with an
+  // address latch and dual enable. See the per-chip citation in
+  // js/chips/chips59.js for the datasheet reference.
+  // inputs: [A, B, C, LE, E1, E2]
+  const [aN, bN, cN, leN, e1N, e2N] = gate.inputs;
+  if (!comp.state) comp.state = { a: 0, b: 0, c: 0 };
+  const le = this._readPinBit(comp, leN);
+  if (le === 1) {
+    comp.state.a = this._readPinBit(comp, aN);
+    comp.state.b = this._readPinBit(comp, bN);
+    comp.state.c = this._readPinBit(comp, cN);
+  }
+  const enabled = (this._readPinBit(comp, e1N) === 0)
+               && (this._readPinBit(comp, e2N) === 1);
+  const R_ON = (comp.chipDef && comp.chipDef.onResistance) || 80;
+  const sections = [
+    { bit: comp.state.a, common: 'XCOM', ch0: 'X0', ch1: 'X1', tag: 'X' },
+    { bit: comp.state.b, common: 'YCOM', ch0: 'Y0', ch1: 'Y1', tag: 'Y' },
+    { bit: comp.state.c, common: 'ZCOM', ch0: 'Z0', ch1: 'Z1', tag: 'Z' },
+  ];
+  let changed = false;
+  for (const s of sections) {
+    const k0 = 'mux2L:' + s.tag + ':0';
+    const k1 = 'mux2L:' + s.tag + ':1';
+    if (enabled && s.bit === 0) {
+      if (this._coupleChipPins(comp, k0, s.common, s.ch0, R_ON)) changed = true;
+      if (this._uncoupleChipPins(comp, k1)) changed = true;
+    } else if (enabled && s.bit === 1) {
+      if (this._uncoupleChipPins(comp, k0)) changed = true;
+      if (this._coupleChipPins(comp, k1, s.common, s.ch1, R_ON)) changed = true;
+    } else {
+      if (this._uncoupleChipPins(comp, k0)) changed = true;
+      if (this._uncoupleChipPins(comp, k1)) changed = true;
+    }
+  }
+  return changed;
 }
 
 function _evaluateCounterDecadeDecoded_fn(comp, gate) {
@@ -9804,6 +14731,39 @@ function _evaluateCounterDecadeDecoded_fn(comp, gate) {
   const outputs = [q0N, q1N, q2N, q3N, q4N, q5N, q6N, q7N, q8N, q9N];
   const vals = outputs.map((_, i) => (i === cnt ? 1 : 0));
   const co = cnt <= 4 ? 1 : 0;
+  vals.push(co);
+
+  return this._drivePinBits(comp, [...outputs, coN], vals);
+}
+
+function _evaluateCounterOctalDecoded_fn(comp, gate) {
+  // CD4022 octal (divide-by-8) Johnson counter with 8 decoded outputs.
+  // Octal sibling of COUNTER_DECADE_DECODED (CD4017): mod-8 instead of mod-10,
+  // 8 decoded outputs Q0..Q7, and CARRY OUT HIGH for the first half of the
+  // cycle (counts 0-3) so it can ripple-clock a following stage every 8 pulses.
+  // inputs:  [CLK, MR, CI]
+  // outputs: [Q0, Q1, Q2, Q3, Q4, Q5, Q6, Q7, CO]
+  const [clkN, mrN, ciN] = gate.inputs;
+  const [q0N, q1N, q2N, q3N, q4N, q5N, q6N, q7N, coN] = gate.outputs;
+  const state = this._getSeqState(comp, q0N, { count: 0, prevClk: 0 });
+
+  const mr = this._readPinBit(comp, mrN);
+  if (mr === 1) {
+    state.count = 0;
+    state.prevClk = this._readPinBit(comp, clkN);
+  } else {
+    const ci = this._readPinBit(comp, ciN);
+    const clk = this._readPinBit(comp, clkN);
+    if (ci === 0 && state.prevClk === 0 && clk === 1) {
+      state.count = (state.count + 1) % 8;
+    }
+    state.prevClk = clk;
+  }
+
+  const cnt = state.count;
+  const outputs = [q0N, q1N, q2N, q3N, q4N, q5N, q6N, q7N];
+  const vals = outputs.map((_, i) => (i === cnt ? 1 : 0));
+  const co = cnt <= 3 ? 1 : 0;
   vals.push(co);
 
   return this._drivePinBits(comp, [...outputs, coN], vals);
@@ -9847,12 +14807,587 @@ function _evaluateCounterBinOsc14_fn(comp, gate) {
   );
 }
 
+function _evaluateCounterBinOsc14Clko_fn(comp, gate) {
+  // 74HC4060 / SN74HC4060: 14-stage binary ripple counter with oscillator pins.
+  // Same counter core as COUNTER_BIN_OSC_14, but this part brings out the two
+  // oscillator buffer outputs CLKO and CLKOn as real driven pins.
+  // Source: Texas Instruments, "SN54HC4060, SN74HC4060 14-Stage Asynchronous
+  //   Binary Counters and Oscillators", SCLS161D (1982, rev. 2003), p.1-2.
+  //   Function table: CLKI high-to-low transition advances the counter; a HIGH
+  //   on CLR clears all stages AND parks the oscillator (CLKO HIGH, CLKOn LOW).
+  // inputs:  [CLKI, CLR]
+  // outputs: [Q4,Q5,Q6,Q7,Q8,Q9,Q10,Q12,Q13,Q14, CLKO, CLKOn]
+  const [clkN, clrN] = gate.inputs;
+  const q = gate.outputs;
+  const clkoN = q[10], clkonN = q[11];
+  const state = this._getSeqState(comp, q[0], { count: 0, prevClk: 0 });
+
+  const clr = this._readPinBit(comp, clrN);
+  const clk = this._readPinBit(comp, clkN);
+  if (clr === 1) {
+    state.count = 0;
+    state.prevClk = clk;
+  } else if (state.prevClk === 1 && clk === 0) {
+    // advance on the falling (high-to-low) edge of CLKI
+    state.count = (state.count + 1) & 0x3FFF;
+    state.prevClk = clk;
+  } else {
+    state.prevClk = clk;
+  }
+
+  const cnt = state.count;
+  let changed = this._drivePinBits(comp,
+    [q[0], q[1], q[2], q[3], q[4], q[5], q[6], q[7], q[8], q[9]],
+    [
+      (cnt >> 3) & 1,   // Q4
+      (cnt >> 4) & 1,   // Q5
+      (cnt >> 5) & 1,   // Q6
+      (cnt >> 6) & 1,   // Q7
+      (cnt >> 7) & 1,   // Q8
+      (cnt >> 8) & 1,   // Q9
+      (cnt >> 9) & 1,   // Q10
+      (cnt >> 11) & 1,  // Q12 (stage 11 not brought out)
+      (cnt >> 12) & 1,  // Q13
+      (cnt >> 13) & 1,  // Q14
+    ]
+  );
+
+  // Oscillator buffer pins. While CLR is HIGH the oscillator is disabled and
+  // the datasheet pins CLKO HIGH / CLKOn LOW. Otherwise they present
+  // complementary buffered copies of the CLKI node so an RC/crystal loop (or
+  // an observer) sees an oscillator-style waveform.
+  const clko  = clr === 1 ? 1 : (clk === 0 ? 1 : 0);
+  const clkon = clr === 1 ? 0 : (clk === 0 ? 0 : 1);
+  if (this._drivePinBits(comp, [clkoN, clkonN], [clko, clkon])) changed = true;
+  return changed;
+}
+
+function _evaluateCounterDisplay4Digit928_fn(comp, gate) {
+  // MM74C925/926/928 family — 4-digit counter + multiplexed 7-segment display
+  // driver. One primitive covers the whole family; the per-chip differences are
+  // passed in on the gate:
+  //   • gate.maxCount  — terminal count before wrap-to-0 (default 1999 = '928).
+  //                      9999 for the full 4-decade '925/'926.
+  //   • inputs[3] (DS) — optional DISPLAY SELECT. Present on '926/'928 (HIGH = show
+  //                      live counter, LOW = show latch). Absent on the '925, whose
+  //                      multiplexer reads the latch directly — so a missing DS pin
+  //                      reads as "show latch" (= DS LOW), which with LE HIGH still
+  //                      shows the live count. See the '925 logic diagram, p.2.
+  //   • outputs[11] (CO) — optional CARRY-OUT/overflow. Present on '926/'928, absent
+  //                      on the '925. Driven only when wired.
+  //
+  // Source: Fairchild Semiconductor, "MM74C925 / MM74C926 / MM74C927 / MM74C928
+  //   4-Digit Counters with Multiplexed 7-Segment Output Drivers", DS005919
+  //   (Oct 1987, rev. Jan 1999). [Online]. Available:
+  //   https://pdf.datasheet.live/3e8c607b/fairchildsemi.com/74C925.pdf (TI/Fairchild
+  //   reprint; the jameco.com 44599.pdf mirror is Cloudflare-gated). Verified as
+  //   300-dpi PDF page images (issues.md C4 — the text summarizer hallucinates
+  //   these pinouts):
+  //     • '928 18-pin DIP terminal assignment, "Connection Diagrams" p.2 and the
+  //       MM74C928 logic diagram p.3 — d1 e2 f3 g4, LATCH ENABLE 5,
+  //       DISPLAY SELECT 6, A_OUT 7, B_OUT 8, GND 9, C_OUT 10, D_OUT 11,
+  //       CLOCK 12, RESET 13, CARRY-OUT 14, a15 b16 c17, VCC 18. (The pre-existing
+  //       stub had this as a 16-pin part with no DISPLAY SELECT or CARRY-OUT —
+  //       a C2-class hand-entered pinout error, corrected here.)
+  //     • '925 16-pin DIP terminal assignment, "Connection Diagrams" p.2 (left)
+  //       and MM74C925 logic diagram p.2 — d1 e2 f3 g4, LATCH ENABLE 5, A_OUT 6,
+  //       B_OUT 7, GND 8, C_OUT 9, D_OUT 10, CLOCK 11, RESET 12, a13 b14 c15,
+  //       VCC 16. NO display-select and NO carry-out pin (those are '926/'928
+  //       additions). The '925 is a full 4-decade counter (0000–9999).
+  //     • Functional Description p.2: Reset = asynchronous, active HIGH; Clock =
+  //       negative-edge sensitive; Latch Enable HIGH = flow-through, LOW = latch;
+  //       Display Select HIGH = show counter, LOW = show latch.
+  //     • General Description p.1: the '928 is the '926 except the most-significant
+  //       digit divides by 2 (so the display reads 0000–1999, "3½ digits") and the
+  //       carry-out is an OVERFLOW indicator that goes HIGH at terminal count and
+  //       returns LOW only on reset.
+  //
+  // inputs:  [CLK, RST, LE, (DS)]
+  // outputs: [a, b, c, d, e, f, g, D1, D2, D3, D4, (CO)]
+  //   D1=A_OUT (units) … D4=D_OUT (thousands). CO = overflow (optional).
+  const maxCount = (typeof gate.maxCount === 'number') ? gate.maxCount : 1999;
+  const [clkN, rstN, leN, dsN] = gate.inputs;
+  const segN = gate.outputs.slice(0, 7);                 // a..g
+  const digitN = gate.outputs.slice(7, 11);              // D1..D4
+  const coN = gate.outputs[11];                          // optional
+  const state = this._getSeqState(comp, gate.outputs[0],
+    { count: 0, latch: 0, overflow: 0, prevClk: 0 });
+
+  const rst = this._readPinBit(comp, rstN);
+  const clk = this._readPinBit(comp, clkN);
+  const le  = this._readPinBit(comp, leN);
+  const ds  = (dsN !== undefined) ? this._readPinBit(comp, dsN) : 0;
+
+  if (rst === 1) {
+    // Asynchronous, active-HIGH reset: counter and overflow flag both cleared.
+    state.count = 0;
+    state.overflow = 0;
+    state.prevClk = clk;
+  } else {
+    // Negative-edge (HIGH→LOW) clock advances the counter. Rolling over past the
+    // terminal count latches the overflow flag (datasheet: carry-out HIGH at the
+    // top count, stays HIGH until reset).
+    if (state.prevClk === 1 && clk === 0) {
+      const next = state.count + 1;
+      if (next > maxCount) { state.count = 0; state.overflow = 1; }
+      else state.count = next;
+    }
+    state.prevClk = clk;
+  }
+
+  // Output latch: transparent while LE HIGH (flow-through), holds while LE LOW.
+  if (le === 1) state.latch = state.count;
+  // Display Select: HIGH shows the live counter, LOW shows the latched value.
+  const shown = ds === 1 ? state.count : state.latch;
+
+  // Split into the four displayed BCD digits: D1=units … D4=thousands (0/1).
+  const digitVal = [
+    shown % 10,
+    Math.floor(shown / 10) % 10,
+    Math.floor(shown / 100) % 10,
+    Math.floor(shown / 1000) % 10,
+  ];
+
+  // Time-multiplexed scan. The real part drives one digit at a time from an
+  // internal ~1 kHz oscillator that has NO external pin, so there is nothing to
+  // clock it from in the netlist. We stand in for that oscillator with the
+  // simulator's own per-evaluate tick (simVersion, incremented once at the end of
+  // each evaluate()): one digit position is driven per pass and the four cycle in
+  // turn, exactly as a real multiplexed display does when stepped by the
+  // time-domain loop. (Approximation: the scan only advances while the circuit is
+  // being stepped — e.g. a CLOCK component drives CLK — not between manual edits.)
+  const pos = this.simVersion % 4;
+  const digitSel = [0, 0, 0, 0];
+  digitSel[pos] = 1;                                       // active digit = HIGH (sourcing)
+  const segBits = BCD_7SEG_CC_TABLE[digitVal[pos]].slice(4, 11); // active-HIGH segments
+
+  let changed = false;
+  if (this._drivePinBits(comp, segN, segBits)) changed = true;
+  if (this._drivePinBits(comp, digitN, digitSel)) changed = true;
+  if (coN !== undefined && this._drivePinBit(comp, coN, state.overflow)) changed = true;
+  return changed;
+}
+
+function _evaluateCounterDisplay4Digit926_fn(comp, gate) {
+  // MM74C926 — 4-digit decade counter + multiplexed 7-segment display driver.
+  //
+  // Source: Fairchild Semiconductor, "MM74C925 / MM74C926 / MM74C927 / MM74C928
+  //   4-Digit Counters with Multiplexed 7-Segment Output Drivers", DS005919
+  //   (Oct 1987, rev. Jan 1999). [Online]. Available:
+  //   https://media.digikey.com/pdf/Data%20Sheets/Fairchild%20PDFs/MM74C925-28.pdf
+  //   Verified as 300-dpi PDF page images (issues.md C4 — the text summarizer
+  //   hallucinates these pinouts):
+  //     • 18-pin DIP terminal assignment, "Connection Diagrams" p.2 (the
+  //       MM74C926/927/928 share one diagram) and the MM74C926 logic diagram
+  //       p.3 — d1 e2 f3 g4, LATCH ENABLE 5, DISPLAY SELECT 6, A_OUT 7,
+  //       B_OUT 8, GND 9, C_OUT 10, D_OUT 11, CLOCK 12, RESET 13, CARRY-OUT 14,
+  //       a15 b16 c17, VCC 18. (The pre-existing stub had this as a 16-pin part
+  //       with no DISPLAY SELECT or CARRY-OUT — a C2-class hand-entered pinout
+  //       error, corrected here. The 16-pin layout actually belongs to the
+  //       MM74C925, the no-display-select/no-carry sibling.)
+  //     • Functional Description p.2: Reset = asynchronous, active HIGH; Clock =
+  //       negative-edge sensitive; Latch Enable HIGH = flow-through, LOW = latch;
+  //       Display Select HIGH = show counter, LOW = show latch. (Identical to the
+  //       '928 — the parts differ only in the counter modulus and carry-out.)
+  //     • General Description p.1: the '926 is the '925 plus a display select and
+  //       a carry-out for cascading. All four digits divide by 10, so the display
+  //       reads 0000–9999. The carry-out "goes HIGH at 6000, goes back LOW at
+  //       0000" — i.e. CO = (count >= 6000); it is a level, NOT the latched
+  //       overflow flag of the '928 (which is HIGH at 2000 until reset).
+  //
+  // inputs:  [CLK, RST, LE, DS]
+  // outputs: [a, b, c, d, e, f, g, D1, D2, D3, D4, CO]
+  //   D1=A_OUT (units) … D4=D_OUT (thousands). CO = cascade carry (count>=6000).
+  const [clkN, rstN, leN, dsN] = gate.inputs;
+  const segN = gate.outputs.slice(0, 7);                 // a..g
+  const digitN = gate.outputs.slice(7, 11);              // D1..D4
+  const coN = gate.outputs[11];
+  const state = this._getSeqState(comp, gate.outputs[0],
+    { count: 0, latch: 0, prevClk: 0 });
+
+  const rst = this._readPinBit(comp, rstN);
+  const clk = this._readPinBit(comp, clkN);
+  const le  = this._readPinBit(comp, leN);
+  const ds  = this._readPinBit(comp, dsN);
+
+  if (rst === 1) {
+    // Asynchronous, active-HIGH reset: counter cleared.
+    state.count = 0;
+    state.prevClk = clk;
+  } else {
+    // Negative-edge (HIGH→LOW) clock advances the 0–9999 decade counter,
+    // wrapping back to 0 after 9999.
+    if (state.prevClk === 1 && clk === 0) {
+      state.count = (state.count + 1) % 10000;
+    }
+    state.prevClk = clk;
+  }
+
+  // Output latch: transparent while LE HIGH (flow-through), holds while LE LOW.
+  if (le === 1) state.latch = state.count;
+  // Display Select: HIGH shows the live counter, LOW shows the latched value.
+  const shown = ds === 1 ? state.count : state.latch;
+
+  // Split into the four displayed BCD digits: D1=units … D4=thousands.
+  const digitVal = [
+    shown % 10,
+    Math.floor(shown / 10) % 10,
+    Math.floor(shown / 100) % 10,
+    Math.floor(shown / 1000) % 10,
+  ];
+
+  // Carry-out for cascading: HIGH while the count is 6000–9999, LOW otherwise.
+  // The rollover from 9999→0000 therefore presents a HIGH→LOW edge that a
+  // cascaded '926's negative-edge clock advances on. (Datasheet level, not the
+  // '928's latched overflow.) It tracks the live counter, not the display latch.
+  const carry = state.count >= 6000 ? 1 : 0;
+
+  // Time-multiplexed scan. The real part drives one digit at a time from an
+  // internal ~1 kHz oscillator that has NO external pin, so there is nothing to
+  // clock it from in the netlist. We stand in for that oscillator with the
+  // simulator's own per-evaluate tick (simVersion, incremented once at the end
+  // of each evaluate()): one digit position is driven per pass and the four
+  // cycle in turn, exactly as a real multiplexed display does when stepped by
+  // the time-domain loop. (Approximation: the scan only advances while the
+  // circuit is being stepped — e.g. a CLOCK component drives CLK — not between
+  // manual edits.)
+  const pos = this.simVersion % 4;
+  const digitSel = [0, 0, 0, 0];
+  digitSel[pos] = 1;                                       // active digit = HIGH (sourcing)
+  const segBits = BCD_7SEG_CC_TABLE[digitVal[pos]].slice(4, 11); // active-HIGH segments
+
+  let changed = false;
+  if (this._drivePinBits(comp, segN, segBits)) changed = true;
+  if (this._drivePinBits(comp, digitN, digitSel)) changed = true;
+  if (this._drivePinBit(comp, coN, carry)) changed = true;
+  return changed;
+}
+
+function _evaluateCounterDisplay4Digit927_fn(comp, gate) {
+  // MM74C927 — 4-digit timer counter + multiplexed 7-segment display driver.
+  // Identical to the '926 except the second-most-significant digit divides by 6
+  // instead of 10, so with a 10 Hz clock the display reads minutes : seconds .
+  // tenths (max 9:59.9).
+  //
+  // Source: National Semiconductor (Fairchild), "MM74C925 / MM74C926 / MM74C927
+  //   / MM74C928 4-Digit Counters with Multiplexed 7-Segment Output Drivers",
+  //   DS005919 (March 1988, rev. 1995). [Online]. Available:
+  //   https://archive.org/details/manuallib-id-2710717 (file 2710717.pdf).
+  //   Verified as 300-dpi PDF page images (issues.md C4 — the text summarizer
+  //   hallucinates these pinouts):
+  //     • 18-pin DIP terminal assignment, "Connection Diagrams" p.1 (the
+  //       MM74C926/927/928 share one diagram) and the MM74C927 Logic and Block
+  //       Diagram p.4 — d1 e2 f3 g4, LATCH ENABLE 5, DISPLAY SELECT 6, A_OUT 7,
+  //       B_OUT 8, GND 9, C_OUT 10, D_OUT 11, CLOCK 12, RESET 13, CARRY-OUT 14,
+  //       a15 b16 c17, VCC 18. (The pre-existing stub had this as a 16-pin part
+  //       with no DISPLAY SELECT or CARRY-OUT — a C2-class hand-entered pinout
+  //       error, corrected here. The 16-pin layout actually belongs to the
+  //       MM74C925, the no-display-select/no-carry sibling.)
+  //     • Logic and Block Diagram p.4: the four decade dividers, MSD→LSD, are
+  //       ÷10, ÷6, ÷10, ÷10 — i.e. the second-most-significant digit (C_OUT/D3)
+  //       is the ÷6 one. Mixed-radix count of 6000 states (0–5999 internally).
+  //     • Functional Description p.3: Reset = asynchronous, active HIGH; Clock =
+  //       negative-edge sensitive; Latch Enable HIGH = flow-through, LOW = latch;
+  //       Display Select HIGH = show counter, LOW = show latch. (Identical to the
+  //       '926 — the parts differ only in the counter modulus and carry-out.)
+  //     • General Description p.1 + Carry-Out Waveforms p.6: CARRY-OUT goes HIGH
+  //       at display 6:00.0 and back LOW at the 9:59.9→0:00.0 rollover — a
+  //       repeating cascade level (CO = minutes digit >= 6, i.e. count >= 3600),
+  //       NOT the '928's latched overflow. The HIGH→LOW edge at rollover advances
+  //       a cascaded '927's negative-edge clock.
+  //
+  // inputs:  [CLK, RST, LE, DS]
+  // outputs: [a, b, c, d, e, f, g, D1, D2, D3, D4, CO]
+  //   D1=A_OUT (tenths) … D4=D_OUT (minutes). CO = cascade carry.
+  const [clkN, rstN, leN, dsN] = gate.inputs;
+  const segN = gate.outputs.slice(0, 7);                 // a..g
+  const digitN = gate.outputs.slice(7, 11);              // D1..D4
+  const coN = gate.outputs[11];
+  const state = this._getSeqState(comp, gate.outputs[0],
+    { count: 0, latch: 0, prevClk: 0 });
+
+  const rst = this._readPinBit(comp, rstN);
+  const clk = this._readPinBit(comp, clkN);
+  const le  = this._readPinBit(comp, leN);
+  const ds  = this._readPinBit(comp, dsN);
+
+  if (rst === 1) {
+    // Asynchronous, active-HIGH reset: counter cleared.
+    state.count = 0;
+    state.prevClk = clk;
+  } else {
+    // Negative-edge (HIGH→LOW) clock advances the mixed-radix timer counter.
+    // The chain is units ÷10 → seconds-units ÷10 → seconds-tens ÷6 →
+    // minutes ÷10, which is a single linear counter of 6000 states wrapping
+    // back to 0 after 5999 (display 9:59.9 → 0:00.0).
+    if (state.prevClk === 1 && clk === 0) {
+      state.count = (state.count + 1) % 6000;
+    }
+    state.prevClk = clk;
+  }
+
+  // Output latch: transparent while LE HIGH (flow-through), holds while LE LOW.
+  if (le === 1) state.latch = state.count;
+  // Display Select: HIGH shows the live counter, LOW shows the latched value.
+  const shown = ds === 1 ? state.count : state.latch;
+
+  // Split into the four displayed digits. The seconds-tens digit (D3) is the
+  // ÷6 stage, so it spans 0–5 and weighs 100; minutes (D4) weighs 600.
+  const digitVal = [
+    shown % 10,
+    Math.floor(shown / 10) % 10,
+    Math.floor(shown / 100) % 6,
+    Math.floor(shown / 600) % 10,
+  ];
+
+  // Carry-out for cascading: HIGH once the minutes digit reaches 6 (count
+  // 3600, display 6:00.0) and LOW otherwise, so the 5999→0 rollover presents a
+  // HIGH→LOW edge. Tracks the live counter, not the display latch.
+  const carry = state.count >= 3600 ? 1 : 0;
+
+  // Time-multiplexed scan. The real part drives one digit at a time from an
+  // internal ~1 kHz oscillator that has NO external pin, so there is nothing to
+  // clock it from in the netlist. We stand in for that oscillator with the
+  // simulator's own per-evaluate tick (simVersion, incremented once at the end
+  // of each evaluate()): one digit position is driven per pass and the four
+  // cycle in turn, exactly as a real multiplexed display does when stepped by
+  // the time-domain loop. (Approximation: the scan only advances while the
+  // circuit is being stepped — e.g. a CLOCK component drives CLK — not between
+  // manual edits.)
+  const pos = this.simVersion % 4;
+  const digitSel = [0, 0, 0, 0];
+  digitSel[pos] = 1;                                       // active digit = HIGH (sourcing)
+  const segBits = BCD_7SEG_CC_TABLE[digitVal[pos]].slice(4, 11); // active-HIGH segments
+
+  let changed = false;
+  if (this._drivePinBits(comp, segN, segBits)) changed = true;
+  if (this._drivePinBits(comp, digitN, digitSel)) changed = true;
+  if (this._drivePinBit(comp, coN, carry)) changed = true;
+  return changed;
+}
+
+chipEvaluators._evaluateCounterDisplay4Digit928 = _evaluateCounterDisplay4Digit928_fn;
+chipEvaluators._evaluateCounterDisplay4Digit926 = _evaluateCounterDisplay4Digit926_fn;
+chipEvaluators._evaluateCounterDisplay4Digit927 = _evaluateCounterDisplay4Digit927_fn;
 chipEvaluators._evaluateDFFActHi              = _evaluateDFFActHi_fn;
 chipEvaluators._evaluateShiftReg8BitPisoCd    = _evaluateShiftReg8BitPisoCd_fn;
+chipEvaluators._evaluateShiftReg8BitPisoCd4021 = _evaluateShiftReg8BitPisoCd4021_fn;
+chipEvaluators._evaluateShiftRegMuxLatch835    = _evaluateShiftRegMuxLatch835_fn;
+chipEvaluators._evaluateShiftReg18Bit4006     = _evaluateShiftReg18Bit4006_fn;
+chipEvaluators._evaluateShiftReg64Bit4031     = _evaluateShiftReg64Bit4031_fn;
 chipEvaluators._evaluateShiftReg4BitSipo      = _evaluateShiftReg4BitSipo_fn;
 chipEvaluators._evaluateBilateralSwitch       = _evaluateBilateralSwitch_fn;
+chipEvaluators._evaluateAnalogMux8             = _evaluateAnalogMux8_fn;
+chipEvaluators._evaluateAnalogMux16            = _evaluateAnalogMux16_fn;
+chipEvaluators._evaluateAnalogMuxDual4         = _evaluateAnalogMuxDual4_fn;
+chipEvaluators._evaluateAnalogMuxDual4_4852    = _evaluateAnalogMuxDual4_4852_fn;
+chipEvaluators._evaluateAnalogMuxDual8         = _evaluateAnalogMuxDual8_fn;
+chipEvaluators._evaluateAnalogMuxTriple2       = _evaluateAnalogMuxTriple2_fn;
+chipEvaluators._evaluateAnalogMux8Latch        = _evaluateAnalogMux8Latch_fn;
+chipEvaluators._evaluateAnalogMuxDual4Latch     = _evaluateAnalogMuxDual4Latch_fn;
+chipEvaluators._evaluateAnalogMuxTriple2Latch   = _evaluateAnalogMuxTriple2Latch_fn;
 chipEvaluators._evaluateCounterDecadeDecoded  = _evaluateCounterDecadeDecoded_fn;
+chipEvaluators._evaluateCounterOctalDecoded   = _evaluateCounterOctalDecoded_fn;
 chipEvaluators._evaluateCounterBinOsc14       = _evaluateCounterBinOsc14_fn;
+chipEvaluators._evaluateCounterBinOsc14Clko   = _evaluateCounterBinOsc14Clko_fn;
+
+function _evaluateKeyEncoderScan_fn(comp, gate) {
+  // Matrix key-scan encoder — MM74C922 (16-key, 4 cols x 4 rows) and the
+  // 5-row MM74C923 share this logic, differing only in row count / output bits.
+  //
+  // Source: Fairchild Semiconductor, "MM74C922 / MM74C923 16-Key Encoder /
+  //   20-Key Encoder", DS006037 (Oct 1987, rev. Apr 2001).
+  //   [Online]. Available:
+  //   https://ece-classes.usc.edu/ee459/library/datasheets/MM74C922.pdf
+  //   Verified: DIP terminal assignment (p.1), Truth Tables (p.2), Block
+  //   Diagram (p.3) and Theory of Operation (p.8), read as 300-dpi PDF page
+  //   images (issues.md C4 — the text summarizer hallucinates these pinouts).
+  //
+  // How the real part works (Theory of Operation, p.8): an on-chip Schmitt
+  // oscillator clocks a 2-bit counter that drives a 2-to-4 decoder. The decoder
+  // outputs (COLUMN X1..X4) are open-drain and pull one column LOW at a time,
+  // 25% of the time each; the rest are off (high-impedance). ROW inputs Y1..Y4
+  // have on-chip pull-ups, so with no key down every row reads HIGH and the
+  // scan free-runs. When the key at (Yi, Xj) closes WHILE column Xj is the one
+  // being scanned LOW, row Yi is pulled LOW; that "key detect" stops the
+  // counter (freezing Xj LOW), locks out the other rows (2-key roll-over),
+  // latches the code, and after the debounce period raises DATA AVAILABLE.
+  //
+  // Encoding (Truth Table, p.2): code = colIndex(X-1) | (rowIndex(Y-1) << 2),
+  // i.e. A,B = the scanned column 0..3, C,D = the detected row 0..3 (E = bit 4
+  // for the 5-row '923). A is the LSB.
+  //
+  // Engine modeling notes (digital approximations of analog behavior):
+  //   * Columns are driven open-drain via _drivePinOC (scanned = sink LOW,
+  //     others = Hi-Z), exactly as the datasheet describes. Rows are read with
+  //     the on-chip pull-up modeled: a floating row net reads HIGH.
+  //   * The RC debounce period (set by the C_KBM capacitor on the KEYBOUNCE
+  //     MASK pin) and the RC oscillator (C_OSC) are not modeled — this is the
+  //     datasheet's "synchronous scan" mode where OSC is driven directly as a
+  //     clock and the cap is omitted. KBM is therefore not a logic input here.
+  //   * Detection is combinational each pass (rows settle through the external
+  //     matrix between passes); the counter only advances on an OSC rising edge
+  //     when the current column shows no key, so a held key stops the scan.
+  //
+  // inputs:  [R1..Rn, OSC, OEn]   (n = 4 for '922, 5 for '923)
+  // outputs: [C1, C2, C3, C4, DA, A, B, C, D(, E)]
+  const nCols = 4;
+  const nRows = gate.inputs.length - 2;
+  const rowNames = gate.inputs.slice(0, nRows);
+  const oscN = gate.inputs[nRows];
+  const oeN  = gate.inputs[nRows + 1];
+  const colNames  = gate.outputs.slice(0, nCols);
+  const daN       = gate.outputs[nCols];
+  const dataNames = gate.outputs.slice(nCols + 1);
+
+  const state = this._getSeqState(comp, daN,
+    { count: 0, prevOsc: 0, locked: false, lockRow: 0, code: 0, da: 0 });
+
+  // Read each row with the on-chip pull-up modeled: a floating/undriven row
+  // net (no key connecting it to the LOW scanned column) reads HIGH.
+  const vth = this._specFor(comp).VTH;
+  const rowLow = rowNames.map(name => {
+    const v = this._readPinVoltage(comp, name);
+    if (v === null) return false;      // floating → pull-up HIGH → not pressed
+    return v <= vth;                   // pulled LOW by a closed key → pressed
+  });
+
+  const osc = this._readPinBit(comp, oscN);
+  const rising = state.prevOsc === 0 && osc === 1;
+
+  if (state.locked) {
+    // Stay locked while the latched key is still held on its frozen column.
+    if (rowLow[state.lockRow]) {
+      state.da = 1;
+    } else {
+      state.locked = false;            // key released — DA drops, scan resumes
+      state.da = 0;
+    }
+  } else {
+    // Scanning. Look for a key on the column currently driven LOW (state.count).
+    // Lowest-index row wins (priority / row lock-out).
+    let pressed = -1;
+    for (let r = 0; r < nRows; r++) { if (rowLow[r]) { pressed = r; break; } }
+    if (pressed >= 0) {
+      state.locked  = true;
+      state.lockRow = pressed;
+      state.code    = state.count | (pressed << 2);
+      state.da      = 1;
+    } else {
+      state.da = 0;
+      if (rising) state.count = (state.count + 1) % nCols; // advance only if clear
+    }
+  }
+  state.prevOsc = osc;
+
+  // Drive columns open-drain: the scanned (or locked) column sinks LOW, the
+  // rest are high-impedance.
+  let changed = false;
+  for (let c = 0; c < nCols; c++) {
+    if (this._drivePinOC(comp, colNames[c], c === state.count ? 0 : 1)) changed = true;
+  }
+  // DATA AVAILABLE is a normal push-pull output (not 3-stated).
+  if (this._drivePinBit(comp, daN, state.da)) changed = true;
+  // Data outputs are 3-state: enabled only when OUTPUT ENABLE (OEn) is LOW.
+  if (this._readPinBit(comp, oeN) === 0) {
+    const bits = dataNames.map((_, k) => (state.code >> k) & 1);
+    if (this._drivePinBits(comp, dataNames, bits)) changed = true;
+  } else {
+    if (this._drivePinsHighZ(comp, dataNames)) changed = true;
+  }
+  return changed;
+}
+chipEvaluators._evaluateKeyEncoderScan        = _evaluateKeyEncoderScan_fn;
+
+function _evaluateCounterBinRipple_fn(comp, gate) {
+  // Generic N-stage binary ripple counter (CD4020 14-stage, CD4024 7-stage,
+  // CD4040 12-stage, etc.). Counts on the FALLING edge of the clock; the
+  // master-reset input is active HIGH and clears all stages asynchronously.
+  //   inputs:  [CLK, MR]
+  //   outputs: Qn pins named by stage number (Q1 = stage 1 = bit 0, Q14 = bit 13).
+  // Only the stages that are physically brought out need be listed; the wrap
+  // width is taken from the highest stage number present, so each part divides
+  // by 2^N correctly (the CD4020 wraps at 2^14 even though Q2/Q3 are internal).
+  //
+  // Optional overrides for parts whose output pins aren't named "Qn":
+  //   gate.bits   = [bitIndex,...] parallel to gate.outputs (explicit stage→bit)
+  //   gate.maxBit = wrap width is 2^(maxBit+1)
+  // Used by the CD4045B, whose single counter output is the 21st stage brought
+  // out under the datasheet name "y+d" (no digits to parse), so it passes
+  // bits:[20], maxBit:20 → divide-by-2^21. Default path is unchanged.
+  const [clkN, mrN] = gate.inputs;
+  const outNames = gate.outputs;
+  const bitIndex = gate.bits
+    ? gate.bits.slice()
+    : outNames.map(n => {
+        const stage = parseInt(String(n).replace(/[^0-9]/g, ''), 10) || 1;
+        return stage - 1;
+      });
+  const maxBit = (gate.maxBit !== undefined)
+    ? gate.maxBit
+    : bitIndex.reduce((m, b) => Math.max(m, b), 0);
+  const mask = (1 << (maxBit + 1)) - 1;        // wrap at 2^(highest stage)
+  const state = this._getSeqState(comp, outNames[0], { count: 0, prevClk: 0 });
+
+  const mr = this._readPinBit(comp, mrN);
+  if (mr === 1) {
+    state.count = 0;
+    state.prevClk = this._readPinBit(comp, clkN);
+  } else {
+    const clk = this._readPinBit(comp, clkN);
+    if (state.prevClk === 1 && clk === 0) {
+      state.count = (state.count + 1) & mask;
+    }
+    state.prevClk = clk;
+  }
+
+  const cnt = state.count;
+  return this._drivePinBits(comp, outNames, bitIndex.map(b => (cnt >> b) & 1));
+}
+chipEvaluators._evaluateCounterBinRipple      = _evaluateCounterBinRipple_fn;
+
+function _evaluateCounterBcdDual4518_fn(comp, gate) {
+  // CD4518 dual BCD up-counter (the CD4520 binary version can reuse this via
+  // gate.mod = 16). Two identical, independent synchronous up-counter sections.
+  // Each section has a D-type CLOCK and ENABLE input that let it advance on
+  // EITHER edge, per the datasheet truth table (TI SCHS076D):
+  //   - the rising (L->H) edge of CLOCK while ENABLE is HIGH, or
+  //   - the falling (H->L) edge of ENABLE while CLOCK is LOW.
+  // All other CLOCK/ENABLE transitions hold the count. RESET is active HIGH and
+  // asynchronously clears that section to zero. Carry within a section is
+  // synchronous, so the four stages present a clean BCD (mod-10) count.
+  //   inputs:  [CLOCK_A, ENABLE_A, RESET_A,  CLOCK_B, ENABLE_B, RESET_B]
+  //   outputs: [Q1A,Q2A,Q3A,Q4A,  Q1B,Q2B,Q3B,Q4B]   (Q1 = LSB / weight 1)
+  // gate.mod selects the modulus (10 = BCD/CD4518, 16 = binary/CD4520); default 10.
+  const mod = gate.mod || 10;
+  const state = this._getSeqState(comp, gate.outputs[0],
+    { cnt: [0, 0], prevClk: [0, 0], prevEn: [0, 0] });
+  let changed = false;
+  for (let s = 0; s < 2; s++) {
+    const clk   = this._readPinBit(comp, gate.inputs[s * 3]);
+    const en    = this._readPinBit(comp, gate.inputs[s * 3 + 1]);
+    const reset = this._readPinBit(comp, gate.inputs[s * 3 + 2]);
+    if (reset === 1) {
+      state.cnt[s] = 0;
+    } else {
+      const clockEdge  = (state.prevClk[s] === 0 && clk === 1 && en === 1);
+      const enableEdge = (state.prevEn[s]  === 1 && en  === 0 && clk === 0);
+      if (clockEdge || enableEdge) {
+        state.cnt[s] = (state.cnt[s] + 1) % mod;
+      }
+    }
+    state.prevClk[s] = clk;
+    state.prevEn[s]  = en;
+    const cnt = state.cnt[s];
+    const base = s * 4;
+    if (this._drivePinBit(comp, gate.outputs[base],     (cnt >> 0) & 1)) changed = true;
+    if (this._drivePinBit(comp, gate.outputs[base + 1], (cnt >> 1) & 1)) changed = true;
+    if (this._drivePinBit(comp, gate.outputs[base + 2], (cnt >> 2) & 1)) changed = true;
+    if (this._drivePinBit(comp, gate.outputs[base + 3], (cnt >> 3) & 1)) changed = true;
+  }
+  return changed;
+}
+chipEvaluators._evaluateCounterBcdDual4518    = _evaluateCounterBcdDual4518_fn;
 
 // ── Block 61: FET bus switch evaluator (74x6800, 74x6845) ─────────────────
 
@@ -9946,13 +15481,29 @@ function _evaluateBcdDown2Dec_fn(comp, gate) {
 // ── Block 65 74x40103 binary down counter evaluator ─────────────────────
 
 function _evaluateBinDown8Bit_fn(comp, gate) {
-  // CD74HC40103: Presettable synchronous 8 bit binary down counter.
-  // inputs:  [CLK, PEn, P0, P1, P2, P3, P4, P5, P6, P7, CEn, SPE]
-  // outputs: [TC]
-  // PEn=0 AND rising CLK → load 8 bit preset
-  // CEn=0 AND SPE=0 → counting enabled
-  // TC: active LOW, LOW when counter reaches 0
-  const [clkN, penN, p0N, p1N, p2N, p3N, p4N, p5N, p6N, p7N, cenN, speN] = gate.inputs;
+  // Presettable synchronous 8 bit binary down counter (CD40103B / CD74HC40103).
+  //
+  // Legacy 12-input contract (pre-existing 74x4103 / 74x40103 entries):
+  //   inputs:  [CLK, PEn, P0, P1, P2, P3, P4, P5, P6, P7, CEn, SPE]
+  //   PEn=0 AND rising CLK → synchronous load; CEn=0 AND SPE=0 → count enabled;
+  //   TC active LOW, LOW when count=0. Behaviour preserved exactly below.
+  //
+  // Extended 14-input contract (the verified CD40103B, js/chips/chips130.js):
+  //   inputs:  [..legacy 12.., APE, CLR]  (both active LOW, async)
+  //   Adds the two async controls the real silicon has and the legacy entries
+  //   lacked, plus the CI/CE-gated terminal count. Per the TI CD40102B/CD40103B
+  //   TRUTH TABLE (SCHS104B, Fig. 13), priority high→low:
+  //     CLR=0 → async clear to MAXIMUM count (255); APE=0 → async preset (load
+  //     JAM); SPE(=PEn)=0 → synchronous preset on the next rising CLK; else
+  //     CI/CE(=CEn)=0 → count down on rising CLK (0→255 wrap); else hold.
+  //   CO/ZD (TC) is LOW only when count=0 AND CI/CE=0 (so cascades chain on the
+  //   carry). The extra inputs are read defensively, so any def passing only the
+  //   12 legacy inputs keeps its original behaviour bit-for-bit.
+  const ins = gate.inputs;
+  const [clkN, penN, p0N, p1N, p2N, p3N, p4N, p5N, p6N, p7N, cenN, speN] = ins;
+  const apeN = ins[12];                 // optional async preset enable (active LOW)
+  const clrN = ins[13];                 // optional master clear-to-max (active LOW)
+  const fullModel = apeN !== undefined || clrN !== undefined;
   const [tcName] = gate.outputs;
   const state = this._getSeqState(comp, tcName + '_bin8dn', { count: 0, prevClk: 0 });
 
@@ -9960,31 +15511,126 @@ function _evaluateBinDown8Bit_fn(comp, gate) {
   const pen = this._readPinBit(comp, penN);
   const cen = this._readPinBit(comp, cenN);
   const spe = this._readPinBit(comp, speN);
+  const ape = apeN !== undefined ? this._readPinBit(comp, apeN) : 1;
+  const clr = clrN !== undefined ? this._readPinBit(comp, clrN) : 1;
+  const jam = () =>
+        this._readPinBit(comp, p0N)        | (this._readPinBit(comp, p1N) << 1)
+      | (this._readPinBit(comp, p2N) << 2)  | (this._readPinBit(comp, p3N) << 3)
+      | (this._readPinBit(comp, p4N) << 4)  | (this._readPinBit(comp, p5N) << 5)
+      | (this._readPinBit(comp, p6N) << 6)  | (this._readPinBit(comp, p7N) << 7);
 
-  if (state.prevClk === 0 && clk === 1) {
+  if (fullModel) {
+    // Asynchronous controls are level-sensitive: applied every solve, CLR wins.
+    if (clr === 0) {
+      state.count = 255;
+    } else if (ape === 0) {
+      state.count = jam();
+    } else if (state.prevClk === 0 && clk === 1) {
+      if (pen === 0) state.count = jam();                                        // sync preset
+      else if (cen === 0) state.count = state.count === 0 ? 255 : state.count - 1; // count down
+      // else: inhibit (hold)
+    }
+  } else if (state.prevClk === 0 && clk === 1) {
     if (pen === 0) {
-      // Synchronous preset load
-      state.count = this._readPinBit(comp, p0N)        | (this._readPinBit(comp, p1N) << 1)
-                  | (this._readPinBit(comp, p2N) << 2)  | (this._readPinBit(comp, p3N) << 3)
-                  | (this._readPinBit(comp, p4N) << 4)  | (this._readPinBit(comp, p5N) << 5)
-                  | (this._readPinBit(comp, p6N) << 6)  | (this._readPinBit(comp, p7N) << 7);
+      state.count = jam();
     } else if (cen === 0 && spe === 0) {
       state.count = state.count === 0 ? 255 : state.count - 1;
     }
   }
   state.prevClk = clk;
 
-  const tc = state.count === 0 ? 0 : 1; // active LOW: LOW when count=0
+  // Active LOW: LOW when count=0. Real CO/ZD is gated by CI/CE (full model only);
+  // the legacy entries kept the simpler ungated zero-detect.
+  const tc = fullModel ? (state.count === 0 && cen === 0 ? 0 : 1)
+                       : (state.count === 0 ? 0 : 1);
   return this._drivePinBit(comp, tcName, tc);
 }
 
 chipEvaluators._evaluateBcdDown2Dec = _evaluateBcdDown2Dec_fn;
 chipEvaluators._evaluateBinDown8Bit = _evaluateBinDown8Bit_fn;
 
+// ── Block 129 CD40102B 2-decade BCD presettable synchronous down counter ──
+// Faithful model of the real CD40102B, which differs from the older
+// `BCD_DOWN_2DEC` primitive (that one invented a 2nd TC/TCdec output and lacked
+// the asynchronous preset and the clear-to-max-count). Behaviour and the
+// control-input precedence below are taken directly from the datasheet:
+//   Source: Texas Instruments (Harris), "CD40102B, CD40103B Types - CMOS 8-Stage
+//     Presettable Synchronous Down Counters", SCHS095B (revised July 2003).
+//     [Online]. Available: https://www.ti.com/lit/ds/symlink/cd40102b.pdf.
+//     Verified: page-1 functional description, the page-5 TRUTH TABLE, and the
+//     page-6 (3-381) Fig.15 timing diagram, read as 300-dpi PDF page images
+//     (issues.md C4).
+function _evaluateBcdDown2DecCd40102_fn(comp, gate) {
+  // inputs:  [CLK, CLR, CICE, APE, SPE, J0, J1, J2, J3, J4, J5, J6, J7]
+  //   CLR  (pin 2)  active LOW: async clear to MAX count (99) - dominates all.
+  //   CICE (pin 3)  CARRY-IN/COUNTER ENABLE, active LOW: LOW enables counting.
+  //   APE  (pin 9)  ASYNC PRESET ENABLE, active LOW: async jam-load of J0..J7.
+  //   SPE  (pin 15) SYNC PRESET ENABLE, active LOW: jam-load on next rising CLK.
+  //   J0..J3 = LSD (units BCD, J3 MSB); J4..J7 = MSD (tens BCD, J7 MSB) [note 4].
+  // outputs: [COZD]
+  //   CO/ZD (pin 14) active LOW: LOW when count == 0 AND CICE is LOW; the count
+  //   sits at zero for exactly one clock period (it jumps to max on the next
+  //   rising edge), so CO/ZD is naturally a one-clock-wide LOW pulse.
+  // Truth-table precedence (CLR > APE > SPE > count): page-5 TRUTH TABLE.
+  const [clkN, clrN, ciceN, apeN, speN,
+         j0N, j1N, j2N, j3N, j4N, j5N, j6N, j7N] = gate.inputs;
+  const [cozdName] = gate.outputs;
+  const state = this._getSeqState(comp, cozdName + '_bcd2dec40102',
+    { units: 9, tens: 9, prevClk: 0 });
+
+  const clk  = this._readPinBit(comp, clkN);
+  const clr  = this._readPinBit(comp, clrN);
+  const cice = this._readPinBit(comp, ciceN);
+  const ape  = this._readPinBit(comp, apeN);
+  const spe  = this._readPinBit(comp, speN);
+
+  const readJamUnits = () =>
+      this._readPinBit(comp, j0N)        | (this._readPinBit(comp, j1N) << 1)
+    | (this._readPinBit(comp, j2N) << 2) | (this._readPinBit(comp, j3N) << 3);
+  const readJamTens = () =>
+      this._readPinBit(comp, j4N)        | (this._readPinBit(comp, j5N) << 1)
+    | (this._readPinBit(comp, j6N) << 2) | (this._readPinBit(comp, j7N) << 3);
+  const clampBcd = (v) => (v > 9 ? 9 : v); // invalid BCD jam codes 10-15 -> 9
+
+  const rising = (state.prevClk === 0 && clk === 1);
+
+  if (clr === 0) {
+    // CLR LOW (active): async clear to maximum count (99). Dominates everything.
+    state.units = 9;
+    state.tens  = 9;
+  } else if (ape === 0) {
+    // APE LOW (active): async jam-load, regardless of SPE/CICE/CLOCK.
+    state.units = clampBcd(readJamUnits());
+    state.tens  = clampBcd(readJamTens());
+  } else if (rising) {
+    if (spe === 0) {
+      // SPE LOW: synchronous jam-load on the rising edge (regardless of CICE).
+      state.units = clampBcd(readJamUnits());
+      state.tens  = clampBcd(readJamTens());
+    } else if (cice === 0) {
+      // Count enabled: decrement one BCD count. At 00 the counter jumps to the
+      // maximum count (99) on this edge - the documented count-to-max wrap.
+      if (state.units === 0) {
+        state.units = 9;
+        state.tens  = (state.tens === 0) ? 9 : state.tens - 1;
+      } else {
+        state.units -= 1;
+      }
+    }
+  }
+  state.prevClk = clk;
+
+  // CO/ZD active LOW: LOW only when the full count is zero AND CICE is LOW.
+  const cozd = (state.units === 0 && state.tens === 0 && cice === 0) ? 0 : 1;
+  return this._drivePinBit(comp, cozdName, cozd);
+}
+chipEvaluators._evaluateBcdDown2DecCd40102 = _evaluateBcdDown2DecCd40102_fn;
+
+
 // ── Block 65 74x40105 FIFO evaluator ────────────────────────────────────
 
 function _evaluateFifo16x4RstTri_fn(comp, gate) {
-  // CD74HC40105: 16-word × 4 bit asynchronous FIFO with tri-state outputs and reset.
+  // CD74HC40105: 16 word × 4 bit asynchronous FIFO with tri state outputs and reset.
   // inputs:  [D0, D1, D2, D3, WR, RD, RSTn, OEn]
   // outputs: [Q0, Q1, Q2, Q3, FF, EF]
   // WR rising edge → push word (if not full and RSTn=1)
@@ -10027,5 +15673,1133 @@ function _evaluateFifo16x4RstTri_fn(comp, gate) {
 }
 
 chipEvaluators._evaluateFifo16x4RstTri = _evaluateFifo16x4RstTri_fn;
+
+// ── Cascaded comparators, parity, ECC ─────────────────────────────────────
+// Implementations promoted from generic stubs once js/Simplifications.md §5
+// declared the underlying truth tables in-scope for the simulator.
+
+function _evaluateComparator8BitCascade_fn(comp, gate) {
+  // 74x885: 8 bit magnitude comparator with cascade inputs.
+  // inputs:  [A0,B0, A1,B1, A2,B2, A3,B3, A4,B4, A5,B5, A6,B6, A7,B7, ALTBI, AEQBI]
+  // outputs: [AGEB, ALTB, AEQB, AGTB]
+  // Truth table at A=B: cascade inputs decide; conflicting cascade is treated
+  // per the SN74AS885 datasheet ('00' defaults to A>B, '11' is invalid).
+  const bits = this._readGateInputs(comp, gate.inputs);
+  let a = 0, b = 0;
+  for (let i = 0; i < 8; i++) {
+    a |= bits[2 * i]     << i;
+    b |= bits[2 * i + 1] << i;
+  }
+  const altbi = bits[16];
+  const aeqbi = bits[17];
+  let ageb, altb, aeqb, agtb;
+  if (a > b)      { ageb = 1; altb = 0; aeqb = 0; agtb = 1; }
+  else if (a < b) { ageb = 0; altb = 1; aeqb = 0; agtb = 0; }
+  else {
+    // A == B: defer to cascade. AEQBI alone → equal; ALTBI alone → less than;
+    // both LOW → default greater than; both HIGH → invalid (all LOW).
+    if (aeqbi && !altbi)      { ageb = 1; altb = 0; aeqb = 1; agtb = 0; }
+    else if (altbi && !aeqbi) { ageb = 0; altb = 1; aeqb = 0; agtb = 0; }
+    else if (!altbi && !aeqbi){ ageb = 1; altb = 0; aeqb = 0; agtb = 1; }
+    else                      { ageb = 0; altb = 0; aeqb = 0; agtb = 0; }
+  }
+  return this._drivePinBits(comp, gate.outputs, [ageb, altb, aeqb, agtb]);
+}
+
+function _evaluateComparator8BitLatch_fn(comp, gate) {
+  // 74x866: 8 bit magnitude comparator with latched outputs.
+  // inputs:  [A0,B0, A1,B1, ... A7,B7, LE]
+  // outputs: [AGEB, ALTB, AGTB, AEQB]
+  // LE=HIGH → transparent (outputs follow comparison).
+  // LE=LOW  → latched (hold previous result).
+  const state = this._getSeqState(comp, gate.outputs[0], { ageb: 0, altb: 0, agtb: 0, aeqb: 0 });
+  const bits = this._readGateInputs(comp, gate.inputs);
+  let a = 0, b = 0;
+  for (let i = 0; i < 8; i++) {
+    a |= bits[2 * i]     << i;
+    b |= bits[2 * i + 1] << i;
+  }
+  const le = bits[16];
+  if (le) {
+    if (a > b)      { state.ageb = 1; state.altb = 0; state.agtb = 1; state.aeqb = 0; }
+    else if (a < b) { state.ageb = 0; state.altb = 1; state.agtb = 0; state.aeqb = 0; }
+    else            { state.ageb = 1; state.altb = 0; state.agtb = 0; state.aeqb = 1; }
+  }
+  return this._drivePinBits(comp, gate.outputs, [state.ageb, state.altb, state.agtb, state.aeqb]);
+}
+
+function _parityBufferDrive(self, comp, gate, invert) {
+  // 74x655/74x656: Octal buffer with parity generator (24-pin).
+  // inputs:  [OEn, PEOEn, A0..A7, PEIn]
+  // outputs: [YA0, YA1, YB0..YB7, PE]
+  // YA0/YA1 are second copies of A0/A1 (datasheet feature).
+  // PE = XOR of A0..A7 and PEIn (parity tree); PEIn lets users cascade.
+  const bits  = self._readGateInputs(comp, gate.inputs);
+  const oen   = bits[0];
+  const peoen = bits[1];
+  const a     = bits.slice(2, 10);
+  const pein  = bits[10];
+  let changed = false;
+
+  for (let i = 0; i < 10; i++) {
+    const outName = gate.outputs[i];
+    if (oen !== 0) {
+      if (self._drivePinHighZ(comp, outName)) changed = true;
+    } else {
+      let srcBit;
+      if (i === 0)      srcBit = a[0]; // YA0
+      else if (i === 1) srcBit = a[1]; // YA1
+      else              srcBit = a[i - 2]; // YB0..YB7 ← A0..A7
+      const outBit = invert ? (srcBit ? 0 : 1) : srcBit;
+      if (self._drivePinBit(comp, outName, outBit)) changed = true;
+    }
+  }
+
+  const peOut = gate.outputs[10];
+  if (peoen !== 0) {
+    if (self._drivePinHighZ(comp, peOut)) changed = true;
+  } else {
+    const parity = a.reduce((acc, bit) => acc ^ bit, 0) ^ pein;
+    if (self._drivePinBit(comp, peOut, parity)) changed = true;
+  }
+  return changed;
+}
+
+function _evaluateParityBuffer_fn(comp, gate)    { return _parityBufferDrive(this, comp, gate, false); }
+function _evaluateParityBufferInv_fn(comp, gate) { return _parityBufferDrive(this, comp, gate, true);  }
+
+function _evaluateParityXcvr_fn(comp, gate) {
+  // 74x657: Parity tree wrapped around the transceiver.
+  // inputs:  [OEBAn, PEn, DIR, A0..A7, B0..B7]
+  // outputs: [PE]
+  // PEn=HIGH → PE = LOW (parity check disabled).
+  // PEn=LOW  → PE = even parity of the active 8 bit bus (A side when DIR=1, B side when DIR=0).
+  const bits  = this._readGateInputs(comp, gate.inputs);
+  const pen   = bits[1];
+  const dir   = bits[2];
+  if (pen !== 0) {
+    return this._drivePinBit(comp, gate.outputs[0], 0);
+  }
+  const start = dir === 1 ? 3 : 11; // A side starts at index 3, B side at index 11
+  let parity = 0;
+  for (let i = 0; i < 8; i++) parity ^= bits[start + i];
+  return this._drivePinBit(comp, gate.outputs[0], parity);
+}
+
+function _evaluateAddrCompCascade_fn(comp, gate) {
+  // 74x677: 8 bit address comparator with three cascade enables.
+  // inputs:  [A0..A7, B0..B7, EGn, ELn, EQn]   outputs: [GEn, EQout]
+  // EQout (active HIGH) = 1 when A == B and EQn = LOW.
+  // GEn  (active LOW)   = 0 when (A > B AND EGn=LOW) OR (A == B AND ELn=LOW with EGn=LOW).
+  //                     Disabled enables raise the corresponding output to its inactive state.
+  const bits = this._readGateInputs(comp, gate.inputs);
+  let a = 0, b = 0;
+  for (let i = 0; i < 8; i++) {
+    a |= bits[i]     << i;
+    b |= bits[8 + i] << i;
+  }
+  const egn = bits[16];
+  const eln = bits[17];
+  const eqn = bits[18];
+
+  const eqout = (a === b && eqn === 0) ? 1 : 0;
+  let gen = 1;
+  if (egn === 0 && a >  b) gen = 0;
+  if (egn === 0 && a === b && eln === 0) gen = 0;
+  return this._drivePinBits(comp, gate.outputs, [gen, eqout]);
+}
+
+function _evaluateAddrCompLatch_fn(comp, gate) {
+  // 74x678 (16 bit) / 74x679 (12 bit): address comparator with internal latched reference.
+  // inputs:  [A0..An, LE, OEn]  outputs: [GEn, EQout]
+  // LE=HIGH stores the current A word as the internal reference.
+  // OEn=HIGH drives both outputs HiZ.
+  // Otherwise EQout=HIGH when A==ref, GEn=LOW when A>=ref.
+  const numAddr = gate.inputs.length - 2;
+  const state = this._getSeqState(comp, gate.outputs[0], { ref: 0 });
+  const bits = this._readGateInputs(comp, gate.inputs);
+  let a = 0;
+  for (let i = 0; i < numAddr; i++) a |= bits[i] << i;
+  const le  = bits[numAddr];
+  const oen = bits[numAddr + 1];
+  if (le) state.ref = a;
+  if (oen !== 0) {
+    let changed = false;
+    for (const op of gate.outputs) if (this._drivePinHighZ(comp, op)) changed = true;
+    return changed;
+  }
+  const eqout = a === state.ref ? 1 : 0;
+  const gen   = a >= state.ref ? 0 : 1;
+  return this._drivePinBits(comp, gate.outputs, [gen, eqout]);
+}
+
+function _evaluateAddrCompFixed_fn(comp, gate) {
+  // 74x680: 12 bit address comparator with mask programmable fixed reference.
+  // inputs:  [A0..A11, G]  outputs: [GEn, EQout]
+  // Real silicon ships with a factory-set reference; the simulator uses zero
+  // as the fixed reference, so EQout asserts when the address is all-LOW.
+  const bits = this._readGateInputs(comp, gate.inputs);
+  let a = 0;
+  for (let i = 0; i < 12; i++) a |= bits[i] << i;
+  const g = bits[12];
+  if (g !== 0) {
+    return this._drivePinBits(comp, gate.outputs, [1, 0]);
+  }
+  const eqout = a === 0 ? 1 : 0;
+  const gen   = 0; // A >= 0 is always true for unsigned A
+  return this._drivePinBits(comp, gate.outputs, [gen, eqout]);
+}
+
+// SEC-DED parity-check matrix used by 74x636/74x637.
+// 8 columns for data bits D0-D7 plus 7 columns for check bits CB0-CB6.
+// Every data column carries an odd-weight, unique 7-bit signature so single
+// bit errors produce a syndrome that maps back to exactly one position.
+const ECC_SECDED_DATA_COLS = [
+  0b0000111, 0b0001011, 0b0001101, 0b0001110,
+  0b0010011, 0b0010101, 0b0010110, 0b0011001,
+];
+const ECC_SECDED_CHECK_COLS = [
+  0b0000001, 0b0000010, 0b0000100, 0b0001000,
+  0b0010000, 0b0100000, 0b1000000,
+];
+
+function _eccComputeCheckBits(dataBits) {
+  // Each check bit i = XOR of D[j] across all data columns whose i-th bit is set.
+  const cb = [0, 0, 0, 0, 0, 0, 0];
+  for (let j = 0; j < 8; j++) {
+    if (!dataBits[j]) continue;
+    const col = ECC_SECDED_DATA_COLS[j];
+    for (let i = 0; i < 7; i++) {
+      if ((col >> i) & 1) cb[i] ^= 1;
+    }
+  }
+  return cb;
+}
+
+function _evaluateEccSecded_fn(comp, gate) {
+  // 74x636 / 74x637: 8 bit SECDED error detection and correction.
+  // inputs:  [OEn, SEn, D0..D7, CB0..CB6]
+  // outputs: [D0..D7, CB0..CB6, fE]
+  // OEn=HIGH → every output HiZ.
+  // SEn=LOW  (write/generate): chip drives CB outputs from D inputs, leaves D
+  //          HiZ so the user supplies the data; fE=0.
+  // SEn=HIGH (read/check): both D and CB are driven externally. Chip computes
+  //          syndrome and asserts fE=HIGH on a non-correctable (even-weight)
+  //          syndrome — i.e. when at least two bit errors are present.
+  const bits = this._readGateInputs(comp, gate.inputs);
+  const oen = bits[0];
+  const sen = bits[1];
+  const d   = bits.slice(2, 10);
+  const cbIn = bits.slice(10, 17);
+  const isOC = comp.chipDef && comp.chipDef.openCollector;
+  let changed = false;
+
+  if (oen !== 0) {
+    for (const op of gate.outputs) {
+      if (this._drivePinHighZ(comp, op)) changed = true;
+    }
+    return changed;
+  }
+
+  const computedCb = _eccComputeCheckBits(d);
+
+  // D pins: always HiZ from the chip (data is externally sourced in both modes).
+  for (let i = 0; i < 8; i++) {
+    if (this._drivePinHighZ(comp, gate.outputs[i])) changed = true;
+  }
+
+  if (sen === 0) {
+    // Write/generate mode: drive CB outputs with the computed check bits.
+    for (let i = 0; i < 7; i++) {
+      const outName = gate.outputs[8 + i];
+      if (isOC) {
+        if (this._drivePinOC(comp, outName, computedCb[i])) changed = true;
+      } else {
+        if (this._drivePinBit(comp, outName, computedCb[i])) changed = true;
+      }
+    }
+    const feOut = gate.outputs[15];
+    if (isOC) {
+      if (this._drivePinOC(comp, feOut, 0)) changed = true;
+    } else {
+      if (this._drivePinBit(comp, feOut, 0)) changed = true;
+    }
+    return changed;
+  }
+
+  // Read/check mode: CB pins are externally sourced too, so keep HiZ from chip.
+  for (let i = 0; i < 7; i++) {
+    if (this._drivePinHighZ(comp, gate.outputs[8 + i])) changed = true;
+  }
+
+  // Compute the 7-bit syndrome.
+  let syndrome = 0;
+  for (let i = 0; i < 7; i++) {
+    if ((cbIn[i] ^ computedCb[i]) === 1) syndrome |= (1 << i);
+  }
+
+  let fe = 0;
+  if (syndrome !== 0) {
+    // Odd-weight syndrome = single-bit (or 3-bit) error: matches a column, treat as correctable.
+    // Even-weight non-zero syndrome = double-bit error: uncorrectable.
+    let weight = 0;
+    for (let i = 0; i < 7; i++) if ((syndrome >> i) & 1) weight++;
+    if ((weight & 1) === 0) fe = 1;
+    else {
+      // Confirm the syndrome corresponds to a known column; if not, flag too.
+      let matched = false;
+      for (const col of ECC_SECDED_DATA_COLS)  if (col === syndrome) { matched = true; break; }
+      if (!matched) {
+        for (const col of ECC_SECDED_CHECK_COLS) if (col === syndrome) { matched = true; break; }
+      }
+      if (!matched) fe = 1;
+    }
+  }
+
+  const feOut = gate.outputs[15];
+  if (isOC) {
+    if (this._drivePinOC(comp, feOut, fe)) changed = true;
+  } else {
+    if (this._drivePinBit(comp, feOut, fe)) changed = true;
+  }
+  return changed;
+}
+
+chipEvaluators._evaluateComparator8BitCascade = _evaluateComparator8BitCascade_fn;
+chipEvaluators._evaluateComparator8BitLatch   = _evaluateComparator8BitLatch_fn;
+chipEvaluators._evaluateParityBuffer          = _evaluateParityBuffer_fn;
+chipEvaluators._evaluateParityBufferInv       = _evaluateParityBufferInv_fn;
+chipEvaluators._evaluateParityXcvr            = _evaluateParityXcvr_fn;
+chipEvaluators._evaluateAddrCompCascade       = _evaluateAddrCompCascade_fn;
+chipEvaluators._evaluateAddrCompLatch         = _evaluateAddrCompLatch_fn;
+chipEvaluators._evaluateAddrCompFixed         = _evaluateAddrCompFixed_fn;
+chipEvaluators._evaluateEccSecded             = _evaluateEccSecded_fn;
+
+function _xcvrParityDrive(self, comp, gate, invert) {
+  // 74x658/659/664/665: A→B transceiver with parity output.
+  // inputs:  [OEABn, OEBAn, DIR, PEn, A0..A7]
+  // outputs: [B0..B7, PAR]
+  // The gate definition only exposes the A→B path. B drives are valid when
+  // OEABn=LOW and DIR=HIGH; otherwise the B side floats. PAR = even parity
+  // over A0-A7 when PEn=LOW, else LOW.
+  const bits   = self._readGateInputs(comp, gate.inputs);
+  const oeabn  = bits[0];
+  const dir    = bits[2];
+  const pen    = bits[3];
+  const a      = bits.slice(4, 12);
+  const driveB = oeabn === 0 && dir === 1;
+  let changed = false;
+
+  for (let i = 0; i < 8; i++) {
+    const outName = gate.outputs[i];
+    if (driveB) {
+      const outBit = invert ? (a[i] ? 0 : 1) : a[i];
+      if (self._drivePinBit(comp, outName, outBit)) changed = true;
+    } else {
+      if (self._drivePinHighZ(comp, outName)) changed = true;
+    }
+  }
+
+  const parOut = gate.outputs[8];
+  if (pen !== 0) {
+    if (self._drivePinBit(comp, parOut, 0)) changed = true;
+  } else {
+    const parity = a.reduce((acc, bit) => acc ^ bit, 0);
+    if (self._drivePinBit(comp, parOut, parity)) changed = true;
+  }
+  return changed;
+}
+
+function _evaluateXcvrParity_fn(comp, gate)    { return _xcvrParityDrive(this, comp, gate, false); }
+function _evaluateXcvrParityInv_fn(comp, gate) { return _xcvrParityDrive(this, comp, gate, true);  }
+
+chipEvaluators._evaluateXcvrParity    = _evaluateXcvrParity_fn;
+chipEvaluators._evaluateXcvrParityInv = _evaluateXcvrParityInv_fn;
+
+function _evaluateXcvrParityReg833_fn(comp, gate) {
+  // 74x833: 8-bit-to-9-bit parity bus transceiver with a *stored* error flag.
+  // Distinct from the 655/657/658 parity primitives above: this part is
+  // bidirectional, carries the 9th (parity) bit on its own I/O pin, and latches
+  // a sticky parity-error flag into an on-chip register (CLK/CLRn).
+  // Source: TI SCBS195C FUNCTION TABLE + ERROR-FLAG FUNCTION TABLE + logic
+  //   diagram (see the 74x833 header comment in js/chips/chips41.js).
+  //
+  // inputs:  [OEAn, OEBn, CLRn, CLK, A1..A8, B1..B8, PARITY]
+  //          indices 0,   1,    2,   3,  4-11,   12-19,  20
+  // outputs: [A1..A8, B1..B8, PARITY, ERRn]
+  //          indices 0-7,   8-15,   16,     17
+  // A1-A8, B1-B8 and PARITY are bidirectional (listed in inputs AND outputs).
+  //
+  // Odd parity: a valid 9-bit word (8 data bits + PARITY) has an odd count of 1s.
+  // Modes, with OEA/OEB active LOW (FUNCTION TABLE):
+  //   OEB=L, OEA=H : A->B, PARITY = generated odd-parity of the A byte.
+  //   OEB=L, OEA=L : A->B, PARITY = the inverted parity bit (a forced-error
+  //                  diagnostic — the far end will see a bad word).
+  //   OEB=H, OEA=L : B->A, PARITY is an INPUT; the 9-bit B-side word is checked.
+  //   OEB=H, OEA=H : isolation, A/B/PARITY all Hi-Z.
+  // ERR (pin 10) is an open-collector, active-LOW, sticky flag. Per the
+  // ERROR-FLAG FUNCTION TABLE, on a CLK rising edge ERRnext = pOk AND ERRprev
+  // (pOk=1 means the sampled word had valid odd parity): once a bad word is
+  // caught the flag latches LOW and holds until CLRn is pulsed LOW.
+  //
+  // Simplification: the datasheet marks ERR "NA" while transmitting (OEB=L), so
+  // the register is only sampled in the two OEB=H (receive / isolation) modes;
+  // transmit modes hold the stored flag. Documented in issues.md.
+  const oea = this._readPinBit(comp, gate.inputs[0]);
+  const oeb = this._readPinBit(comp, gate.inputs[1]);
+  const clr = this._readPinBit(comp, gate.inputs[2]);
+  const clk = this._readPinBit(comp, gate.inputs[3]);
+  let changed = false;
+
+  const errName = gate.outputs[17];
+  const state = this._getSeqState(comp, errName, { err: 1, prevClk: 0 });
+
+  let pOk = 1;         // 1 = sampled word had valid odd parity (no error)
+  let sample = false;  // whether this CLK edge updates the error register
+
+  if (oeb === 0) {
+    // Transmit A -> B and generate parity. A side Hi-Z; PARITY driven.
+    const a = [];
+    for (let i = 0; i < 8; i++) a.push(this._readPinBit(comp, gate.inputs[4 + i]));
+    for (let i = 0; i < 8; i++) if (this._drivePinHighZ(comp, gate.outputs[i])) changed = true;
+    for (let i = 0; i < 8; i++) if (this._drivePinBit(comp, gate.outputs[8 + i], a[i])) changed = true;
+    const aOnesOdd = a.reduce((x, b) => x ^ b, 0);   // 1 if A holds an odd count of 1s
+    const genParity = aOnesOdd ? 0 : 1;              // odd-parity generator bit
+    const inverted = (oea === 0);
+    const parOut = inverted ? (genParity ? 0 : 1) : genParity;
+    if (this._drivePinBit(comp, gate.outputs[16], parOut)) changed = true;
+  } else if (oea === 0) {
+    // Receive B -> A and check parity. B and PARITY are inputs; A driven.
+    const b = [];
+    for (let i = 0; i < 8; i++) b.push(this._readPinBit(comp, gate.inputs[12 + i]));
+    const par = this._readPinBit(comp, gate.inputs[20]);
+    for (let i = 0; i < 8; i++) if (this._drivePinBit(comp, gate.outputs[i], b[i])) changed = true;
+    for (let i = 0; i < 8; i++) if (this._drivePinHighZ(comp, gate.outputs[8 + i])) changed = true;
+    if (this._drivePinHighZ(comp, gate.outputs[16])) changed = true;
+    pOk = b.reduce((x, bit) => x ^ bit, 0) ^ par;    // odd 9-bit word => valid => pOk=1
+    sample = true;
+  } else {
+    // Isolation: A / B / PARITY all Hi-Z. Per the datasheet note, a clocked ERR
+    // then reflects the A-bus parity (A odd => no error).
+    for (let i = 0; i < 8; i++) if (this._drivePinHighZ(comp, gate.outputs[i])) changed = true;
+    for (let i = 0; i < 8; i++) if (this._drivePinHighZ(comp, gate.outputs[8 + i])) changed = true;
+    if (this._drivePinHighZ(comp, gate.outputs[16])) changed = true;
+    let aOnesOdd = 0;
+    for (let i = 0; i < 8; i++) aOnesOdd ^= this._readPinBit(comp, gate.inputs[4 + i]);
+    pOk = aOnesOdd;
+    sample = true;
+  }
+
+  // Sticky error register: async CLRn LOW forces ERR HIGH (no error); otherwise
+  // sample on the CLK rising edge with ERRnext = pOk AND ERRprev.
+  if (clr === 0) {
+    state.err = 1;
+  } else if (sample && clk === 1 && state.prevClk === 0) {
+    state.err = (pOk && state.err) ? 1 : 0;
+  }
+  state.prevClk = clk;
+
+  // ERR is open-collector active-LOW: err=1 releases (Hi-Z, pulled up => HIGH),
+  // err=0 sinks the pin LOW.
+  if (this._drivePinOC(comp, errName, state.err)) changed = true;
+  return changed;
+}
+
+chipEvaluators._evaluateXcvrParityReg833 = _evaluateXcvrParityReg833_fn;
+
+function _evaluateXcvrParityReg834_fn(comp, gate) {
+  // 74x834: the INVERTING sibling of the 74x833 8-bit-to-9-bit parity bus
+  // transceiver. Same architecture as _evaluateXcvrParityReg833_fn — bidirectional
+  // byte buses, the 9th (parity) bit on its own I/O pin, and a sticky parity-error
+  // flag latched into an on-chip register (CP/CLRn). The ONE difference: the data
+  // buses are inverted end to end — B = NOT A on transmit, A = NOT B on receive.
+  // The parity generator and the error check are identical to the 833, because
+  // inverting all eight data bits leaves the count of 1s the same parity (8 is
+  // even), so the transmitted 9-bit word is still valid odd parity.
+  // Source: Signetics/Philips SN74ABT834 FUNCTION TABLE + ERROR-FLAG FUNCTION TABLE
+  //   + pin configuration (see the 74x834 header comment in js/chips/chips41.js).
+  //   Data columns read B = A̅ (transmit) and A = B̅ (receive); PARITY and ERROR
+  //   columns match the 833 exactly.
+  //
+  // inputs:  [OEAn, OEBn, CLRn, CP, A0..A7, B0..B7, PARITY]
+  //          indices 0,   1,    2,   3, 4-11,  12-19,  20
+  // outputs: [A0..A7, B0..B7, PARITY, ERRn]
+  //          indices 0-7,   8-15,   16,     17
+  // Modes, OEA/OEB active LOW:
+  //   OEB=L, OEA=H : A->B, B = A̅, PARITY = generated odd-parity of the A byte.
+  //   OEB=L, OEA=L : A->B, B = A̅, PARITY = inverted parity (forced-error diagnostic).
+  //   OEB=H, OEA=L : B->A, A = B̅, PARITY is an INPUT; the 9-bit B word is checked.
+  //   OEB=H, OEA=H : isolation, A/B/PARITY all Hi-Z.
+  const oea = this._readPinBit(comp, gate.inputs[0]);
+  const oeb = this._readPinBit(comp, gate.inputs[1]);
+  const clr = this._readPinBit(comp, gate.inputs[2]);
+  const clk = this._readPinBit(comp, gate.inputs[3]);
+  let changed = false;
+
+  const errName = gate.outputs[17];
+  const state = this._getSeqState(comp, errName, { err: 1, prevClk: 0 });
+
+  let pOk = 1;         // 1 = sampled word had valid odd parity (no error)
+  let sample = false;  // whether this CLK edge updates the error register
+
+  if (oeb === 0) {
+    // Transmit A -> B (inverted) and generate parity. A side Hi-Z; PARITY driven.
+    const a = [];
+    for (let i = 0; i < 8; i++) a.push(this._readPinBit(comp, gate.inputs[4 + i]));
+    for (let i = 0; i < 8; i++) if (this._drivePinHighZ(comp, gate.outputs[i])) changed = true;
+    for (let i = 0; i < 8; i++) if (this._drivePinBit(comp, gate.outputs[8 + i], a[i] ? 0 : 1)) changed = true;
+    const aOnesOdd = a.reduce((x, b) => x ^ b, 0);   // 1 if A holds an odd count of 1s
+    const genParity = aOnesOdd ? 0 : 1;              // odd-parity generator bit
+    const inverted = (oea === 0);                    // both OE low => forced-error
+    const parOut = inverted ? (genParity ? 0 : 1) : genParity;
+    if (this._drivePinBit(comp, gate.outputs[16], parOut)) changed = true;
+  } else if (oea === 0) {
+    // Receive B -> A (inverted) and check parity. B and PARITY are inputs; A driven.
+    const b = [];
+    for (let i = 0; i < 8; i++) b.push(this._readPinBit(comp, gate.inputs[12 + i]));
+    const par = this._readPinBit(comp, gate.inputs[20]);
+    for (let i = 0; i < 8; i++) if (this._drivePinBit(comp, gate.outputs[i], b[i] ? 0 : 1)) changed = true;
+    for (let i = 0; i < 8; i++) if (this._drivePinHighZ(comp, gate.outputs[8 + i])) changed = true;
+    if (this._drivePinHighZ(comp, gate.outputs[16])) changed = true;
+    pOk = b.reduce((x, bit) => x ^ bit, 0) ^ par;    // odd 9-bit word => valid => pOk=1
+    sample = true;
+  } else {
+    // Isolation: A / B / PARITY all Hi-Z. Per the datasheet note, a clocked ERR
+    // then reflects the A-bus parity (A odd => no error).
+    for (let i = 0; i < 8; i++) if (this._drivePinHighZ(comp, gate.outputs[i])) changed = true;
+    for (let i = 0; i < 8; i++) if (this._drivePinHighZ(comp, gate.outputs[8 + i])) changed = true;
+    if (this._drivePinHighZ(comp, gate.outputs[16])) changed = true;
+    let aOnesOdd = 0;
+    for (let i = 0; i < 8; i++) aOnesOdd ^= this._readPinBit(comp, gate.inputs[4 + i]);
+    pOk = aOnesOdd;
+    sample = true;
+  }
+
+  // Sticky error register: async CLRn LOW forces ERR HIGH (no error); otherwise
+  // sample on the CP rising edge with ERRnext = pOk AND ERRprev.
+  if (clr === 0) {
+    state.err = 1;
+  } else if (sample && clk === 1 && state.prevClk === 0) {
+    state.err = (pOk && state.err) ? 1 : 0;
+  }
+  state.prevClk = clk;
+
+  // ERR (pin 10) is open-collector active-LOW: err=1 releases (Hi-Z, pulled up =>
+  // HIGH), err=0 sinks the pin LOW.
+  if (this._drivePinOC(comp, errName, state.err)) changed = true;
+  return changed;
+}
+
+chipEvaluators._evaluateXcvrParityReg834 = _evaluateXcvrParityReg834_fn;
+
+function _evaluateXcvrParityLatch853_fn(comp, gate) {
+  // 74x853: 8-bit-to-9-bit parity bus transceiver, non-inverting. Same bus and
+  // parity architecture as the 74x833 (_evaluateXcvrParityReg833_fn) — the ONLY
+  // difference is the error-flag storage element. The 833 clocks its flag into an
+  // edge-triggered register on a CLK rising edge; the 853 holds its flag in a
+  // level-sensitive LATCH gated by LE (pin 13, active LOW): LE LOW is transparent
+  // (ERR follows the live parity check), LE HIGH freezes the captured value.
+  // Because it is a plain transparent latch, the 853 flag is NOT accumulate-sticky
+  // the way the 833 register is — while LE is LOW a later good word re-clears it;
+  // the flag only "sticks" once LE is raised to hold it. Async CLRn LOW forces the
+  // flag to no-error regardless of LE.
+  // Source: TI SCBS198G FUNCTION TABLE (see the 74x853 header comment in
+  //   js/chips/chips42.js), read as rendered PDF page images (issues.md C4).
+  //
+  // inputs:  [OEAn, OEBn, CLRn, LEn, A1..A8, B1..B8, PARITY]
+  //          indices 0,   1,    2,   3,  4-11,   12-19,  20
+  // outputs: [A1..A8, B1..B8, PARITY, ERRn]
+  //          indices 0-7,   8-15,   16,     17
+  // A1-A8, B1-B8 and PARITY are bidirectional (listed in inputs AND outputs).
+  //
+  // Odd parity: a valid 9-bit word (8 data bits + PARITY) has an odd count of 1s.
+  // Modes, with OEA/OEB active LOW (FUNCTION TABLE):
+  //   OEB=L, OEA=H : A->B, PARITY = generated odd-parity of the A byte.
+  //   OEB=L, OEA=L : A->B, PARITY = the inverted parity bit (forced-error
+  //                  diagnostic — the far end sees a bad word). ERR = NA (held).
+  //   OEB=H, OEA=L : B->A, PARITY is an INPUT; the 9-bit B-side word is checked.
+  //   OEB=H, OEA=H : isolation, A/B/PARITY all Hi-Z; ERR (when latched) reflects
+  //                  A-bus parity, matching the 833 model.
+  // ERR (pin 10) is an open-collector, active-LOW flag.
+  const oea = this._readPinBit(comp, gate.inputs[0]);
+  const oeb = this._readPinBit(comp, gate.inputs[1]);
+  const clr = this._readPinBit(comp, gate.inputs[2]);
+  const le  = this._readPinBit(comp, gate.inputs[3]);
+  let changed = false;
+
+  const errName = gate.outputs[17];
+  const state = this._getSeqState(comp, errName, { err: 1 });
+
+  let pOk = 1;         // 1 = sampled word had valid odd parity (no error)
+  let sample = false;  // whether this mode presents a check to the latch
+
+  if (oeb === 0) {
+    // Transmit A -> B and generate parity. A side Hi-Z; PARITY driven.
+    const a = [];
+    for (let i = 0; i < 8; i++) a.push(this._readPinBit(comp, gate.inputs[4 + i]));
+    for (let i = 0; i < 8; i++) if (this._drivePinHighZ(comp, gate.outputs[i])) changed = true;
+    for (let i = 0; i < 8; i++) if (this._drivePinBit(comp, gate.outputs[8 + i], a[i])) changed = true;
+    const aOnesOdd = a.reduce((x, b) => x ^ b, 0);   // 1 if A holds an odd count of 1s
+    const genParity = aOnesOdd ? 0 : 1;              // odd-parity generator bit
+    const inverted = (oea === 0);                    // both OE low => forced-error
+    const parOut = inverted ? (genParity ? 0 : 1) : genParity;
+    if (this._drivePinBit(comp, gate.outputs[16], parOut)) changed = true;
+    // ERR is NA while transmitting: the latch holds its stored value.
+  } else if (oea === 0) {
+    // Receive B -> A and check parity. B and PARITY are inputs; A driven.
+    const b = [];
+    for (let i = 0; i < 8; i++) b.push(this._readPinBit(comp, gate.inputs[12 + i]));
+    const par = this._readPinBit(comp, gate.inputs[20]);
+    for (let i = 0; i < 8; i++) if (this._drivePinBit(comp, gate.outputs[i], b[i])) changed = true;
+    for (let i = 0; i < 8; i++) if (this._drivePinHighZ(comp, gate.outputs[8 + i])) changed = true;
+    if (this._drivePinHighZ(comp, gate.outputs[16])) changed = true;
+    pOk = b.reduce((x, bit) => x ^ bit, 0) ^ par;    // odd 9-bit word => valid => pOk=1
+    sample = true;
+  } else {
+    // Isolation: A / B / PARITY all Hi-Z. Per the datasheet note, a latched ERR
+    // then reflects the A-bus parity (A odd => no error).
+    for (let i = 0; i < 8; i++) if (this._drivePinHighZ(comp, gate.outputs[i])) changed = true;
+    for (let i = 0; i < 8; i++) if (this._drivePinHighZ(comp, gate.outputs[8 + i])) changed = true;
+    if (this._drivePinHighZ(comp, gate.outputs[16])) changed = true;
+    let aOnesOdd = 0;
+    for (let i = 0; i < 8; i++) aOnesOdd ^= this._readPinBit(comp, gate.inputs[4 + i]);
+    pOk = aOnesOdd;
+    sample = true;
+  }
+
+  // Level-sensitive error latch: async CLRn LOW forces ERR HIGH (no error);
+  // otherwise, while LE is LOW (transparent) the flag follows the live check.
+  // LE HIGH (or a transmit mode where no check is presented) holds the flag.
+  if (clr === 0) {
+    state.err = 1;
+  } else if (sample && le === 0) {
+    state.err = pOk ? 1 : 0;
+  }
+
+  // ERR is open-collector active-LOW: err=1 releases (Hi-Z, pulled up => HIGH),
+  // err=0 sinks the pin LOW.
+  if (this._drivePinOC(comp, errName, state.err)) changed = true;
+  return changed;
+}
+
+chipEvaluators._evaluateXcvrParityLatch853 = _evaluateXcvrParityLatch853_fn;
+
+function _evaluateXcvrParityLatch854_fn(comp, gate) {
+  // 74x854: the INVERTING sibling of the 74x853 8-bit-to-9-bit parity bus
+  // transceiver with a level-sensitive error-flag LATCH. Relationship to the 853
+  // (_evaluateXcvrParityLatch853_fn) is exactly the relationship of the 74x834 to
+  // the 74x833: identical control, parity generator, error-flag latch, and pin
+  // map — the ONE difference is that both data buses invert end to end
+  // (B = NOT A on transmit, A = NOT B on receive). Inverting all eight data bits
+  // leaves the count of 1s the same parity (8 is even), so the transmitted 9-bit
+  // word is still valid odd parity and the generator/checker math is unchanged.
+  // The error flag is a transparent latch (LE pin 13, active LOW: LE LOW =
+  // transparent, LE HIGH = hold), NOT the accumulate-sticky register of the 833/834
+  // — while LE is LOW a later good word re-clears it. Async CLRn LOW forces
+  // no-error regardless of LE.
+  // Source: Signetics/Philips SN74ABT854 FUNCTION TABLE + ERROR-FLAG FUNCTION TABLE
+  //   + PIN DESCRIPTION (see the 74x854 header comment in js/chips/chips42.js),
+  //   read as rendered PDF page images (issues.md C4). Data columns read B = A̅
+  //   (transmit) and A = B̅ (receive); PARITY and ERROR columns match the 853.
+  //
+  // inputs:  [OEAn, OEBn, CLRn, LEn, A0..A7, B0..B7, PARITY]
+  //          indices 0,   1,    2,   3,  4-11,   12-19,  20
+  // outputs: [A0..A7, B0..B7, PARITY, ERRn]
+  //          indices 0-7,   8-15,   16,     17
+  // A0-A7, B0-B7 and PARITY are bidirectional (listed in inputs AND outputs).
+  //
+  // Modes, OEA/OEB active LOW:
+  //   OEB=L, OEA=H : A->B, B = A̅, PARITY = generated odd-parity of the A byte.
+  //   OEB=L, OEA=L : A->B, B = A̅, PARITY = inverted parity (forced-error diagnostic).
+  //   OEB=H, OEA=L : B->A, A = B̅, PARITY is an INPUT; the 9-bit B word is checked.
+  //   OEB=H, OEA=H : isolation, A/B/PARITY all Hi-Z; ERR (when latched) reflects
+  //                  A-bus parity, matching the 853/833 model.
+  const oea = this._readPinBit(comp, gate.inputs[0]);
+  const oeb = this._readPinBit(comp, gate.inputs[1]);
+  const clr = this._readPinBit(comp, gate.inputs[2]);
+  const le  = this._readPinBit(comp, gate.inputs[3]);
+  let changed = false;
+
+  const errName = gate.outputs[17];
+  const state = this._getSeqState(comp, errName, { err: 1 });
+
+  let pOk = 1;         // 1 = sampled word had valid odd parity (no error)
+  let sample = false;  // whether this mode presents a check to the latch
+
+  if (oeb === 0) {
+    // Transmit A -> B (inverted) and generate parity. A side Hi-Z; PARITY driven.
+    const a = [];
+    for (let i = 0; i < 8; i++) a.push(this._readPinBit(comp, gate.inputs[4 + i]));
+    for (let i = 0; i < 8; i++) if (this._drivePinHighZ(comp, gate.outputs[i])) changed = true;
+    for (let i = 0; i < 8; i++) if (this._drivePinBit(comp, gate.outputs[8 + i], a[i] ? 0 : 1)) changed = true;
+    const aOnesOdd = a.reduce((x, b) => x ^ b, 0);   // 1 if A holds an odd count of 1s
+    const genParity = aOnesOdd ? 0 : 1;              // odd-parity generator bit
+    const inverted = (oea === 0);                    // both OE low => forced-error
+    const parOut = inverted ? (genParity ? 0 : 1) : genParity;
+    if (this._drivePinBit(comp, gate.outputs[16], parOut)) changed = true;
+    // ERR is NA while transmitting: the latch holds its stored value.
+  } else if (oea === 0) {
+    // Receive B -> A (inverted) and check parity. B and PARITY are inputs; A driven.
+    const b = [];
+    for (let i = 0; i < 8; i++) b.push(this._readPinBit(comp, gate.inputs[12 + i]));
+    const par = this._readPinBit(comp, gate.inputs[20]);
+    for (let i = 0; i < 8; i++) if (this._drivePinBit(comp, gate.outputs[i], b[i] ? 0 : 1)) changed = true;
+    for (let i = 0; i < 8; i++) if (this._drivePinHighZ(comp, gate.outputs[8 + i])) changed = true;
+    if (this._drivePinHighZ(comp, gate.outputs[16])) changed = true;
+    pOk = b.reduce((x, bit) => x ^ bit, 0) ^ par;    // odd 9-bit word => valid => pOk=1
+    sample = true;
+  } else {
+    // Isolation: A / B / PARITY all Hi-Z. Per the datasheet note, a latched ERR
+    // then reflects the A-bus parity (A odd => no error).
+    for (let i = 0; i < 8; i++) if (this._drivePinHighZ(comp, gate.outputs[i])) changed = true;
+    for (let i = 0; i < 8; i++) if (this._drivePinHighZ(comp, gate.outputs[8 + i])) changed = true;
+    if (this._drivePinHighZ(comp, gate.outputs[16])) changed = true;
+    let aOnesOdd = 0;
+    for (let i = 0; i < 8; i++) aOnesOdd ^= this._readPinBit(comp, gate.inputs[4 + i]);
+    pOk = aOnesOdd;
+    sample = true;
+  }
+
+  // Level-sensitive error latch: async CLRn LOW forces ERR HIGH (no error);
+  // otherwise, while LE is LOW (transparent) the flag follows the live check.
+  // LE HIGH (or a transmit mode where no check is presented) holds the flag.
+  if (clr === 0) {
+    state.err = 1;
+  } else if (sample && le === 0) {
+    state.err = pOk ? 1 : 0;
+  }
+
+  // ERR is open-collector active-LOW: err=1 releases (Hi-Z, pulled up => HIGH),
+  // err=0 sinks the pin LOW.
+  if (this._drivePinOC(comp, errName, state.err)) changed = true;
+  return changed;
+}
+
+chipEvaluators._evaluateXcvrParityLatch854 = _evaluateXcvrParityLatch854_fn;
+
+// ── Block 71 evaluators: analog companion chips ─────────────────────────────
+// LM393 comparator, LM741 op-amp, ULN2003 Darlington array, LM7805 regulator,
+// 2764 EPROM, and the crystal-oscillator can. The analog parts read real MNA
+// net voltages (same mechanism as the 555 timer).
+
+// LM393-style comparator section with open-collector output.
+// inputs: [IN+, IN-]   output: OUT
+// Output transistor ON (sinks to GND) when IN- is above IN+; released (Hi-Z,
+// pulled HIGH by the chip's implicit OC pull-up) when IN+ is above IN-.
+// A small deadband holds the previous decision when the inputs are within a
+// few mV so the gate↔MNA iteration cannot chatter around the crossing point.
+function _evaluateComparatorOC_fn(comp, gate) {
+  const vP = this._readPinVoltage(comp, gate.inputs[0]);
+  const vN = this._readPinVoltage(comp, gate.inputs[1]);
+  if (vP === null || vN === null) return this._drivePinHighZ(comp, gate.output);
+  const state = this._getSeqState(comp, gate.output + '_cmp', { q: 1 }); // q=1 → released
+  const DEADBAND = 0.005; // V
+  if (vP - vN > DEADBAND) state.q = 1;
+  else if (vN - vP > DEADBAND) state.q = 0;
+  return state.q
+    ? this._drivePinHighZ(comp, gate.output)
+    : this._drivePinSink(comp, gate.output);
+}
+
+// LM741-style op-amp. inputs: [IN+, IN-]   output: OUT
+// Damped relaxation: each pass the output moves by STEP_GAIN × (V+ − V−),
+// clamped to the single-supply swing. Open loop this slams to a rail like a
+// comparator; with resistive negative feedback the fixed-point iteration
+// converges to the feedback-defined output (STEP_GAIN < 2 keeps a unity-
+// feedback follower stable; convergence continues across time steps).
+function _evaluateOpamp_fn(comp, gate) {
+  const vP = this._readPinVoltage(comp, gate.inputs[0]);
+  const vN = this._readPinVoltage(comp, gate.inputs[1]);
+  // A 741 on a 5 V single supply cannot swing near either rail.
+  const OUT_LO = 1.0, OUT_HI = 4.0, STEP_GAIN = 1.5;
+  const state = this._getSeqState(comp, gate.output + '_opamp', { v: (OUT_LO + OUT_HI) / 2 });
+  // The output stage always drives (a real op-amp output is never Hi-Z) —
+  // crucial for feedback wiring where IN- connects only to OUT and would
+  // otherwise read as floating forever. Integrate only when both inputs
+  // carry a real voltage.
+  if (vP !== null && vN !== null) {
+    const vNext = Math.max(OUT_LO, Math.min(OUT_HI, state.v + STEP_GAIN * (vP - vN)));
+    if (Math.abs(vNext - state.v) > 1e-4) state.v = vNext;
+  }
+  return this._drivePin(comp, gate.output, DRIVE.PUSH_PULL, state.v);
+}
+
+// ULN2003-style Darlington sink channel. inputs: [IN]   output: OUT
+// Inverting open-collector power switch: input HIGH → output sinks hard to
+// GND; input LOW → output floats. Modeled with a much lower saturation
+// resistance than a logic output so it out-drives pull-ups, mirroring the
+// real part's 500 mA capability. A floating input is OFF (the Darlington
+// base needs real current), hence the analog read instead of _readPinBit.
+const ULN_R_SAT = 30; // Ω — Darlington Vce(sat) ≈ 0.9 V at ~30 mA scale
+function _evaluateDarlingtonOC_fn(comp, gate) {
+  const vIn = this._readPinVoltage(comp, gate.inputs[0]);
+  const on = vIn !== null && vIn > 2.0; // datasheet input threshold ≈ 2.4 V
+  return on
+    ? this._drivePin(comp, gate.output, DRIVE.SINK_ONLY, 0, ULN_R_SAT)
+    : this._drivePinHighZ(comp, gate.output);
+}
+
+// LM7805-style +5 V regulator. inputs: [VIN]   output: VOUT
+// The simulator's rails are already regulated 5 V, so the part is idealized:
+// VOUT follows VIN capped at 5 V, driven as a stiff source (real headroom
+// requirements are covered in the chip guide instead).
+const VREG_R_OUT = 5; // Ω — much stiffer than a logic output
+function _evaluateVreg5V_fn(comp, gate) {
+  const vIn = this._readPinVoltage(comp, gate.inputs[0]);
+  if (vIn === null || vIn < 0.5) return this._drivePinHighZ(comp, gate.output);
+  const vOut = Math.min(VCC_VOLTAGE, vIn);
+  return this._drivePin(comp, gate.output, DRIVE.PUSH_PULL, vOut, VREG_R_OUT);
+}
+
+// 2764-style 8K × 8 UV EPROM.
+// gate.inputs:  [A0..A12 (13), O0..O7 (8), CE, OE, PGM, VPP]
+// gate.outputs: [O0..O7]
+// Erased state is all-1s (0xFF) and a program pulse can only clear bits —
+// real EPROM physics. "UV erase" = remove the chip and place it again
+// (a fresh component starts with empty ffState).
+//   Standby (CE=1):                         O → Hi-Z
+//   Read    (CE=0, OE=0, PGM=1):            drive mem[addr] → O
+//   Program (CE=0, OE=1, PGM=0, VPP=1):     mem[addr] &= O bus, O → Hi-Z
+function _evaluateEprom8kx8_fn(comp, gate) {
+  const bits = this._readGateInputs(comp, gate.inputs);
+  let addr = 0;
+  for (let i = 0; i < 13; i++) addr |= bits[i] << i;
+  const dataIn = bits.slice(13, 21);
+  const ce = bits[21], oe = bits[22], pgm = bits[23], vpp = bits[24];
+
+  if (ce !== 0) return this._drivePinsHighZ(comp, gate.outputs);
+
+  const state = this._getSeqState(comp, gate.outputs[0] + '_eprom8k', { mem: {} });
+  const ERASED = [1, 1, 1, 1, 1, 1, 1, 1];
+
+  if (pgm === 0 && oe !== 0 && vpp === 1) {
+    const cur = state.mem[addr] || ERASED;
+    state.mem[addr] = cur.map((b, i) => b & dataIn[i]);
+    return this._drivePinsHighZ(comp, gate.outputs);
+  }
+  if (oe === 0 && pgm !== 0) {
+    return this._drivePinBits(comp, gate.outputs, state.mem[addr] || ERASED);
+  }
+  return this._drivePinsHighZ(comp, gate.outputs);
+}
+
+// Crystal-oscillator can. inputs: [EN]   output: OUT   gate.freqHz: frequency
+// Free-running 50%-duty square wave derived from simTime. EN floating or HIGH
+// runs the oscillator; LOW tri-states OUT (standard can behavior). Phase only
+// advances when simTime has moved, so the multi-pass gate↔MNA iteration inside
+// one evaluate() cannot over-advance the clock.
+function _evaluateXtalOsc_fn(comp, gate) {
+  const vEn = this._readPinVoltage(comp, gate.inputs[0]);
+  const enabled = vEn === null || vEn > this._specFor(comp).VTH;
+  if (!enabled) return this._drivePinHighZ(comp, gate.output);
+  const state = this._getSeqState(comp, gate.output + '_xo', { phase: 0, lastT: null });
+  if (state.lastT !== null && this.simTime > state.lastT) {
+    const freq = gate.freqHz || 10;
+    state.phase = (state.phase + (this.simTime - state.lastT) * freq) % 1;
+  }
+  state.lastT = this.simTime;
+  return this._drivePinBit(comp, gate.output, state.phase < 0.5 ? 1 : 0);
+}
+
+chipEvaluators._evaluateComparatorOC = _evaluateComparatorOC_fn;
+chipEvaluators._evaluateOpamp        = _evaluateOpamp_fn;
+chipEvaluators._evaluateDarlingtonOC = _evaluateDarlingtonOC_fn;
+chipEvaluators._evaluateVreg5V       = _evaluateVreg5V_fn;
+chipEvaluators._evaluateEprom8kx8    = _evaluateEprom8kx8_fn;
+chipEvaluators._evaluateXtalOsc      = _evaluateXtalOsc_fn;
+
+// 74x299 / 74x2299: 8-bit universal shift/storage register with 3-state I/O,
+// dedicated cascade outputs QA'/QH', and a direct (asynchronous) overriding
+// clear. The '2299 is the Advanced-Schottky variant with 25 Ohm series output
+// resistors; its logic and pinout are identical to the '299, so one evaluator
+// serves both. Distinct from SHIFT_REG_8BIT_BIDIR_CLR_TRI (74x323) because that
+// part's clear is synchronous and it has no separate QA'/QH' outputs.
+//
+// Source: Texas Instruments, "SN54ALS299, SN74ALS299 8-Bit Universal
+//   Shift/Storage Registers With 3-State Outputs", SDAS220B (Dec 1982, rev.
+//   Dec 1994). [Online]. Available:
+//   https://www.ti.com/lit/ds/symlink/sn74als299.pdf. Verified: terminal
+//   assignment (DW/N package top view), function table, and positive-logic
+//   logic diagram, pages 1-3, read as PDF page images. The '299 family pinout
+//   and function are industry-standard and shared by the AS-family '2299.
+//
+// inputs:  [S0,S1, SR,SL, OE1n,OE2n, CLRn, CLK,
+//           A/QA,B/QB,C/QC,D/QD,E/QE,F/QF,G/QG,H/QH]   (I/O ports read as data)
+// outputs: [A/QA,B/QB,C/QC,D/QD,E/QE,F/QF,G/QG,H/QH, QA', QH']
+//   Mode (S1:S0): 00=hold, 01=shift right (SR enters at QA), 10=shift left
+//     (SL enters at QH), 11=synchronous parallel load from the I/O ports.
+//   Bit i (i=0..7) = register stage QA..QH.
+//   CLRn=0 forces the register to 0 immediately, overriding the clock.
+//   The eight I/O ports drive out the stored bits only when OE1n=OE2n=0 and the
+//   part is not in load mode; in load mode they are released (high-Z) so the
+//   external bus can present data to be clocked in. QA'/QH' are taken directly
+//   off the flip-flops and are always driven, independent of OE.
+function _evaluateShiftReg8BitUnivClrTri_fn(comp, gate) {
+  const bits = this._readGateInputs(comp, gate.inputs);
+  const [s0,s1,sr,sl,oe1n,oe2n,clrn,clk,
+         a_i,b_i,c_i,d_i,e_i,f_i,g_i,h_i] = bits;
+  if (!comp.state) comp.state = { reg: 0, prevClk: clk };
+  let changed = false;
+  const mode = (s1 << 1) | s0;
+
+  if (clrn === 0) {
+    comp.state.reg = 0;                       // direct overriding clear
+  } else if (comp.state.prevClk === 0 && clk === 1) {
+    const cur = comp.state.reg;
+    switch (mode) {
+      case 0: break;                                                  // hold
+      case 1: comp.state.reg = ((cur << 1) | sr) & 0xFF; break;       // shift right, SR→QA
+      case 2: comp.state.reg = ((cur >> 1) | (sl << 7)) & 0xFF; break;// shift left, SL→QH
+      case 3: comp.state.reg = (a_i|(b_i<<1)|(c_i<<2)|(d_i<<3)|       // parallel load
+                                (e_i<<4)|(f_i<<5)|(g_i<<6)|(h_i<<7)) & 0xFF; break;
+    }
+  }
+  comp.state.prevClk = clk;
+
+  const reg = comp.state.reg;
+
+  // Dedicated cascade outputs QA' (bit 0) and QH' (bit 7) are always driven.
+  if (this._drivePinBit(comp, gate.outputs[8], reg & 1)) changed = true;
+  if (this._drivePinBit(comp, gate.outputs[9], (reg >> 7) & 1)) changed = true;
+
+  // I/O ports: released in load mode, else driven when both enables are low.
+  const driveIO = (mode !== 3) && (oe1n === 0) && (oe2n === 0);
+  for (let i = 0; i < 8; i++) {
+    if (driveIO) {
+      if (this._drivePinBit(comp, gate.outputs[i], (reg >> i) & 1)) changed = true;
+    } else {
+      if (this._drivePinHighZ(comp, gate.outputs[i])) changed = true;
+    }
+  }
+  return changed;
+}
+chipEvaluators._evaluateShiftReg8BitUnivClrTri = _evaluateShiftReg8BitUnivClrTri_fn;
+
+function _evaluateSerialParallelMult784_fn(comp, gate) {
+  // 74F784: 8-bit serial/parallel multiplier with a final-stage adder/subtracter.
+  // inputs:  [CP, PLn, M, ASn, Y, K, Bn, Bn1, X0, X1, X2, X3, X4, X5, X6, X7]
+  // outputs: [SP, SPB]   (SP = serial X*Y product; SPB = serial X*Y +/- B)
+  //
+  // What the part does (Signetics datasheet, see Source below): the 8-bit
+  // multiplicand X (X0=LSB..X7=MSB) is parallel-loaded into latches; the
+  // multiplier Y is clocked in serially, LSB first, one bit per clock; the
+  // product X*Y leaves SP serially, LSB first. A serial add/subtract stage adds
+  // or subtracts a second serial operand B (Bn) to the product, giving X*Y +/- B
+  // on SPB with A/S(bar) choosing add (HIGH) or subtract (LOW). PL(bar) LOW on a
+  // clock edge loads X and clears the arithmetic cells to start a new multiply,
+  // and (per the datasheet) that same edge also takes the first Y bit.
+  //
+  // Model: a running serial multiplier. Each clock incorporates the current Y bit
+  //   y_t at bit position t: acc += y_t * X, product bit_t = acc & 1, then
+  //   acc >>= 1 (the carry into higher product bits is retained). Because a Y bit
+  //   of weight 2^j only affects product bits >= j, product bit t is final once
+  //   y_t has been seen -- this reproduces the LSB-first serial product exactly
+  //   for the UNSIGNED case. The SPB path is a bit-serial add/subtract of the Bn
+  //   stream to that product bit, carrying (add) or borrowing (subtract) across
+  //   clocks. Outputs update only on the rising CP edge and hold between edges.
+  //
+  // Deliberate simplifications (see issues.md): (1) M (Two's Complement vs
+  //   unsigned multiplicand) is read but does not alter the datapath -- correct
+  //   signed operation needs the end-of-word sign-bit correction and the exact
+  //   clock sequencing the real array performs, which the digital engine can't
+  //   drive faithfully, so only unsigned multiply is modeled. (2) K (cascade in
+  //   from a more-significant chip) and (3) the real pipeline latency (the chip
+  //   emits no valid SP on the load clock) are omitted -- this model has zero
+  //   latency, giving the true product bit immediately. Bn1 (the one-clock-early
+  //   B input the chip uses to align B with the load clock) is accepted but the
+  //   Bn stream is used as the serial B operand.
+  //
+  // Source: Signetics, "FAST 74F784 -- 8-Bit Serial/Parallel Multiplier (With
+  //   Adder/Subtracter)", Preliminary Specification, June 1987, in *1987
+  //   Signetics FAST Data Manual*, pp. 6-767..6-770. [Online]. Available:
+  //   http://www.bitsavers.org/components/signetics/_dataBooks/1987_Signetics_FAST_Data_Manual.pdf.
+  //   Verified: PIN CONFIGURATION, pin-function table and DESCRIPTION, read as a
+  //   300-dpi rendering of PDF page 832 (issues.md C4). DIP-20 terminals:
+  //   Bn-1=1, PL(bar)=2, X3=3, X2=4, X1=5, X0=6, SP=7, S+/-B=8, CP=9, GND=10,
+  //   M=11, K=12, A/S(bar)=13, Bn=14, X7=15, X6=16, X5=17, X4=18, Y=19, Vcc=20.
+  //   Not cloned from a sibling (issues.md C2): the pre-existing stub pinout
+  //   (CLK/A_Bn/OVF/S0..S7/B1..B7) was hand-entered and wrong; replaced from the
+  //   datasheet page image.
+  const [cpN, plN, /*M*/, asN, yN, /*K*/, bnN, /*Bn1*/,
+         x0N, x1N, x2N, x3N, x4N, x5N, x6N, x7N] = gate.inputs;
+  const [spN, spbN] = gate.outputs;
+  const state = this._getSeqState(comp, spN,
+    { xreg: 0, acc: 0, bcarry: 0, prevClk: 0, sp: 0, spb: 0 });
+
+  const cp = this._readPinBit(comp, cpN);
+  if (state.prevClk === 0 && cp === 1) {
+    // Rising clock edge.
+    if (this._readPinBit(comp, plN) === 0) {
+      // Parallel load: latch X, clear the arithmetic cells, start a new multiply.
+      state.xreg =
+        this._readPinBit(comp, x0N)        | (this._readPinBit(comp, x1N) << 1) |
+        (this._readPinBit(comp, x2N) << 2) | (this._readPinBit(comp, x3N) << 3) |
+        (this._readPinBit(comp, x4N) << 4) | (this._readPinBit(comp, x5N) << 5) |
+        (this._readPinBit(comp, x6N) << 6) | (this._readPinBit(comp, x7N) << 7);
+      state.acc = 0;
+      state.bcarry = 0;
+    }
+    const y = this._readPinBit(comp, yN);
+    state.acc += y * state.xreg;
+    const spBit = state.acc & 1;
+    state.acc = Math.floor(state.acc / 2);
+
+    // Serial add/subtract of the B stream onto the product bit.
+    const b = this._readPinBit(comp, bnN);
+    let spbBit;
+    if (this._readPinBit(comp, asN) === 1) {          // A/S(bar) HIGH = add
+      const s = spBit + b + state.bcarry;
+      spbBit = s & 1;
+      state.bcarry = s >> 1;
+    } else {                                          // LOW = subtract
+      const d = spBit - b - state.bcarry;
+      spbBit = d & 1;
+      state.bcarry = d < 0 ? 1 : 0;
+    }
+    state.sp = spBit;
+    state.spb = spbBit;
+  }
+  state.prevClk = cp;
+
+  let changed = this._drivePinBit(comp, spN, state.sp);
+  if (this._drivePinBit(comp, spbN, state.spb)) changed = true;
+  return changed;
+}
+chipEvaluators._evaluateSerialParallelMult784 = _evaluateSerialParallelMult784_fn;
+
+function _evaluateBusXcvr9BitDualOE_fn(comp, gate) {
+  // 74x863 (non-inverting) / 74x864 (inverting): 9-bit bidirectional bus
+  // transceiver with dual (NOR-ed) output enables per direction. No DIR pin.
+  //
+  // gate.inputs:  [A0..A8 (0-8), B0..B8 (9-17), OEAB0 (18), OEAB1 (19),
+  //                OEBA0 (20), OEBA1 (21)]
+  // gate.outputs: [A0..A8 (0-8), B0..B8 (9-17)]  (same bidir pins as inputs)
+  // gate.invert:  true => B side carries /A and A side carries /B (the '864).
+  //
+  // Function table (see Source on the chip entry): each direction has two
+  // active-LOW enables that are NOR-ed, so a direction turns on only when BOTH
+  // of its enables are LOW.
+  //   OEAB0=L AND OEAB1=L, other pair not both L -> A->B (read A, drive B; A Hi-Z)
+  //   OEBA0=L AND OEBA1=L, other pair not both L -> B->A (read B, drive A; B Hi-Z)
+  //   all four HIGH (neither pair enabled)       -> Isolation (all Hi-Z)
+  //   all four LOW  (both pairs enabled)          -> "Latch A and B": both drivers
+  //     active, holding the last word that crossed. For the non-inverting '863
+  //     A = B; for the inverting '864 the held B side is the complement of A.
+  // The latch value tracked here is always the A-side logic word. `xf` maps a
+  // word between the A and B domains (identity for '863, bit-invert for '864);
+  // it is its own inverse, so the same map serves both transfer directions.
+  const inv = !!gate.invert;
+  const xf = (b) => inv ? (b ^ 1) : b;
+  const enAB = this._readPinBit(comp, gate.inputs[18]) === 0 &&
+               this._readPinBit(comp, gate.inputs[19]) === 0;
+  const enBA = this._readPinBit(comp, gate.inputs[20]) === 0 &&
+               this._readPinBit(comp, gate.inputs[21]) === 0;
+  const aOut = gate.outputs.slice(0, 9);
+  const bOut = gate.outputs.slice(9, 18);
+  const state = this._getSeqState(comp, gate.outputs[0] + '_xcvr864',
+    { latched: new Array(9).fill(0) });
+  let changed = false;
+  if (enAB && !enBA) {
+    // A -> B: release A, drive B from A. Latch stores the A-side word.
+    if (this._drivePinsHighZ(comp, aOut)) changed = true;
+    const a = [];
+    for (let i = 0; i < 9; i++) a.push(this._readPinBit(comp, gate.inputs[i]));
+    state.latched = a.slice();
+    if (this._drivePinBits(comp, bOut, a.map(xf))) changed = true;
+  } else if (enBA && !enAB) {
+    // B -> A: release B, drive A from B. A-side word (what the latch stores) is
+    // the transformed B word.
+    if (this._drivePinsHighZ(comp, bOut)) changed = true;
+    const aWord = [];
+    for (let i = 0; i < 9; i++) aWord.push(xf(this._readPinBit(comp, gate.inputs[9 + i])));
+    state.latched = aWord.slice();
+    if (this._drivePinBits(comp, aOut, aWord)) changed = true;
+  } else if (enAB && enBA) {
+    // Latch: hold the last word. A gets the stored A-side word, B its xf image.
+    if (this._drivePinBits(comp, aOut, state.latched)) changed = true;
+    if (this._drivePinBits(comp, bOut, state.latched.map(xf))) changed = true;
+  } else {
+    // Isolation.
+    if (this._drivePinsHighZ(comp, gate.outputs)) changed = true;
+  }
+  return changed;
+}
+chipEvaluators._evaluateBusXcvr9BitDualOE = _evaluateBusXcvr9BitDualOE_fn;
+
+function _evaluateShiftRegDualRank963_fn(comp, gate) {
+  // SN74ALS963 dual-rank 8-bit shift register (datasheet citation in the chip-def
+  // header comment). Two 8-bit registers with independent clocks:
+  //   Reg1 = parallel I/O register  -> drives the bidirectional A/OA..H/OH pins
+  //          through the OE 3-state buffer; loads from those pins on CLK1.
+  //   Reg2 = shift register         -> SERIN in, SEROUT out; shifts on CLK2.
+  // Bit order index 0 = A (MSB) ... 7 = H (LSB). Shift is toward A (verified from
+  // the datasheet "typical sequence" waveform, p.2-790: 0011 0011 with SERIN=0
+  // becomes 0110 0110): new[i]=old[i+1], new[7]=SERIN, MSB (index 0) at SEROUT.
+  // Active-LOW gates: OE, GIN, G21 (Reg2->Reg1), G12 (Reg1->Reg2), GSH (shift).
+  // SCLR is active-HIGH synchronous clear. Full 'ALS963 function table (p.2-786):
+  // Reg1 updates on CLK1 rising, Reg2 on CLK2 rising; both edges read the pre-edge
+  // contents so a simultaneous exchange/copy uses old values.
+  //   CLK1: SCLR=1 -> Reg1 cleared, unless GIN=0 (I/O load wins);
+  //         else GIN=0 & G21=0 -> Reg1 = Reg2 OR I/O; GIN=0 -> Reg1 = I/O;
+  //         G21=0 -> Reg1 = Reg2; otherwise hold.
+  //   CLK2: SCLR=1 -> Reg2 cleared; else G12=0 -> Reg2 = Reg1; GSH=0 -> shift;
+  //         otherwise hold.
+  // inputs:  [OE, SERIN, GIN, G21, SCLR, G12, GSH, CLK2, CLK1, IOA..IOH (9..16)]
+  // outputs: [SEROUT, IOA..IOH (1..8)]
+  const [oeN, serinN, ginN, g21N, sclrN, g12N, gshN, clk2N, clk1N] = gate.inputs;
+  const ioInNames = gate.inputs.slice(9, 17);
+
+  const state = this._getSeqState(comp, gate.outputs[0] + '_963',
+    { reg1: new Array(8).fill(0), reg2: new Array(8).fill(0),
+      prevClk1: 0, prevClk2: 0 });
+
+  const gin   = this._readPinBit(comp, ginN);
+  const g21   = this._readPinBit(comp, g21N);
+  const g12   = this._readPinBit(comp, g12N);
+  const gsh   = this._readPinBit(comp, gshN);
+  const sclr  = this._readPinBit(comp, sclrN);
+  const serin = this._readPinBit(comp, serinN);
+  const clk1  = this._readPinBit(comp, clk1N);
+  const clk2  = this._readPinBit(comp, clk2N);
+  const io    = ioInNames.map((n) => this._readPinBit(comp, n));
+
+  // Snapshot pre-edge contents; the two clocks are independent, so both edges in
+  // one evaluation see the old registers (needed for exchange/copy correctness).
+  const oldR1 = state.reg1.slice();
+  const oldR2 = state.reg2.slice();
+
+  // CLK1 rising -> Reg1 (I/O register)
+  if (state.prevClk1 === 0 && clk1 === 1) {
+    if (sclr === 1) {
+      state.reg1 = (gin === 0) ? io.slice() : new Array(8).fill(0);
+    } else {
+      const fromIO = (gin === 0), fromR2 = (g21 === 0);
+      if (fromIO && fromR2)  state.reg1 = oldR2.map((b, i) => b | io[i]);
+      else if (fromIO)       state.reg1 = io.slice();
+      else if (fromR2)       state.reg1 = oldR2.slice();
+      // else hold
+    }
+  }
+  state.prevClk1 = clk1;
+
+  // CLK2 rising -> Reg2 (shift register)
+  if (state.prevClk2 === 0 && clk2 === 1) {
+    if (sclr === 1)        state.reg2 = new Array(8).fill(0);
+    else if (g12 === 0)    state.reg2 = oldR1.slice();               // copy Reg1 -> Reg2
+    else if (gsh === 0)    state.reg2 = [...oldR2.slice(1), serin];  // shift toward A
+    // else hold
+  }
+  state.prevClk2 = clk2;
+
+  let changed = this._drivePinBit(comp, gate.outputs[0], state.reg2[0]); // SEROUT = MSB
+  const oe = this._readPinBit(comp, oeN);
+  if (oe === 0) {
+    if (this._drivePinBits(comp, gate.outputs.slice(1, 9), state.reg1.slice())) changed = true;
+  } else {
+    if (this._drivePinsHighZ(comp, gate.outputs.slice(1, 9))) changed = true;
+  }
+  return changed;
+}
+chipEvaluators._evaluateShiftRegDualRank963 = _evaluateShiftRegDualRank963_fn;
 
 export { chipEvaluators };

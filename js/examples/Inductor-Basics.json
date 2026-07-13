@@ -1,0 +1,195 @@
+{
+  "version": 1,
+  "chipFamily": "HC",
+  "components": [
+    {
+      "id": 1,
+      "type": "switch",
+      "on": false,
+      "startHoleId": "0:0:power:3:1",
+      "endHoleId": "0:0:main:3:0"
+    },
+    {
+      "id": 2,
+      "type": "resistor",
+      "resistance": 150,
+      "startHoleId": "0:0:main:3:1",
+      "endHoleId": "0:0:main:7:0"
+    },
+    {
+      "id": 3,
+      "type": "led",
+      "color": "red",
+      "startHoleId": "0:0:main:7:1",
+      "endHoleId": "0:0:power:7:0"
+    },
+    {
+      "id": 4,
+      "type": "inductor",
+      "inductance": 0.047,
+      "startHoleId": "0:0:main:3:2",
+      "endHoleId": "0:0:main:11:0"
+    },
+    {
+      "id": 5,
+      "type": "resistor",
+      "resistance": 150,
+      "startHoleId": "0:0:main:11:1",
+      "endHoleId": "0:0:main:15:0"
+    },
+    {
+      "id": 6,
+      "type": "led",
+      "color": "green",
+      "startHoleId": "0:0:main:15:1",
+      "endHoleId": "0:0:power:15:0"
+    },
+    {
+      "id": 7,
+      "type": "button",
+      "tileX": 0,
+      "tileY": 0,
+      "col": 22,
+      "row": 1,
+      "vertical": false
+    },
+    {
+      "id": 8,
+      "type": "inductor",
+      "inductance": 0.047,
+      "startHoleId": "0:0:main:27:1",
+      "endHoleId": "0:0:main:31:0"
+    },
+    {
+      "id": 9,
+      "type": "resistor",
+      "resistance": 220,
+      "startHoleId": "0:0:main:31:1",
+      "endHoleId": "0:0:power:31:0"
+    },
+    {
+      "id": 10,
+      "type": "led",
+      "color": "yellow",
+      "startHoleId": "0:0:power:26:0",
+      "endHoleId": "0:0:main:27:2"
+    },
+    {
+      "id": 11,
+      "type": "testpoint",
+      "tileX": 0,
+      "tileY": 0,
+      "col": 27,
+      "row": 3,
+      "label": "TP1",
+      "color": "#f39c12"
+    },
+    {
+      "id": 12,
+      "type": "clock",
+      "tileX": 0,
+      "tileY": 0,
+      "col": 40,
+      "row": 0,
+      "frequencyHz": 2,
+      "dutyCycle": 0.5
+    },
+    {
+      "id": 13,
+      "type": "resistor",
+      "resistance": 47,
+      "startHoleId": "0:0:main:40:1",
+      "endHoleId": "0:0:main:44:0"
+    },
+    {
+      "id": 14,
+      "type": "led",
+      "color": "red",
+      "startHoleId": "0:0:main:44:1",
+      "endHoleId": "0:0:power:44:0"
+    },
+    {
+      "id": 15,
+      "type": "inductor",
+      "inductance": 0.047,
+      "startHoleId": "0:0:main:40:2",
+      "endHoleId": "0:0:main:48:0"
+    },
+    {
+      "id": 16,
+      "type": "resistor",
+      "resistance": 47,
+      "startHoleId": "0:0:main:48:1",
+      "endHoleId": "0:0:main:52:0"
+    },
+    {
+      "id": 17,
+      "type": "led",
+      "color": "green",
+      "startHoleId": "0:0:main:52:1",
+      "endHoleId": "0:0:power:52:0"
+    }
+  ],
+  "wires": [
+    {
+      "id": 1,
+      "startHoleId": "0:0:power:22:1",
+      "endHoleId": "0:0:main:22:0",
+      "color": "#e74c3c"
+    },
+    {
+      "id": 2,
+      "startHoleId": "0:0:main:25:0",
+      "endHoleId": "0:0:main:27:0",
+      "color": "#00cec9"
+    }
+  ],
+  "extraTiles": [],
+  "textBoxes": [
+    {
+      "id": 1,
+      "x": 10,
+      "y": -470,
+      "w": 620,
+      "h": 40,
+      "text": "Title: Inductor Basics — Ramp, Kickback, Choke",
+      "v": 2
+    },
+    {
+      "id": 2,
+      "x": 10,
+      "y": -428,
+      "w": 1060,
+      "h": 46,
+      "text": "Description: Three coil mini-demos: current that ramps instead of jumping, a flyback kick caught by a freewheel LED, and an RL choke that smothers a blinking clock.",
+      "v": 2
+    },
+    {
+      "id": 3,
+      "x": 10,
+      "y": -360,
+      "w": 420,
+      "h": 180,
+      "text": "1. COILS RESIST CHANGE IN CURRENT\nFlip the switch. The red LED (plain resistor) snaps on instantly. The green LED sits behind a 47mH coil, so its current has to ramp up — it fades in over a couple of seconds. Once the ramp finishes, the coil acts like a plain wire (LEDs equally bright): at DC an inductor is just a wire.",
+      "v": 2
+    },
+    {
+      "id": 4,
+      "x": 450,
+      "y": -360,
+      "w": 420,
+      "h": 180,
+      "text": "2. FLYBACK KICKBACK\nHold the button a few seconds to let current build in the coil, then RELEASE. The current has nowhere to go, so the coil slams its left node negative — and the yellow freewheel LED (wired from GND up to the coil) catches that kick and flashes while the stored energy drains. This is why relay coils always get a flyback diode.",
+      "v": 2
+    },
+    {
+      "id": 5,
+      "x": 890,
+      "y": -360,
+      "w": 420,
+      "h": 180,
+      "text": "3. RL CHOKE (FILTER)\nThe 2Hz clock drives two identical LED branches. The red LED blinks hard. The green one sits behind a coil: the current never gets going before the clock flips again, so the blink is smothered to a dim throb. A coil passes DC but fights fast changes — that's a choke.",
+      "v": 2
+    }
+  ]
+}

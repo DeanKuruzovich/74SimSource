@@ -79,9 +79,9 @@ function expect(label, actual, expected) {
   }
 }
 
-// --- 74465 -- Octal Buffer (non-inv, 2 enables, tri-state) -------------------
+// --- 74465 -- Octal Buffer (non-inv, 2 enables, tri state) -------------------
 {
-  const { comp, spec } = makeComp('74465');
+  const { comp, spec } = makeComp('74x465');
   const gate = spec.gates[0];
   expect('74465 gate type', gate.type, 'BUFFER_OCTAL_TRI');
 
@@ -100,21 +100,21 @@ function expect(label, actual, expected) {
   expect('74465 Y3=A3=0', getPin(comp, 'Y3'), 0);
   expect('74465 Y4=A4=1', getPin(comp, 'Y4'), 1);
 
-  // G1n=1 => tri-state
+  // G1n=1 => tri state
   setPin(comp, 'G1n', 1);
   runGate(comp, gate);
   expect('74465 G1n=1 Y1 HiZ', getPin(comp, 'Y1'), 0.5);
   expect('74465 G1n=1 Y8 HiZ', getPin(comp, 'Y8'), 0.5);
 
-  // G1n=0, G2n=1 => tri-state
+  // G1n=0, G2n=1 => tri state
   setPin(comp, 'G1n', 0); setPin(comp, 'G2n', 1);
   runGate(comp, gate);
   expect('74465 G2n=1 Y1 HiZ', getPin(comp, 'Y1'), 0.5);
 }
 
-// --- 74466 -- Octal Buffer (inv, 2 enables, tri-state) -----------------------
+// --- 74466 -- Octal Buffer (inv, 2 enables, tri state) -----------------------
 {
-  const { comp, spec } = makeComp('74466');
+  const { comp, spec } = makeComp('74x466');
   const gate = spec.gates[0];
   expect('74466 gate type', gate.type, 'BUFFER_OCTAL_INV_TRI');
 
@@ -137,9 +137,9 @@ function expect(label, actual, expected) {
 
 // --- 74467 -- same gate type as 74465 ----------------------------------------
 {
-  const spec = CHIPS_BLOCK_27['74467'];
+  const spec = CHIPS_BLOCK_27['74x467'];
   expect('74467 uses BUFFER_OCTAL_TRI', spec.gates[0].type, 'BUFFER_OCTAL_TRI');
-  const { comp } = makeComp('74467');
+  const { comp } = makeComp('74x467');
   const gate = spec.gates[0];
   setPin(comp, 'G1n', 0); setPin(comp, 'G2n', 0);
   for (let i = 1; i <= 8; i++) setPin(comp, `A${i}`, 1);
@@ -149,9 +149,9 @@ function expect(label, actual, expected) {
 
 // --- 74468 -- same gate type as 74466 ----------------------------------------
 {
-  const spec = CHIPS_BLOCK_27['74468'];
+  const spec = CHIPS_BLOCK_27['74x468'];
   expect('74468 uses BUFFER_OCTAL_INV_TRI', spec.gates[0].type, 'BUFFER_OCTAL_INV_TRI');
-  const { comp } = makeComp('74468');
+  const { comp } = makeComp('74x468');
   const gate = spec.gates[0];
   setPin(comp, 'G1n', 0); setPin(comp, 'G2n', 0);
   for (let i = 1; i <= 8; i++) setPin(comp, `A${i}`, 1);
@@ -161,7 +161,7 @@ function expect(label, actual, expected) {
 
 // --- 74469 -- 8 bit Synchronous Up/Down Counter ------------------------------
 {
-  const { comp, spec } = makeComp('74469');
+  const { comp, spec } = makeComp('74x469');
   const gate = spec.gates[0];
   expect('74469 gate type', gate.type, 'COUNTER_8BIT_UPDOWN_SYNC');
 

@@ -5,40 +5,40 @@
 
 export const CHIPS_BLOCK_58 = {
 
-  // 74x4059: Programmable divide-by-N counter (24-pin)
-  // CD74x4059 programmable counter with 4 bit data inputs (J-K or P inputs), mode pins, clock, enable
+  // 74x4059: Programmable divide by-N counter (24-pin)
+  // CD74x4059 programmable counter with 4 bit data inputs (JK or P inputs), mode pins, clock, enable
   // Complex chip treat as GENERIC_STUB
   '74x4059': {
     name: '74x4059',
-    simpleName: 'Programmable Divide-by-N Counter',
-    description: 'Programmable divide-by-N counter (24-pin)',
+    simpleName: 'Programmable Divide by-N Counter',
+    description: 'Programmable divide by-N counter (24-pin)',
     pins: 24, vcc: 24, gnd: 12,
     datasheet: 'https://www.ti.com/lit/ds/symlink/cd74hc4059.pdf',
-    tags: ['counter', 'programmable', 'divide-by-N', 'stub'],
-    guideOverview: 'The 74x4059 is a programmable divide-by-N counter. Instead of always dividing a clock by a fixed power of two or ten, it lets you load programmable values and mode settings so the output frequency can be tailored to the job. It is useful in frequency synthesis, programmable timers, and control circuits where one clock source must be divided by a chosen number.',
+    tags: ['counter', 'programmable', 'divide by-N', 'stub'],
+    guideOverview: 'The 74x4059 is a programmable divide by-N counter. Instead of always dividing a clock by a fixed power of two or ten, it lets you load programmable values and mode settings so the output frequency can be tailored to the job. It is useful in frequency synthesis, programmable timers, and control circuits where one clock source must be divided by a chosen number.',
     guidePinDescriptions: {
       'P10': 'Program input bit 0 for the first digit or preset group.',
       'P11': 'Program input bit 1 for the first preset group.',
       'P12': 'Program input bit 2 for the first preset group.',
       'P13': 'Program input bit 3 for the first preset group.',
-      'PL': 'Program-load control. Use it to load the programmed divide value into the device.',
+      'PL': 'Program load control. Use it to load the programmed divide value into the device.',
       'P20': 'Program input bit 0 for the second preset group.',
       'P21': 'Program input bit 1 for the second preset group.',
       'P22': 'Program input bit 2 for the second preset group.',
       'P23': 'Program input bit 3 for the second preset group.',
-      'Ka': 'Mode-control input A used to choose the counter operating mode.',
-      'Kb': 'Mode-control input B.',
+      'Ka': 'Mode control input A used to choose the counter operating mode.',
+      'Kb': 'Mode control input B.',
       'GND': 'Ground reference for the package.',
-      'Kc': 'Mode-control input C.',
+      'Kc': 'Mode control input C.',
       'P30': 'Program input bit 0 for the third preset group.',
       'P31': 'Program input bit 1 for the third preset group.',
       'P32': 'Program input bit 2 for the third preset group.',
       'P33': 'Program input bit 3 for the third preset group.',
-      'LE': 'Latch-enable control for the program inputs.',
+      'LE': 'Latch enable control for the program inputs.',
       'CLK': 'Clock input that is divided by the programmed ratio.',
       'MR': 'Master reset. Assert it to clear the counter state.',
       'ENn': 'Active LOW enable. Pull LOW to let the counter run.',
-      'EOn': 'Active LOW end-of-count or related cascade output, used when chaining counters.',
+      'EOn': 'Active LOW end of count or related cascade output, used when chaining counters.',
       'NC': 'No internal connection. Leave unconnected.',
       'VCC': 'Positive supply for the chip.',
     },
@@ -46,7 +46,7 @@ export const CHIPS_BLOCK_58 = {
       {
         title: 'Programmable Division',
         paragraphs: [
-          'A divide-by-N counter outputs one pulse for every N input pulses. By loading different programmed values, the same chip can generate many different output rates from one clock source.',
+          'A divide by-N counter outputs one pulse for every N input pulses. By loading different programmed values, the same chip can generate many different output rates from one clock source.',
         ],
       },
       {
@@ -88,119 +88,208 @@ export const CHIPS_BLOCK_58 = {
   },
 
   // 74x4060: 14-stage binary ripple counter with oscillator (16-pin)
-  // SN74x4060 same Q outputs as 4020 but has built in RC/crystal oscillator
-  // RST (controller reset active high), CLK input, osc pins OSCIN/OSCOUT/RS
+  // Counter advances on the high-to-low (falling) edge of CLKI; CLR is active
+  // HIGH and forces all Q outputs LOW while also parking the oscillator
+  // (CLKO HIGH, CLKOn LOW). Stages 1-3 and stage 11 are internal only, so the
+  // accessible outputs are Q4-Q10 and Q12-Q14.
+  // The hand-entered stub pinout that this entry replaced was wrong (it listed
+  // OSCIN/OSCOUT/RS and Q1-Q3/Q11 on the wrong pins). Verified against the TI
+  // package drawing AND logic diagram below — see issues.md C2.
+  // Source: Texas Instruments, "SN54HC4060, SN74HC4060 14-Stage Asynchronous
+  //   Binary Counters and Oscillators", SCLS161D (Dec 1982, rev. Sep 2003).
+  //   [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74hc4060.pdf.
+  //   Verified: terminal assignment (J/N package, p.1), function table +
+  //   positive-logic diagram with TI letter naming QD=stage4 … QN=stage14
+  //   (p.2), read as rendered PDF page images (issues.md C4). Letter→pin map:
+  //   1=QL=Q12, 2=QM=Q13, 3=QN=Q14, 4=QF=Q6, 5=QE=Q5, 6=QG=Q7, 7=QD=Q4,
+  //   8=GND, 9=CLKO, 10=CLKOn, 11=CLKI, 12=CLR, 13=QI=Q9, 14=QH=Q8, 15=QJ=Q10,
+  //   16=VCC. Function table: CLKI falling + CLR LOW advances; CLR HIGH clears.
   '74x4060': {
     name: '74x4060',
     simpleName: '14-Stage Binary Counter with Oscillator',
     description: '14-stage binary ripple counter with internal oscillator (16-pin)',
     pins: 16, vcc: 16, gnd: 8,
+    sequential: true,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74hc4060.pdf',
-    tags: ['counter', 'binary', '14-stage', 'oscillator', 'stub'],
-    guideOverview: 'The 74x4060 combines a binary ripple counter with an on-chip oscillator interface. With only a few external timing components, one chip can generate its own clock and then divide it down into much slower output frequencies. It is a classic part for timers, blinkers, low-frequency clocks, and long delay generators.',
+    tags: ['counter', 'binary', '14-stage', 'oscillator', 'divider', 'timer'],
+    guideOverview: 'The 74x4060 combines a 14-stage binary ripple counter with an on chip oscillator. Add an external resistor and capacitor (or a crystal) across CLKI, CLKO, and CLKOn and the chip clocks itself, then divides that clock down into much slower outputs. The accessible outputs are Q4 through Q14, with stages 1-3 and stage 11 internal only. It is a classic part for timers, blinkers, low frequency clocks, and long delay generators.',
     guidePinDescriptions: {
-      'Q12': 'Higher-order divided clock output.',
-      'Q6': 'Counter output stage 6.',
-      'Q5': 'Counter output stage 5.',
-      'Q7': 'Counter output stage 7.',
-      'Q4': 'Counter output stage 4.',
-      'OSCOUT': 'Oscillator output or timing-network node used with the external RC or crystal circuit.',
-      'OSCIN': 'Oscillator input node for the external timing network.',
+      'Q12': 'Counter stage 12 output. Toggles once per 4096 clock pulses (divide by 4096).',
+      'Q13': 'Counter stage 13 output (divide by 8192).',
+      'Q14': 'Counter stage 14 output (divide by 16384). Slowest available output.',
+      'Q6': 'Counter stage 6 output (divide by 64).',
+      'Q5': 'Counter stage 5 output (divide by 32).',
+      'Q7': 'Counter stage 7 output (divide by 128).',
+      'Q4': 'Counter stage 4 output (divide by 16). Fastest available output.',
       'GND': 'Ground reference for the device.',
-      'MR': 'Master reset. Assert it to clear the counter and restart timing.',
-      'Q3': 'Counter output stage 3.',
-      'Q2': 'Counter output stage 2.',
-      'Q1': 'Counter output stage 1.',
-      'RS': 'Timing-network resistor connection used by the internal oscillator.',
-      'Q11': 'Counter output stage 11.',
-      'Q10': 'Counter output stage 10.',
+      'CLKO': 'Oscillator output. With an external RC or crystal it forms the timing loop. Forced HIGH while CLR is HIGH.',
+      'CLKOn': 'Inverted oscillator output, the complement of CLKO. Forced LOW while CLR is HIGH.',
+      'CLKI': 'Clock input. The counter advances on each high-to-low (falling) edge.',
+      'CLR': 'Master reset, active HIGH. A HIGH clears every counter stage to zero and stops the oscillator.',
+      'Q9': 'Counter stage 9 output (divide by 512).',
+      'Q8': 'Counter stage 8 output (divide by 256).',
+      'Q10': 'Counter stage 10 output (divide by 1024).',
       'VCC': 'Positive supply for the oscillator and counter logic.',
     },
     guideSections: [
       {
         title: 'Oscillator Plus Divider',
         paragraphs: [
-          'The internal oscillator section creates a clock using external resistor and capacitor parts, then the ripple counter divides that clock by successive powers of two. This saves parts compared with building an oscillator and divider separately.',
+          'The oscillator section makes a clock from external resistor and capacitor parts (or a crystal), then the ripple counter divides that clock by successive powers of two. This saves parts compared with building an oscillator and divider separately. In the simulator you can also just drive CLKI directly with a clock instead of wiring the RC loop.',
         ],
       },
       {
-        title: 'Timing Uses',
+        title: 'Reading the Outputs',
+        paragraphs: [
+          'Stages 1-3 and stage 11 are internal, so they never reach a pin. The available taps are Q4 (divide by 16) up to Q14 (divide by 16384). Each higher output is half the frequency of the one before it.',
+        ],
         formulas: [
-          'Qn frequency = oscillator frequency / 2^n',
+          'Qn frequency = clock frequency / 2^n',
         ],
         list: [
           'Long delay timers.',
           'LED blink generators.',
-          'Slow control clocks derived from one RC network.',
+          'Slow control clocks derived from one fast clock.',
         ],
-        note: 'This part is documented as a stub in the simulator rather than a full oscillator model.',
+        note: 'The counter advances on the falling edge of CLKI. A HIGH on CLR clears all outputs to zero. The simulator drives CLKI as a normal clock and does not model the analog RC oscillator timing.',
       },
     ],
     pinout: [
-      { pin:  1, name: 'Q12',    type: 'output' },
-      { pin:  2, name: 'Q6',     type: 'output' },
-      { pin:  3, name: 'Q5',     type: 'output' },
-      { pin:  4, name: 'Q7',     type: 'output' },
-      { pin:  5, name: 'Q4',     type: 'output' },
-      { pin:  6, name: 'OSCOUT', type: 'output' },
-      { pin:  7, name: 'OSCIN',  type: 'input'  },
-      { pin:  8, name: 'GND',    type: 'power'  },
-      { pin:  9, name: 'MR',     type: 'input'  },
-      { pin: 10, name: 'Q3',     type: 'output' },
-      { pin: 11, name: 'Q2',     type: 'output' },
-      { pin: 12, name: 'Q1',     type: 'output' },
-      { pin: 13, name: 'RS',     type: 'input'  },
-      { pin: 14, name: 'Q11',    type: 'output' },
-      { pin: 15, name: 'Q10',    type: 'output' },
-      { pin: 16, name: 'VCC',    type: 'power'  },
+      { pin:  1, name: 'Q12',   type: 'output' },
+      { pin:  2, name: 'Q13',   type: 'output' },
+      { pin:  3, name: 'Q14',   type: 'output' },
+      { pin:  4, name: 'Q6',    type: 'output' },
+      { pin:  5, name: 'Q5',    type: 'output' },
+      { pin:  6, name: 'Q7',    type: 'output' },
+      { pin:  7, name: 'Q4',    type: 'output' },
+      { pin:  8, name: 'GND',   type: 'power'  },
+      { pin:  9, name: 'CLKO',  type: 'output' },
+      { pin: 10, name: 'CLKOn', type: 'output' },
+      { pin: 11, name: 'CLKI',  type: 'input'  },
+      { pin: 12, name: 'CLR',   type: 'input'  },
+      { pin: 13, name: 'Q9',    type: 'output' },
+      { pin: 14, name: 'Q8',    type: 'output' },
+      { pin: 15, name: 'Q10',   type: 'output' },
+      { pin: 16, name: 'VCC',   type: 'power'  },
     ],
     gates: [
-      { type: 'GENERIC_STUB', inputs: ['OSCIN','RS','MR'], outputs: [] },
+      { type: 'COUNTER_BIN_OSC_14_CLKO', inputs: ['CLKI','CLR'], outputs: ['Q4','Q5','Q6','Q7','Q8','Q9','Q10','Q12','Q13','Q14','CLKO','CLKOn'] },
     ],
   },
 
-  // 74x4061: 14-stage asynchronous binary counter with oscillator (16-pin)
-  // SN74x4061 similar to 4060 but asynchronous variant; same pinout
+  // 74x4061: 14-stage asynchronous (ripple) binary counter with oscillator (16-pin)
+  // Functionally the asynchronous 14-stage counter+oscillator. No standalone TI
+  // "SN74HC4061" datasheet is published (ti.com/lit 404s for sn74hc4061, and TI,
+  // NXP, onsemi and ST host only the '4060). The "74HC4061" listed by distributors
+  // and datasheet aggregators is the SAME part TI documents as the SN74HC4060
+  // family doc, whose own title is "14-Stage ASYNCHRONOUS Binary Counters and
+  // Oscillators" — so that doc is the authoritative source for this entry. The
+  // hand-entered stub pinout that this replaced was wrong (it cloned a bad '4060
+  // map: OSCIN/OSCOUT/RS and Q1-Q3/Q11 on the wrong pins). Re-verified against the
+  // TI package drawing AND logic diagram — see issues.md C2.
+  // Behaviour: counter advances on the high-to-low (falling) edge of CLKI; CLR is
+  // active HIGH and forces all Q LOW while parking the oscillator (CLKO HIGH,
+  // CLKOn LOW). Stages 1-3 and 11 are internal only; accessible taps are Q4-Q10,
+  // Q12-Q14. Reuses the COUNTER_BIN_OSC_14_CLKO primitive (the '4060 core).
+  // Source: Texas Instruments, "SN54HC4060, SN74HC4060 14-Stage Asynchronous
+  //   Binary Counters and Oscillators", SCLS161D (Dec 1982, rev. Sep 2003).
+  //   [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74hc4060.pdf.
+  //   Verified: terminal assignment (J/N package, p.1) + function table and
+  //   positive-logic diagram with TI letter naming QD=stage4 … QN=stage14 (p.2),
+  //   read as rendered PDF page images (issues.md C4). Letter→pin map:
+  //   1=QL=Q12, 2=QM=Q13, 3=QN=Q14, 4=QF=Q6, 5=QE=Q5, 6=QG=Q7, 7=QD=Q4, 8=GND,
+  //   9=CLKO, 10=CLKOn, 11=CLKI, 12=CLR, 13=QI=Q9, 14=QH=Q8, 15=QJ=Q10, 16=VCC.
+  // Source (existence/identity of the "74HC4061" listing, reconciled, not trusted
+  //   for pinout): "74HC4061 — Asynchronous 14-Stage Binary Counters and
+  //   Oscillators (Texas Instruments)", alldatasheet.com. [Online]. Available:
+  //   https://www.alldatasheet.com/view.jsp?Searchword=74HC4061. Verified: it
+  //   resolves to the SN74HC4060 family document above.
   '74x4061': {
     name: '74x4061',
     simpleName: '14-Stage Asynchronous Binary Counter with Oscillator',
-    description: '14-stage asynchronous binary counter with internal oscillator (16-pin)',
+    description: '14-stage async (ripple) binary counter, internal oscillator (16-pin)',
     pins: 16, vcc: 16, gnd: 8,
-    datasheet: '',
-    tags: ['counter', 'binary', '14-stage', 'async', 'oscillator', 'stub'],
+    sequential: true,
+    datasheet: 'https://www.ti.com/lit/ds/symlink/sn74hc4060.pdf',
+    tags: ['counter', 'binary', '14-stage', 'async', 'oscillator', 'divider', 'timer'],
+    guideOverview: 'The 74x4061 is a 14-stage binary ripple counter with an on chip oscillator. "Asynchronous" here means it is a ripple counter: each stage clocks the next, so the bits do not all change at exactly the same instant. Wire an external resistor and capacitor (or a crystal) across CLKI, CLKO, and CLKOn and the chip clocks itself, then divides that clock down into much slower outputs. The accessible taps are Q4 through Q14; stages 1-3 and stage 11 are internal only.',
+    guidePinDescriptions: {
+      'Q12': 'Counter stage 12 output. Toggles once per 4096 clock pulses (divide by 4096).',
+      'Q13': 'Counter stage 13 output (divide by 8192).',
+      'Q14': 'Counter stage 14 output (divide by 16384). Slowest available output.',
+      'Q6': 'Counter stage 6 output (divide by 64).',
+      'Q5': 'Counter stage 5 output (divide by 32).',
+      'Q7': 'Counter stage 7 output (divide by 128).',
+      'Q4': 'Counter stage 4 output (divide by 16). Fastest available output.',
+      'GND': 'Ground reference for the device.',
+      'CLKO': 'Oscillator output. With an external RC or crystal it forms the timing loop. Forced HIGH while CLR is HIGH.',
+      'CLKOn': 'Inverted oscillator output, the complement of CLKO. Forced LOW while CLR is HIGH.',
+      'CLKI': 'Clock input. The counter advances on each high-to-low (falling) edge.',
+      'CLR': 'Master reset, active HIGH. A HIGH clears every counter stage to zero and stops the oscillator.',
+      'Q9': 'Counter stage 9 output (divide by 512).',
+      'Q8': 'Counter stage 8 output (divide by 256).',
+      'Q10': 'Counter stage 10 output (divide by 1024).',
+      'VCC': 'Positive supply for the oscillator and counter logic.',
+    },
+    guideSections: [
+      {
+        title: 'Ripple Counter, Not Synchronous',
+        paragraphs: [
+          'In a ripple counter the first flip-flop is clocked by CLKI, and each later stage is clocked by the one before it. The change rolls down the chain like a wave, so the higher outputs switch a tiny moment after the lower ones. That is the meaning of "asynchronous". It costs nothing in parts but means the outputs are not all valid on the same edge, which matters if you decode several of them at once.',
+        ],
+      },
+      {
+        title: 'Oscillator Plus Divider',
+        paragraphs: [
+          'The oscillator section makes a clock from external resistor and capacitor parts (or a crystal), then the counter divides that clock by successive powers of two. In the simulator you can skip the RC loop and drive CLKI directly with a clock; each higher output is half the frequency of the one before it.',
+        ],
+        formulas: [
+          'Qn frequency = clock frequency / 2^n',
+        ],
+        list: [
+          'Long delay timers.',
+          'LED blink generators.',
+          'Slow control clocks derived from one fast clock.',
+        ],
+        note: 'The counter advances on the falling edge of CLKI. A HIGH on CLR clears all outputs to zero. The simulator drives CLKI as a normal clock and does not model the analog RC oscillator timing.',
+      },
+    ],
     pinout: [
-      { pin:  1, name: 'Q12',    type: 'output' },
-      { pin:  2, name: 'Q6',     type: 'output' },
-      { pin:  3, name: 'Q5',     type: 'output' },
-      { pin:  4, name: 'Q7',     type: 'output' },
-      { pin:  5, name: 'Q4',     type: 'output' },
-      { pin:  6, name: 'OSCOUT', type: 'output' },
-      { pin:  7, name: 'OSCIN',  type: 'input'  },
-      { pin:  8, name: 'GND',    type: 'power'  },
-      { pin:  9, name: 'MR',     type: 'input'  },
-      { pin: 10, name: 'Q3',     type: 'output' },
-      { pin: 11, name: 'Q2',     type: 'output' },
-      { pin: 12, name: 'Q1',     type: 'output' },
-      { pin: 13, name: 'RS',     type: 'input'  },
-      { pin: 14, name: 'Q11',    type: 'output' },
-      { pin: 15, name: 'Q10',    type: 'output' },
-      { pin: 16, name: 'VCC',    type: 'power'  },
+      { pin:  1, name: 'Q12',   type: 'output' },
+      { pin:  2, name: 'Q13',   type: 'output' },
+      { pin:  3, name: 'Q14',   type: 'output' },
+      { pin:  4, name: 'Q6',    type: 'output' },
+      { pin:  5, name: 'Q5',    type: 'output' },
+      { pin:  6, name: 'Q7',    type: 'output' },
+      { pin:  7, name: 'Q4',    type: 'output' },
+      { pin:  8, name: 'GND',   type: 'power'  },
+      { pin:  9, name: 'CLKO',  type: 'output' },
+      { pin: 10, name: 'CLKOn', type: 'output' },
+      { pin: 11, name: 'CLKI',  type: 'input'  },
+      { pin: 12, name: 'CLR',   type: 'input'  },
+      { pin: 13, name: 'Q9',    type: 'output' },
+      { pin: 14, name: 'Q8',    type: 'output' },
+      { pin: 15, name: 'Q10',   type: 'output' },
+      { pin: 16, name: 'VCC',   type: 'power'  },
     ],
     gates: [
-      { type: 'GENERIC_STUB', inputs: ['OSCIN','RS','MR'], outputs: [] },
+      { type: 'COUNTER_BIN_OSC_14_CLKO',
+        inputs: ['CLKI','CLR'],
+        outputs: ['Q4','Q5','Q6','Q7','Q8','Q9','Q10','Q12','Q13','Q14','CLKO','CLKOn'] },
     ],
   },
 
-  // 74x4066: Quad single-pole single-throw analog switch (14-pin)
+  // 74x4066: Quad single pole single throw analog switch (14-pin)
   // SN74x4066 four independent SPST analog switches; same pinout as 4016 but improved Ron
   '74x4066': {
     name: '74x4066',
     simpleName: 'Quad Bilateral Analog Switch',
-    description: 'Quad single-pole single-throw analog switch (14-pin)',
+    description: 'Quad single pole single throw analog switch (14-pin)',
     pins: 14, vcc: 14, gnd: 7,
+    onResistance: 80,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74hc4066.pdf',
-    tags: ['analog', 'switch', 'bilateral', 'quad', 'bidir', 'stub'],
-    guideOverview: 'The 74x4066 contains four independent bilateral analog switches. Each channel acts like an electronically controlled SPST switch that can pass signals in either direction when enabled. It is useful for routing analog voltages, gating audio, or switching low-speed digital lines without committing to a one-way buffer.',
+    tags: ['analog', 'switch', 'bilateral', 'quad', 'bidir'],
+    guideOverview: 'The 74x4066 contains four independent bilateral analog switches. Each channel acts like an electronically controlled SPST switch that can pass signals in either direction when enabled. It is useful for routing analog voltages, gating audio, or switching low speed digital lines without committing to a one way buffer.',
     guidePinDescriptions: {
       'A1': 'One side of switch channel 1.',
       'B1': 'Other side of switch channel 1.',
@@ -215,7 +304,7 @@ export const CHIPS_BLOCK_58 = {
       'E4': 'Control input for channel 4.',
       'B4': 'Other side of switch channel 4.',
       'A4': 'One side of switch channel 4.',
-      'VCC': 'Positive supply for the switch-control logic.',
+      'VCC': 'Positive supply for the switch control logic.',
     },
     guideSections: [
       {
@@ -229,9 +318,9 @@ export const CHIPS_BLOCK_58 = {
         list: [
           'Audio or sensor signal routing.',
           'Digitally controlled signal gating.',
-          'Simple low-frequency multiplexing.',
+          'Simple low frequency multiplexing.',
         ],
-        note: 'The simulator documents the switching role of this part but does not model analog on-resistance in detail.',
+        note: '74Sim models each channel as a passive resistive coupling: when E is HIGH, A and B are connected through the chip\'s on-resistance (~80 Ω for the 4066) and any analog voltage between the rails passes through; when E is LOW, both terminals are isolated. Distortion, bandwidth, and leakage are not modelled.',
       },
     ],
     pinout: [
@@ -251,89 +340,108 @@ export const CHIPS_BLOCK_58 = {
       { pin: 14, name: 'VCC', type: 'power'  },
     ],
     gates: [
-      { type: 'GENERIC_STUB', inputs: ['E1','E2','E3','E4'], outputs: [] },
+      { type: 'BILATERAL_SWITCH', inputs: ['A1','B1','E1'], outputs: ['A1','B1'] },
+      { type: 'BILATERAL_SWITCH', inputs: ['A2','B2','E2'], outputs: ['A2','B2'] },
+      { type: 'BILATERAL_SWITCH', inputs: ['A3','B3','E3'], outputs: ['A3','B3'] },
+      { type: 'BILATERAL_SWITCH', inputs: ['A4','B4','E4'], outputs: ['A4','B4'] },
     ],
   },
 
   // 74x4067: 16-channel analog multiplexer/demultiplexer (24-pin)
-  // CD74x4067 single-chip 16:1 analog mux; VEE at pin 13; S0-S3 select; INH inhibit; Z common I/O
+  // Single-chip 16:1 bidirectional analog mux/demux. Common I/O = Z (pin 1);
+  // 4-bit select A(LSB)/B/C/D(MSB); E (inhibit) opens all channels. No VEE pin.
+  // Source: Texas Instruments, "CD74HC4067, CD74HCT4067 High-Speed CMOS Logic
+  //   16-Channel Analog Multiplexer and Demultiplexer", SCHS209D (Nov 1998,
+  //   rev. Dec 2024). [Online]. Available:
+  //   https://www.ti.com/lit/ds/symlink/cd74hc4067.pdf. Verified: Figure 4-1
+  //   terminal assignment + Table 4-1 truth table, pages 2 & 4-5, read as
+  //   rendered PDF page images (issues.md C4 — never a WebFetch text summary).
+  //   Pin map: COMMON I/O(1), I7..I0 on 2-9, S0(10), S1(11), GND(12), S3(13),
+  //   S2(14), E inhibit(15), I15..I8 on 16-23, VCC(24). NO VEE pin — the signal
+  //   path is referenced between VCC and GND (unlike the 4051/4052/4053).
+  //   This corrects the original hand-entered stub (issues.md C6), which put the
+  //   common on pin 9 and invented a VEE on pin 13.
+  //   Channel/select names mapped to the engine's ANALOG_MUX_16 convention:
+  //   Z=COMMON, Y0..Y15=I0..I15, A/B/C/D = S0/S1/S2/S3, INH = E.
+  //   ON resistance from §1 Features (HC: 70 ohm typ at VCC=4.5 V).
   '74x4067': {
     name: '74x4067',
     simpleName: '16-Channel Analog Multiplexer/Demultiplexer',
-    description: '16-channel analog multiplexer / demultiplexer (24-pin)',
+    description: '16-channel analog mux/demux, bidirectional, INHIBIT disable (24-pin)',
     pins: 24, vcc: 24, gnd: 12,
+    onResistance: 70,
     datasheet: 'https://www.ti.com/lit/ds/symlink/cd74hc4067.pdf',
-    tags: ['analog', 'mux', 'demux', '16-channel', 'bidir', 'stub'],
-    guideOverview: 'The 74x4067 is a 16-channel analog multiplexer/demultiplexer. It uses a 4 bit select code to connect one of sixteen channels to a shared common node, and the switch path is bilateral so analog or digital signals can travel either way. This makes it a very practical part for sensor arrays, audio switching, and expanding the number of signals a small microcontroller can inspect.',
+    tags: ['analog', 'mux', 'demux', '16-channel', 'bidir'],
+    guideOverview: 'The 74x4067 is a 16-channel analog multiplexer/demultiplexer. It uses a 4 bit select code on A (LSB), B, C, and D (MSB) to connect one of sixteen channels Y0-Y15 to a shared common node Z, and the switch path is bilateral so analog or digital signals can travel either way. Pulling INHIBIT HIGH opens all sixteen channels at once. This makes it a practical part for sensor arrays, audio switching, and expanding the number of signals a small microcontroller can inspect through a single pin.',
     guidePinDescriptions: {
-      'Y7': 'Channel 7 analog I/O node.',
-      'Y6': 'Channel 6 analog I/O node.',
-      'Y5': 'Channel 5 analog I/O node.',
-      'Y4': 'Channel 4 analog I/O node.',
-      'Y3': 'Channel 3 analog I/O node.',
-      'Y2': 'Channel 2 analog I/O node.',
-      'Y1': 'Channel 1 analog I/O node.',
-      'Y0': 'Channel 0 analog I/O node.',
-      'Z': 'Common node that connects to the selected channel.',
-      'A': 'Least significant select input bit.',
-      'B': 'Select input bit B.',
-      'GND': 'Ground reference for the device.',
-      'VEE': 'Negative analog supply or lower analog rail reference.',
-      'C': 'Select input bit C.',
-      'D': 'Most significant select input bit.',
-      'INH': 'Inhibit control. Use it to disconnect all channels from Z.',
-      'Y15': 'Channel 15 analog I/O node.',
-      'Y14': 'Channel 14 analog I/O node.',
-      'Y13': 'Channel 13 analog I/O node.',
-      'Y12': 'Channel 12 analog I/O node.',
-      'Y11': 'Channel 11 analog I/O node.',
-      'Y10': 'Channel 10 analog I/O node.',
-      'Y9': 'Channel 9 analog I/O node.',
-      'VCC': 'Positive supply for the switch-control circuitry.',
+      'Z': 'Common node. It connects to the addressed channel when the chip is enabled.',
+      'Y0': 'Channel 0 in/out (selected when DCBA = 0000).',
+      'Y1': 'Channel 1 in/out (selected when DCBA = 0001).',
+      'Y2': 'Channel 2 in/out (selected when DCBA = 0010).',
+      'Y3': 'Channel 3 in/out (selected when DCBA = 0011).',
+      'Y4': 'Channel 4 in/out (selected when DCBA = 0100).',
+      'Y5': 'Channel 5 in/out (selected when DCBA = 0101).',
+      'Y6': 'Channel 6 in/out (selected when DCBA = 0110).',
+      'Y7': 'Channel 7 in/out (selected when DCBA = 0111).',
+      'Y8': 'Channel 8 in/out (selected when DCBA = 1000).',
+      'Y9': 'Channel 9 in/out (selected when DCBA = 1001).',
+      'Y10': 'Channel 10 in/out (selected when DCBA = 1010).',
+      'Y11': 'Channel 11 in/out (selected when DCBA = 1011).',
+      'Y12': 'Channel 12 in/out (selected when DCBA = 1100).',
+      'Y13': 'Channel 13 in/out (selected when DCBA = 1101).',
+      'Y14': 'Channel 14 in/out (selected when DCBA = 1110).',
+      'Y15': 'Channel 15 in/out (selected when DCBA = 1111).',
+      'A': 'Channel-select bit A (least significant).',
+      'B': 'Channel-select bit B.',
+      'C': 'Channel-select bit C.',
+      'D': 'Channel-select bit D (most significant).',
+      'INH': 'Inhibit. HIGH opens all channels so Z floats; LOW enables normal mux/demux operation.',
+      'GND': 'Ground reference (0 V); also the lower reference of the signal path.',
+      'VCC': 'Positive supply for the switches and select logic.',
     },
     guideSections: [
       {
         title: '4 bit Selection',
         paragraphs: [
-          'The A, B, C, and D inputs form a 4 bit address that selects one of the sixteen Y channels. Only the addressed channel connects to the common Z pin when the part is enabled.',
+          'The A (LSB), B, C, and D (MSB) inputs form a 4 bit address that selects one of the sixteen Y channels: DCBA = 0000 picks Y0, 0001 picks Y1, and so on up to 1111 for Y15. Only the addressed channel connects to the common Z pin, and only while INHIBIT is LOW. A HIGH on INHIBIT opens all sixteen channels regardless of the address.',
         ],
       },
       {
-        title: 'Analog Range',
+        title: 'Bidirectional Switch',
         paragraphs: [
-          'Because this is an analog switch rather than a pure logic mux, the allowed signal range depends on the supply rails. The VEE pin lets the chip work with signals that go below ground in suitable circuits.',
+          'Each channel is a real bidirectional switch, not a one-way logic gate, so it does not matter which side you drive. As a multiplexer, wire sixteen signals to Y0-Y15 and read the chosen one at Z. As a demultiplexer, drive Z and the signal appears on whichever channel you address. The connection has a low ON resistance (about 70 ohm), so the addressed channel and Z are effectively tied together.',
         ],
-        note: 'This simulator entry is a documented stub and does not model analog signal loss or switch resistance.',
+        note: 'Unlike the 4051/4052/4053, this part has no separate VEE pin — the signal path is referenced between VCC and GND.',
       },
     ],
     pinout: [
-      { pin:  1, name: 'Y7',  type: 'bidir'  },
-      { pin:  2, name: 'Y6',  type: 'bidir'  },
-      { pin:  3, name: 'Y5',  type: 'bidir'  },
-      { pin:  4, name: 'Y4',  type: 'bidir'  },
-      { pin:  5, name: 'Y3',  type: 'bidir'  },
-      { pin:  6, name: 'Y2',  type: 'bidir'  },
-      { pin:  7, name: 'Y1',  type: 'bidir'  },
-      { pin:  8, name: 'Y0',  type: 'bidir'  },
-      { pin:  9, name: 'Z',   type: 'bidir'  },
-      { pin: 10, name: 'A',   type: 'input'  },
-      { pin: 11, name: 'B',   type: 'input'  },
-      { pin: 12, name: 'GND', type: 'power'  },
-      { pin: 13, name: 'VEE', type: 'power'  },
-      { pin: 14, name: 'C',   type: 'input'  },
-      { pin: 15, name: 'D',   type: 'input'  },
-      { pin: 16, name: 'INH', type: 'input'  },
-      { pin: 17, name: 'Y15', type: 'bidir'  },
-      { pin: 18, name: 'Y14', type: 'bidir'  },
-      { pin: 19, name: 'Y13', type: 'bidir'  },
-      { pin: 20, name: 'Y12', type: 'bidir'  },
-      { pin: 21, name: 'Y11', type: 'bidir'  },
-      { pin: 22, name: 'Y10', type: 'bidir'  },
-      { pin: 23, name: 'Y9',  type: 'bidir'  },
-      { pin: 24, name: 'VCC', type: 'power'  },
+      { pin:  1, name: 'Z',   type: 'bidir', description: 'Common in/out (couples to selected channel)' },
+      { pin:  2, name: 'Y7',  type: 'bidir', description: 'Channel 7 in/out' },
+      { pin:  3, name: 'Y6',  type: 'bidir', description: 'Channel 6 in/out' },
+      { pin:  4, name: 'Y5',  type: 'bidir', description: 'Channel 5 in/out' },
+      { pin:  5, name: 'Y4',  type: 'bidir', description: 'Channel 4 in/out' },
+      { pin:  6, name: 'Y3',  type: 'bidir', description: 'Channel 3 in/out' },
+      { pin:  7, name: 'Y2',  type: 'bidir', description: 'Channel 2 in/out' },
+      { pin:  8, name: 'Y1',  type: 'bidir', description: 'Channel 1 in/out' },
+      { pin:  9, name: 'Y0',  type: 'bidir', description: 'Channel 0 in/out' },
+      { pin: 10, name: 'A',   type: 'input', description: 'Channel-select bit A (LSB, S0)' },
+      { pin: 11, name: 'B',   type: 'input', description: 'Channel-select bit B (S1)' },
+      { pin: 12, name: 'GND', type: 'power', description: 'Ground / signal reference (0 V)' },
+      { pin: 13, name: 'D',   type: 'input', description: 'Channel-select bit D (MSB, S3)' },
+      { pin: 14, name: 'C',   type: 'input', description: 'Channel-select bit C (S2)' },
+      { pin: 15, name: 'INH', type: 'input', description: 'Inhibit (E): HIGH opens all channels' },
+      { pin: 16, name: 'Y15', type: 'bidir', description: 'Channel 15 in/out' },
+      { pin: 17, name: 'Y14', type: 'bidir', description: 'Channel 14 in/out' },
+      { pin: 18, name: 'Y13', type: 'bidir', description: 'Channel 13 in/out' },
+      { pin: 19, name: 'Y12', type: 'bidir', description: 'Channel 12 in/out' },
+      { pin: 20, name: 'Y11', type: 'bidir', description: 'Channel 11 in/out' },
+      { pin: 21, name: 'Y10', type: 'bidir', description: 'Channel 10 in/out' },
+      { pin: 22, name: 'Y9',  type: 'bidir', description: 'Channel 9 in/out' },
+      { pin: 23, name: 'Y8',  type: 'bidir', description: 'Channel 8 in/out' },
+      { pin: 24, name: 'VCC', type: 'power', description: 'Positive supply' },
     ],
     gates: [
-      { type: 'GENERIC_STUB', inputs: ['A','B','C','D','INH'], outputs: [] },
+      { type: 'ANALOG_MUX_16', inputs: ['A','B','C','D','INH'] },
     ],
   },
 
@@ -346,7 +454,7 @@ export const CHIPS_BLOCK_58 = {
     pins: 14, vcc: 14, gnd: 7,
     datasheet: 'https://www.ti.com/lit/ds/symlink/cd4072b.pdf',
     tags: ['OR', 'dual', '4 input', 'gate'],
-    guideOverview: 'The 74x4072 contains two independent 4 input OR gates. An OR gate outputs HIGH when any input is HIGH, so this chip is useful when several possible conditions should all be able to trigger the same result. Four-input OR gates save space when you need to combine many signals without cascading smaller gates.',
+    guideOverview: 'The 74x4072 contains two independent 4 input OR gates. An OR gate outputs HIGH when any input is HIGH, so this chip is useful when several possible conditions should all be able to trigger the same result. Four input OR gates save space when you need to combine many signals without cascading smaller gates.',
     guidePinDescriptions: {
       '1Y': 'Output of gate 1. It goes HIGH if any of 1A, 1B, 1C, or 1D is HIGH.',
       '1A': 'Input A of gate 1.',
@@ -378,7 +486,7 @@ export const CHIPS_BLOCK_58 = {
         list: [
           'Combining several control or alarm sources into one line.',
           'Creating set or trigger conditions from multiple inputs.',
-          'Reducing gate count when four-way logic combining is needed.',
+          'Reducing gate count when four way logic combining is needed.',
         ],
       },
     ],
@@ -432,9 +540,9 @@ export const CHIPS_BLOCK_58 = {
     },
     guideSections: [
       {
-        title: 'Three-Way OR Logic',
+        title: 'Three Way OR Logic',
         paragraphs: [
-          'Each section outputs HIGH when at least one of its three inputs is HIGH. That makes the chip convenient for medium fan-in control logic without cascading multiple 2 input gates.',
+          'Each section outputs HIGH when at least one of its three inputs is HIGH. That makes the chip convenient for medium fan in control logic without cascading multiple 2 input gates.',
         ],
       },
       {
@@ -479,7 +587,7 @@ export const CHIPS_BLOCK_58 = {
     pins: 14, vcc: 14, gnd: 7,
     datasheet: 'https://www.ti.com/lit/ds/symlink/cd4078b.pdf',
     tags: ['OR', 'NOR', 'single', '8-input', 'gate'],
-    guideOverview: 'The 74x4078 is a wide 8-input logic-combining gate with both OR and NOR outputs. It can answer either “is any input active?” or “are all inputs inactive?” without needing a separate inverter. This is useful in system-monitoring logic, group enables, and any design where many conditions must be merged into one result.',
+    guideOverview: 'The 74x4078 is a wide 8-input logic combining gate with both OR and NOR outputs. It can answer either “is any input active?” or “are all inputs inactive?” without needing a separate inverter. This is useful in system monitoring logic, group enables, and any design where many conditions must be merged into one result.',
     guidePinDescriptions: {
       'Yn': 'NOR output, active HIGH only when all eight inputs are LOW.',
       'A': 'Input A of the 8-input gate.',
@@ -498,7 +606,7 @@ export const CHIPS_BLOCK_58 = {
     },
     guideSections: [
       {
-        title: 'Wide Fan-In Logic',
+        title: 'Wide Fan In Logic',
         paragraphs: [
           'An 8-input gate saves board space when many signals need to be examined together. Instead of building a tree of smaller gates, one package can combine all eight inputs directly.',
         ],
@@ -532,18 +640,18 @@ export const CHIPS_BLOCK_58 = {
     ],
   },
 
-  // 74x4094: 8 bit three-state shift register / latch (16-pin)
-  // CD74x4094 serial-in, parallel-out with output enable; STR (strobe latch), CLK, D, Q1-Q8, QS1/QS2 serial outputs
+  // 74x4094: 8 bit three state shift register / latch (16-pin)
+  // CD74x4094 serial in, parallel out with output enable; STR (strobe latch), CLK, D, Q1-Q8, QS1/QS2 serial outputs
   '74x4094': {
     name: '74x4094',
-    simpleName: '8 bit Three-State Shift Register / Latch',
-    description: '8 bit three-state shift register / latch with serial output (16-pin)',
+    simpleName: '8 bit Three State Shift Register / Latch',
+    description: '8 bit three state shift register / latch with serial output (16-pin)',
     pins: 16, vcc: 16, gnd: 8,
     datasheet: 'https://www.ti.com/lit/ds/symlink/cd74hc4094.pdf',
-    tags: ['shift-register', 'latch', '8 bit', 'tri-state'],
-    guideOverview: 'The 74x4094 is an 8 bit serial-in, parallel-out shift register with an output latch and three-state outputs. Data bits shift in serially on the clock, then the strobe input transfers the stored pattern to the output latch so the outputs can all update together. It is a useful part for LED driving, output expansion, and bus-connected serial-to-parallel conversion.',
+    tags: ['shift-register', 'latch', '8 bit', 'tri state'],
+    guideOverview: 'The 74x4094 is an 8 bit serial in, parallel out shift register with an output latch and three state outputs. Data bits shift in serially on the clock, then the strobe input transfers the stored pattern to the output latch so the outputs can all update together. It is a useful part for LED driving, output expansion, and bus connected serial to parallel conversion.',
     guidePinDescriptions: {
-      'STR': 'Strobe or latch control. Use it to transfer the internal shift-register contents to the output latch.',
+      'STR': 'Strobe or latch control. Use it to transfer the internal shift register contents to the output latch.',
       'D': 'Serial data input.',
       'CLK': 'Shift clock input. Each active edge shifts a new bit into the register.',
       'Q1': 'Parallel output bit 1.',
@@ -557,7 +665,7 @@ export const CHIPS_BLOCK_58 = {
       'Q8': 'Parallel output bit 8.',
       'QS1': 'Serial output tap used for cascading into another shift register.',
       'QS2': 'Second serial output or cascade output as defined in the datasheet.',
-      'OE': 'Output enable for the three-state outputs. Disable it when the outputs should disconnect from a shared bus.',
+      'OE': 'Output enable for the three state outputs. Disable it when the outputs should disconnect from a shared bus.',
       'VCC': 'Positive supply for the shift register and output latch.',
     },
     guideSections: [
@@ -568,7 +676,7 @@ export const CHIPS_BLOCK_58 = {
         ],
       },
       {
-        title: 'Why Three-State Helps',
+        title: 'Why Three State Helps',
         paragraphs: [
           'With OE control, the outputs can disconnect from a shared bus instead of always driving it. That makes the part easier to combine with other devices on common signal lines.',
         ],
@@ -610,7 +718,7 @@ export const CHIPS_BLOCK_58 = {
     guideOverview: 'The 74x4102 is a presettable synchronous 2-decade BCD down counter (CD40102B). Both BCD digits count downward together on each rising CP edge when CEn and SPE are LOW. Drive PL LOW on a rising CP edge to synchronously load the preset values (P20 P23 for units, P10 P13 for tens). BOun goes LOW when the units decade reaches zero; TC goes LOW when both decades reach zero.',
     guidePinDescriptions: {
       'CP': 'Clock input. Rising edge advances the counter or loads preset.',
-      'PL': 'Synchronous parallel-load enable (active LOW). Hold LOW on a rising CP edge to load P10 P13 and P20 P23.',
+      'PL': 'Synchronous parallel load enable (active LOW). Hold LOW on a rising CP edge to load P10 P13 and P20 P23.',
       'P10': 'Preset data bit 0 for the tens decade (LSB).',
       'P11': 'Preset data bit 1 for the tens decade.',
       'P12': 'Preset data bit 2 for the tens decade.',
@@ -622,7 +730,7 @@ export const CHIPS_BLOCK_58 = {
       'P21': 'Preset data bit 1 for the units decade.',
       'P20': 'Preset data bit 0 for the units decade (LSB).',
       'CEn': 'Count enable (active LOW). Both CEn and SPE must be LOW to count.',
-      'SPE': 'Single-phase enable (active LOW). Both CEn and SPE must be LOW to count.',
+      'SPE': 'Single phase enable (active LOW). Both CEn and SPE must be LOW to count.',
       'TC': 'Terminal count (active LOW). Goes LOW when both BCD decades reach 0.',
       'VCC': 'Positive supply for the logic.',
     },
@@ -672,7 +780,7 @@ export const CHIPS_BLOCK_58 = {
     datasheet: 'https://www.ti.com/lit/gpn/cd40103b',
     tags: ['counter', 'binary', '8 bit', 'down', 'preset', 'synchronous'],
     sequential: true,
-    guideOverview: 'The 74x4103 is a presettable synchronous 8 bit binary down counter (CD40103B). Load a starting value by holding PEn LOW on a rising CLK edge; the counter then decrements by 1 on each rising CLK edge when both CEn and SPE are LOW. TC goes active LOW when the counter reaches zero, making it easy to cascade multiple stages for longer delays or divide-by-N functions.',
+    guideOverview: 'The 74x4103 is a presettable synchronous 8 bit binary down counter (CD40103B). Load a starting value by holding PEn LOW on a rising CLK edge; the counter then decrements by 1 on each rising CLK edge when both CEn and SPE are LOW. TC goes active LOW when the counter reaches zero, making it easy to cascade multiple stages for longer delays or divide by-N functions.',
     guidePinDescriptions: {
       'PEn': 'Synchronous preset enable (active LOW). Hold LOW on a rising CLK edge to load P0 P7.',
       'P5': 'Preset data bit 5.',
@@ -686,7 +794,7 @@ export const CHIPS_BLOCK_58 = {
       'P0': 'Preset data bit 0 (LSB).',
       'P1': 'Preset data bit 1.',
       'P2': 'Preset data bit 2.',
-      'SPE': 'Single-phase enable (active LOW). Both CEn and SPE must be LOW to count.',
+      'SPE': 'Single phase enable (active LOW). Both CEn and SPE must be LOW to count.',
       'CLK': 'Clock input. Rising edge advances the counter or loads preset.',
       'NC': 'No internal connection. Leave unconnected.',
       'VCC': 'Positive supply for the device.',
@@ -699,7 +807,7 @@ export const CHIPS_BLOCK_58 = {
           'Both CEn and SPE must be LOW for counting to occur. Hold PEn LOW on a rising CLK edge to synchronously reload the preset at any time.',
         ],
         list: [
-          'TC (pin 9) goes LOW when the count reaches 0 connect to CEn of a cascaded stage for multi-byte counters.',
+          'TC (pin 9) goes LOW when the count reaches 0 connect to CEn of a cascaded stage for multi byte counters.',
           'The counter wraps from 0 back to 255 on the next clock edge if counting is not halted.',
         ],
       },
@@ -729,11 +837,11 @@ export const CHIPS_BLOCK_58 = {
 
   // 74x4245: 8 bit 3V/5V translating transceiver (24-pin)
   // SN74LVC4245A VCCA (pin 11) powers A-side, VCCB (pin 13) powers B-side, GND at pin 12.
-  // Pin 24 is a second VCCB connection at the far end of the package (common in dual-supply 24-pin SOIC).
+  // Pin 24 is a second VCCB connection at the far end of the package (common in dual supply 24-pin SOIC).
   '74x4245': {
     name: '74x4245',
     simpleName: '8 bit Translating Transceiver (3V/5V)',
-    description: '8 bit 3V/5V translating transceiver with three-state outputs (24-pin)',
+    description: '8 bit 3V/5V translating transceiver with three state outputs (24-pin)',
     pins: 24, vcc: 11, gnd: 12,
     datasheet: 'https://www.ti.com/lit/gpn/sn74lvc4245a',
     tags: ['transceiver', '8 bit', 'voltage-translator', 'bidir'],
@@ -768,7 +876,7 @@ export const CHIPS_BLOCK_58 = {
       {
         title: 'Voltage Translation',
         paragraphs: [
-          'A translating transceiver lets one side of the bus operate at one supply voltage while the other side uses another. VCCA sets the logic thresholds and output swing for A-side pins; VCCB does the same for B-side pins. The device handles direction control and three-state isolation so mixed-voltage systems can exchange data safely.',
+          'A translating transceiver lets one side of the bus operate at one supply voltage while the other side uses another. VCCA sets the logic thresholds and output swing for A-side pins; VCCB does the same for B-side pins. The device handles direction control and three state isolation so mixed voltage systems can exchange data safely.',
         ],
       },
       {
@@ -809,16 +917,16 @@ export const CHIPS_BLOCK_58 = {
     ],
   },
 
-  // 74x4301: 8 bit latch, inverting outputs, three-state (20-pin)
+  // 74x4301: 8 bit latch, inverting outputs, three state (20-pin)
   // MN74x4301 latching of 8 data inputs; inverted Q outputs; bus-style pinout (D inputs lower, Q outputs upper)
   '74x4301': {
     name: '74x4301',
     simpleName: '8 bit Inverting Latch (TS)',
-    description: '8 bit latch with inverting three-state outputs (20-pin)',
+    description: '8 bit latch with inverting three state outputs (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
     datasheet: 'https://www.ti.com/lit/gpn/sn74hc563',
-    tags: ['latch', '8 bit', 'inverting', 'tri-state'],
-    guideOverview: 'The 74x4301 is an octal transparent latch with inverting three-state outputs. While latch enable is active, the outputs follow the inputs through an inversion stage; when the latch closes, the last state is held and can be driven onto or disconnected from a bus. This is useful for temporary storage, bus interfacing, and address/data holding when inverted bus polarity is acceptable or desirable.',
+    tags: ['latch', '8 bit', 'inverting', 'tri state'],
+    guideOverview: 'The 74x4301 is an octal transparent latch with inverting three state outputs. While latch enable is active, the outputs follow the inputs through an inversion stage; when the latch closes, the last state is held and can be driven onto or disconnected from a bus. This is useful for temporary storage, bus interfacing, and address/data holding when inverted bus polarity is acceptable or desirable.',
     guidePinDescriptions: {
       'OEn': 'Active LOW output enable. Pull LOW to let the latched outputs drive the bus.',
       'D1': 'Data input bit 1.',
@@ -831,14 +939,14 @@ export const CHIPS_BLOCK_58 = {
       'D8': 'Data input bit 8.',
       'GND': 'Ground reference for the device.',
       'LE': 'Latch enable. When active, the latch is transparent; when inactive, it holds the previous value.',
-      'Q8n': 'Inverting three-state output bit 8.',
-      'Q7n': 'Inverting three-state output bit 7.',
-      'Q6n': 'Inverting three-state output bit 6.',
-      'Q5n': 'Inverting three-state output bit 5.',
-      'Q4n': 'Inverting three-state output bit 4.',
-      'Q3n': 'Inverting three-state output bit 3.',
-      'Q2n': 'Inverting three-state output bit 2.',
-      'Q1n': 'Inverting three-state output bit 1.',
+      'Q8n': 'Inverting three state output bit 8.',
+      'Q7n': 'Inverting three state output bit 7.',
+      'Q6n': 'Inverting three state output bit 6.',
+      'Q5n': 'Inverting three state output bit 5.',
+      'Q4n': 'Inverting three state output bit 4.',
+      'Q3n': 'Inverting three state output bit 3.',
+      'Q2n': 'Inverting three state output bit 2.',
+      'Q1n': 'Inverting three state output bit 1.',
       'VCC': 'Positive supply for the latch.',
     },
     guideSections: [
@@ -882,16 +990,16 @@ export const CHIPS_BLOCK_58 = {
     ],
   },
 
-  // 74x4302: 8 bit latch, non-inverting outputs, three-state (20-pin)
-  // MN74x4302 same as 4301 but non-inverting Q outputs
+  // 74x4302: 8 bit latch, non inverting outputs, three state (20-pin)
+  // MN74x4302 same as 4301 but non inverting Q outputs
   '74x4302': {
     name: '74x4302',
-    simpleName: '8 bit Non-Inverting Latch (TS)',
-    description: '8 bit latch with non-inverting three-state outputs (20-pin)',
+    simpleName: '8 bit Non Inverting Latch (TS)',
+    description: '8 bit latch with non inverting three state outputs (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
     datasheet: 'https://www.ti.com/lit/ds/symlink/sn74hc573a.pdf',
-    tags: ['latch', '8 bit', 'non-inverting', 'tri-state'],
-    guideOverview: 'The 74x4302 is an octal transparent latch with non-inverting three-state outputs. It can capture and hold a byte while presenting the same polarity on the output bus, making it a common building block in microprocessor-style address and data latching. The three-state outputs let it share a bus cleanly with other devices.',
+    tags: ['latch', '8 bit', 'non inverting', 'tri state'],
+    guideOverview: 'The 74x4302 is an octal transparent latch with non inverting three state outputs. It can capture and hold a byte while presenting the same polarity on the output bus, making it a common building block in microprocessor style address and data latching. The three state outputs let it share a bus cleanly with other devices.',
     guidePinDescriptions: {
       'OEn': 'Active LOW output enable. Pull LOW to let the outputs drive the bus.',
       'D1': 'Data input bit 1.',
@@ -904,14 +1012,14 @@ export const CHIPS_BLOCK_58 = {
       'D8': 'Data input bit 8.',
       'GND': 'Ground reference for the latch.',
       'LE': 'Latch enable. When active, the latch is transparent; when inactive, the stored byte is held.',
-      'Q8': 'Non-inverting three-state output bit 8.',
-      'Q7': 'Non-inverting three-state output bit 7.',
-      'Q6': 'Non-inverting three-state output bit 6.',
-      'Q5': 'Non-inverting three-state output bit 5.',
-      'Q4': 'Non-inverting three-state output bit 4.',
-      'Q3': 'Non-inverting three-state output bit 3.',
-      'Q2': 'Non-inverting three-state output bit 2.',
-      'Q1': 'Non-inverting three-state output bit 1.',
+      'Q8': 'Non inverting three state output bit 8.',
+      'Q7': 'Non inverting three state output bit 7.',
+      'Q6': 'Non inverting three state output bit 6.',
+      'Q5': 'Non inverting three state output bit 5.',
+      'Q4': 'Non inverting three state output bit 4.',
+      'Q3': 'Non inverting three state output bit 3.',
+      'Q2': 'Non inverting three state output bit 2.',
+      'Q1': 'Non inverting three state output bit 1.',
       'VCC': 'Positive supply for the device.',
     },
     guideSections: [
@@ -922,7 +1030,7 @@ export const CHIPS_BLOCK_58 = {
         ],
       },
       {
-        title: 'Three-State Bus Use',
+        title: 'Three State Bus Use',
         paragraphs: [
           'With output enable control, the latch can either drive the bus or disconnect from it. That is why parts like this are common in shared data-path designs.',
         ],
@@ -955,16 +1063,16 @@ export const CHIPS_BLOCK_58 = {
     ],
   },
 
-  // 74x4303: 8 bit D-type flip-flop, inverting outputs, three-state (20-pin)
+  // 74x4303: 8 bit D type flip flop, inverting outputs, three state (20-pin)
   // MN74x4303 clocked 8 bit FF with inverted Q outputs; bus-style pinout like 4301
   '74x4303': {
     name: '74x4303',
-    simpleName: '8 bit Inverting D Flip-Flop (TS)',
-    description: '8 bit D-type flip-flop with inverting three-state outputs (20-pin)',
+    simpleName: '8 bit Inverting D Flip Flop (TS)',
+    description: '8 bit D type flip flop with inverting three state outputs (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
     datasheet: 'https://www.ti.com/lit/gpn/sn74als564b',
-    tags: ['flip-flop', '8 bit', 'D-type', 'inverting', 'tri-state'],
-    guideOverview: 'The 74x4303 is an octal edge-triggered D register with inverting three-state outputs. On each active clock edge it captures the input byte, stores it, and presents the inverted result at the outputs when enabled. This kind of part is used in synchronous bus systems where data must be sampled only on clock edges and where active LOW bus conventions are acceptable.',
+    tags: ['flip flop', '8 bit', 'D type', 'inverting', 'tri state'],
+    guideOverview: 'The 74x4303 is an octal edge triggered D register with inverting three state outputs. On each active clock edge it captures the input byte, stores it, and presents the inverted result at the outputs when enabled. This kind of part is used in synchronous bus systems where data must be sampled only on clock edges and where active LOW bus conventions are acceptable.',
     guidePinDescriptions: {
       'OEn': 'Active LOW output enable. Pull LOW to let the stored outputs drive the bus.',
       'D1': 'Data input bit 1.',
@@ -977,21 +1085,21 @@ export const CHIPS_BLOCK_58 = {
       'D8': 'Data input bit 8.',
       'GND': 'Ground reference for the register.',
       'CLK': 'Clock input. The input byte is captured on the active clock edge.',
-      'Q8n': 'Inverting three-state output bit 8.',
-      'Q7n': 'Inverting three-state output bit 7.',
-      'Q6n': 'Inverting three-state output bit 6.',
-      'Q5n': 'Inverting three-state output bit 5.',
-      'Q4n': 'Inverting three-state output bit 4.',
-      'Q3n': 'Inverting three-state output bit 3.',
-      'Q2n': 'Inverting three-state output bit 2.',
-      'Q1n': 'Inverting three-state output bit 1.',
-      'VCC': 'Positive supply for the flip-flop register.',
+      'Q8n': 'Inverting three state output bit 8.',
+      'Q7n': 'Inverting three state output bit 7.',
+      'Q6n': 'Inverting three state output bit 6.',
+      'Q5n': 'Inverting three state output bit 5.',
+      'Q4n': 'Inverting three state output bit 4.',
+      'Q3n': 'Inverting three state output bit 3.',
+      'Q2n': 'Inverting three state output bit 2.',
+      'Q1n': 'Inverting three state output bit 1.',
+      'VCC': 'Positive supply for the flip flop register.',
     },
     guideSections: [
       {
-        title: 'Edge-Triggered Storage',
+        title: 'Edge Triggered Storage',
         paragraphs: [
-          'Unlike a transparent latch, a D flip-flop samples the inputs only on a clock edge. That makes timing easier in synchronous systems because the stored value changes only at defined instants.',
+          'Unlike a transparent latch, a D flip flop samples the inputs only on a clock edge. That makes timing easier in synchronous systems because the stored value changes only at defined instants.',
         ],
       },
       {
@@ -1028,16 +1136,16 @@ export const CHIPS_BLOCK_58 = {
     ],
   },
 
-  // 74x4304: 8 bit D-type flip-flop, non-inverting outputs, three-state (20-pin)
-  // MN74x4304 same as 4303 but non-inverting Q outputs
+  // 74x4304: 8 bit D type flip flop, non inverting outputs, three state (20-pin)
+  // MN74x4304 same as 4303 but non inverting Q outputs
   '74x4304': {
     name: '74x4304',
-    simpleName: '8 bit Non-Inverting D Flip-Flop (TS)',
-    description: '8 bit D-type flip-flop with non-inverting three-state outputs (20-pin)',
+    simpleName: '8 bit Non Inverting D Flip Flop (TS)',
+    description: '8 bit D type flip flop with non inverting three state outputs (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
     datasheet: 'https://www.ti.com/lit/gpn/sn74hc574',
-    tags: ['flip-flop', '8 bit', 'D-type', 'non-inverting', 'tri-state'],
-    guideOverview: 'The 74x4304 is an octal edge-triggered D register with non-inverting three-state outputs. It captures a byte on the clock edge and then holds that value until the next clock, which makes it a standard building block for synchronous data buses and register stages. The three-state outputs let it coexist with other bus drivers cleanly.',
+    tags: ['flip flop', '8 bit', 'D type', 'non inverting', 'tri state'],
+    guideOverview: 'The 74x4304 is an octal edge triggered D register with non inverting three state outputs. It captures a byte on the clock edge and then holds that value until the next clock, which makes it a standard building block for synchronous data buses and register stages. The three state outputs let it coexist with other bus drivers cleanly.',
     guidePinDescriptions: {
       'OEn': 'Active LOW output enable. Pull LOW to let the stored outputs drive the bus.',
       'D1': 'Data input bit 1.',
@@ -1050,14 +1158,14 @@ export const CHIPS_BLOCK_58 = {
       'D8': 'Data input bit 8.',
       'GND': 'Ground reference for the register.',
       'CLK': 'Clock input. The register captures the input byte on the active edge.',
-      'Q8': 'Non-inverting three-state output bit 8.',
-      'Q7': 'Non-inverting three-state output bit 7.',
-      'Q6': 'Non-inverting three-state output bit 6.',
-      'Q5': 'Non-inverting three-state output bit 5.',
-      'Q4': 'Non-inverting three-state output bit 4.',
-      'Q3': 'Non-inverting three-state output bit 3.',
-      'Q2': 'Non-inverting three-state output bit 2.',
-      'Q1': 'Non-inverting three-state output bit 1.',
+      'Q8': 'Non inverting three state output bit 8.',
+      'Q7': 'Non inverting three state output bit 7.',
+      'Q6': 'Non inverting three state output bit 6.',
+      'Q5': 'Non inverting three state output bit 5.',
+      'Q4': 'Non inverting three state output bit 4.',
+      'Q3': 'Non inverting three state output bit 3.',
+      'Q2': 'Non inverting three state output bit 2.',
+      'Q1': 'Non inverting three state output bit 1.',
       'VCC': 'Positive supply for the device.',
     },
     guideSections: [
@@ -1068,9 +1176,9 @@ export const CHIPS_BLOCK_58 = {
         ],
       },
       {
-        title: 'Bus-Friendly Outputs',
+        title: 'Bus Friendly Outputs',
         paragraphs: [
-          'Three-state outputs allow the stored byte to be disconnected from the bus when another device needs control of the same lines. That bus-sharing role is one of the main reasons parts like this are so common.',
+          'Three state outputs allow the stored byte to be disconnected from the bus when another device needs control of the same lines. That bus sharing role is one of the main reasons parts like this are so common.',
         ],
       },
     ],

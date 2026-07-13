@@ -3,18 +3,18 @@ export const CHIPS_BLOCK_27 = {
 
 
 
-  // - 74465: Octal buffer, non-inverting, two enables -
+  // - 74465: Octal buffer, non inverting, two enables -
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic */
-  '74465': {
+  '74x465': {
     name: '74x465',
-    simpleName: 'Octal Buffer (non-inv, 2-en)',
-    description: 'Octal buffer with two active LOW enables, non-inverting, tri-state (20-pin)',
+    simpleName: 'Octal Buffer (non inv, 2-en)',
+    description: 'Octal buffer with two active LOW enables, non inverting, tri state (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
-    tags: ['buffer', 'octal', 'tri-state', 'non-inverting'],
-    guideOverview: 'The 74x465 is an octal non-inverting tri-state buffer with two active LOW enables (G1n, G2n) that must both be LOW to enable the outputs. When either is HIGH all eight Y outputs are high-impedance. Having two enables allows the chip to be gated by two independent control signals without external NAND logic.',
+    tags: ['buffer', 'octal', 'tri state', 'non inverting'],
+    guideOverview: 'The 74x465 is an octal non inverting tri state buffer with two active LOW enables (G1n, G2n) that must both be LOW to enable the outputs. When either is HIGH all eight Y outputs are high impedance. Having two enables allows the chip to be gated by two independent control signals without external NAND logic.',
     guidePinDescriptions: {
-      'G1n': 'Enable 1 (active LOW). When HIGH, all outputs tri-stated.',
+      'G1n': 'Enable 1 (active LOW). When HIGH, all outputs tri stated.',
       'A1':  'Data input 1.',
       'A2':  'Data input 2.',
       'A3':  'Data input 3.',
@@ -24,22 +24,22 @@ export const CHIPS_BLOCK_27 = {
       'A7':  'Data input 7.',
       'A8':  'Data input 8.',
       'GND': 'Ground reference (pin 10).',
-      'Y8':  'Tri-state output 8.',
-      'Y7':  'Tri-state output 7.',
-      'Y6':  'Tri-state output 6.',
-      'Y5':  'Tri-state output 5.',
-      'Y4':  'Tri-state output 4.',
-      'Y3':  'Tri-state output 3.',
-      'Y2':  'Tri-state output 2.',
-      'Y1':  'Tri-state output 1.',
+      'Y8':  'Tri state output 8.',
+      'Y7':  'Tri state output 7.',
+      'Y6':  'Tri state output 6.',
+      'Y5':  'Tri state output 5.',
+      'Y4':  'Tri state output 4.',
+      'Y3':  'Tri state output 3.',
+      'Y2':  'Tri state output 2.',
+      'Y1':  'Tri state output 1.',
       'G2n': 'Enable 2 (active LOW). Both G1n and G2n must be LOW to enable.',
       'VCC': 'Positive supply (+5 V, pin 20).',
     },
     guideSections: [
       {
-        title: 'Dual-Enable Bus Gating',
+        title: 'Dual Enable Bus Gating',
         paragraphs: [
-          'The two-enable structure implements a wired AND in the enable path. You can use G1n for chip select and G2n for read/write direction without needing an external AND gate.',
+          'The two enable structure implements a wired AND in the enable path. You can use G1n for chip select and G2n for read/write direction without needing an external AND gate.',
         ],
       },
     ],
@@ -75,13 +75,13 @@ export const CHIPS_BLOCK_27 = {
   // - 74466: Octal buffer, inverting outputs, two enables -
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic */
-  '74466': {
+  '74x466': {
     name: '74x466',
     simpleName: 'Octal Buffer (inv, 2-en)',
-    description: 'Octal buffer with two active LOW enables, inverting outputs, tri-state (20-pin)',
+    description: 'Octal buffer, two active-LOW enables, inverting, 3-state (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
-    tags: ['buffer', 'octal', 'tri-state', 'inverting'],
-    guideOverview: 'The 74x466 is an octal inverting tri-state buffer with two active LOW enables (G1n, G2n). Both enables must be LOW to drive the Y outputs; each output is the complement of its input. Use when an inverting buffer with a dual-enable AND condition is needed.',
+    tags: ['buffer', 'octal', 'tri state', 'inverting'],
+    guideOverview: 'The 74x466 is an octal inverting tri state buffer with two active LOW enables (G1n, G2n). Both enables must be LOW to drive the Y outputs; each output is the complement of its input. Use when an inverting buffer with a dual enable AND condition is needed.',
     guidePinDescriptions: {
       'G1n': 'Enable 1 (active LOW).',
       'A1':  'Data input 1.',
@@ -93,14 +93,14 @@ export const CHIPS_BLOCK_27 = {
       'A7':  'Data input 7.',
       'A8':  'Data input 8.',
       'GND': 'Ground reference (pin 10).',
-      'Y8':  'Inverted tri-state output 8.',
-      'Y7':  'Inverted tri-state output 7.',
-      'Y6':  'Inverted tri-state output 6.',
-      'Y5':  'Inverted tri-state output 5.',
-      'Y4':  'Inverted tri-state output 4.',
-      'Y3':  'Inverted tri-state output 3.',
-      'Y2':  'Inverted tri-state output 2.',
-      'Y1':  'Inverted tri-state output 1.',
+      'Y8':  'Inverted tri state output 8.',
+      'Y7':  'Inverted tri state output 7.',
+      'Y6':  'Inverted tri state output 6.',
+      'Y5':  'Inverted tri state output 5.',
+      'Y4':  'Inverted tri state output 4.',
+      'Y3':  'Inverted tri state output 3.',
+      'Y2':  'Inverted tri state output 2.',
+      'Y1':  'Inverted tri state output 1.',
       'G2n': 'Enable 2 (active LOW).',
       'VCC': 'Positive supply (+5 V, pin 20).',
     },
@@ -108,7 +108,7 @@ export const CHIPS_BLOCK_27 = {
       {
         title: '74x465 vs 74x466',
         paragraphs: [
-          'Same pinout, same dual-enable structure. 74x465 passes data unchanged; 74x466 inverts it. Select based on the bus polarity you need on the output side.',
+          'Same pinout, same dual enable structure. 74x465 passes data unchanged; 74x466 inverts it. Select based on the bus polarity you need on the output side.',
         ],
       },
     ],
@@ -141,16 +141,16 @@ export const CHIPS_BLOCK_27 = {
     ],
   },
 
-  // - 74467: Octal buffer, non-inverting, separate enable per group -
+  // - 74467: Octal buffer, non inverting, separate enable per group -
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic */
-  '74467': {
+  '74x467': {
     name: '74x467',
-    simpleName: 'Octal Buffer (non-inv, split-en)',
-    description: 'Octal buffer, non-inverting, separate active LOW enables per nibble, tri-state (20-pin)',
+    simpleName: 'Octal Buffer (non inv, split en)',
+    description: 'Octal buffer, non-inverting, split active-LOW enables, 3-state (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
-    tags: ['buffer', 'octal', 'tri-state', 'non-inverting'],
-    guideOverview: 'The 74x467 is an octal non-inverting tri-state buffer with independent enables for each 4 bit nibble. G1n controls A1-A4/Y1-Y4 and G2n controls A5-A8/Y5-Y8. This split-enable design allows one byte to be driven as two independently-gated nibbles on the same bus.',
+    tags: ['buffer', 'octal', 'tri state', 'non inverting'],
+    guideOverview: 'The 74x467 is an octal non inverting tri state buffer with independent enables for each 4 bit nibble. G1n controls A1-A4/Y1-Y4 and G2n controls A5-A8/Y5-Y8. This split enable design allows one byte to be driven as two independently gated nibbles on the same bus.',
     guidePinDescriptions: {
       'G1n': 'Enable for lower nibble A1-A4 (active LOW).',
       'A1':  'Data input 1 (lower nibble).',
@@ -162,22 +162,22 @@ export const CHIPS_BLOCK_27 = {
       'A7':  'Data input 7.',
       'A8':  'Data input 8.',
       'GND': 'Ground reference (pin 10).',
-      'Y8':  'Tri-state output 8.',
-      'Y7':  'Tri-state output 7.',
-      'Y6':  'Tri-state output 6.',
-      'Y5':  'Tri-state output 5.',
-      'Y4':  'Tri-state output 4.',
-      'Y3':  'Tri-state output 3.',
-      'Y2':  'Tri-state output 2.',
-      'Y1':  'Tri-state output 1.',
+      'Y8':  'Tri state output 8.',
+      'Y7':  'Tri state output 7.',
+      'Y6':  'Tri state output 6.',
+      'Y5':  'Tri state output 5.',
+      'Y4':  'Tri state output 4.',
+      'Y3':  'Tri state output 3.',
+      'Y2':  'Tri state output 2.',
+      'Y1':  'Tri state output 1.',
       'G2n': 'Enable for upper nibble A5-A8 (active LOW).',
       'VCC': 'Positive supply (+5 V, pin 20).',
     },
     guideSections: [
       {
-        title: 'Split-Nibble Enable',
+        title: 'Split Nibble Enable',
         paragraphs: [
-          'The 74x467 differs from the 74x465 in that G1n and G2n are independent per-nibble enables rather than a shared AND pair. Use it when you need to selectively pass only the lower or upper byte of an 8 bit bus.',
+          'The 74x467 differs from the 74x465 in that G1n and G2n are independent per nibble enables rather than a shared AND pair. Use it when you need to selectively pass only the lower or upper byte of an 8 bit bus.',
         ],
       },
     ],
@@ -213,13 +213,13 @@ export const CHIPS_BLOCK_27 = {
   // - 74468: Octal buffer, inverting, separate enable per group -
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic */
-  '74468': {
+  '74x468': {
     name: '74x468',
-    simpleName: 'Octal Buffer (inv, split-en)',
-    description: 'Octal buffer, inverting, separate active LOW enables per nibble, tri-state (20-pin)',
+    simpleName: 'Octal Buffer (inv, split en)',
+    description: 'Octal buffer, inverting, split active-LOW enables, 3-state (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
-    tags: ['buffer', 'octal', 'tri-state', 'inverting'],
-    guideOverview: 'The 74x468 is an octal inverting tri-state buffer with split per-nibble enables (G1n for A1-A4, G2n for A5-A8). Each output is the complement of its input. Combines the inverting capability of 74x466 with the split-enable flexibility of 74x467.',
+    tags: ['buffer', 'octal', 'tri state', 'inverting'],
+    guideOverview: 'The 74x468 is an octal inverting tri state buffer with split per nibble enables (G1n for A1-A4, G2n for A5-A8). Each output is the complement of its input. Combines the inverting capability of 74x466 with the split enable flexibility of 74x467.',
     guidePinDescriptions: {
       'G1n': 'Enable for lower nibble A1-A4 (active LOW).',
       'A1':  'Data input 1 (lower nibble).',
@@ -231,20 +231,20 @@ export const CHIPS_BLOCK_27 = {
       'A7':  'Data input 7.',
       'A8':  'Data input 8.',
       'GND': 'Ground reference (pin 10).',
-      'Y8':  'Inverted tri-state output 8.',
-      'Y7':  'Inverted tri-state output 7.',
-      'Y6':  'Inverted tri-state output 6.',
-      'Y5':  'Inverted tri-state output 5.',
-      'Y4':  'Inverted tri-state output 4.',
-      'Y3':  'Inverted tri-state output 3.',
-      'Y2':  'Inverted tri-state output 2.',
-      'Y1':  'Inverted tri-state output 1.',
+      'Y8':  'Inverted tri state output 8.',
+      'Y7':  'Inverted tri state output 7.',
+      'Y6':  'Inverted tri state output 6.',
+      'Y5':  'Inverted tri state output 5.',
+      'Y4':  'Inverted tri state output 4.',
+      'Y3':  'Inverted tri state output 3.',
+      'Y2':  'Inverted tri state output 2.',
+      'Y1':  'Inverted tri state output 1.',
       'G2n': 'Enable for upper nibble A5-A8 (active LOW).',
       'VCC': 'Positive supply (+5 V, pin 20).',
     },
     guideSections: [
       {
-        title: 'Inverting Split-Enable Buffer',
+        title: 'Inverting Split Enable Buffer',
         paragraphs: [
           'Use the 74x468 when you need to selectively invert either the lower or upper nibble of an 8 bit bus independently. Both nibbles or only one can be driven at a time.',
         ],
@@ -283,16 +283,16 @@ export const CHIPS_BLOCK_27 = {
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Counter_(digital)
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic */
-  '74469': {
+  '74x469': {
     name: '74x469',
     simpleName: '8 bit Sync Up/Down Counter',
-    description: '8 bit synchronous up/down counter with parallel load and hold, tri-state (24-pin)',
+    description: '8-bit sync up/down counter, parallel load, hold, 3-state (24-pin)',
     pins: 24, vcc: 24, gnd: 12,
     sequential: true,
-    tags: ['counter', '8 bit', 'synchronous', 'up-down', 'load', 'tri-state'],
-    guideOverview: 'The 74x469 is an 8 bit synchronous up/down counter with parallel load, hold enable (ENn), tri-state outputs (OEn), and ripple carry output (RCO). U_Dn selects counting direction. LOADn (active LOW) parallel-loads P0-P7 on the next clock. ENn inhibits counting without clearing the count. RCO signals overflow (up) or underflow (down).',
+    tags: ['counter', '8 bit', 'synchronous', 'up-down', 'load', 'tri state'],
+    guideOverview: 'The 74x469 is an 8 bit synchronous up/down counter with parallel load, hold enable (ENn), tri state outputs (OEn), and ripple carry output (RCO). U_Dn selects counting direction. LOADn (active LOW) parallel loads P0-P7 on the next clock. ENn inhibits counting without clearing the count. RCO signals overflow (up) or underflow (down).',
     guidePinDescriptions: {
-      'OEn':   'Output Enable (active LOW). When HIGH, Q0-Q7 are tri-stated.',
+      'OEn':   'Output Enable (active LOW). When HIGH, Q0-Q7 are tri stated.',
       'CLK':   'Clock (rising edge).',
       'LOADn': 'Parallel Load (active LOW). Loads P0-P7 on rising CLK.',
       'U_Dn':  'Up/Down. HIGH = count up; LOW = count down.',

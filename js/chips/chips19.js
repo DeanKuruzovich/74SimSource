@@ -6,10 +6,10 @@ export const CHIPS_BLOCK_19 = {
   // ── 74286: 9 bit Parity Generator/Checker, Bus Driver ─────────────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Parity_bit */
-  '74286': {
+  '74x286': {
     name: '74x286',
     simpleName: '9 bit Parity Bus Driver',
-    description: '9 bit parity generator/checker with parity I/O port for bus systems (14-pin)',
+    description: '9 bit parity generator/checker with parity I/O port (14-pin)',
     pins: 14, vcc: 14, gnd: 7,
     tags: ['parity', '9 bit', 'bus driver', 'generator', 'checker'],
     guideOverview: 'The 74x286 is a 9 bit parity generator/checker for bus systems. It adds a PE (Parity Enable) input to the 9 data bits (A-I), which is XORed with the rest. Presenting 8 data bits plus a received parity bit through A-I lets EVEN/ODD indicate a correct or incorrect parity check.',
@@ -63,14 +63,14 @@ export const CHIPS_BLOCK_19 = {
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Open_collector
      Wikipedia: https://en.wikipedia.org/wiki/Random-access_memory */
-  '74289': {
+  '74x289': {
     name: '74x289',
     simpleName: 'RAM 16×4 (OC, inv)',
-    description: '64 bit static RAM (16 words × 4 bits), open-collector inverted outputs (16-pin)',
+    description: '64 bit static RAM (16×4), open collector inverted outputs (16-pin)',
     pins: 16, vcc: 16, gnd: 8,
     openCollector: true, sequential: true,
-    tags: ['ram', 'memory', '16x4', 'open-collector', 'static'],
-    guideOverview: 'The 74x289 is a 64 bit static RAM organized as 16 words by 4 bits with open-collector, inverted outputs. A0-A3 address 16 locations. CS (active LOW) and WE (active LOW) control access. During write, D0-D3 are stored. During read, Q0-Q3 provide inverted stored data via open-collector outputs requiring external pull ups.',
+    tags: ['ram', 'memory', '16x4', 'open collector', 'static'],
+    guideOverview: 'The 74x289 is a 64 bit static RAM organized as 16 words by 4 bits with open collector, inverted outputs. A0-A3 address 16 locations. CS (active LOW) and WE (active LOW) control access. During write, D0-D3 are stored. During read, Q0-Q3 provide inverted stored data via open collector outputs requiring external pull ups.',
     guidePinDescriptions: {
       'A0':  'Address bit 0 (LSB).',
       'A1':  'Address bit 1.',
@@ -83,7 +83,7 @@ export const CHIPS_BLOCK_19 = {
       'D1':  'Data input bit 1.',
       'D2':  'Data input bit 2.',
       'D3':  'Data input bit 3.',
-      'Q3n': 'Inverted data output bit 3 (open-collector).',
+      'Q3n': 'Inverted data output bit 3 (open collector).',
       'Q2n': 'Inverted data output bit 2.',
       'Q1n': 'Inverted data output bit 1.',
       'Q0n': 'Inverted data output bit 0. LOW = stored 1; HIGH = stored 0.',
@@ -124,29 +124,29 @@ export const CHIPS_BLOCK_19 = {
   // ── 74290: Decade Counter (÷2+÷5), 14-pin ──────────────────────────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Counter_(digital) */
-  '74290': {
+  '74x290': {
     name: '74x290',
     simpleName: 'Decade Counter (÷2+÷5)',
-    description: 'Decade counter with separate divide-by-2 and divide-by-5 sections (14-pin)',
+    description: 'Decade counter with separate divide by-2 and divide by-5 sections (14-pin)',
     pins: 14, vcc: 5, gnd: 10,
     sequential: true,
-    tags: ['counter', 'decade', 'bcd', 'divide-by-2', 'divide-by-5'],
-    guideOverview: 'The 74x290 is a decade counter built from a divide-by-2 section (CLK_A to QA) and a divide-by-5 section (CLK_B to QB-QD). Connect QA to CLK_B for a 0-9 BCD counter. R01 and R02 both HIGH asynchronously reset to 0000; R91 and R92 both HIGH asynchronously set to 1001 (decimal 9).',
+    tags: ['counter', 'decade', 'bcd', 'divide by-2', 'divide by-5'],
+    guideOverview: 'The 74x290 is a decade counter built from a divide by-2 section (CLK_A to QA) and a divide by-5 section (CLK_B to QB-QD). Connect QA to CLK_B for a 0-9 BCD counter. R01 and R02 both HIGH asynchronously reset to 0000; R91 and R92 both HIGH asynchronously set to 1001 (decimal 9).',
     guidePinDescriptions: {
-      'CLK_A': 'Clock for the divide-by-2 section. Falling-edge triggered.',
+      'CLK_A': 'Clock for the divide by-2 section. Falling edge triggered.',
       'R01':   'Reset input 1. R01 and R02 both HIGH clears all outputs.',
       'R02':   'Reset input 2.',
       'NC1':   'Not connected.',
       'VCC':   'Positive supply (pin 5).',
       'R91':   'Set-to-9 input 1. Both HIGH sets outputs to 1001.',
       'R92':   'Set-to-9 input 2.',
-      'QD':    'Divide-by-5 bit 3 (MSB of BCD).',
-      'QC':    'Divide-by-5 bit 2.',
+      'QD':    'Divide by-5 bit 3 (MSB of BCD).',
+      'QC':    'Divide by-5 bit 2.',
       'GND':   'Ground reference (pin 10).',
-      'QB':    'Divide-by-5 bit 1.',
-      'QA':    'Divide-by-2 output (LSB). Connect to CLK_B for decade mode.',
+      'QB':    'Divide by-5 bit 1.',
+      'QA':    'Divide by-2 output (LSB). Connect to CLK_B for decade mode.',
       'NC2':   'Not connected.',
-      'CLK_B': 'Clock for the divide-by-5 section. Falling-edge triggered.',
+      'CLK_B': 'Clock for the divide by-5 section. Falling edge triggered.',
     },
     pinout: [
       { pin:  1, name: 'CLK_A', type: 'input' },
@@ -180,7 +180,7 @@ export const CHIPS_BLOCK_19 = {
   // -- 74292: Programmable Frequency Divider/Digital Timer ───────────────────
   // ── 74292: Prog. Freq Divider, 16-pin ──────────────────────────────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits */
-  '74292': {
+  '74x292': {
     name: '74x292',
     simpleName: 'Prog. Freq Divider',
     description: 'Programmable frequency divider and digital timer (16-pin)',
@@ -231,7 +231,7 @@ export const CHIPS_BLOCK_19 = {
       {
         title: 'Programmable Division Ratio',
         paragraphs: [
-          'Set S0-S9 to hard-wire a division ratio N. f_out = f_clk / N.',
+          'Set S0-S9 to hard wire a division ratio N. f_out = f_clk / N.',
         ],
         formulas: [
           'f_out = f_clk / N',
@@ -244,29 +244,29 @@ export const CHIPS_BLOCK_19 = {
   // ── 74293: 4 bit Counter (÷2+÷8), 14-pin ───────────────────────────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Counter_(digital) */
-  '74293': {
+  '74x293': {
     name: '74x293',
     simpleName: '4 bit Counter (÷2+÷8)',
-    description: '4 bit binary counter with separate divide-by-2 and divide-by-8 sections (14-pin)',
+    description: '4 bit binary counter, separate divide-by-2 and divide-by-8 (14-pin)',
     pins: 14, vcc: 5, gnd: 10,
     sequential: true,
-    tags: ['counter', '4 bit', 'binary', 'divide-by-2', 'divide-by-8'],
-    guideOverview: 'The 74x293 is a 4 bit binary counter with a divide-by-2 section (CLK_A to QA) and a divide-by-8 section (CLK_B to QB-QD). Connect QA to CLK_B for a 4 bit 0-15 binary counter. R01 and R02 both HIGH reset all outputs. No set-to-9 like the 74x290.',
+    tags: ['counter', '4 bit', 'binary', 'divide by-2', 'divide by-8'],
+    guideOverview: 'The 74x293 is a 4 bit binary counter with a divide by-2 section (CLK_A to QA) and a divide by-8 section (CLK_B to QB-QD). Connect QA to CLK_B for a 4 bit 0-15 binary counter. R01 and R02 both HIGH reset all outputs. No set-to-9 like the 74x290.',
     guidePinDescriptions: {
-      'CLK_A': 'Clock for divide-by-2 section. Falling-edge triggered.',
+      'CLK_A': 'Clock for divide by-2 section. Falling edge triggered.',
       'R01':   'Reset input 1. Both HIGH clears all outputs.',
       'R02':   'Reset input 2.',
       'NC1':   'Not connected.',
       'VCC':   'Positive supply (pin 5).',
       'NC2':   'Not connected.',
       'NC3':   'Not connected.',
-      'QD':    'Divide-by-8 bit 3 (MSB).',
-      'QC':    'Divide-by-8 bit 2.',
+      'QD':    'Divide by-8 bit 3 (MSB).',
+      'QC':    'Divide by-8 bit 2.',
       'GND':   'Ground reference (pin 10).',
-      'QB':    'Divide-by-8 bit 1.',
-      'QA':    'Divide-by-2 output (LSB). Connect to CLK_B for 4 bit binary count.',
+      'QB':    'Divide by-8 bit 1.',
+      'QA':    'Divide by-2 output (LSB). Connect to CLK_B for 4 bit binary count.',
       'NC4':   'Not connected.',
-      'CLK_B': 'Clock for divide-by-8 section.',
+      'CLK_B': 'Clock for divide by-8 section.',
     },
     pinout: [
       { pin:  1, name: 'CLK_A', type: 'input' },
@@ -300,7 +300,7 @@ export const CHIPS_BLOCK_19 = {
   // -- 74294: Programmable Frequency Divider/Digital Timer (variant B) ────────
   // ── 74294: Prog. Freq Divider (B), 16-pin ──────────────────────────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits */
-  '74294': {
+  '74x294': {
     name: '74x294',
     simpleName: 'Prog. Freq Divider (B)',
     description: 'Programmable frequency divider and digital timer (variant) (16-pin)',
@@ -351,25 +351,25 @@ export const CHIPS_BLOCK_19 = {
       {
         title: 'Variant B',
         paragraphs: [
-          'The 74x294 is identical in function to the 74x292; the variant designation indicates a different technology process (speed/power trade-off).',
+          'The 74x294 is identical in function to the 74x292; the variant designation indicates a different technology process (speed/power trade off).',
         ],
       },
     ],
   },
 
-  // -- 74295: 4 bit Bidirectional Shift Register, Tri-state ──────────────────
+  // -- 74295: 4 bit Bidirectional Shift Register, Tri state ──────────────────
   // ── 74295: 4 bit Bidir Shift Reg (3-state), 14-pin ─────────────────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Shift_register
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic */
-  '74295': {
+  '74x295': {
     name: '74x295',
     simpleName: '4 bit Bidir Shift Reg (3-state)',
-    description: '4 bit bidirectional shift register with tri-state outputs (14-pin)',
+    description: '4 bit bidirectional shift register with tri state outputs (14-pin)',
     pins: 14, vcc: 14, gnd: 7,
     sequential: true,
-    tags: ['shift register', '4 bit', 'bidirectional', 'tri-state'],
-    guideOverview: 'The 74x295 is a 4 bit bidirectional shift register with 3-state outputs. MODE HIGH = serial shift (data enters at SER); MODE LOW = parallel load from A-D on the clock edge. Output Enable (active LOW): when asserted (LOW), drives Q outputs; when HIGH, tri-states them for bus connection.',
+    tags: ['shift register', '4 bit', 'bidirectional', 'tri state'],
+    guideOverview: 'The 74x295 is a 4 bit bidirectional shift register with 3-state outputs. MODE HIGH = serial shift (data enters at SER); MODE LOW = parallel load from A-D on the clock edge. Output Enable (active LOW): when asserted (LOW), drives Q outputs; when HIGH, tri states them for bus connection.',
     guidePinDescriptions: {
       'SER':  'Serial input. Data enters at QA on each clock when MODE=HIGH.',
       'A':    'Parallel data input A. Loaded when MODE=LOW on CLK edge.',
@@ -378,12 +378,12 @@ export const CHIPS_BLOCK_19 = {
       'D':    'Parallel data input D.',
       'MODE': 'Mode select. HIGH = serial shift; LOW = parallel load.',
       'GND':  'Ground reference (pin 7).',
-      'CLK':  'Clock input. Rising-edge triggered.',
-      'OEn':  'Output Enable (active LOW). When asserted (LOW), drives QA-QD; when HIGH, tri-states them.',
-      'QD':   'Output bit D (MSB / serial-out end).',
+      'CLK':  'Clock input. Rising edge triggered.',
+      'OEn':  'Output Enable (active LOW). When asserted (LOW), drives QA-QD; when HIGH, tri states them.',
+      'QD':   'Output bit D (MSB / serial out end).',
       'QC':   'Output bit C.',
       'QB':   'Output bit B.',
-      'QA':   'Output bit A (LSB / serial-in end).',
+      'QA':   'Output bit A (LSB / serial in end).',
       'VCC':  'Positive supply (+5 V, pin 14).',
     },
     pinout: [
@@ -409,67 +409,7 @@ export const CHIPS_BLOCK_19 = {
       {
         title: 'Serial/Parallel Conversion',
         paragraphs: [
-          'Set MODE=LOW and clock once to parallel-load A-D. Then set MODE=HIGH and clock four times; bits shift out QD while SER feeds new bits at QA.',
-        ],
-      },
-    ],
-  },
-
-  // -- 74297: Digital Phase-Locked Loop Filter ───────────────────────────────
-  // ── 74297: Digital PLL Filter, 16-pin ──────────────────────────────────────
-  /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits */
-  '74297': {
-    name: '74x297',
-    simpleName: 'Digital PLL Filter',
-    description: 'Digital phase-locked loop filter (16-pin)',
-    pins: 16, vcc: 16, gnd: 8,
-    sequential: true,
-    tags: ['pll', 'filter', 'phase-locked loop', 'digital'],
-    guideOverview: 'The 74x297 is a digital phase-locked loop (PLL) filter. It compares CLK_IN with a REF signal, uses K1-K4 to set filter bandwidth, and N1-N4 to program a feedback divider. The output CLK_OUT locks to N times the REF frequency. UP_DN indicates the current phase-error direction.',
-    guidePinDescriptions: {
-      'CLK_IN':  'Input clock to the phase comparator.',
-      'REF':     'Reference frequency input.',
-      'K1':      'Filter bandwidth constant bit 1.',
-      'K2':      'Filter bandwidth constant bit 2.',
-      'K3':      'Filter bandwidth constant bit 3.',
-      'K4':      'Filter bandwidth constant bit 4.',
-      'UP_DN':   'Phase error direction. Indicates lead or lag relative to REF.',
-      'GND':     'Ground reference (pin 8).',
-      'CLK_OUT': 'Phase-locked output. Tracks REF after acquisition.',
-      'N1':      'Feedback divider bit 1 (LSB).',
-      'N2':      'Feedback divider bit 2.',
-      'N3':      'Feedback divider bit 3.',
-      'N4':      'Feedback divider bit 4 (MSB).',
-      'V_IN':    'VCO voltage input.',
-      'NC1':     'Not connected.',
-      'VCC':     'Positive supply (+5 V, pin 16).',
-    },
-    pinout: [
-      { pin:  1, name: 'CLK_IN',  type: 'input' },
-      { pin:  2, name: 'REF',     type: 'input' },
-      { pin:  3, name: 'K1',      type: 'input' },
-      { pin:  4, name: 'K2',      type: 'input' },
-      { pin:  5, name: 'K3',      type: 'input' },
-      { pin:  6, name: 'K4',      type: 'input' },
-      { pin:  7, name: 'UP_DN',   type: 'output' },
-      { pin:  8, name: 'GND',     type: 'power' },
-      { pin:  9, name: 'CLK_OUT', type: 'output' },
-      { pin: 10, name: 'N1',      type: 'input' },
-      { pin: 11, name: 'N2',      type: 'input' },
-      { pin: 12, name: 'N3',      type: 'input' },
-      { pin: 13, name: 'N4',      type: 'input' },
-      { pin: 14, name: 'V_IN',    type: 'input' },
-      { pin: 15, name: 'NC1',     type: 'nc' },
-      { pin: 16, name: 'VCC',     type: 'power' },
-    ],
-    gates: [
-      { type: 'PLL_FILTER', inputs: ['CLK_IN','REF','K1','K2','K3','K4','N1','N2','N3','N4','V_IN'], outputs: ['CLK_OUT','UP_DN'] },
-    ],
-    guideSections: [
-      {
-        title: 'Digital PLL Concept',
-        paragraphs: [
-          'The phase comparator measures the difference between CLK_IN and REF. The loop filter (K1-K4) smooths corrections. With N=1 the output tracks REF directly; with N>1 CLK_OUT runs at N times the REF frequency.',
+          'Set MODE=LOW and clock once to parallel load A-D. Then set MODE=HIGH and clock four times; bits shift out QD while SER feeds new bits at QA.',
         ],
       },
     ],
@@ -479,14 +419,14 @@ export const CHIPS_BLOCK_19 = {
   // ── 74298: Quad 2:1 Mux/Storage, 16-pin ────────────────────────────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Multiplexer */
-  '74298': {
+  '74x298': {
     name: '74x298',
     simpleName: 'Quad 2:1 Mux/Storage',
     description: 'Quad 2 input multiplexer with clocked storage (16-pin)',
     pins: 16, vcc: 16, gnd: 8,
     sequential: true,
     tags: ['mux', 'multiplexer', 'storage', 'quad'],
-    guideOverview: 'The 74x298 is a quad 2-to-1 multiplexer with clocked storage. SEL chooses between A or B inputs for all four sections simultaneously; the selected value is latched on the rising CLK edge. Unlike the combinational 74x157, outputs are glitch-free and update only on the clock.',
+    guideOverview: 'The 74x298 is a quad 2-to-1 multiplexer with clocked storage. SEL chooses between A or B inputs for all four sections simultaneously; the selected value is latched on the rising CLK edge. Unlike the combinational 74x157, outputs are glitch free and update only on the clock.',
     guidePinDescriptions: {
       'A1':  'Section 1 input A.',
       'B1':  'Section 1 input B.',
@@ -530,78 +470,124 @@ export const CHIPS_BLOCK_19 = {
       {
         title: 'Clocked Selection',
         paragraphs: [
-          'Setting SEL before the clock edge ensures glitch-free output. Compare to the 74x157 where any SEL change immediately propagates. Typical use: select between two 4 bit data sources synchronously.',
+          'Setting SEL before the clock edge ensures glitch free output. Compare to the 74x157 where any SEL change immediately propagates. Typical use: select between two 4 bit data sources synchronously.',
         ],
       },
     ],
   },
 
-  // -- 74299: 8 bit Universal Shift/Storage Register, Tri-state ──────────────
-  // ── 74299: 8 bit Univ Shift Reg (3-state), 20-pin ──────────────────────────
-  /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
-     Wikipedia: https://en.wikipedia.org/wiki/Shift_register
-     Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic */
-  '74299': {
+  // ── 74x299: 8-bit universal shift/storage register, 3-state I/O, 20-pin ──────
+  // Notable: the eight A/QA..H/QH pins are multiplexed (each is both a data input
+  // and a 3-state output); two active-LOW output enables that BOTH must be LOW to
+  // drive the bus; two dedicated always-driven cascade outputs QA'/QH'; and a
+  // direct (asynchronous) overriding clear.
+  //
+  // Source: Texas Instruments, "SN54LS299, SN54S299, SN74LS299, SN74S299 8-Bit
+  //   Universal Shift/Storage Registers", SDLS156 (Mar. 1974, rev. Mar. 1988).
+  //   [Online]. Available: https://www.ti.com/lit/ds/symlink/sn74ls299.pdf.
+  //   Verified: terminal assignment (DW/N package top view) + FUNCTION TABLE +
+  //   positive-logic logic diagram, pages 1-3, read as PDF page images (NOT a text
+  //   summarizer — see issues.md C4). Cross-checks the ALS299 map in issues.md C52.
+  // PINOUT FIX (issues.md C105): the previous hand-entered pinout was wrong — it
+  //   invented separate QA-QH outputs + IO_F/G/H inputs, dropped CLR and QA'/QH',
+  //   and its old SHIFT_REG_8BIT_UNIV_TRI primitive entered SR at the QH end. Same
+  //   C2-class hazard flagged for this entry in C52. Corrected to the datasheet map
+  //   and re-pointed at the shared SHIFT_REG_8BIT_UNIV_CLR_TRI primitive.
+  '74x299': {
     name: '74x299',
     simpleName: '8 bit Univ Shift Reg (3-state)',
-    description: '8 bit bidirectional universal shift/storage register with tri-state outputs (20-pin)',
+    description: '8 bit universal shift register, muxed 3-state I/O, async clear (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
     sequential: true,
-    tags: ['shift register', '8 bit', 'bidirectional', 'universal', 'tri-state'],
-    guideOverview: 'The 74x299 is an 8 bit universal shift/storage register with 3-state I/O. Mode pins S0/S1 select: 00=hold, 01=shift right, 10=shift left, 11=parallel load. Output Enable pins (OE, active LOW) independently control the low and high nibble outputs for flexible bus interfacing.',
+    datasheet: 'https://www.ti.com/lit/ds/symlink/sn74ls299.pdf',
+    tags: ['shift register', '8 bit', 'bidirectional', 'universal', 'tri state'],
+    guideOverview: 'The 74x299 is an 8 bit universal shift/storage register. "Universal" means it does all four register jobs in one part: on each rising clock edge the two mode pins S1:S0 pick hold (00), shift right (01), shift left (10), or load all eight bits at once (11). To fit eight bits of parallel data into a 20 pin package it multiplexes its data pins — each of the eight A/QA through H/QH pins is a 3-state output when the register drives the bus and an input when you parallel-load it. Two active-LOW output enables gate all eight of those pins together: both must be LOW to drive, either one HIGH releases them to high impedance. Two extra pins, QA\' and QH\', are always-driven copies of the first and last bits, so you can chain several 299s into a wider register even while the shared bus pins are floating. A separate clear pin zeros the register the instant you pull it LOW, with no clock edge.',
     guidePinDescriptions: {
-      'S0':   'Mode select bit 0. S1:S0 = 00 hold, 01 shift-right, 10 shift-left, 11 parallel load.',
-      'OEAn': 'Output Enable A (active LOW) for bits QA-QD.',
-      'OEBn': 'Output Enable B (active LOW) for bits QE-QH.',
-      'SR':   'Serial right input. Enters at QA during shift-right (S=01).',
-      'QA':   'Bit A (LSB). Also parallel load I/O in mode 11.',
-      'QB':   'Bit B.',
-      'QC':   'Bit C.',
-      'QD':   'Bit D.',
-      'CLK':  'Clock. All mode operations occur on rising edge.',
+      'S0':   'Mode select bit 0. With S1 it picks the action on the next clock edge: 00 hold, 01 shift right, 10 shift left, 11 parallel load.',
+      'S1':   'Mode select bit 1. See S0 for the four combinations.',
+      'OE1n': 'Output Enable 1 (active LOW). Both OE1n and OE2n must be LOW for the A/QA-H/QH pins to drive the bus; either one HIGH puts all eight in high impedance.',
+      'OE2n': 'Output Enable 2 (active LOW). Works with OE1n; the two together gate the same eight I/O pins.',
+      'SR':   'Serial input for shift right. Its level is clocked into the QA stage on a shift-right edge.',
+      'SL':   'Serial input for shift left. Its level is clocked into the QH stage on a shift-left edge.',
+      'CLK':  'Clock. Hold, both shifts, and parallel load all take effect on the rising edge.',
+      'CLRn': 'Clear (active LOW). Forces all eight bits to 0 at once, ignoring the clock and the mode pins.',
+      "QA'":  'Dedicated copy of the QA (first) stage. Always driven, even when the I/O pins are in high impedance — serves as the shift-left serial output when chaining.',
+      "QH'":  'Dedicated copy of the QH (last) stage. Always driven — serves as the shift-right serial output when chaining.',
+      'A/QA': 'Bit A I/O (first stage). Drives the stored bit when the outputs are enabled; reads as load data during parallel load.',
+      'B/QB': 'Bit B I/O.',
+      'C/QC': 'Bit C I/O.',
+      'D/QD': 'Bit D I/O.',
+      'E/QE': 'Bit E I/O.',
+      'F/QF': 'Bit F I/O.',
+      'G/QG': 'Bit G I/O.',
+      'H/QH': 'Bit H I/O (last stage).',
       'GND':  'Ground reference (pin 10).',
-      'QE':   'Bit E.',
-      'QF':   'Bit F.',
-      'QG':   'Bit G.',
-      'QH':   'Bit H (MSB). Serial-out end for shift-right.',
-      'SL':   'Serial left input. Enters at QH during shift-left (S=10).',
-      'S1':   'Mode select bit 1.',
-      'IO_H': 'Parallel I/O for bit H.',
-      'IO_G': 'Parallel I/O for bit G.',
-      'IO_F': 'Parallel I/O for bit F.',
       'VCC':  'Positive supply (+5 V, pin 20).',
     },
     pinout: [
-      { pin:  1, name: 'S0',   type: 'input' },
-      { pin:  2, name: 'OEAn', type: 'input' },
-      { pin:  3, name: 'OEBn', type: 'input' },
-      { pin:  4, name: 'SR',   type: 'input' },
-      { pin:  5, name: 'QA',   type: 'output' },
-      { pin:  6, name: 'QB',   type: 'output' },
-      { pin:  7, name: 'QC',   type: 'output' },
-      { pin:  8, name: 'QD',   type: 'output' },
-      { pin:  9, name: 'CLK',  type: 'input' },
-      { pin: 10, name: 'GND',  type: 'power' },
-      { pin: 11, name: 'QE',   type: 'output' },
-      { pin: 12, name: 'QF',   type: 'output' },
-      { pin: 13, name: 'QG',   type: 'output' },
-      { pin: 14, name: 'QH',   type: 'output' },
-      { pin: 15, name: 'SL',   type: 'input' },
-      { pin: 16, name: 'S1',   type: 'input' },
-      { pin: 17, name: 'IO_H', type: 'input' },
-      { pin: 18, name: 'IO_G', type: 'input' },
-      { pin: 19, name: 'IO_F', type: 'input' },
-      { pin: 20, name: 'VCC',  type: 'power' },
+      { pin:  1, name: 'S0',   type: 'input'  },
+      { pin:  2, name: 'OE1n', type: 'input'  },
+      { pin:  3, name: 'OE2n', type: 'input'  },
+      { pin:  4, name: 'G/QG', type: 'bidir'  },
+      { pin:  5, name: 'E/QE', type: 'bidir'  },
+      { pin:  6, name: 'C/QC', type: 'bidir'  },
+      { pin:  7, name: 'A/QA', type: 'bidir'  },
+      { pin:  8, name: "QA'",  type: 'output' },
+      { pin:  9, name: 'CLRn', type: 'input'  },
+      { pin: 10, name: 'GND',  type: 'power'  },
+      { pin: 11, name: 'SR',   type: 'input'  },
+      { pin: 12, name: 'CLK',  type: 'input'  },
+      { pin: 13, name: 'B/QB', type: 'bidir'  },
+      { pin: 14, name: 'D/QD', type: 'bidir'  },
+      { pin: 15, name: 'F/QF', type: 'bidir'  },
+      { pin: 16, name: 'H/QH', type: 'bidir'  },
+      { pin: 17, name: "QH'",  type: 'output' },
+      { pin: 18, name: 'SL',   type: 'input'  },
+      { pin: 19, name: 'S1',   type: 'input'  },
+      { pin: 20, name: 'VCC',  type: 'power'  },
     ],
     gates: [
-      { type: 'SHIFT_REG_8BIT_UNIV_TRI', inputs: ['S0','S1','SR','SL','OEAn','OEBn','QA','QB','QC','QD','QE','QF','QG','QH','CLK'], outputs: ['QA','QB','QC','QD','QE','QF','QG','QH'] },
+      { type: 'SHIFT_REG_8BIT_UNIV_CLR_TRI',
+        inputs:  ['S0','S1','SR','SL','OE1n','OE2n','CLRn','CLK',
+                  'A/QA','B/QB','C/QC','D/QD','E/QE','F/QF','G/QG','H/QH'],
+        outputs: ['A/QA','B/QB','C/QC','D/QD','E/QE','F/QF','G/QG','H/QH',"QA'","QH'"] },
     ],
     guideSections: [
       {
-        title: 'Universal Shift Register Modes',
+        title: 'The four modes',
         paragraphs: [
-          'Parallel load (S1:S0=11) captures 8 bits from the QA-QH I/O pins simultaneously. Shift right (01) moves data toward QH, feeding SR at QA. Shift left (10) moves toward QA, feeding SL at QH. Hold (00) preserves the register.',
-          'Split output enables (OEAn for low nibble, OEBn for high nibble) let one half drive a bus while the other is isolated.',
+          'S1 and S0 choose what the register does on the next rising clock edge. There is no separate load or shift-enable pin — the two mode pins are the whole control interface, and nothing happens until a clock edge arrives (clear is the one exception; it is immediate).',
+          'Shift right moves every bit one stage toward QH and pulls the new QA bit from the SR pin. Shift left moves toward QA and pulls the new QH bit from SL. Parallel load ignores SR and SL and captures all eight I/O pins at once.',
+        ],
+        formulas: [
+          'S1 S0 = 0 0  ->  hold (keep the stored byte)',
+          'S1 S0 = 0 1  ->  shift right (SR -> QA, bits move toward QH)',
+          'S1 S0 = 1 0  ->  shift left (SL -> QH, bits move toward QA)',
+          'S1 S0 = 1 1  ->  parallel load (I/O pins -> register)',
+        ],
+      },
+      {
+        title: 'Multiplexed I/O and the cascade outputs',
+        paragraphs: [
+          'A full 8 bit register with separate inputs and outputs would need 16 data pins. The 299 uses eight by making each A/QA-H/QH pin do double duty: a 3-state output while the register drives the bus, an input during parallel load. In load mode the chip releases those pins to high impedance on its own so an outside source can drive them, then captures them on the clock edge.',
+          'Both output enables, OE1n and OE2n, gate all eight I/O pins together. The pins drive only when both are LOW and the register is not loading; either enable HIGH floats all eight. This is one on/off switch for the whole byte, not a per-bit or per-nibble control.',
+          'QA\' and QH\' are separate pins wired straight to the first and last stages. They stay driven no matter what the output enables do, so you can wire several 299s in a row — QH\' of one into the SR input of the next — to build a 16, 24, or 32 bit register that still shifts while the shared I/O bus sits in high impedance.',
+        ],
+      },
+      {
+        title: 'Asynchronous clear, and a layout gotcha',
+        paragraphs: [
+          'CLRn is a direct clear: pull it LOW and all eight bits go to 0 right away, with no clock edge and regardless of the mode pins. The closely related 74x323 is the same register but with a synchronous clear that only acts on a clock edge — worth checking which one a design calls for before you substitute.',
+          'Watch the pin order: the bits are not laid out in sequence around the package. A/QA through H/QH sit on pins 7, 13, 6, 14, 5, 15, 4, 16 — the odd bits count down one side while the even bits count up the other. Wire the bus by pin name, not by pin number.',
+        ],
+      },
+      {
+        title: 'Common uses',
+        list: [
+          'Bidirectional parallel-to-serial and serial-to-parallel conversion on a shared data bus.',
+          'Buffer or accumulator storage that can also shift a byte out one bit at a time.',
+          'Stacked or push-down registers, several 299s cascaded through QH\'/SR.',
+          'An 8 bit register that can load, hold, and shift both directions without external steering logic.',
         ],
       },
     ],
@@ -612,14 +598,14 @@ export const CHIPS_BLOCK_19 = {
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Open_collector
      Wikipedia: https://en.wikipedia.org/wiki/Random-access_memory */
-  '74300': {
+  '74x300': {
     name: '74x300',
     simpleName: 'RAM 256×1 (OC)',
-    description: '256 bit static RAM organized as 256 words × 1 bit, open-collector output (16-pin)',
+    description: '256 bit static RAM (256 words × 1 bit), open collector output (16-pin)',
     pins: 16, vcc: 16, gnd: 8,
     openCollector: true, sequential: true,
-    tags: ['ram', 'memory', '256x1', 'open-collector', 'static'],
-    guideOverview: 'The 74x300 is a 256x1 bit static RAM: 256 individually addressable 1 bit locations. An 8 bit address (A0-A7) selects one of 256 cells. WE (active LOW) writes DI to the selected cell when CS (active LOW) is asserted. DO is an open-collector output; add a pull up resistor to VCC.',
+    tags: ['ram', 'memory', '256x1', 'open collector', 'static'],
+    guideOverview: 'The 74x300 is a 256x1 bit static RAM: 256 individually addressable 1 bit locations. An 8 bit address (A0-A7) selects one of 256 cells. WE (active LOW) writes DI to the selected cell when CS (active LOW) is asserted. DO is an open collector output; add a pull up resistor to VCC.',
     guidePinDescriptions: {
       'A0':  'Address bit 0 (LSB).',
       'A1':  'Address bit 1.',
@@ -633,7 +619,7 @@ export const CHIPS_BLOCK_19 = {
       'WEn': 'Write Enable (active LOW). With CSn=LOW writes DI to addressed cell.',
       'CSn': 'Chip Select (active LOW). When HIGH, DO is disabled and writes inhibited.',
       'DI':  'Data input.',
-      'DO':  'Data output (open-collector). Add pull up to VCC.',
+      'DO':  'Data output (open collector). Add pull up to VCC.',
       'NC1': 'Not connected.',
       'NC2': 'Not connected.',
       'VCC': 'Positive supply (+5 V, pin 16).',
@@ -657,7 +643,7 @@ export const CHIPS_BLOCK_19 = {
       { pin: 16, name: 'VCC', type: 'power' },
     ],
     gates: [
-      { type: 'RAM_256X1_OC', inputs: ['A0','A1','A2','A3','A4','A5','A6','A7','WEn','CSn','DI'], outputs: ['DO'] },
+      { type: 'RAM_256X1_OC_N', inputs: ['A0','A1','A2','A3','A4','A5','A6','A7','WEn','CSn','DI'], outputs: ['DO'] },
     ],
     guideSections: [
       {
@@ -674,14 +660,14 @@ export const CHIPS_BLOCK_19 = {
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Open_collector
      Wikipedia: https://en.wikipedia.org/wiki/Random-access_memory */
-  '74301': {
+  '74x301': {
     name: '74x301',
     simpleName: 'RAM 256×1 (OC) v2',
-    description: '256 bit static RAM organized as 256 words × 1 bit, open-collector output (16-pin)',
+    description: '256 bit static RAM (256 words × 1 bit), open collector output (16-pin)',
     pins: 16, vcc: 16, gnd: 8,
     openCollector: true, sequential: true,
-    tags: ['ram', 'memory', '256x1', 'open-collector', 'static'],
-    guideOverview: 'The 74x301 is the Schottky (S) process variant of the 74x300. Functionally identical: 256x1 bit static RAM with open-collector output. Schottky technology gives faster access times. Pinout and usage are the same as the 74x300.',
+    tags: ['ram', 'memory', '256x1', 'open collector', 'static'],
+    guideOverview: 'The 74x301 is the Schottky (S) process variant of the 74x300. Functionally identical: 256x1 bit static RAM with open collector output. Schottky technology gives faster access times. Pinout and usage are the same as the 74x300.',
     guidePinDescriptions: {
       'A0':  'Address bit 0 (LSB).',
       'A1':  'Address bit 1.',
@@ -695,7 +681,7 @@ export const CHIPS_BLOCK_19 = {
       'WEn': 'Write Enable (active LOW).',
       'CSn': 'Chip Select (active LOW).',
       'DI':  'Data input.',
-      'DO':  'Data output (open-collector).',
+      'DO':  'Data output (open collector).',
       'NC1': 'Not connected.',
       'NC2': 'Not connected.',
       'VCC': 'Positive supply (+5 V, pin 16).',
@@ -719,7 +705,7 @@ export const CHIPS_BLOCK_19 = {
       { pin: 16, name: 'VCC', type: 'power' },
     ],
     gates: [
-      { type: 'RAM_256X1_OC', inputs: ['A0','A1','A2','A3','A4','A5','A6','A7','WEn','CSn','DI'], outputs: ['DO'] },
+      { type: 'RAM_256X1_OC_N', inputs: ['A0','A1','A2','A3','A4','A5','A6','A7','WEn','CSn','DI'], outputs: ['DO'] },
     ],
     guideSections: [
       {
@@ -736,14 +722,14 @@ export const CHIPS_BLOCK_19 = {
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Open_collector
      Wikipedia: https://en.wikipedia.org/wiki/Random-access_memory */
-  '74302': {
+  '74x302': {
     name: '74x302',
     simpleName: 'RAM 256×1 (OC) v3',
-    description: '256 bit static RAM organized as 256 words × 1 bit, open-collector output (16-pin)',
+    description: '256 bit static RAM (256 words × 1 bit), open collector output (16-pin)',
     pins: 16, vcc: 16, gnd: 8,
     openCollector: true, sequential: true,
-    tags: ['ram', 'memory', '256x1', 'open-collector', 'static'],
-    guideOverview: 'The 74x302 is the Low power Schottky (LS) variant of the 74x300. Functionally identical: 256x1 bit static RAM with open-collector output. LS technology reduces power consumption at the cost of slightly slower access times versus the 74x301.',
+    tags: ['ram', 'memory', '256x1', 'open collector', 'static'],
+    guideOverview: 'The 74x302 is the Low power Schottky (LS) variant of the 74x300. Functionally identical: 256x1 bit static RAM with open collector output. LS technology reduces power consumption at the cost of slightly slower access times versus the 74x301.',
     guidePinDescriptions: {
       'A0':  'Address bit 0 (LSB).',
       'A1':  'Address bit 1.',
@@ -757,7 +743,7 @@ export const CHIPS_BLOCK_19 = {
       'WEn': 'Write Enable (active LOW).',
       'CSn': 'Chip Select (active LOW).',
       'DI':  'Data input.',
-      'DO':  'Data output (open-collector).',
+      'DO':  'Data output (open collector).',
       'NC1': 'Not connected.',
       'NC2': 'Not connected.',
       'VCC': 'Positive supply (+5 V, pin 16).',
@@ -781,11 +767,11 @@ export const CHIPS_BLOCK_19 = {
       { pin: 16, name: 'VCC', type: 'power' },
     ],
     gates: [
-      { type: 'RAM_256X1_OC', inputs: ['A0','A1','A2','A3','A4','A5','A6','A7','WEn','CSn','DI'], outputs: ['DO'] },
+      { type: 'RAM_256X1_OC_N', inputs: ['A0','A1','A2','A3','A4','A5','A6','A7','WEn','CSn','DI'], outputs: ['DO'] },
     ],
     guideSections: [
       {
-        title: 'LS-Process Variant',
+        title: 'LS Process Variant',
         paragraphs: [
           'Low power Schottky consumes less current than the 74x300 or 74x301 at the cost of slightly higher access time. Prefer in battery or low power TTL systems.',
         ],
@@ -793,18 +779,18 @@ export const CHIPS_BLOCK_19 = {
     ],
   },
 
-  // -- 74303: Octal Divide-by-2 Clock Driver ─────────────────────────────────
+  // -- 74303: Octal Divide by-2 Clock Driver ─────────────────────────────────
   // ── 74303: Octal ÷2 Clock Driver, 16-pin ───────────────────────────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
-  '74303': {
+  '74x303': {
     name: '74x303',
     simpleName: 'Octal ÷2 Clock Driver',
-    description: 'Octal divide-by-2 clock driver; outputs Q7 and Q8 are inverted (16-pin)',
+    description: 'Octal divide by-2 clock driver; outputs Q7 and Q8 are inverted (16-pin)',
     pins: 16, vcc: 16, gnd: 8,
     sequential: true,
     tags: ['clock', 'divider', 'buffer', 'driver'],
-    guideOverview: 'The 74x303 is an octal divide-by-2 clock driver with eight independent toggle flip-flop channels. Each CLK input drives a dedicated D-FF in toggle mode, producing a half-frequency output. Q3-Q6 and Q8 are non-inverting; Q7n is inverted. Used for clock tree distribution at half the master clock rate.',
+    guideOverview: 'The 74x303 is an octal divide by-2 clock driver with eight independent toggle flip flop channels. Each CLK input drives a dedicated D-FF in toggle mode, producing a half frequency output. Q3-Q6 and Q8 are non inverting; Q7n is inverted. Used for clock tree distribution at half the master clock rate.',
     guidePinDescriptions: {
       'CLK1': 'Clock input for channel 1.',
       'CLK2': 'Clock input for channel 2.',
@@ -815,12 +801,12 @@ export const CHIPS_BLOCK_19 = {
       'CLK7': 'Clock input for channel 7.',
       'GND':  'Ground reference (pin 8).',
       'CLK8': 'Clock input for channel 8.',
-      'Q8':   'Divide-by-2 output for channel 8.',
-      'Q7n':  'Divide-by-2 output for channel 7 (inverted).',
-      'Q6':   'Divide-by-2 output for channel 6.',
-      'Q5':   'Divide-by-2 output for channel 5.',
-      'Q4':   'Divide-by-2 output for channel 4.',
-      'Q3':   'Divide-by-2 output for channel 3.',
+      'Q8':   'Divide by-2 output for channel 8.',
+      'Q7n':  'Divide by-2 output for channel 7 (inverted).',
+      'Q6':   'Divide by-2 output for channel 6.',
+      'Q5':   'Divide by-2 output for channel 5.',
+      'Q4':   'Divide by-2 output for channel 4.',
+      'Q3':   'Divide by-2 output for channel 3.',
       'VCC':  'Positive supply (+5 V, pin 16).',
     },
     pinout: [
@@ -846,9 +832,9 @@ export const CHIPS_BLOCK_19 = {
     ],
     guideSections: [
       {
-        title: 'Half-Rate Clock Distribution',
+        title: 'Half Rate Clock Distribution',
         paragraphs: [
-          'Each channel is a toggle flip-flop (D-FF with Q fed back to D). Rising CLK edges toggle the output, producing a 50% duty-cycle signal at half the input frequency. All eight channels are independent, so you can clock them from different sources.',
+          'Each channel is a toggle flip flop (D-FF with Q fed back to D). Rising CLK edges toggle the output, producing a 50% duty cycle signal at half the input frequency. All eight channels are independent, so you can clock them from different sources.',
           'Q7n is inverted; if phase alignment with other outputs is needed, account for this inversion.',
         ],
       },

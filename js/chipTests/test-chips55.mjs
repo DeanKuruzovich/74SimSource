@@ -1,21 +1,21 @@
 // test-chips55.mjs - Tests for all chips defined in js/chips/chips55.js
 // Chips under test:
-//   74x2970     : Memory timing controller (GENERIC_STUB, 24-pin)
-//   74x3004     : Selectable GTL voltage reference (GENERIC_STUB, 6-pin)
-//   74x3037     : Quad 2 input NAND, 30Ω driver (real NAND logic, 16-pin)
-//   74x3038     : Quad 2 input NAND, open-collector 30Ω (openCollector, 16-pin)
-//   74x3040     : Dual 4 input NAND, 30Ω driver (real NAND logic, 16-pin)
-//   74x3125     : Quad FET bus switch active low OE (GENERIC_STUB, 14-pin)
-//   74x3126     : Quad FET bus switch active high OE (GENERIC_STUB, 14-pin)
-//   74FCT3244   : Dual 4 bit buffer/line driver (GENERIC_STUB, 20-pin)
-//   74CBT3244   : Dual 4 bit FET bus switch CBT (GENERIC_STUB bidir, 20-pin)
-//   74FST3244   : Dual 4 bit FET bus switch FST (GENERIC_STUB bidir, 20-pin)
-//   74FCT3245   : Octal bidir transceiver (GENERIC_STUB bidir, 20-pin)
-//   74CBT3245   : Octal FET bus switch CBT (GENERIC_STUB bidir, 20-pin)
-//   74FST3245   : Octal FET bus switch FST (GENERIC_STUB bidir, 20-pin)
-//   74LVX3245   : Octal bidir voltage-translating transceiver (GENERIC_STUB bidir, 24-pin)
-//   74x3251     : 8-to-1 FET mux/demux (GENERIC_STUB bidir, 16-pin)
-//   74x3253     : Dual 4-to-1 FET mux/demux (GENERIC_STUB bidir, 16-pin)
+//   74x2970     : Memory timing controller (GENERIC_STUB, 24 pin)
+//   74x3004     : Selectable GTL voltage reference (GENERIC_STUB, 6 pin)
+//   74x3037     : Quad 2 input NAND, 30Ω driver (real NAND logic, 16 pin)
+//   74x3038     : Quad 2 input NAND, open collector 30Ω (openCollector, 16 pin)
+//   74x3040     : Dual 4 input NAND, 30Ω driver (real NAND logic, 16 pin)
+//   74x3125     : Quad FET bus switch active low OE (GENERIC_STUB, 14 pin)
+//   74x3126     : Quad FET bus switch active high OE (GENERIC_STUB, 14 pin)
+//   74FCT3244   : Dual 4 bit buffer/line driver (GENERIC_STUB, 20 pin)
+//   74CBT3244   : Dual 4 bit FET bus switch CBT (GENERIC_STUB bidir, 20 pin)
+//   74FST3244   : Dual 4 bit FET bus switch FST (GENERIC_STUB bidir, 20 pin)
+//   74FCT3245   : Octal bidir transceiver (GENERIC_STUB bidir, 20 pin)
+//   74CBT3245   : Octal FET bus switch CBT (GENERIC_STUB bidir, 20 pin)
+//   74FST3245   : Octal FET bus switch FST (GENERIC_STUB bidir, 20 pin)
+//   74LVX3245   : Octal bidir voltage-translating transceiver (GENERIC_STUB bidir, 24 pin)
+//   74x3251     : 8-to-1 FET mux/demux (GENERIC_STUB bidir, 16 pin)
+//   74x3253     : Dual 4-to-1 FET mux/demux (GENERIC_STUB bidir, 16 pin)
 
 import { CHIPS_BLOCK_55 } from '../chips/chips55.js';
 import { BreadboardWorld, holeId } from '../breadboard.js';
@@ -217,7 +217,7 @@ console.log('\n=== SECTION B: 74x3037 Quad NAND logic ===');
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SECTION C - 74x3038: Open-collector NAND logic tests
+// SECTION C - 74x3038: Open collector NAND logic tests
 // ─────────────────────────────────────────────────────────────────────────────
 
 console.log('\n=== SECTION C: 74x3038 Open Collector NAND logic ===');

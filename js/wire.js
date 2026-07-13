@@ -19,9 +19,17 @@ export function getNextWireNum() {
   return nextWireNum;
 }
 
+const _recentColors = [];
+const AVOID_LAST_N = 3;
+
 function randomWireColor(realistic = false) {
   const palette = realistic ? REALISTIC_WIRE_COLORS : WIRE_COLORS;
-  return palette[Math.floor(Math.random() * palette.length)];
+  const available = palette.filter(c => !_recentColors.includes(c));
+  const pool = available.length > 0 ? available : palette;
+  const color = pool[Math.floor(Math.random() * pool.length)];
+  _recentColors.push(color);
+  if (_recentColors.length > AVOID_LAST_N) _recentColors.shift();
+  return color;
 }
 
 // A wire is a connection between two hole IDs with a shared net number + color
@@ -178,40 +186,63 @@ export class WireManager {
     return this.wires.map(w => w.serialize());
   }
 
+  // Reassign every wire's startNet/endNet from scratch based on current hole
+  // positions. Two wire endpoints get the same net iff their holes share a
+  // breadboard strip (world.areConnected). Power-rail holes do not propagate
+  // via _findExistingNet — same rationale as addWireSmart. Mutates wires in
+  // place so outside references remain valid. When a wire bridges two
+  // previously-distinct nets, the older net's color wins (matches addWireSmart).
+  recomputeNets(world) {
+    if (!world) return;
+    const oldWires = this.wires.slice();
+    this.wires = [];
+    nextWireNum = 0;
+    for (const w of oldWires) {
+      const startIsPower = w.startHoleId.split(':')[2] === 'power';
+      const endIsPower   = w.endHoleId.split(':')[2] === 'power';
+      const existingStart = startIsPower ? null : this._findExistingNet(w.startHoleId, world);
+      const existingEnd   = endIsPower   ? null : this._findExistingNet(w.endHoleId,   world);
+      let netNum;
+      let mergedColor = null;
+      if (existingStart && existingEnd && existingStart.net !== existingEnd.net) {
+        const oldNet = existingEnd.net;
+        const newNet = existingStart.net;
+        for (const w2 of this.wires) {
+          if (w2.startNet === oldNet) w2.startNet = newNet;
+          if (w2.endNet === oldNet) w2.endNet = newNet;
+        }
+        netNum = newNet;
+        mergedColor = existingStart.color;
+      } else if (existingStart) {
+        netNum = existingStart.net;
+        mergedColor = existingStart.color;
+      } else if (existingEnd) {
+        netNum = existingEnd.net;
+        mergedColor = existingEnd.color;
+      } else {
+        netNum = nextWireNum++;
+      }
+      w.startNet = netNum;
+      w.endNet = netNum;
+      if (mergedColor) w.color = mergedColor;
+      this.wires.push(w);
+    }
+  }
+
   // Net numbers are not persisted - they're recovered from breadboard
-  // connectivity. Wires whose endpoints share a strip get the same net,
-  // matching what addWireSmart would produce when placed interactively.
+  // connectivity via recomputeNets(), so loaded wires match what addWireSmart
+  // would produce when placed interactively.
   deserialize(data, world = null) {
     this.wires = [];
     nextWireNum = 0;
     for (let i = 0; i < data.length; i++) {
       const d = data[i];
-      let netNum = null;
-      if (world) {
-        const startIsPower = d.startHoleId.split(':')[2] === 'power';
-        const endIsPower   = d.endHoleId.split(':')[2] === 'power';
-        const existingStart = startIsPower ? null : this._findExistingNet(d.startHoleId, world);
-        const existingEnd   = endIsPower   ? null : this._findExistingNet(d.endHoleId,   world);
-        if (existingStart && existingEnd && existingStart.net !== existingEnd.net) {
-          // Bridging two previously-distinct nets → renumber the second to the first.
-          const oldNet = existingEnd.net;
-          const newNet = existingStart.net;
-          for (const w of this.wires) {
-            if (w.startNet === oldNet) w.startNet = newNet;
-            if (w.endNet === oldNet) w.endNet = newNet;
-          }
-          netNum = newNet;
-        } else if (existingStart) {
-          netNum = existingStart.net;
-        } else if (existingEnd) {
-          netNum = existingEnd.net;
-        }
-      }
-      const w = new Wire(d.startHoleId, d.endHoleId, netNum);
+      const w = new Wire(d.startHoleId, d.endHoleId);
       w.id = d.id ?? (i + 1);
       if (d.color) w.color = d.color;
       this.wires.push(w);
     }
     Wire._nextId = Math.max(0, ...this.wires.map(w => w.id)) + 1;
+    if (world) this.recomputeNets(world);
   }
 }

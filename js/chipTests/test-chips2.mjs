@@ -192,11 +192,11 @@ function test8InputNAND(chipId, inputNames, outPin) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const EXPECTED_CHIP_IDS = [
-  '7415','7416','7417',
-  '7421','7422','7425',
-  '7427','7430','7437',
-  '7438','7440','7442',
-  '7445',
+  '74x15','74x16','74x17',
+  '74x21','74x22','74x25',
+  '74x27','74x30','74x37',
+  '74x38','74x40','74x42',
+  '74x45',
 ];
 
 console.log('\nS1: All 13 chip IDs present in CHIPS_BLOCK_2');
@@ -250,16 +250,16 @@ console.log('\nS3: All gate input/output names exist in chip pinout');
 
 // ── G1: 7415 Triple 3 input AND (open collector) ─────────────────────────────
 console.log('\nG1: 7415 - Triple 3 input AND OC (key cases, all 3 gates)');
-test3InputGate('7415', '1A', '1B', '1C', '1Y', 'AND');
-test3InputGate('7415', '2A', '2B', '2C', '2Y', 'AND');
-test3InputGate('7415', '3A', '3B', '3C', '3Y', 'AND');
+test3InputGate('74x15', '1A', '1B', '1C', '1Y', 'AND');
+test3InputGate('74x15', '2A', '2B', '2C', '2Y', 'AND');
+test3InputGate('74x15', '3A', '3B', '3C', '3Y', 'AND');
 
 // ── G2: 7416 Hex NOT (open collector) ────────────────────────────────────────
 console.log('\nG2: 7416 - Hex NOT OC (all 6 gates, 2 cases each)');
 {
   const gates = [['1A','1Y'],['2A','2Y'],['3A','3Y'],['4A','4Y'],['5A','5Y'],['6A','6Y']];
   for (const [inp, out] of gates) {
-    testSingleInputGate('7416', inp, out, 'NOT');
+    testSingleInputGate('74x16', inp, out, 'NOT');
   }
 }
 
@@ -268,52 +268,52 @@ console.log('\nG3: 7417 - Hex BUFFER OC (all 6 gates, 2 cases each)');
 {
   const gates = [['1A','1Y'],['2A','2Y'],['3A','3Y'],['4A','4Y'],['5A','5Y'],['6A','6Y']];
   for (const [inp, out] of gates) {
-    testSingleInputGate('7417', inp, out, 'BUFFER');
+    testSingleInputGate('74x17', inp, out, 'BUFFER');
   }
 }
 
 // ── G4: 7421 Dual 4 input AND ────────────────────────────────────────────────
 console.log('\nG4: 7421 - Dual 4 input AND (key cases, both gates)');
-test4InputGate('7421', ['1A','1B','1C','1D'], '1Y', 'AND');
-test4InputGate('7421', ['2A','2B','2C','2D'], '2Y', 'AND');
+test4InputGate('74x21', ['1A','1B','1C','1D'], '1Y', 'AND');
+test4InputGate('74x21', ['2A','2B','2C','2D'], '2Y', 'AND');
 
 // ── G5: 7422 Dual 4 input NAND (open collector) ──────────────────────────────
 console.log('\nG5: 7422 - Dual 4 input NAND OC (key cases, both gates)');
-test4InputGate('7422', ['1A','1B','1C','1D'], '1Y', 'NAND');
-test4InputGate('7422', ['2A','2B','2C','2D'], '2Y', 'NAND');
+test4InputGate('74x22', ['1A','1B','1C','1D'], '1Y', 'NAND');
+test4InputGate('74x22', ['2A','2B','2C','2D'], '2Y', 'NAND');
 
 // ── G6: 7425 Dual 4 input NOR (with strobe) ──────────────────────────────────
 // Note: the strobe pin (1G/2G) is in the pinout but absent from the gate
 // definition, so it is not evaluated by the simulator. Tests cover the 4
 // declared inputs only.
 console.log('\nG6: 7425 - Dual 4 input NOR (strobe not in gate def) (both gates)');
-test4InputGate('7425', ['1A','1B','1C','1D'], '1Y', 'NOR');
-test4InputGate('7425', ['2A','2B','2C','2D'], '2Y', 'NOR');
+test4InputGate('74x25', ['1A','1B','1C','1D'], '1Y', 'NOR');
+test4InputGate('74x25', ['2A','2B','2C','2D'], '2Y', 'NOR');
 
 // ── G7: 7427 Triple 3 input NOR ──────────────────────────────────────────────
 console.log('\nG7: 7427 - Triple 3 input NOR (key cases, all 3 gates)');
-test3InputGate('7427', '1A', '1B', '1C', '1Y', 'NOR');
-test3InputGate('7427', '2A', '2B', '2C', '2Y', 'NOR');
-test3InputGate('7427', '3A', '3B', '3C', '3Y', 'NOR');
+test3InputGate('74x27', '1A', '1B', '1C', '1Y', 'NOR');
+test3InputGate('74x27', '2A', '2B', '2C', '2Y', 'NOR');
+test3InputGate('74x27', '3A', '3B', '3C', '3Y', 'NOR');
 
 // ── G8: 7430 8-input NAND ────────────────────────────────────────────────────
 console.log('\nG8: 7430 - 8-input NAND (3 key cases)');
-test8InputNAND('7430', ['A','B','C','D','E','F','G','H'], 'Y');
+test8InputNAND('74x30', ['A','B','C','D','E','F','G','H'], 'Y');
 
 // ── G9: 7437 Quad 2 input NAND (buffer) ──────────────────────────────────────
 console.log('\nG9: 7437 - Quad 2 input NAND buffer (full truth table gate 1, spot-check gate 4)');
-test2InputGate('7437', '1A', '1B', '1Y', 'NAND');
-test2InputGate('7437', '4A', '4B', '4Y', 'NAND');
+test2InputGate('74x37', '1A', '1B', '1Y', 'NAND');
+test2InputGate('74x37', '4A', '4B', '4Y', 'NAND');
 
 // ── G10: 7438 Quad 2 input NAND (open collector) ─────────────────────────────
 console.log('\nG10: 7438 - Quad 2 input NAND OC (full truth table gate 1, spot-check gate 4)');
-test2InputGate('7438', '1A', '1B', '1Y', 'NAND');
-test2InputGate('7438', '4A', '4B', '4Y', 'NAND');
+test2InputGate('74x38', '1A', '1B', '1Y', 'NAND');
+test2InputGate('74x38', '4A', '4B', '4Y', 'NAND');
 
 // ── G11: 7440 Dual 4 input NAND (buffer) ─────────────────────────────────────
 console.log('\nG11: 7440 - Dual 4 input NAND buffer (key cases, both gates)');
-test4InputGate('7440', ['1A','1B','1C','1D'], '1Y', 'NAND');
-test4InputGate('7440', ['2A','2B','2C','2D'], '2Y', 'NAND');
+test4InputGate('74x40', ['1A','1B','1C','1D'], '1Y', 'NAND');
+test4InputGate('74x40', ['2A','2B','2C','2D'], '2Y', 'NAND');
 
 // ── G12: 7442 BCD to Decimal Decoder ─────────────────────────────────────────
 // The simulator does not implement BCD_DECIMAL gate evaluation (falls through
@@ -321,7 +321,7 @@ test4InputGate('7440', ['2A','2B','2C','2D'], '2Y', 'NAND');
 // simulated without throwing, and that output pin count is correct.
 console.log('\nG12: 7442 - BCD to Decimal (BCD_DECIMAL not simulated - smoke test)');
 {
-  const { world, chip, wm } = setupChipWithPower('7442');
+  const { world, chip, wm } = setupChipWithPower('74x42');
   const sim = new CircuitSimulator();
   let threw = false;
   try { sim.evaluate(world, [chip], wm); } catch (e) { threw = true; }
@@ -342,7 +342,7 @@ console.log('\nG12: 7442 - BCD to Decimal (BCD_DECIMAL not simulated - smoke tes
 // ── G13: 7445 BCD to Decimal Decoder/Driver (open collector) ─────────────────
 console.log('\nG13: 7445 - BCD to Decimal OC (BCD_DECIMAL not simulated - smoke test)');
 {
-  const { world, chip, wm } = setupChipWithPower('7445');
+  const { world, chip, wm } = setupChipWithPower('74x45');
   const sim = new CircuitSimulator();
   let threw = false;
   try { sim.evaluate(world, [chip], wm); } catch (e) { threw = true; }
@@ -383,9 +383,9 @@ console.log('\nP2: colSpan === pins/2 for all chips');
   }
 }
 
-console.log('\nP3: VCC and GND pins at correct hole IDs (14-pin and 16-pin layouts)');
+console.log('\nP3: VCC and GND pins at correct hole IDs (14 pin and 16 pin layouts)');
 {
-  // 14-pin DIP at col=10: VCC (pin 14) → top row col=10, row=4; GND (pin 7) → bottom col=16, row=5
+  // 14 pin DIP at col=10: VCC (pin 14) → top row col=10, row=4; GND (pin 7) → bottom col=16, row=5
   for (const chipId of EXPECTED_CHIP_IDS.filter(id => CHIPS_BLOCK_2[id].pins === 14)) {
     const chip = new ChipComponent(chipId);
     chip.place(0, 0, 10, 4);
@@ -397,7 +397,7 @@ console.log('\nP3: VCC and GND pins at correct hole IDs (14-pin and 16-pin layou
       `${chipId} GND at col=16 row=5 (got ${gndPin.holeId})`);
   }
 
-  // 16-pin DIP at col=10: VCC (pin 16) → top row col=10, row=4; GND (pin 8) → bottom col=17, row=5
+  // 16 pin DIP at col=10: VCC (pin 16) → top row col=10, row=4; GND (pin 8) → bottom col=17, row=5
   for (const chipId of EXPECTED_CHIP_IDS.filter(id => CHIPS_BLOCK_2[id].pins === 16)) {
     const chip = new ChipComponent(chipId);
     chip.place(0, 0, 10, 4);

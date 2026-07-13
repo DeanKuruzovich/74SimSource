@@ -6,14 +6,14 @@ export const CHIPS_BLOCK_20 = {
   // ── 74304: Octal ÷2 Clock Driver ──────────────────────────────────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Flip-flop_(electronics) */
-  '74304': {
+  '74x304': {
     name: '74x304',
     simpleName: 'Octal ÷2 Clock Driver',
-    description: 'Octal divide-by-2 clock driver (16-pin)',
+    description: 'Octal divide by-2 clock driver (16-pin)',
     pins: 16, vcc: 16, gnd: 8,
     sequential: true,
     tags: ['clock', 'divider', 'driver', 'octal'],
-    guideOverview: 'The 74x304 is an octal divide-by-2 clock driver with 8 independent toggle flip-flop channels. All outputs (Q3-Q8) are non-inverting, unlike the 74x303 where Q7n is inverted. Used for distributing a half-rate clock to up to 8 loads with high drive capability.',
+    guideOverview: 'The 74x304 is an octal divide by-2 clock driver with 8 independent toggle flip flop channels. All outputs (Q3-Q8) are non inverting, unlike the 74x303 where Q7n is inverted. Used for distributing a half rate clock to up to 8 loads with high drive capability.',
     guidePinDescriptions: {
       'CLK1': 'Clock input for channel 1.',
       'CLK2': 'Clock input for channel 2.',
@@ -24,12 +24,12 @@ export const CHIPS_BLOCK_20 = {
       'CLK7': 'Clock input for channel 7.',
       'GND':  'Ground reference (pin 8).',
       'CLK8': 'Clock input for channel 8.',
-      'Q8':   'Divide-by-2 output for channel 8 (non-inverting).',
-      'Q7':   'Divide-by-2 output for channel 7.',
-      'Q6':   'Divide-by-2 output for channel 6.',
-      'Q5':   'Divide-by-2 output for channel 5.',
-      'Q4':   'Divide-by-2 output for channel 4.',
-      'Q3':   'Divide-by-2 output for channel 3.',
+      'Q8':   'Divide by-2 output for channel 8 (non inverting).',
+      'Q7':   'Divide by-2 output for channel 7.',
+      'Q6':   'Divide by-2 output for channel 6.',
+      'Q5':   'Divide by-2 output for channel 5.',
+      'Q4':   'Divide by-2 output for channel 4.',
+      'Q3':   'Divide by-2 output for channel 3.',
       'VCC':  'Positive supply (+5 V, pin 16).',
     },
     pinout: [
@@ -55,9 +55,9 @@ export const CHIPS_BLOCK_20 = {
     ],
     guideSections: [
       {
-        title: 'Octal Half-Rate Clock Driver',
+        title: 'Octal Half Rate Clock Driver',
         paragraphs: [
-          'Each of the 8 channels divides its clock by 2, delivering a 50% duty-cycle output. All outputs are in phase with each other if driven by the same source. Choose the 74x304 over the 74x303 when consistent polarity across all 8 outputs is required.',
+          'Each of the 8 channels divides its clock by 2, delivering a 50% duty cycle output. All outputs are in phase with each other if driven by the same source. Choose the 74x304 over the 74x303 when consistent polarity across all 8 outputs is required.',
         ],
       },
     ],
@@ -66,14 +66,14 @@ export const CHIPS_BLOCK_20 = {
   // -- 74305 ─────────────────────
   // ── 74305: Octal ÷2 Clock (4 inv), 16-pin ──────────────────────────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits */
-  '74305': {
+  '74x305': {
     name: '74x305',
     simpleName: 'Octal ÷2 Clock (4 inv)',
-    description: 'Octal divide-by-2 clock driver with 4 inverted outputs (16-pin)',
+    description: 'Octal divide by-2 clock driver with 4 inverted outputs (16-pin)',
     pins: 16, vcc: 16, gnd: 8,
     sequential: true,
     tags: ['clock', 'divider', 'driver', 'octal', 'inverting'],
-    guideOverview: 'The 74x305 is an octal divide-by-2 clock driver where channels 5-8 produce inverted outputs (Q5n-Q8n) and channels 3-4 produce non-inverted outputs. This mixed polarity is useful when a circuit needs complementary clock phases at different loads from a single chip.',
+    guideOverview: 'The 74x305 is an octal divide by-2 clock driver where channels 5-8 produce inverted outputs (Q5n-Q8n) and channels 3-4 produce non inverted outputs. This mixed polarity is useful when a circuit needs complementary clock phases at different loads from a single chip.',
     guidePinDescriptions: {
       'CLK1': 'Clock input for channel 1.',
       'CLK2': 'Clock input for channel 2.',
@@ -84,12 +84,12 @@ export const CHIPS_BLOCK_20 = {
       'CLK7': 'Clock input for channel 7.',
       'GND':  'Ground reference (pin 8).',
       'CLK8': 'Clock input for channel 8.',
-      'Q8n':  'Divide-by-2 output for channel 8 (inverted).',
-      'Q7n':  'Divide-by-2 output for channel 7 (inverted).',
-      'Q6n':  'Divide-by-2 output for channel 6 (inverted).',
-      'Q5n':  'Divide-by-2 output for channel 5 (inverted).',
-      'Q4':   'Divide-by-2 output for channel 4 (non-inverting).',
-      'Q3':   'Divide-by-2 output for channel 3 (non-inverting).',
+      'Q8n':  'Divide by-2 output for channel 8 (inverted).',
+      'Q7n':  'Divide by-2 output for channel 7 (inverted).',
+      'Q6n':  'Divide by-2 output for channel 6 (inverted).',
+      'Q5n':  'Divide by-2 output for channel 5 (inverted).',
+      'Q4':   'Divide by-2 output for channel 4 (non inverting).',
+      'Q3':   'Divide by-2 output for channel 3 (non inverting).',
       'VCC':  'Positive supply (+5 V, pin 16).',
     },
     pinout: [
@@ -117,7 +117,7 @@ export const CHIPS_BLOCK_20 = {
       {
         title: 'Mixed Polarity Clock Distribution',
         paragraphs: [
-          'Channels 3-4 output non-inverted half-rate clocks; channels 5-8 output inverted half-rate clocks. Feed all channels from the same source to get complementary phase clock pairs without external inverters.',
+          'Channels 3-4 output non inverted half rate clocks; channels 5-8 output inverted half rate clocks. Feed all channels from the same source to get complementary phase clock pairs without external inverters.',
         ],
       },
     ],
@@ -129,38 +129,38 @@ export const CHIPS_BLOCK_20 = {
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic
      Wikipedia: https://en.wikipedia.org/wiki/Open_collector
      Wikipedia: https://en.wikipedia.org/wiki/Bus_transceiver */
-  '74306': {
+  '74x306': {
     name: '74x306',
     simpleName: '8 bit Bus Xcvr GTL+',
-    description: '8 bit LV-TTL to GTL+ bus transceiver with tri-state and OC outputs (24-pin)',
+    description: '8 bit LV-TTL to GTL+ bus transceiver with tri state and OC outputs (24-pin)',
     pins: 24, vcc: 24, gnd: 12,
-    tags: ['transceiver', 'bus', 'GTL+', '8 bit', 'tri-state', 'open-collector'],
-    guideOverview: 'The 74x306 is an 8 bit bidirectional bus transceiver that translates between LV-TTL logic levels and GTL+ (Gunning Transceiver Logic Plus) bus levels. DIR controls direction; OEn (active LOW) enables the chip. Used to interface a TTL processor bus with a GTL+ backplane.',
+    tags: ['transceiver', 'bus', 'GTL+', '8 bit', 'tri state', 'open collector'],
+    guideOverview: 'The 74x306 is an 8 bit bidirectional bus transceiver that translates between LV TTL logic levels and GTL+ (Gunning Transceiver Logic Plus) bus levels. DIR controls direction; OEn (active LOW) enables the chip. Used to interface a TTL processor bus with a GTL+ backplane.',
     guidePinDescriptions: {
-      'OEn':  'Output Enable (active LOW). When asserted (LOW), drives outputs; when HIGH, disables (tri-states) them.',
-      'DIR':  'Direction control. HIGH = A-to-B; LOW = B-to-A.',
-      'A1':   'Port A bit 1.',
-      'B1':   'Port B bit 1 (GTL+ side).',
-      'A2':   'Port A bit 2.',
-      'B2':   'Port B bit 2.',
-      'A3':   'Port A bit 3.',
-      'B3':   'Port B bit 3.',
-      'A4':   'Port A bit 4.',
-      'B4':   'Port B bit 4.',
-      'A5':   'Port A bit 5.',
-      'GND':  'Ground reference (pin 12).',
-      'B5':   'Port B bit 5.',
-      'A6':   'Port A bit 6.',
-      'B6':   'Port B bit 6.',
-      'A7':   'Port A bit 7.',
-      'B7':   'Port B bit 7.',
-      'A8':   'Port A bit 8.',
-      'B8':   'Port B bit 8.',
-      'NC1':  'Not connected.',
-      'NC2':  'Not connected.',
-      'NC3':  'Not connected.',
-      'NC4':  'Not connected.',
-      'VCC':  'Positive supply (+5 V, pin 24).',
+      'OEn': 'Output Enable (active LOW). When asserted (LOW), drives outputs; when HIGH, disables (tri states) them.',
+      'DIR': 'Direction control. HIGH = A-to B; LOW = B-to A.',
+      'A1': 'Port A bit 1.',
+      'B1': 'Port B bit 1 (GTL+ side).',
+      'A2': 'Port A bit 2.',
+      'B2': 'Port B bit 2.',
+      'A3': 'Port A bit 3.',
+      'B3': 'Port B bit 3.',
+      'A4': 'Port A bit 4.',
+      'B4': 'Port B bit 4.',
+      'A5': 'Port A bit 5.',
+      'GND': 'Ground reference (pin 12).',
+      'B5': 'Port B bit 5.',
+      'A6': 'Port A bit 6.',
+      'B6': 'Port B bit 6.',
+      'A7': 'Port A bit 7.',
+      'B7': 'Port B bit 7.',
+      'A8': 'Port A bit 8.',
+      'B8': 'Port B bit 8.',
+      'NC1': 'Not connected.',
+      'NC2': 'Not connected.',
+      'NC3': 'Not connected.',
+      'NC4': 'Not connected.',
+      'VCC': 'Positive supply (+5 V, pin 24).',
     },
     pinout: [
       { pin:  1, name: 'OEn',  type: 'input' },
@@ -195,7 +195,7 @@ export const CHIPS_BLOCK_20 = {
       {
         title: 'GTL+ Level Translation',
         paragraphs: [
-          'GTL+ is a low-voltage differential-like bus standard used in servers and workstations. Logic HIGH on a GTL+ bus is achieved by a pull up resistor; logic LOW is driven by an open-collector output. The 74x306 bridges 5V TTL logic to this bus, handling level shifting in both directions.',
+          'GTL+ is a low voltage differential like bus standard used in servers and workstations. Logic HIGH on a GTL+ bus is achieved by a pull up resistor; logic LOW is driven by an open collector output. The 74x306 bridges 5V TTL logic to this bus, handling level shifting in both directions.',
         ],
       },
     ],
@@ -206,14 +206,14 @@ export const CHIPS_BLOCK_20 = {
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Open_collector
      Wikipedia: https://en.wikipedia.org/wiki/Random-access_memory */
-  '74309': {
+  '74x309': {
     name: '74x309',
     simpleName: 'RAM 1024×1 (OC)',
-    description: '1024 bit static RAM organized as 1024 words × 1 bit, open-collector (16-pin)',
+    description: '1024 bit static RAM (1024 words × 1 bit), open collector (16-pin)',
     pins: 16, vcc: 16, gnd: 8,
     openCollector: true, sequential: true,
-    tags: ['ram', 'memory', '1024x1', 'open-collector', 'static'],
-    guideOverview: 'The 74x309 is a 1024x1 bit static RAM with a 10 bit address (A0-A9) selecting one of 1024 single-bit cells. CSn and WEn (both active LOW) control access. The open-collector DO output requires a pull up resistor. Twice the depth of the 74x300.',
+    tags: ['ram', 'memory', '1024x1', 'open collector', 'static'],
+    guideOverview: 'The 74x309 is a 1024x1 bit static RAM with a 10 bit address (A0-A9) selecting one of 1024 single bit cells. CSn and WEn (both active LOW) control access. The open collector DO output requires a pull up resistor. Twice the depth of the 74x300.',
     guidePinDescriptions: {
       'A0':  'Address bit 0 (LSB).',
       'A1':  'Address bit 1.',
@@ -229,7 +229,7 @@ export const CHIPS_BLOCK_20 = {
       'WEn': 'Write Enable (active LOW).',
       'CSn': 'Chip Select (active LOW).',
       'DI':  'Data input.',
-      'DO':  'Data output (open-collector). Add pull up to VCC.',
+      'DO':  'Data output (open collector). Add pull up to VCC.',
       'VCC': 'Positive supply (+5 V, pin 16).',
     },
     pinout: [
@@ -257,7 +257,7 @@ export const CHIPS_BLOCK_20 = {
       {
         title: '1024x1 Static RAM',
         paragraphs: [
-          'Eight 74x309 chips in parallel give 1024 bytes of byte-wide RAM. Chip select lines are tied together or decoded individually for expansion.',
+          'Eight 74x309 chips in parallel give 1024 bytes of byte wide RAM. Chip select lines are tied together or decoded individually for expansion.',
         ],
       },
     ],
@@ -267,13 +267,13 @@ export const CHIPS_BLOCK_20 = {
   // ── 74310: Octal Buffer/Inv (ST, 3-state), 20-pin ──────────────────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Three-state_logic */
-  '74310': {
+  '74x310': {
     name: '74x310',
     simpleName: 'Octal Buffer/Inv (ST, 3-state)',
-    description: 'Octal inverting buffer with Schmitt trigger inputs and tri-state outputs (20-pin)',
+    description: 'Octal inverting buffer, Schmitt trigger inputs, 3-state outputs (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
-    tags: ['buffer', 'inverter', 'schmitt trigger', 'tri-state', 'octal'],
-    guideOverview: 'The 74x310 is an octal inverting buffer with Schmitt-trigger inputs and 3-state outputs. Schmitt triggers provide hysteresis, cleaning up noisy or slowly-slewing signals before inversion. Two independent output-enable pins (OE1n, OE2n) control the two groups of four buffers.',
+    tags: ['buffer', 'inverter', 'schmitt trigger', 'tri state', 'octal'],
+    guideOverview: 'The 74x310 is an octal inverting buffer with Schmitt trigger inputs and 3-state outputs. Schmitt triggers provide hysteresis, cleaning up noisy or slowly slewing signals before inversion. Two independent output-enable pins (OE1n, OE2n) control the two groups of four buffers.',
     guidePinDescriptions: {
       'OE1n': 'Output Enable 1 (active LOW) for Y1-Y4.',
       'A1':   'Input 1.',
@@ -323,9 +323,9 @@ export const CHIPS_BLOCK_20 = {
     ],
     guideSections: [
       {
-        title: 'Schmitt-Trigger Inputs',
+        title: 'Schmitt Trigger Inputs',
         paragraphs: [
-          'Schmitt-trigger inputs add hysteresis: the input threshold for switching HIGH is higher than for switching LOW. This prevents oscillation on slowly-changing inputs and rejects glitches. Useful at bus interfaces, long cable receivers, or after RC filter stages.',
+          'Schmitt trigger inputs add hysteresis: the input threshold for switching HIGH is higher than for switching LOW. This prevents oscillation on slowly changing inputs and rejects glitches. Useful at bus interfaces, long cable receivers, or after RC filter stages.',
         ],
       },
     ],
@@ -337,14 +337,14 @@ export const CHIPS_BLOCK_20 = {
      Wikipedia: https://en.wikipedia.org/wiki/Flip-flop_(electronics)
      Wikipedia: https://en.wikipedia.org/wiki/Open_collector
      Wikipedia: https://en.wikipedia.org/wiki/Random-access_memory */
-  '74311': {
+  '74x311': {
     name: '74x311',
     simpleName: 'RAM 16×9 Latch (OC)',
-    description: '144 bit static RAM (16 words × 9 bits) with output latch, open-collector (20-pin)',
+    description: '144 bit static RAM (16×9), output latch, open collector (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
     openCollector: true, sequential: true,
-    tags: ['ram', 'memory', '16x9', 'latch', 'open-collector'],
-    guideOverview: 'The 74x311 is a 144 bit static RAM (16 words x 9 bits) with an output latch and open-collector output. The LE (Latch Enable) pin holds the Q output stable during address changes, preventing glitches during reads. OEn (active LOW) enables the output.',
+    tags: ['ram', 'memory', '16x9', 'latch', 'open collector'],
+    guideOverview: 'The 74x311 is a 144 bit static RAM (16 words x 9 bits) with an output latch and open collector output. The LE (Latch Enable) pin holds the Q output stable during address changes, preventing glitches during reads. OEn (active LOW) enables the output.',
     guidePinDescriptions: {
       'A0':  'Address bit 0 (LSB).',
       'A1':  'Address bit 1.',
@@ -352,7 +352,7 @@ export const CHIPS_BLOCK_20 = {
       'A3':  'Address bit 3 (MSB). Selects 1 of 16 words.',
       'WEn': 'Write Enable (active LOW). With CSn=LOW writes D0-D8.',
       'CSn': 'Chip Select (active LOW).',
-      'OEn': 'Output Enable (active LOW). When HIGH, Q is tri-stated.',
+      'OEn': 'Output Enable (active LOW). When HIGH, Q is tri stated.',
       'LE':  'Latch Enable. When HIGH, output Q tracks the RAM read; when LOW, Q is latched.',
       'D0':  'Data input bit 0.',
       'GND': 'Ground reference (pin 10).',
@@ -364,7 +364,7 @@ export const CHIPS_BLOCK_20 = {
       'D6':  'Data input bit 6.',
       'D7':  'Data input bit 7.',
       'D8':  'Data input bit 8.',
-      'Q':   'Data output (open-collector, latched).',
+      'Q':   'Data output (open collector, latched).',
       'VCC': 'Positive supply (+5 V, pin 20).',
     },
     pinout: [
@@ -408,14 +408,14 @@ export const CHIPS_BLOCK_20 = {
      Wikipedia: https://en.wikipedia.org/wiki/Flip-flop_(electronics)
      Wikipedia: https://en.wikipedia.org/wiki/Open_collector
      Wikipedia: https://en.wikipedia.org/wiki/Random-access_memory */
-  '74312': {
+  '74x312': {
     name: '74x312',
     simpleName: 'RAM 16×9 (OC)',
-    description: '144 bit static RAM organized as 16 words × 9 bits, open-collector (20-pin)',
+    description: '144 bit static RAM organized as 16 words × 9 bits, open collector (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
     openCollector: true, sequential: true,
-    tags: ['ram', 'memory', '16x9', 'open-collector'],
-    guideOverview: 'The 74x312 is a 144 bit static RAM organized as 16 words x 9 bits with an open-collector output. Unlike the 74x311 it has no output latch. A0-A3 address 16 nine-bit words. OEn (active LOW) enables the Q output.',
+    tags: ['ram', 'memory', '16x9', 'open collector'],
+    guideOverview: 'The 74x312 is a 144 bit static RAM organized as 16 words x 9 bits with an open collector output. Unlike the 74x311 it has no output latch. A0-A3 address 16 nine bit words. OEn (active LOW) enables the Q output.',
     guidePinDescriptions: {
       'A0':  'Address bit 0 (LSB).',
       'A1':  'Address bit 1.',
@@ -423,7 +423,7 @@ export const CHIPS_BLOCK_20 = {
       'A3':  'Address bit 3 (MSB).',
       'WEn': 'Write Enable (active LOW).',
       'CSn': 'Chip Select (active LOW).',
-      'OEn': 'Output Enable (active LOW). When HIGH, Q is tri-stated.',
+      'OEn': 'Output Enable (active LOW). When HIGH, Q is tri stated.',
       'D0':  'Data input bit 0.',
       'D1':  'Data input bit 1.',
       'GND': 'Ground reference (pin 10).',
@@ -434,7 +434,7 @@ export const CHIPS_BLOCK_20 = {
       'D6':  'Data input bit 6.',
       'D7':  'Data input bit 7.',
       'D8':  'Data input bit 8.',
-      'Q':   'Data output (open-collector).',
+      'Q':   'Data output (open collector).',
       'NC1': 'Not connected.',
       'VCC': 'Positive supply (+5 V, pin 20).',
     },
@@ -478,14 +478,14 @@ export const CHIPS_BLOCK_20 = {
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Open_collector
      Wikipedia: https://en.wikipedia.org/wiki/Random-access_memory */
-  '74313': {
+  '74x313': {
     name: '74x313',
     simpleName: 'RAM 16×12 (OC)',
-    description: '192 bit static RAM organized as 16 words × 12 bits, open-collector (20-pin)',
+    description: '192 bit static RAM organized as 16 words × 12 bits, open collector (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
     openCollector: true, sequential: true,
-    tags: ['ram', 'memory', '16x12', 'open-collector'],
-    guideOverview: 'The 74x313 is a 192 bit static RAM organized as 16 words x 12 bits with open-collector outputs. A0-A3 address 16 words of 12 bits each. CSn and WEn control access; OEn enables outputs. Suitable for wider lookup tables or microcode stores in TTL-only designs.',
+    tags: ['ram', 'memory', '16x12', 'open collector'],
+    guideOverview: 'The 74x313 is a 192 bit static RAM organized as 16 words x 12 bits with open collector outputs. A0-A3 address 16 words of 12 bits each. CSn and WEn control access; OEn enables outputs. Suitable for wider lookup tables or microcode stores in TTL only designs.',
     guidePinDescriptions: {
       'A0':  'Address bit 0.',
       'A1':  'Address bit 1.',
@@ -537,7 +537,7 @@ export const CHIPS_BLOCK_20 = {
       {
         title: '16x12 RAM',
         paragraphs: [
-          'Twelve data bits per address allow storing 12 bit values (e.g., 12 bit microinstruction words) at each of 16 locations. Output is open-collector requiring pull up resistors.',
+          'Twelve data bits per address allow storing 12 bit values (e.g., 12 bit microinstruction words) at each of 16 locations. Output is open collector requiring pull up resistors.',
         ],
       },
     ],
@@ -548,14 +548,14 @@ export const CHIPS_BLOCK_20 = {
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Open_collector
      Wikipedia: https://en.wikipedia.org/wiki/Random-access_memory */
-  '74314': {
+  '74x314': {
     name: '74x314',
     simpleName: 'RAM 1024×1 (OC) v2',
-    description: '1024 bit static RAM organized as 1024 words × 1 bit, open-collector (16-pin)',
+    description: '1024 bit static RAM (1024 words × 1 bit), open collector (16-pin)',
     pins: 16, vcc: 16, gnd: 8,
     openCollector: true, sequential: true,
-    tags: ['ram', 'memory', '1024x1', 'open-collector'],
-    guideOverview: 'The 74x314 is a variant of the 74x309: 1024x1 bit static RAM with open-collector output. Functionally identical (A0-A9 address, WEn/CSn control, DI/DO data pins); the variant number reflects a different process or manufacturer.',
+    tags: ['ram', 'memory', '1024x1', 'open collector'],
+    guideOverview: 'The 74x314 is a variant of the 74x309: 1024x1 bit static RAM with open collector output. Functionally identical (A0-A9 address, WEn/CSn control, DI/DO data pins); the variant number reflects a different process or manufacturer.',
     guidePinDescriptions: {
       'A0':  'Address bit 0.',
       'A1':  'Address bit 1.',
@@ -571,7 +571,7 @@ export const CHIPS_BLOCK_20 = {
       'WEn': 'Write Enable (active LOW).',
       'CSn': 'Chip Select (active LOW).',
       'DI':  'Data input.',
-      'DO':  'Data output (open-collector).',
+      'DO':  'Data output (open collector).',
       'VCC': 'Positive supply (+5 V, pin 16).',
     },
     pinout: [
@@ -610,30 +610,30 @@ export const CHIPS_BLOCK_20 = {
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Open_collector
      Wikipedia: https://en.wikipedia.org/wiki/Random-access_memory */
-  '74315': {
+  '74x315': {
     name: '74x315',
     simpleName: 'RAM 1024×1 PD (OC)',
-    description: '1024 bit static RAM with power-down mode, open-collector (16-pin)',
+    description: '1024 bit static RAM with power-down mode, open collector (16-pin)',
     pins: 16, vcc: 16, gnd: 8,
     openCollector: true, sequential: true,
-    tags: ['ram', 'memory', '1024x1', 'open-collector', 'power-down'],
-    guideOverview: 'The 74x315 is a 1024x1 bit static RAM with a power-down mode for reduced standby current. When CSn is deasserted (HIGH) the chip enters low power standby. Otherwise identical to the 74x309 in pinout and operation.',
+    tags: ['ram', 'memory', '1024x1', 'open collector', 'power-down'],
+    guideOverview: 'The 74x315 is a 1024x1 bit static RAM with a power down mode for reduced standby current. When CSn is deasserted (HIGH) the chip enters low power standby. Otherwise identical to the 74x309 in pinout and operation.',
     guidePinDescriptions: {
-      'A0':  'Address bit 0.',
-      'A1':  'Address bit 1.',
-      'A2':  'Address bit 2.',
-      'A3':  'Address bit 3.',
-      'A4':  'Address bit 4.',
-      'A5':  'Address bit 5.',
-      'A6':  'Address bit 6.',
+      'A0': 'Address bit 0.',
+      'A1': 'Address bit 1.',
+      'A2': 'Address bit 2.',
+      'A3': 'Address bit 3.',
+      'A4': 'Address bit 4.',
+      'A5': 'Address bit 5.',
+      'A6': 'Address bit 6.',
       'GND': 'Ground reference (pin 8).',
-      'A7':  'Address bit 7.',
-      'A8':  'Address bit 8.',
-      'A9':  'Address bit 9.',
+      'A7': 'Address bit 7.',
+      'A8': 'Address bit 8.',
+      'A9': 'Address bit 9.',
       'WEn': 'Write Enable (active LOW).',
-      'CSn': 'Chip Select (active LOW). When HIGH, chip enters power-down standby.',
-      'DI':  'Data input.',
-      'DO':  'Data output (open-collector).',
+      'CSn': 'Chip Select (active LOW). When HIGH, chip enters power down standby.',
+      'DI': 'Data input.',
+      'DO': 'Data output (open collector).',
       'VCC': 'Positive supply (+5 V, pin 16).',
     },
     pinout: [
@@ -659,9 +659,9 @@ export const CHIPS_BLOCK_20 = {
     ],
     guideSections: [
       {
-        title: 'Power-Down Mode',
+        title: 'Power Down Mode',
         paragraphs: [
-          'When CSn is HIGH the chip reduces its supply current significantly while retaining stored data. Useful in battery-backed designs or multiplexed memory banks where most chips are idle most of the time.',
+          'When CSn is HIGH the chip reduces its supply current significantly while retaining stored data. Useful in battery backed designs or multiplexed memory banks where most chips are idle most of the time.',
         ],
       },
     ],
@@ -672,30 +672,30 @@ export const CHIPS_BLOCK_20 = {
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Open_collector
      Wikipedia: https://en.wikipedia.org/wiki/Random-access_memory */
-  '74316': {
+  '74x316': {
     name: '74x316',
     simpleName: 'RAM 64×4 (OC, common I/O)',
-    description: '256 bit static RAM (64 words × 4 bits), common I/O, open-collector (16-pin)',
+    description: '256 bit static RAM (64 words × 4 bits), common I/O, open collector (16-pin)',
     pins: 16, vcc: 16, gnd: 8,
     openCollector: true, sequential: true,
-    tags: ['ram', 'memory', '64x4', 'open-collector', 'common I/O'],
-    guideOverview: 'The 74x316 is a 256 bit static RAM organized as 64 words x 4 bits with common I/O (bidirectional data pins IO0-IO3) and open-collector outputs. A 6 bit address (A0-A5) selects one of 64 four-bit words. WEn low writes D0-D1 and reads back the updated cell on IO0-IO3.',
+    tags: ['ram', 'memory', '64x4', 'open collector', 'common I/O'],
+    guideOverview: 'The 74x316 is a 256 bit static RAM organized as 64 words x 4 bits with common I/O (bidirectional data pins IO0-IO3) and open collector outputs. A 6 bit address (A0-A5) selects one of 64 four bit words. WEn low writes D0-D1 and reads back the updated cell on IO0-IO3.',
     guidePinDescriptions: {
-      'A0':  'Address bit 0.',
-      'A1':  'Address bit 1.',
-      'A2':  'Address bit 2.',
-      'A3':  'Address bit 3.',
-      'A4':  'Address bit 4.',
-      'A5':  'Address bit 5 (MSB). Selects 1 of 64 words.',
+      'A0': 'Address bit 0.',
+      'A1': 'Address bit 1.',
+      'A2': 'Address bit 2.',
+      'A3': 'Address bit 3.',
+      'A4': 'Address bit 4.',
+      'A5': 'Address bit 5 (MSB). Selects 1 of 64 words.',
       'WEn': 'Write Enable (active LOW).',
       'GND': 'Ground reference (pin 8).',
       'CSn': 'Chip Select (active LOW).',
-      'IO0': 'Bidirectional data bit 0 (open-collector).',
+      'IO0': 'Bidirectional data bit 0 (open collector).',
       'IO1': 'Bidirectional data bit 1.',
       'IO2': 'Bidirectional data bit 2.',
       'IO3': 'Bidirectional data bit 3.',
-      'D0':  'Data input bit 0 (write-only).',
-      'D1':  'Data input bit 1.',
+      'D0': 'Data input bit 0 (write only).',
+      'D1': 'Data input bit 1.',
       'VCC': 'Positive supply (+5 V, pin 16).',
     },
     pinout: [
@@ -723,7 +723,7 @@ export const CHIPS_BLOCK_20 = {
       {
         title: '64x4 Common I/O RAM',
         paragraphs: [
-          'Common I/O (also called shared I/O) means the same pins serve as both data input and output, reducing pin count. Add pull up resistors on IO0-IO3 since these are open-collector. Keep D0/D1 stable only during writes.',
+          'Common I/O (also called shared I/O) means the same pins serve as both data input and output, reducing pin count. Add pull up resistors on IO0-IO3 since these are open collector. Keep D0/D1 stable only during writes.',
         ],
       },
     ],
@@ -734,14 +734,14 @@ export const CHIPS_BLOCK_20 = {
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Open_collector
      Wikipedia: https://en.wikipedia.org/wiki/Random-access_memory */
-  '74317': {
+  '74x317': {
     name: '74x317',
     simpleName: 'RAM 64×4 (OC)',
-    description: '256 bit static RAM organized as 64 words × 4 bits, open-collector (20-pin)',
+    description: '256 bit static RAM organized as 64 words × 4 bits, open collector (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
     openCollector: true, sequential: true,
-    tags: ['ram', 'memory', '64x4', 'open-collector'],
-    guideOverview: 'The 74x317 is a 256 bit static RAM organized as 64 words x 4 bits with separate data-in (D0-D3) and data-out (Q0-Q3) ports, plus open-collector outputs. A 6 bit address (A0-A5) selects one of 64 nibbles. WEn and CSn control write/read.',
+    tags: ['ram', 'memory', '64x4', 'open collector'],
+    guideOverview: 'The 74x317 is a 256 bit static RAM organized as 64 words x 4 bits with separate data-in (D0-D3) and data-out (Q0-Q3) ports, plus open collector outputs. A 6 bit address (A0-A5) selects one of 64 nibbles. WEn and CSn control write/read.',
     guidePinDescriptions: {
       'A0':  'Address bit 0.',
       'A1':  'Address bit 1.',
@@ -756,7 +756,7 @@ export const CHIPS_BLOCK_20 = {
       'D1':  'Data input bit 1.',
       'D2':  'Data input bit 2.',
       'D3':  'Data input bit 3.',
-      'Q3':  'Data output bit 3 (open-collector).',
+      'Q3':  'Data output bit 3 (open collector).',
       'Q2':  'Data output bit 2.',
       'Q1':  'Data output bit 1.',
       'Q0':  'Data output bit 0.',
@@ -793,7 +793,7 @@ export const CHIPS_BLOCK_20 = {
       {
         title: '64x4 Separate I/O RAM',
         paragraphs: [
-          'Separate data-in and data-out simplifies board layout compared to common-I/O variants. Eight 74x317s in parallel give 512 bytes of byte-wide storage. Add pull up resistors on Q outputs.',
+          'Separate data-in and data-out simplifies board layout compared to common I/O variants. Eight 74x317s in parallel give 512 bytes of byte wide storage. Add pull up resistors on Q outputs.',
         ],
       },
     ],
@@ -804,14 +804,14 @@ export const CHIPS_BLOCK_20 = {
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Open_collector
      Wikipedia: https://en.wikipedia.org/wiki/Random-access_memory */
-  '74318': {
+  '74x318': {
     name: '74x318',
     simpleName: 'RAM 32×8 (OC)',
-    description: '256 bit static RAM organized as 32 words × 8 bits, open-collector (20-pin)',
+    description: '256 bit static RAM organized as 32 words × 8 bits, open collector (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
     openCollector: true, sequential: true,
-    tags: ['ram', 'memory', '32x8', 'open-collector'],
-    guideOverview: 'The 74x318 is a 256 bit static RAM organized as 32 words x 8 bits with open-collector outputs. A 5 bit address (A0-A4) selects one of 32 byte-wide locations. WEn and CSn control write/read. D0-D7 are inputs; Q5-Q7 are part of the output (note: full 8 bit output wiring may require additional pins).',
+    tags: ['ram', 'memory', '32x8', 'open collector'],
+    guideOverview: 'The 74x318 is a 256 bit static RAM organized as 32 words x 8 bits with open collector outputs. A 5 bit address (A0-A4) selects one of 32 byte wide locations. WEn and CSn control write/read. D0-D7 are inputs; Q5-Q7 are part of the output (note: full 8 bit output wiring may require additional pins).',
     guidePinDescriptions: {
       'A0':  'Address bit 0.',
       'A1':  'Address bit 1.',
@@ -829,7 +829,7 @@ export const CHIPS_BLOCK_20 = {
       'D5':  'Data input bit 5.',
       'D6':  'Data input bit 6.',
       'D7':  'Data input bit 7.',
-      'Q7':  'Data output bit 7 (open-collector).',
+      'Q7':  'Data output bit 7 (open collector).',
       'Q6':  'Data output bit 6.',
       'Q5':  'Data output bit 5.',
       'VCC': 'Positive supply (+5 V, pin 20).',
@@ -861,9 +861,9 @@ export const CHIPS_BLOCK_20 = {
     ],
     guideSections: [
       {
-        title: '32x8 Byte-Wide RAM',
+        title: '32x8 Byte Wide RAM',
         paragraphs: [
-          'Thirty-two byte-wide words; a useful scratchpad for small microcontroller-like applications in TTL. Chain multiple chips on the same address bus with separate CSn lines for larger memories.',
+          'Thirty two byte wide words; a useful scratchpad for small microcontroller like applications in TTL. Chain multiple chips on the same address bus with separate CSn lines for larger memories.',
         ],
       },
     ],
@@ -874,14 +874,14 @@ export const CHIPS_BLOCK_20 = {
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits
      Wikipedia: https://en.wikipedia.org/wiki/Open_collector
      Wikipedia: https://en.wikipedia.org/wiki/Random-access_memory */
-  '74319': {
+  '74x319': {
     name: '74x319',
     simpleName: 'RAM 16×4 (OC)',
-    description: '64 bit static RAM organized as 16 words × 4 bits, open-collector (16-pin)',
+    description: '64 bit static RAM organized as 16 words × 4 bits, open collector (16-pin)',
     pins: 16, vcc: 16, gnd: 8,
     openCollector: true, sequential: true,
-    tags: ['ram', 'memory', '16x4', 'open-collector'],
-    guideOverview: 'The 74x319 is a 64 bit static RAM organized as 16 words x 4 bits with open-collector outputs. A0-A3 address 16 nibble locations. CSn and WEn control access. D0-D3 write; Q0-Q3 read back (open-collector, add pull ups).',
+    tags: ['ram', 'memory', '16x4', 'open collector'],
+    guideOverview: 'The 74x319 is a 64 bit static RAM organized as 16 words x 4 bits with open collector outputs. A0-A3 address 16 nibble locations. CSn and WEn control access. D0-D3 write; Q0-Q3 read back (open collector, add pull ups).',
     guidePinDescriptions: {
       'A0':  'Address bit 0.',
       'A1':  'Address bit 1.',
@@ -894,7 +894,7 @@ export const CHIPS_BLOCK_20 = {
       'D1':  'Data input bit 1.',
       'D2':  'Data input bit 2.',
       'D3':  'Data input bit 3.',
-      'Q3':  'Data output bit 3 (open-collector).',
+      'Q3':  'Data output bit 3 (open collector).',
       'Q2':  'Data output bit 2.',
       'Q1':  'Data output bit 1.',
       'Q0':  'Data output bit 0.',
@@ -925,7 +925,7 @@ export const CHIPS_BLOCK_20 = {
       {
         title: '16x4 Static RAM',
         paragraphs: [
-          'Compact 64 bit RAM useful for state tables, character LUTs, or small register files in TTL-only designs. Add pull up resistors to each Q pin.',
+          'Compact 64 bit RAM useful for state tables, character LUTs, or small register files in TTL only designs. Add pull up resistors to each Q pin.',
         ],
       },
     ],
@@ -934,14 +934,14 @@ export const CHIPS_BLOCK_20 = {
   // -- 74320 ──────────────────────────────────
   // ── 74320: Crystal Osc, 16-pin ─────────────────────────────────────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits */
-  '74320': {
+  '74x320': {
     name: '74x320',
     simpleName: 'Crystal Osc',
     description: 'Crystal-controlled oscillator (16-pin)',
     pins: 16, vcc: 16, gnd: 8,
     sequential: true,
     tags: ['oscillator', 'crystal', 'clock'],
-    guideOverview: 'The 74x320 is a crystal-controlled oscillator that generates a stable clock signal from an external quartz crystal connected to XTAL1/XTAL2. The output frequency is set by the crystal and is highly stable over temperature and time. Used to provide a master clock reference in a digital system.',
+    guideOverview: 'The 74x320 is a crystal controlled oscillator that generates a stable clock signal from an external quartz crystal connected to XTAL1/XTAL2. The output frequency is set by the crystal and is highly stable over temperature and time. Used to provide a master clock reference in a digital system.',
     guidePinDescriptions: {
       'XTAL1': 'Crystal input 1 (connect one terminal of the quartz crystal).',
       'XTAL2': 'Crystal input 2 (connect other terminal; may also feed a feedback capacitor to GND).',
@@ -989,20 +989,24 @@ export const CHIPS_BLOCK_20 = {
         ],
         note: 'Add small load capacitors (typically 12-22 pF) from each crystal pin to GND for correct frequency.',
       },
+      {
+        title: 'Simulation note',
+        note: '74Sim does not model crystal resonance. OUT simply follows the signal on XTAL1 (a pass-through buffer), so to get a clock in-sim you must drive XTAL1 from an external clock/oscillator source — a passive quartz crystal will not start oscillation here.',
+      },
     ],
   },
 
   // -- 74321 ──────────
   // ── 74321: Crystal Osc (F/2, F/4), 16-pin ──────────────────────────────────
   /* Primary source: Wikipedia contributors, "7400-series integrated circuits." [Online]. Available: https://en.wikipedia.org/wiki/7400-series_integrated_circuits */
-  '74321': {
+  '74x321': {
     name: '74x321',
     simpleName: 'Crystal Osc (F/2, F/4)',
     description: 'Crystal-controlled oscillator with F/2 and F/4 count-down outputs (16-pin)',
     pins: 16, vcc: 16, gnd: 8,
     sequential: true,
     tags: ['oscillator', 'crystal', 'clock', 'divider'],
-    guideOverview: 'The 74x321 is a crystal-controlled oscillator with three outputs: the fundamental frequency (OUT), a divided-by-2 output (F2), and a divided-by-4 output (F4). These provide three synchronous clock rates from a single crystal, useful for systems requiring multiple clock domains.',
+    guideOverview: 'The 74x321 is a crystal controlled oscillator with three outputs: the fundamental frequency (OUT), a divided by-2 output (F2), and a divided by-4 output (F4). These provide three synchronous clock rates from a single crystal, useful for systems requiring multiple clock domains.',
     guidePinDescriptions: {
       'XTAL1': 'Crystal input 1.',
       'XTAL2': 'Crystal input 2.',
@@ -1044,14 +1048,15 @@ export const CHIPS_BLOCK_20 = {
     ],
     guideSections: [
       {
-        title: 'Multi-Rate Clock Generation',
+        title: 'Multi Rate Clock Generation',
         paragraphs: [
-          'F2 = OUT / 2 and F4 = OUT / 4, generated by internal toggle flip-flops. All three outputs are synchronous (phase-related). Use OUT for the fastest logic, F2 for a slower pipeline stage, and F4 for timers or slow peripherals.',
+          'F2 = OUT / 2 and F4 = OUT / 4, generated by internal toggle flip flops. All three outputs are synchronous (phase related). Use OUT for the fastest logic, F2 for a slower pipeline stage, and F4 for timers or slow peripherals.',
         ],
         formulas: [
           'F2 = f_crystal / 2',
           'F4 = f_crystal / 4',
         ],
+        note: '74Sim does not model crystal resonance. OUT follows XTAL1 (pass-through); F2 and F4 are produced by dividing the XTAL1 edges by 2 and 4. Drive XTAL1 from an external clock source — a passive crystal will not oscillate in-sim.',
       },
     ],
   },

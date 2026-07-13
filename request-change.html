@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>74Sim Request a Change</title>
+  <link rel="icon" type="image/png" href="assets/Logo74Sim.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/tokens.css">
+  <link rel="stylesheet" href="/css/report-form.css">
+</head>
+<body>
+
+  <div class="content">
+    <div class="page-heading">Request a Change</div>
+    <div class="page-subhead">Want a chip added, a pinout corrected, or something in the simulator or docs changed? Describe it below. If something is broken, use the <a href="/bug-report">bug report form</a> instead.</div>
+    <form id="request-change-form">
+      <div class="form-group">
+        <textarea id="change-description" rows="6" placeholder="Describe the change you would like. Include chip part numbers or datasheet links if relevant." required></textarea>
+      </div>
+
+      <button type="submit" class="btn-submit" id="submit-btn">Submit Change Request</button>
+
+      <div class="status-msg" id="status-msg"></div>
+    </form>
+  </div>
+
+  <script src="/js/request-change.js" defer></script>
+<!-- 100% privacy-first analytics -->
+<script async src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
+</body>
+</html>

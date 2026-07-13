@@ -1,21 +1,21 @@
 // test-chips60.mjs - Tests for all chips defined in js/chips/chips60.js
 // Chips under test:
-//   74x4724  : 8 bit Addressable Latch (ADDRESSABLE_LATCH, 16-pin)
-//   74x4799  : NiCd/NiMH Charge Timer (GENERIC_STUB, 16-pin)
-//   74x4851  : 8-Channel Analog Mux (GENERIC_STUB, 16-pin)
-//   74x4852  : Dual 4-Channel Analog Mux (GENERIC_STUB, 16-pin)
-//   74x5074  : Dual D FF (D_FF, 14-pin)
-//   74x5245  : Octal Transceiver (TRANSCEIVER_8BIT, 20-pin)
-//   74x5300  : Fiber Optic LED Driver (GENERIC_STUB, 8-pin)
-//   74x5302  : Dual Fiber Optic Driver (GENERIC_STUB, 14-pin)
-//   74x5555  : Programmable Delay Timer (GENERIC_STUB, 16-pin)
-//   74x5620  : Octal Transceiver (TRANSCEIVER_8BIT, 20-pin)
-//   74x6000  : Optocoupler Non-Inv (BUFFER, 6-pin)
-//   74x6001  : Optocoupler Inv (NOT, 6-pin)
-//   74x6010  : Optocoupler Non-Inv OC (BUFFER, 6-pin)
-//   74x6011  : Optocoupler Inv OC (NOT, 6-pin)
-//   74x6300  : DRAM Refresh Timer (GENERIC_STUB, 16-pin)
-//   74x6310  : DRAM Access Detector (GENERIC_STUB, 20-pin)
+//   74x4724  : 8 bit Addressable Latch (ADDRESSABLE_LATCH, 16 pin)
+//   74x4799  : NiCd/NiMH Charge Timer (GENERIC_STUB, 16 pin)
+//   74x4851  : 8-Channel Analog Mux (GENERIC_STUB, 16 pin)
+//   74x4852  : Dual 4-Channel Analog Mux (GENERIC_STUB, 16 pin)
+//   74x5074  : Dual D FF (D_FF, 14 pin)
+//   74x5245  : Octal Transceiver (TRANSCEIVER_8BIT, 20 pin)
+//   74x5300  : Fiber Optic LED Driver (GENERIC_STUB, 8 pin)
+//   74x5302  : Dual Fiber Optic Driver (GENERIC_STUB, 14 pin)
+//   74x5555  : Programmable Delay Timer (GENERIC_STUB, 16 pin)
+//   74x5620  : Octal Transceiver (TRANSCEIVER_8BIT, 20 pin)
+//   74x6000  : Optocoupler Non-Inv (BUFFER, 6 pin)
+//   74x6001  : Optocoupler Inv (NOT, 6 pin)
+//   74x6010  : Optocoupler Non-Inv OC (BUFFER, 6 pin)
+//   74x6011  : Optocoupler Inv OC (NOT, 6 pin)
+//   74x6300  : DRAM Refresh Timer (GENERIC_STUB, 16 pin)
+//   74x6310  : DRAM Access Detector (GENERIC_STUB, 20 pin)
 
 import { CHIPS_BLOCK_60 } from '../chips/chips60.js';
 import { BreadboardWorld, holeId } from '../breadboard.js';
@@ -246,9 +246,9 @@ console.log('  -- 4724: All 8 addresses --');
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SECTION F-5074 - 74x5074 Dual D Flip-Flop functional tests
+// SECTION F-5074 - 74x5074 Dual D Flip Flop functional tests
 // ─────────────────────────────────────────────────────────────────────────────
-console.log('\n=== SECTION F-5074: 74x5074 Dual D Flip-Flop ===');
+console.log('\n=== SECTION F-5074: 74x5074 Dual D Flip Flop ===');
 {
   // Test FF1: PRE and CLR active low
   const { world, chip, wm } = setupChipWithPower('74x5074');
@@ -455,12 +455,12 @@ console.log('\n=== SECTION F-5620: 74x5620 Octal Transceiver ===');
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SECTION F-6000 - 74x6000 Optocoupler (Non-Inverting) functional tests
+// SECTION F-6000 - 74x6000 Optocoupler (Non Inverting) functional tests
 // ─────────────────────────────────────────────────────────────────────────────
 console.log('\n=== SECTION F-6000: 74x6000 Optocoupler (Non-Inv) ===');
 {
   const { world, chip, wm } = setupChipWithPower('74x6000');
-  // A=HIGH → Y=HIGH (non-inverting buffer)
+  // A=HIGH → Y=HIGH (non inverting buffer)
   connectHigh(wm, chip, 'A');
   let sim = simulate(world, wm, chip);
   assertPinHigh(sim, chip, 'Y', '6000: A=H → Y=H');

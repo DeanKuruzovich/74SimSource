@@ -1,6 +1,6 @@
 // test-chips65.mjs - Tests for all chips defined in js/chips/chips65.js
-// Implementable: 74x9135 (nine-wide buffer OC), 74x9240 (9 bit inv tri-state),
-//   74x9244 (9 bit non-inv tri-state), 74x9541 (8 bit dual-OE buffer)
+// Implementable: 74x9135 (nine-wide buffer OC), 74x9240 (9 bit inv tri state),
+//   74x9244 (9 bit non-inv tri state), 74x9541 (8 bit dual-OE buffer)
 // Stubs: 74x9164, 74x9245, 74x9323, 74x9595, 74x40102, 74x40103,
 //   74x40104, 74x40105, 74116, 74119, 74120
 
@@ -83,7 +83,7 @@ function simulate(world, wm, chips) {
 const EXPECTED_IDS = [
   '74x9135', '74x9164', '74x9240', '74x9244', '74x9245',
   '74x9323', '74x9541', '74x9595', '74x40102', '74x40103',
-  '74x40104', '74x40105', '74116', '74119', '74120',
+  '74x40104', '74x40105', '74x116', '74x119', '74x120',
 ];
 
 const EXPECTED_SPECS = {
@@ -99,14 +99,14 @@ const EXPECTED_SPECS = {
   '74x40103': { pins: 16, gnd:  8, vcc: 16 },
   '74x40104': { pins: 16, gnd:  8, vcc: 16 },
   '74x40105': { pins: 16, gnd:  8, vcc: 16 },
-  '74116':    { pins: 24, gnd: 12, vcc: 24 },
-  '74119':    { pins: 24, gnd: 12, vcc: 24 },
-  '74120':    { pins: 16, gnd:  8, vcc: 16 },
+  '74x116':    { pins: 24, gnd: 12, vcc: 24 },
+  '74x119':    { pins: 24, gnd: 12, vcc: 24 },
+  '74x120':    { pins: 16, gnd:  8, vcc: 16 },
 };
 
 const STUB_IDS = [
   '74x9164', '74x9245', '74x9323', '74x9595', '74x40102',
-  '74x40103', '74x40104', '74x40105', '74116', '74119', '74120',
+  '74x40103', '74x40104', '74x40105', '74x116', '74x119', '74x120',
 ];
 
 console.log('\n=== SECTION S: Structure ===');
@@ -171,7 +171,7 @@ for (const key of Object.keys(CHIPS_BLOCK_65)) {
   const def = CHIPS_BLOCK_65[key];
   assert(typeof def.description === 'string' && def.description.length > 0, `S10: ${key} has description`);
 }
-// S11 - Open-collector only on 74x9135
+// S11 - Open collector only on 74x9135
 {
   const oc = CHIPS_BLOCK_65['74x9135'];
   assert(oc.openCollector === true, `S11: 74x9135 has openCollector: true`);
@@ -222,7 +222,7 @@ for (const id of EXPECTED_IDS) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SECTION A - 74x9135: Nine-wide buffer, open-collector
+// SECTION A - 74x9135: Nine-wide buffer, open collector
 // ─────────────────────────────────────────────────────────────────────────────
 
 console.log('\n=== SECTION A: 74x9135 - Nine-wide buffer OC ===');
@@ -310,10 +310,10 @@ for (let ch = 1; ch <= 9; ch++) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SECTION B - 74x9240: 9 bit inverting tri-state buffer
+// SECTION B - 74x9240: 9 bit inverting tri state buffer
 // ─────────────────────────────────────────────────────────────────────────────
 
-console.log('\n=== SECTION B: 74x9240 - 9 bit inverting tri-state ===');
+console.log('\n=== SECTION B: 74x9240 - 9 bit inverting tri state ===');
 
 // B1 - OEn=LOW (enabled), all inputs HIGH → all outputs LOW (inverting)
 {
@@ -394,7 +394,7 @@ for (let ch = 1; ch <= 9; ch++) {
   }
 }
 
-// B7 - 24-pin pinout structure
+// B7 - 24 pin pinout structure
 {
   const def = CHIPS_BLOCK_65['74x9240'];
   assert(def.pinout[0].name === 'OEn', `B7: pin 1 is OEn`);
@@ -425,10 +425,10 @@ for (let ch = 1; ch <= 9; ch++) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SECTION C - 74x9244: 9 bit non-inverting tri-state buffer
+// SECTION C - 74x9244: 9 bit non inverting tri state buffer
 // ─────────────────────────────────────────────────────────────────────────────
 
-console.log('\n=== SECTION C: 74x9244 - 9 bit non-inverting tri-state ===');
+console.log('\n=== SECTION C: 74x9244 - 9 bit non inverting tri state ===');
 
 // C1 - OEn=LOW, all inputs HIGH → all outputs HIGH
 {
@@ -520,7 +520,7 @@ for (let ch = 1; ch <= 9; ch++) {
   }
 }
 
-// C8 - 24-pin pinout structure same as 9240
+// C8 - 24 pin pinout structure same as 9240
 {
   const d9240 = CHIPS_BLOCK_65['74x9240'];
   const d9244 = CHIPS_BLOCK_65['74x9244'];
@@ -645,7 +645,7 @@ for (let ch = 1; ch <= 8; ch++) {
   }
 }
 
-// D9 - 20-pin pinout structure matches 74541 pattern
+// D9 - 20 pin pinout structure matches 74541 pattern
 {
   const def = CHIPS_BLOCK_65['74x9541'];
   assert(def.pinout[0].name === 'OE1', `D9: pin 1 is OE1`);
@@ -815,7 +815,7 @@ console.log('\n=== SECTION F: Dynamic tests ===');
   }
 }
 
-// F7 - Walking-one pattern on 74x9244 (non-inverted)
+// F7 - Walking-one pattern on 74x9244 (non inverted)
 {
   const { world, chip, wm } = setupChipWithPower('74x9244');
   connectLow(wm, chip, 'OEn');
@@ -969,7 +969,7 @@ console.log('\n=== SECTION H: Exhaustive truth table tests ===');
   }
 }
 
-// H3 - 74x9244: All 512 input combinations (OEn=L, non-inverting)
+// H3 - 74x9244: All 512 input combinations (OEn=L, non inverting)
 {
   console.log('  H3: 74x9244 exhaustive (512 patterns)...');
   for (let pattern = 0; pattern < 512; pattern++) {

@@ -4,14 +4,14 @@
 
 export const CHIPS_BLOCK_53 = {
 
-  // 74x2543: 8 bit latched transceiver, non-inverting, TRI+25Ω (24-pin)
+  // 74x2543: 8 bit latched transceiver, non inverting, TRI+25Ω (24-pin)
   '74x2543': {
     name: '74x2543',
-    simpleName: '8 bit Latched Transceiver Non-Inverting (25Ω)',
-    description: '8 bit latched transceiver, non-inverting, TRI-STATE with 25 Ω series resistor (24-pin)',
+    simpleName: '8 bit Latched Transceiver Non Inverting (25Ω)',
+    description: '8 bit latched transceiver, non inverting, 3-state, 25 Ω series R (24-pin)',
     pins: 24, vcc: 24, gnd: 12,
     datasheet: '',
-    tags: ['transceiver', 'latch', '8 bit', 'tri-state', 'bidir', 'stub'],
+    tags: ['transceiver', 'latch', '8 bit', 'tri state', 'bidir', 'stub'],
     pinout: [
       { pin:  1, name: 'LEAB', type: 'input'  },
       { pin:  2, name: 'OEAN', type: 'input'  },
@@ -47,10 +47,10 @@ export const CHIPS_BLOCK_53 = {
   '74x2544': {
     name: '74x2544',
     simpleName: '8 bit Latched Transceiver Inverting (25Ω)',
-    description: '8 bit latched transceiver, inverting, TRI-STATE with 25 Ω series resistor (24-pin)',
+    description: '8 bit latched transceiver, inverting, 3-state, 25 Ω series R (24-pin)',
     pins: 24, vcc: 24, gnd: 12,
     datasheet: '',
-    tags: ['transceiver', 'latch', '8 bit', 'inverting', 'tri-state', 'bidir', 'stub'],
+    tags: ['transceiver', 'latch', '8 bit', 'inverting', 'tri state', 'bidir', 'stub'],
     pinout: [
       { pin:  1, name: 'LEAB', type: 'input'  },
       { pin:  2, name: 'OEAN', type: 'input'  },
@@ -85,11 +85,11 @@ export const CHIPS_BLOCK_53 = {
   // 74x2573: 8 bit transparent latch, TRI+25Ω (20-pin)
   '74x2573': {
     name: '74x2573',
-    simpleName: '8 bit Transparent Latch (25Ω, Bus-Oriented)',
-    description: '8 bit transparent latch, TRI-STATE with 25 Ω series resistor (20-pin)',
+    simpleName: '8 bit Transparent Latch (25Ω, Bus Oriented)',
+    description: '8 bit transparent latch, TRI STATE with 25 Ω series resistor (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
     datasheet: '',
-    tags: ['latch', '8 bit', 'transparent', 'tri-state', 'stub'],
+    tags: ['latch', '8 bit', 'transparent', 'tri state', 'stub'],
     pinout: [
       { pin:  1, name: 'OEn',  type: 'input'  },
       { pin:  2, name: 'D1',   type: 'input'  },
@@ -117,14 +117,14 @@ export const CHIPS_BLOCK_53 = {
     ],
   },
 
-  // 74x2574: Octal D-type flip-flop, shared clock, TRI+25Ω (20-pin, bus-oriented pinout)
+  // 74x2574: Octal D type flip flop, shared clock, TRI+25Ω (20-pin, bus oriented pinout)
   '74x2574': {
     name: '74x2574',
-    simpleName: 'Octal D-Type Flip-Flop Shared CLK (25Ω, Bus-Oriented)',
-    description: 'Octal D-type flip-flop with shared clock, TRI-STATE with 25 Ω series resistor (20-pin)',
+    simpleName: 'Octal D Type Flip Flop Shared CLK (25Ω, Bus Oriented)',
+    description: 'Octal D flip-flop, shared clock, 3-state, 25 Ω series R (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
     datasheet: '',
-    tags: ['flip-flop', 'octal', 'D-type', 'tri-state', 'stub'],
+    tags: ['flip flop', 'octal', 'D type', 'tri state', 'stub'],
     pinout: [
       { pin:  1, name: 'OEn',  type: 'input'  },
       { pin:  2, name: 'D1',   type: 'input'  },
@@ -156,7 +156,7 @@ export const CHIPS_BLOCK_53 = {
   '74x2620': {
     name: '74x2620',
     simpleName: 'Octal Bus Transceiver / MOS Driver Inverting (25Ω)',
-    description: 'Octal bus transceiver / MOS driver, inverting, TRI-STATE with 25 Ω series resistor (20-pin)',
+    description: 'Octal bus transceiver/MOS driver, inverting, 3-state, 25 Ω R (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
     datasheet: '',
     tags: ['transceiver', 'octal', 'MOS', 'inverting', 'bidir', 'stub'],
@@ -187,14 +187,14 @@ export const CHIPS_BLOCK_53 = {
     ],
   },
 
-  // 74x2623: Octal bus transceiver / MOS driver, non-inverting, TRI+25Ω (20-pin)
+  // 74x2623: Octal bus transceiver / MOS driver, non inverting, TRI+25Ω (20-pin)
   '74x2623': {
     name: '74x2623',
-    simpleName: 'Octal Bus Transceiver / MOS Driver Non-Inverting (25Ω)',
-    description: 'Octal bus transceiver / MOS driver, non-inverting, TRI-STATE with 25 Ω series resistor (20-pin)',
+    simpleName: 'Octal Bus Transceiver / MOS Driver Non Inverting (25Ω)',
+    description: 'Octal bus transceiver/MOS driver, non inverting, 3-state, 25 Ω R (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
     datasheet: '',
-    tags: ['transceiver', 'octal', 'MOS', 'non-inverting', 'bidir', 'stub'],
+    tags: ['transceiver', 'octal', 'MOS', 'non inverting', 'bidir', 'stub'],
     pinout: [
       { pin:  1, name: 'GABn', type: 'input'  },
       { pin:  2, name: 'GBAn', type: 'input'  },
@@ -226,7 +226,7 @@ export const CHIPS_BLOCK_53 = {
   '74x2640': {
     name: '74x2640',
     simpleName: 'Octal Bus Transceiver / MOS Driver Inverting (25Ω, Alt)',
-    description: 'Octal bus transceiver / MOS driver, inverting, TRI-STATE with 25 Ω series resistor (20-pin)',
+    description: 'Octal bus transceiver/MOS driver, inverting, 3-state, 25 Ω R (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
     datasheet: '',
     tags: ['transceiver', 'octal', 'MOS', 'inverting', 'bidir', 'stub'],
@@ -257,11 +257,11 @@ export const CHIPS_BLOCK_53 = {
     ],
   },
 
-  // 74x2643: Octal bus transceiver, mix inv/non-inv outputs, TRI+25Ω (20-pin)
+  // 74x2643: Octal bus transceiver, mix inv/non inv outputs, TRI+25Ω (20-pin)
   '74x2643': {
     name: '74x2643',
-    simpleName: 'Octal Bus Transceiver Mix Inv/Non-Inv (25Ω)',
-    description: 'Octal bus transceiver with mix of inverting and non-inverting outputs, TRI-STATE with 25 Ω series resistor (20-pin)',
+    simpleName: 'Octal Bus Transceiver Mix Inv/Non Inv (25Ω)',
+    description: 'Octal bus transceiver, mix inv/non inv outputs, 3-state, 25 Ω R (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
     datasheet: '',
     tags: ['transceiver', 'octal', 'bidir', 'stub'],
@@ -292,14 +292,14 @@ export const CHIPS_BLOCK_53 = {
     ],
   },
 
-  // 74x2645: Octal bus transceiver / MOS driver, non-inverting, TRI+25Ω (20-pin)
+  // 74x2645: Octal bus transceiver / MOS driver, non inverting, TRI+25Ω (20-pin)
   '74x2645': {
     name: '74x2645',
-    simpleName: 'Octal Bus Transceiver / MOS Driver Non-Inverting (25Ω, Alt)',
-    description: 'Octal bus transceiver / MOS driver, non-inverting, TRI-STATE with 25 Ω series resistor (20-pin)',
+    simpleName: 'Octal Bus Transceiver / MOS Driver Non Inverting (25Ω, Alt)',
+    description: 'Octal bus transceiver/MOS driver, non inverting, 3-state, 25 Ω R (20-pin)',
     pins: 20, vcc: 20, gnd: 10,
     datasheet: '',
-    tags: ['transceiver', 'octal', 'MOS', 'non-inverting', 'bidir', 'stub'],
+    tags: ['transceiver', 'octal', 'MOS', 'non inverting', 'bidir', 'stub'],
     pinout: [
       { pin:  1, name: 'DIR',  type: 'input'  },
       { pin:  2, name: 'OEn',  type: 'input'  },
@@ -327,11 +327,11 @@ export const CHIPS_BLOCK_53 = {
     ],
   },
 
-  // 74x2646: Octal registered transceiver, non-inverting, TRI+25Ω (24-pin)
+  // 74x2646: Octal registered transceiver, non inverting, TRI+25Ω (24-pin)
   '74x2646': {
     name: '74x2646',
-    simpleName: 'Octal Registered Transceiver Non-Inverting (25Ω)',
-    description: 'Octal registered transceiver, non-inverting, TRI-STATE with 25 Ω series resistor (24-pin)',
+    simpleName: 'Octal Registered Transceiver Non Inverting (25Ω)',
+    description: 'Octal registered transceiver, non inverting, 3-state, 25 Ω R (24-pin)',
     pins: 24, vcc: 24, gnd: 12,
     datasheet: '',
     tags: ['transceiver', 'octal', 'registered', 'bidir', 'stub'],
@@ -370,7 +370,7 @@ export const CHIPS_BLOCK_53 = {
   '74x2648': {
     name: '74x2648',
     simpleName: 'Octal Registered Transceiver Inverting (25Ω)',
-    description: 'Octal registered transceiver, inverting, TRI-STATE with 25 Ω series resistor (24-pin)',
+    description: 'Octal registered transceiver, inverting, 3-state, 25 Ω R (24-pin)',
     pins: 24, vcc: 24, gnd: 12,
     datasheet: '',
     tags: ['transceiver', 'octal', 'registered', 'inverting', 'bidir', 'stub'],
@@ -409,7 +409,7 @@ export const CHIPS_BLOCK_53 = {
   '74x2651': {
     name: '74x2651',
     simpleName: 'Octal Registered Transceiver Inverting (25Ω, Alt)',
-    description: 'Octal registered transceiver, inverting, TRI-STATE with 25 Ω series resistor (24-pin)',
+    description: 'Octal registered transceiver, inverting, 3-state, 25 Ω R (24-pin)',
     pins: 24, vcc: 24, gnd: 12,
     datasheet: '',
     tags: ['transceiver', 'octal', 'registered', 'inverting', 'bidir', 'stub'],
@@ -444,14 +444,14 @@ export const CHIPS_BLOCK_53 = {
     ],
   },
 
-  // 74x2652: Octal registered transceiver, non-inverting, TRI+25Ω (24-pin, alt pinout)
+  // 74x2652: Octal registered transceiver, non inverting, TRI+25Ω (24-pin, alt pinout)
   '74x2652': {
     name: '74x2652',
-    simpleName: 'Octal Registered Transceiver Non-Inverting (25Ω, Alt)',
-    description: 'Octal registered transceiver, non-inverting, TRI-STATE with 25 Ω series resistor (24-pin)',
+    simpleName: 'Octal Registered Transceiver Non Inverting (25Ω, Alt)',
+    description: 'Octal registered transceiver, non inverting, 3-state, 25 Ω R (24-pin)',
     pins: 24, vcc: 24, gnd: 12,
     datasheet: '',
-    tags: ['transceiver', 'octal', 'registered', 'non-inverting', 'bidir', 'stub'],
+    tags: ['transceiver', 'octal', 'registered', 'non inverting', 'bidir', 'stub'],
     pinout: [
       { pin:  1, name: 'CLKAB', type: 'input'  },
       { pin:  2, name: 'OEAN',  type: 'input'  },
@@ -483,14 +483,14 @@ export const CHIPS_BLOCK_53 = {
     ],
   },
 
-  // 74x2821: 10 bit D-type flip-flop, TRI+25Ω (24-pin)
+  // 74x2821: 10 bit D type flip flop, TRI+25Ω (24-pin)
   '74x2821': {
     name: '74x2821',
-    simpleName: '10 bit D-Type Flip-Flop (25Ω)',
-    description: '10 bit D-type flip-flop, TRI-STATE with 25 Ω series resistor (24-pin)',
+    simpleName: '10 bit D Type Flip Flop (25Ω)',
+    description: '10 bit D type flip flop, TRI STATE with 25 Ω series resistor (24-pin)',
     pins: 24, vcc: 24, gnd: 12,
     datasheet: '',
-    tags: ['flip-flop', '10 bit', 'D-type', 'tri-state', 'stub'],
+    tags: ['flip flop', '10 bit', 'D type', 'tri state', 'stub'],
     pinout: [
       { pin:  1, name: 'OEn',  type: 'input'  },
       { pin:  2, name: 'CLK',  type: 'input'  },
@@ -522,14 +522,14 @@ export const CHIPS_BLOCK_53 = {
     ],
   },
 
-  // 74x2823: 9 bit D-type flip-flop with clear, TRI+25Ω (24-pin)
+  // 74x2823: 9 bit D type flip flop with clear, TRI+25Ω (24-pin)
   '74x2823': {
     name: '74x2823',
-    simpleName: '9 bit D-Type Flip-Flop with Clear (25Ω)',
-    description: '9 bit D-type flip-flop with clear, TRI-STATE with 25 Ω series resistor (24-pin)',
+    simpleName: '9 bit D Type Flip Flop with Clear (25Ω)',
+    description: '9 bit D flip-flop with clear, 3-state, 25 Ω series R (24-pin)',
     pins: 24, vcc: 24, gnd: 12,
     datasheet: '',
-    tags: ['flip-flop', '9 bit', 'D-type', 'clear', 'tri-state', 'stub'],
+    tags: ['flip flop', '9 bit', 'D type', 'clear', 'tri state', 'stub'],
     pinout: [
       { pin:  1, name: 'OEn',  type: 'input'  },
       { pin:  2, name: 'CLK',  type: 'input'  },

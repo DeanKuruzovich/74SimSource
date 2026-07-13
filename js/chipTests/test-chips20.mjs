@@ -90,10 +90,10 @@ function fallingEdge(comp, clkPin, gateIdx = 0) {
 // ═══════════════════════════════════════════════════════════════════════════════
 // 74304 - Octal ÷2 Clock Driver
 // ═══════════════════════════════════════════════════════════════════════════════
-test('74304 exists', () => assert(CHIPS_BLOCK_20['74304']));
+test('74304 exists', () => assert(CHIPS_BLOCK_20['74x304']));
 
 test('74304 Q3 toggles on CLK3 falling edge', () => {
-  const c = makeComp('74304');
+  const c = makeComp('74x304');
   setPins(c, {CLK1:0,CLK2:0,CLK3:0,CLK4:0,CLK5:0,CLK6:0,CLK7:0,CLK8:0});
   evalGate(c);
   const init = getPin(c,'Q3');
@@ -101,23 +101,23 @@ test('74304 Q3 toggles on CLK3 falling edge', () => {
   assertEqual(getPin(c,'Q3'), init ^ 1, 'Q3 toggled');
 });
 
-test('74304 Q7 non-inverted (unlike 74303)', () => {
-  const c = makeComp('74304');
+test('74304 Q7 non inverted (unlike 74303)', () => {
+  const c = makeComp('74x304');
   setPins(c, {CLK1:0,CLK2:0,CLK3:0,CLK4:0,CLK5:0,CLK6:0,CLK7:0,CLK8:0});
   evalGate(c);
   const init = getPin(c,'Q7');
   fallingEdge(c,'CLK7');
   // Q7 in 74304 is normal (not inverted)
-  assertEqual(getPin(c,'Q7'), init ^ 1, 'Q7 toggled (non-inverted)');
+  assertEqual(getPin(c,'Q7'), init ^ 1, 'Q7 toggled (non inverted)');
 });
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // 74305 - Octal ÷2 Clock Driver, 4 Inverted Outputs
 // ═══════════════════════════════════════════════════════════════════════════════
-test('74305 exists', () => assert(CHIPS_BLOCK_20['74305']));
+test('74305 exists', () => assert(CHIPS_BLOCK_20['74x305']));
 
-test('74305 Q3 is non-inverted', () => {
-  const c = makeComp('74305');
+test('74305 Q3 is non inverted', () => {
+  const c = makeComp('74x305');
   setPins(c, {CLK1:0,CLK2:0,CLK3:0,CLK4:0,CLK5:0,CLK6:0,CLK7:0,CLK8:0});
   evalGate(c);
   const init = getPin(c,'Q3');
@@ -126,7 +126,7 @@ test('74305 Q3 is non-inverted', () => {
 });
 
 test('74305 Q5n is inverted', () => {
-  const c = makeComp('74305');
+  const c = makeComp('74x305');
   setPins(c, {CLK1:0,CLK2:0,CLK3:0,CLK4:0,CLK5:0,CLK6:0,CLK7:0,CLK8:0});
   evalGate(c);
   const init = getPin(c,'Q5n');
@@ -136,7 +136,7 @@ test('74305 Q5n is inverted', () => {
 });
 
 test('74305 Q8n is inverted', () => {
-  const c = makeComp('74305');
+  const c = makeComp('74x305');
   setPins(c, {CLK1:0,CLK2:0,CLK3:0,CLK4:0,CLK5:0,CLK6:0,CLK7:0,CLK8:0});
   evalGate(c);
   const initQ8n = getPin(c,'Q8n');
@@ -147,10 +147,10 @@ test('74305 Q8n is inverted', () => {
 // ═══════════════════════════════════════════════════════════════════════════════
 // 74306 - 8 bit Bus Transceiver GTL+
 // ═══════════════════════════════════════════════════════════════════════════════
-test('74306 exists', () => assert(CHIPS_BLOCK_20['74306']));
+test('74306 exists', () => assert(CHIPS_BLOCK_20['74x306']));
 
 test('74306 OEn=0, DIR=0: A→B pass-through', () => {
-  const c = makeComp('74306');
+  const c = makeComp('74x306');
   setPins(c, {OEn:0,DIR:0,A1:1,A2:0,A3:1,A4:0,A5:1,A6:0,A7:1,A8:0});
   evalGate(c);
   assertEqual(getPin(c,'B1'), 1, 'B1=A1');
@@ -160,14 +160,14 @@ test('74306 OEn=0, DIR=0: A→B pass-through', () => {
 });
 
 test('74306 OEn=1 → HiZ', () => {
-  const c = makeComp('74306');
+  const c = makeComp('74x306');
   setPins(c, {OEn:1,DIR:0,A1:1,A2:0,A3:1,A4:0,A5:1,A6:0,A7:1,A8:0});
   evalGate(c);
   assertEqual(getPin(c,'B1'), null, 'B1 HiZ');
 });
 
 test('74306 DIR=1 → HiZ (B→A not driven)', () => {
-  const c = makeComp('74306');
+  const c = makeComp('74x306');
   setPins(c, {OEn:0,DIR:1,A1:1,A2:0,A3:0,A4:0,A5:0,A6:0,A7:0,A8:0});
   evalGate(c);
   assertEqual(getPin(c,'B1'), null, 'B1 HiZ when DIR=1');
@@ -176,17 +176,17 @@ test('74306 DIR=1 → HiZ (B→A not driven)', () => {
 // ═══════════════════════════════════════════════════════════════════════════════
 // 74309 - 1024×1 RAM OC
 // ═══════════════════════════════════════════════════════════════════════════════
-test('74309 exists', () => assert(CHIPS_BLOCK_20['74309']));
+test('74309 exists', () => assert(CHIPS_BLOCK_20['74x309']));
 
 test('74309 CSn=1 → HiZ', () => {
-  const c = makeComp('74309');
+  const c = makeComp('74x309');
   setPins(c, {A0:0,A1:0,A2:0,A3:0,A4:0,A5:0,A6:0,A7:0,A8:0,A9:0,WEn:1,CSn:1,DI:0});
   evalGate(c);
   assertEqual(getPin(c,'DO'), null, 'DO HiZ');
 });
 
 test('74309 write then read', () => {
-  const c = makeComp('74309');
+  const c = makeComp('74x309');
   setPins(c, {A0:1,A1:1,A2:0,A3:0,A4:0,A5:0,A6:0,A7:0,A8:0,A9:0,WEn:0,CSn:0,DI:1});
   evalGate(c);
   setPin(c,'WEn',1); evalGate(c);
@@ -194,19 +194,19 @@ test('74309 write then read', () => {
 });
 
 test('74309 read unwritten addr=0 → 0', () => {
-  const c = makeComp('74309');
+  const c = makeComp('74x309');
   setPins(c, {A0:0,A1:0,A2:0,A3:0,A4:0,A5:0,A6:0,A7:0,A8:0,A9:0,WEn:1,CSn:0,DI:0});
   evalGate(c);
   assertEqual(getPin(c,'DO'), 0, 'DO=0');
 });
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 74310 - Octal Inverting Buffer, Schmitt Trigger, Tri-state
+// 74310 - Octal Inverting Buffer, Schmitt Trigger, Tri state
 // ═══════════════════════════════════════════════════════════════════════════════
-test('74310 exists', () => assert(CHIPS_BLOCK_20['74310']));
+test('74310 exists', () => assert(CHIPS_BLOCK_20['74x310']));
 
 test('74310 OE1n=0 enables Y1-Y4, inverted', () => {
-  const c = makeComp('74310');
+  const c = makeComp('74x310');
   setPins(c, {A1:1,A2:0,A3:1,A4:0,A5:0,A6:0,A7:0,A8:0,OE1n:0,OE2n:1});
   evalGate(c);
   assertEqual(getPin(c,'Y1'), 0, 'Y1=!A1=0');
@@ -217,7 +217,7 @@ test('74310 OE1n=0 enables Y1-Y4, inverted', () => {
 });
 
 test('74310 OE2n=0 enables Y5-Y8', () => {
-  const c = makeComp('74310');
+  const c = makeComp('74x310');
   setPins(c, {A1:0,A2:0,A3:0,A4:0,A5:1,A6:0,A7:1,A8:0,OE1n:1,OE2n:0});
   evalGate(c);
   assertEqual(getPin(c,'Y1'), null, 'Y1 HiZ');
@@ -228,7 +228,7 @@ test('74310 OE2n=0 enables Y5-Y8', () => {
 });
 
 test('74310 both OE enabled', () => {
-  const c = makeComp('74310');
+  const c = makeComp('74x310');
   setPins(c, {A1:1,A2:1,A3:1,A4:1,A5:1,A6:1,A7:1,A8:1,OE1n:0,OE2n:0});
   evalGate(c);
   for (let i = 1; i <= 8; i++) assertEqual(getPin(c,`Y${i}`), 0, `Y${i}=0`);
@@ -237,10 +237,10 @@ test('74310 both OE enabled', () => {
 // ═══════════════════════════════════════════════════════════════════════════════
 // 74311 - 16×9 RAM with Output Latch, OC
 // ═══════════════════════════════════════════════════════════════════════════════
-test('74311 exists', () => assert(CHIPS_BLOCK_20['74311']));
+test('74311 exists', () => assert(CHIPS_BLOCK_20['74x311']));
 
 test('74311 write then latch then read', () => {
-  const c = makeComp('74311');
+  const c = makeComp('74x311');
   // Write D0=1 to addr 0
   setPins(c, {A0:0,A1:0,A2:0,A3:0,WEn:0,CSn:0,OEn:0,LE:0,
     D0:1,D1:0,D2:0,D3:0,D4:0,D5:0,D6:0,D7:0,D8:0});
@@ -255,7 +255,7 @@ test('74311 write then latch then read', () => {
 });
 
 test('74311 OEn=1 → HiZ', () => {
-  const c = makeComp('74311');
+  const c = makeComp('74x311');
   setPins(c, {A0:0,A1:0,A2:0,A3:0,WEn:1,CSn:0,OEn:1,LE:0,
     D0:0,D1:0,D2:0,D3:0,D4:0,D5:0,D6:0,D7:0,D8:0});
   evalGate(c);
@@ -265,10 +265,10 @@ test('74311 OEn=1 → HiZ', () => {
 // ═══════════════════════════════════════════════════════════════════════════════
 // 74312 - 16×9 RAM, OC
 // ═══════════════════════════════════════════════════════════════════════════════
-test('74312 exists', () => assert(CHIPS_BLOCK_20['74312']));
+test('74312 exists', () => assert(CHIPS_BLOCK_20['74x312']));
 
 test('74312 write D0=1 addr 0, then read', () => {
-  const c = makeComp('74312');
+  const c = makeComp('74x312');
   setPins(c, {A0:0,A1:0,A2:0,A3:0,WEn:0,CSn:0,OEn:0,
     D0:1,D1:0,D2:0,D3:0,D4:0,D5:0,D6:0,D7:0,D8:0});
   evalGate(c);
@@ -277,7 +277,7 @@ test('74312 write D0=1 addr 0, then read', () => {
 });
 
 test('74312 OEn=1 → HiZ', () => {
-  const c = makeComp('74312');
+  const c = makeComp('74x312');
   setPins(c, {A0:0,A1:0,A2:0,A3:0,WEn:1,CSn:0,OEn:1,
     D0:0,D1:0,D2:0,D3:0,D4:0,D5:0,D6:0,D7:0,D8:0});
   evalGate(c);
@@ -287,10 +287,10 @@ test('74312 OEn=1 → HiZ', () => {
 // ═══════════════════════════════════════════════════════════════════════════════
 // 74313 - 16×12 RAM, OC
 // ═══════════════════════════════════════════════════════════════════════════════
-test('74313 exists', () => assert(CHIPS_BLOCK_20['74313']));
+test('74313 exists', () => assert(CHIPS_BLOCK_20['74x313']));
 
 test('74313 write does not crash', () => {
-  const c = makeComp('74313');
+  const c = makeComp('74x313');
   setPins(c, {A0:0,A1:0,A2:0,A3:0,WEn:0,CSn:0,OEn:0,
     D0:1,D1:1,D2:1,D3:1,D4:1,D5:1,D6:1,D7:1,D8:1,D9:1,D10:1});
   evalGate(c);
@@ -300,10 +300,10 @@ test('74313 write does not crash', () => {
 // ═══════════════════════════════════════════════════════════════════════════════
 // 74314 - 1024×1 RAM OC (same as 74309)
 // ═══════════════════════════════════════════════════════════════════════════════
-test('74314 exists', () => assert(CHIPS_BLOCK_20['74314']));
+test('74314 exists', () => assert(CHIPS_BLOCK_20['74x314']));
 
 test('74314 write then read', () => {
-  const c = makeComp('74314');
+  const c = makeComp('74x314');
   setPins(c, {A0:0,A1:1,A2:0,A3:0,A4:0,A5:0,A6:0,A7:0,A8:0,A9:0,WEn:0,CSn:0,DI:1});
   evalGate(c);
   setPin(c,'WEn',1); evalGate(c);
@@ -313,10 +313,10 @@ test('74314 write then read', () => {
 // ═══════════════════════════════════════════════════════════════════════════════
 // 74315 - 1024×1 RAM with Power-Down OC (same gate type)
 // ═══════════════════════════════════════════════════════════════════════════════
-test('74315 exists', () => assert(CHIPS_BLOCK_20['74315']));
+test('74315 exists', () => assert(CHIPS_BLOCK_20['74x315']));
 
 test('74315 CSn=1 → HiZ (power-down)', () => {
-  const c = makeComp('74315');
+  const c = makeComp('74x315');
   setPins(c, {A0:0,A1:0,A2:0,A3:0,A4:0,A5:0,A6:0,A7:0,A8:0,A9:0,WEn:1,CSn:1,DI:0});
   evalGate(c);
   assertEqual(getPin(c,'DO'), null, 'DO HiZ');
@@ -325,17 +325,17 @@ test('74315 CSn=1 → HiZ (power-down)', () => {
 // ═══════════════════════════════════════════════════════════════════════════════
 // 74316 - 64×4 RAM, Common I/O, OC
 // ═══════════════════════════════════════════════════════════════════════════════
-test('74316 exists', () => assert(CHIPS_BLOCK_20['74316']));
+test('74316 exists', () => assert(CHIPS_BLOCK_20['74x316']));
 
 test('74316 CSn=1 → HiZ', () => {
-  const c = makeComp('74316');
+  const c = makeComp('74x316');
   setPins(c, {A0:0,A1:0,A2:0,A3:0,A4:0,A5:0,WEn:1,CSn:1,D0:0,D1:0,IO0:0,IO1:0,IO2:0,IO3:0});
   evalGate(c);
   assertEqual(getPin(c,'IO0'), null, 'IO0 HiZ');
 });
 
 test('74316 write (WEn=0) → HiZ during write, then read', () => {
-  const c = makeComp('74316');
+  const c = makeComp('74x316');
   // Write: IO pins = inputs during write, we drive IO=0b1010
   setPins(c, {A0:0,A1:0,A2:0,A3:0,A4:0,A5:0,WEn:0,CSn:0,D0:0,D1:0,IO0:0,IO1:1,IO2:0,IO3:1});
   evalGate(c);
@@ -352,10 +352,10 @@ test('74316 write (WEn=0) → HiZ during write, then read', () => {
 // ═══════════════════════════════════════════════════════════════════════════════
 // 74317 - 64×4 RAM, OC
 // ═══════════════════════════════════════════════════════════════════════════════
-test('74317 exists', () => assert(CHIPS_BLOCK_20['74317']));
+test('74317 exists', () => assert(CHIPS_BLOCK_20['74x317']));
 
 test('74317 write then read', () => {
-  const c = makeComp('74317');
+  const c = makeComp('74x317');
   setPins(c, {A0:1,A1:0,A2:0,A3:0,A4:0,A5:0,WEn:0,CSn:0,D0:1,D1:0,D2:1,D3:0});
   evalGate(c);
   setPin(c,'WEn',1); evalGate(c);
@@ -366,7 +366,7 @@ test('74317 write then read', () => {
 });
 
 test('74317 CSn=1 → HiZ', () => {
-  const c = makeComp('74317');
+  const c = makeComp('74x317');
   setPins(c, {A0:0,A1:0,A2:0,A3:0,A4:0,A5:0,WEn:1,CSn:1,D0:0,D1:0,D2:0,D3:0});
   evalGate(c);
   assertEqual(getPin(c,'Q0'), null, 'Q0 HiZ');
@@ -375,10 +375,10 @@ test('74317 CSn=1 → HiZ', () => {
 // ═══════════════════════════════════════════════════════════════════════════════
 // 74318 - 32×8 RAM, OC
 // ═══════════════════════════════════════════════════════════════════════════════
-test('74318 exists', () => assert(CHIPS_BLOCK_20['74318']));
+test('74318 exists', () => assert(CHIPS_BLOCK_20['74x318']));
 
 test('74318 write 0b11100000 and read Q5,Q6,Q7', () => {
-  const c = makeComp('74318');
+  const c = makeComp('74x318');
   setPins(c, {A0:0,A1:0,A2:0,A3:0,A4:0,WEn:0,CSn:0,
     D0:0,D1:0,D2:0,D3:0,D4:0,D5:1,D6:1,D7:1});
   evalGate(c);
@@ -389,7 +389,7 @@ test('74318 write 0b11100000 and read Q5,Q6,Q7', () => {
 });
 
 test('74318 CSn=1 → HiZ', () => {
-  const c = makeComp('74318');
+  const c = makeComp('74x318');
   setPins(c, {A0:0,A1:0,A2:0,A3:0,A4:0,WEn:1,CSn:1,
     D0:0,D1:0,D2:0,D3:0,D4:0,D5:0,D6:0,D7:0});
   evalGate(c);
@@ -399,10 +399,10 @@ test('74318 CSn=1 → HiZ', () => {
 // ═══════════════════════════════════════════════════════════════════════════════
 // 74319 - 16×4 RAM, OC
 // ═══════════════════════════════════════════════════════════════════════════════
-test('74319 exists', () => assert(CHIPS_BLOCK_20['74319']));
+test('74319 exists', () => assert(CHIPS_BLOCK_20['74x319']));
 
-test('74319 write then read (non-inverted)', () => {
-  const c = makeComp('74319');
+test('74319 write then read (non inverted)', () => {
+  const c = makeComp('74x319');
   setPins(c, {A0:0,A1:1,A2:0,A3:0, CSn:0, WEn:0, D0:1,D1:0,D2:1,D3:1});
   evalGate(c);
   setPin(c,'WEn',1); evalGate(c);
@@ -413,26 +413,26 @@ test('74319 write then read (non-inverted)', () => {
 });
 
 test('74319 CSn=1 → HiZ', () => {
-  const c = makeComp('74319');
+  const c = makeComp('74x319');
   setPins(c, {A0:0,A1:0,A2:0,A3:0, CSn:1, WEn:1, D0:0,D1:0,D2:0,D3:0});
   evalGate(c);
   assertEqual(getPin(c,'Q0'), null, 'Q0 HiZ');
 });
 
 test('74319 read unwritten → 0 (unlike 74289)', () => {
-  const c = makeComp('74319');
+  const c = makeComp('74x319');
   setPins(c, {A0:0,A1:0,A2:0,A3:0, CSn:0, WEn:1, D0:0,D1:0,D2:0,D3:0});
   evalGate(c);
-  assertEqual(getPin(c,'Q0'), 0, 'Q0=0 (non-inverted read)');
+  assertEqual(getPin(c,'Q0'), 0, 'Q0=0 (non inverted read)');
 });
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // 74320 - Crystal Oscillator
 // ═══════════════════════════════════════════════════════════════════════════════
-test('74320 exists', () => assert(CHIPS_BLOCK_20['74320']));
+test('74320 exists', () => assert(CHIPS_BLOCK_20['74x320']));
 
 test('74320 OUT follows XTAL1 (stub)', () => {
-  const c = makeComp('74320');
+  const c = makeComp('74x320');
   setPin(c,'XTAL1', 1); evalGate(c);
   assertEqual(getPin(c,'OUT'), 1, 'OUT=1 when XTAL1=1');
   setPin(c,'XTAL1', 0); evalGate(c);
@@ -442,10 +442,10 @@ test('74320 OUT follows XTAL1 (stub)', () => {
 // ═══════════════════════════════════════════════════════════════════════════════
 // 74321 - Crystal Oscillator with F/2 and F/4
 // ═══════════════════════════════════════════════════════════════════════════════
-test('74321 exists', () => assert(CHIPS_BLOCK_20['74321']));
+test('74321 exists', () => assert(CHIPS_BLOCK_20['74x321']));
 
 test('74321 OUT follows XTAL1', () => {
-  const c = makeComp('74321');
+  const c = makeComp('74x321');
   setPin(c,'XTAL1', 1); evalGate(c);
   assertEqual(getPin(c,'OUT'), 1, 'OUT=1');
   setPin(c,'XTAL1', 0); evalGate(c);
@@ -453,7 +453,7 @@ test('74321 OUT follows XTAL1', () => {
 });
 
 test('74321 F2 toggles on every XTAL1 falling edge', () => {
-  const c = makeComp('74321');
+  const c = makeComp('74x321');
   setPin(c,'XTAL1', 0); evalGate(c);
   const init = getPin(c,'F2');
   // 1st falling edge: F2 should toggle
@@ -475,7 +475,7 @@ test('74321 F2 toggles on every XTAL1 falling edge', () => {
 });
 
 test('74321 F4 toggles every 4 XTAL1 falling edges', () => {
-  const c = makeComp('74321');
+  const c = makeComp('74x321');
   setPin(c,'XTAL1', 0); evalGate(c);
   const init = getPin(c,'F4');
   // 4 falling edges

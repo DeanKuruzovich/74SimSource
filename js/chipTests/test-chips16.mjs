@@ -70,8 +70,8 @@ function makeWm(chip, inputs) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const EXPECTED_CHIP_IDS = [
-  '74225', '74226', '74227', '74228', '74229', '74230', '74231', '74232',
-  '74233', '74234', '74235', '74236', '74237', '74238', '74239', '74241',
+  '74x225', '74x226', '74x227', '74x228', '74x229', '74x230', '74x231', '74x232',
+  '74x233', '74x234', '74x235', '74x236', '74x237', '74x238', '74x239', '74x241',
 ];
 
 console.log('\nS1: All chip IDs present in CHIPS_BLOCK_16');
@@ -104,7 +104,7 @@ for (const [id, def] of Object.entries(CHIPS_BLOCK_16)) {
 console.log('\nG1: 74225 - FIFO 16x5 Async');
 {
   // Empty FIFO: EF=LOW (active LOW empty), FF=HIGH (not full)
-  const { world, chip } = setupWorld('74225');
+  const { world, chip } = setupWorld('74x225');
   const wm = makeWm(chip, { DIN0:0,DIN1:0,DIN2:0,DIN3:0,DIN4:0, WR:1, RD:1, OE:1, NC1:0,NC2:0,NC3:0 });
   const sim = simulate(world, chip, wm);
   assert(isLow(getPinVoltage(sim, findPin(chip, 'EF'))),  '74225: empty FIFO -> EF=LOW');
@@ -112,7 +112,7 @@ console.log('\nG1: 74225 - FIFO 16x5 Async');
 }
 {
   // Write 10101 and read it back with OE=LOW
-  const { world, chip } = setupWorld('74225');
+  const { world, chip } = setupWorld('74x225');
   const wmW = makeWm(chip, { DIN0:1,DIN1:0,DIN2:1,DIN3:0,DIN4:1, WR:0, RD:1, OE:1, NC1:0,NC2:0,NC3:0 });
   simulate(world, chip, wmW);
   const wmR = makeWm(chip, { DIN0:0,DIN1:0,DIN2:0,DIN3:0,DIN4:0, WR:1, RD:0, OE:0, NC1:0,NC2:0,NC3:0 });
@@ -125,7 +125,7 @@ console.log('\nG1: 74225 - FIFO 16x5 Async');
 }
 {
   // OE=HIGH: data outputs should be HiZ
-  const { world, chip } = setupWorld('74225');
+  const { world, chip } = setupWorld('74x225');
   const wmW = makeWm(chip, { DIN0:1,DIN1:1,DIN2:1,DIN3:1,DIN4:1, WR:0, RD:1, OE:1, NC1:0,NC2:0,NC3:0 });
   simulate(world, chip, wmW);
   const wmR = makeWm(chip, { DIN0:0,DIN1:0,DIN2:0,DIN3:0,DIN4:0, WR:1, RD:0, OE:1, NC1:0,NC2:0,NC3:0 });
@@ -135,7 +135,7 @@ console.log('\nG1: 74225 - FIFO 16x5 Async');
 }
 {
   // Non-empty FIFO: EF=HIGH
-  const { world, chip } = setupWorld('74225');
+  const { world, chip } = setupWorld('74x225');
   const wmW = makeWm(chip, { DIN0:0,DIN1:0,DIN2:0,DIN3:0,DIN4:0, WR:0, RD:1, OE:1, NC1:0,NC2:0,NC3:0 });
   const sim = simulate(world, chip, wmW);
   assert(isHigh(getPinVoltage(sim, findPin(chip, 'EF'))), '74225: non-empty -> EF=HIGH');
@@ -148,7 +148,7 @@ console.log('\nG2: 74226 - Latched Bus Transceiver');
 {
   // DIR=1, LE=1 (transparent), OEB=0: A->B, read A, drive B
   // Do NOT wire B pins - chip drives them as outputs
-  const { world, chip } = setupWorld('74226');
+  const { world, chip } = setupWorld('74x226');
   const wm = makeWm(chip, { A1:1, A2:0, A3:1, A4:0, OEA:1, OEB:0, DIR:1, LE:1, NC1:0,NC2:0 });
   const sim = simulate(world, chip, wm);
   assert(isHigh(getPinVoltage(sim, findPin(chip, 'B1'))), '74226: DIR=A->B, A1=1 -> B1=HIGH');
@@ -159,7 +159,7 @@ console.log('\nG2: 74226 - Latched Bus Transceiver');
 {
   // DIR=0, LE=1 (transparent), OEA=0: B->A
   // Do NOT wire A pins - chip drives them as outputs
-  const { world, chip } = setupWorld('74226');
+  const { world, chip } = setupWorld('74x226');
   const wm = makeWm(chip, { B1:1, B2:0, B3:1, B4:0, OEA:0, OEB:1, DIR:0, LE:1, NC1:0,NC2:0 });
   const sim = simulate(world, chip, wm);
   assert(isHigh(getPinVoltage(sim, findPin(chip, 'A1'))), '74226: DIR=B->A, B1=1 -> A1=HIGH');
@@ -168,7 +168,7 @@ console.log('\nG2: 74226 - Latched Bus Transceiver');
 {
   // LE=0 (hold), latch retains last transparent value
   // First pass: LE=1, A inputs HIGH, do NOT wire B pins
-  const { world, chip } = setupWorld('74226');
+  const { world, chip } = setupWorld('74x226');
   const wmLe1 = makeWm(chip, { A1:1, A2:1, A3:1, A4:1, OEA:1, OEB:0, DIR:1, LE:1, NC1:0,NC2:0 });
   simulate(world, chip, wmLe1);
   // Second pass: LE=0, A inputs LOW (latch should hold previous HIGH), do NOT wire B pins
@@ -184,7 +184,7 @@ console.log('\nG2: 74226 - Latched Bus Transceiver');
 console.log('\nG3: 74227 - FIFO 16x4 Sync OC');
 {
   // Empty state: EF=LOW (active LOW empty)
-  const { world, chip } = setupWorld('74227');
+  const { world, chip } = setupWorld('74x227');
   const wm = makeWm(chip, { DIN0:0,DIN1:0,DIN2:0,DIN3:0, WR_CLK:0, RD_CLK:0, WR_EN:1, RD_EN:1, NC1:0,NC2:0 });
   const sim = simulate(world, chip, wm);
   assert(isLow(getPinVoltage(sim, findPin(chip, 'EF'))),  '74227: empty -> EF=LOW (active LOW)');
@@ -192,7 +192,7 @@ console.log('\nG3: 74227 - FIFO 16x4 Sync OC');
 }
 {
   // Write on rising WR_CLK edge (WR_EN=0), then read on rising RD_CLK edge (RD_EN=0)
-  const { world, chip } = setupWorld('74227');
+  const { world, chip } = setupWorld('74x227');
   const wmW = makeWm(chip, { DIN0:1,DIN1:0,DIN2:1,DIN3:0, WR_CLK:0, RD_CLK:0, WR_EN:0, RD_EN:1, NC1:0,NC2:0 });
   simulate(world, chip, wmW);
   const wmW2 = makeWm(chip, { DIN0:1,DIN1:0,DIN2:1,DIN3:0, WR_CLK:1, RD_CLK:0, WR_EN:0, RD_EN:1, NC1:0,NC2:0 });
@@ -210,13 +210,13 @@ console.log('\nG3: 74227 - FIFO 16x4 Sync OC');
 // ─────────────────────────────────────────────────────────────────────────────
 console.log('\nG4: 74228 - FIFO 16x4 Sync OC');
 {
-  const { world, chip } = setupWorld('74228');
+  const { world, chip } = setupWorld('74x228');
   const wm = makeWm(chip, { DIN0:0,DIN1:0,DIN2:0,DIN3:0, WR_CLK:0, RD_CLK:0, WR_EN:1, RD_EN:1, NC1:0,NC2:0,NC3:0,NC4:0 });
   const sim = simulate(world, chip, wm);
   assert(isLow(getPinVoltage(sim, findPin(chip, 'EF'))), '74228: empty -> EF=LOW');
 }
 {
-  const { world, chip } = setupWorld('74228');
+  const { world, chip } = setupWorld('74x228');
   const wmW = makeWm(chip, { DIN0:0,DIN1:1,DIN2:0,DIN3:1, WR_CLK:0, RD_CLK:0, WR_EN:0, RD_EN:1, NC1:0,NC2:0,NC3:0,NC4:0 });
   simulate(world, chip, wmW);
   const wmW2 = makeWm(chip, { DIN0:0,DIN1:1,DIN2:0,DIN3:1, WR_CLK:1, RD_CLK:0, WR_EN:0, RD_EN:1, NC1:0,NC2:0,NC3:0,NC4:0 });
@@ -234,14 +234,14 @@ console.log('\nG4: 74228 - FIFO 16x4 Sync OC');
 // ─────────────────────────────────────────────────────────────────────────────
 console.log('\nG5: 74229 - FIFO 16x5 Async');
 {
-  const { world, chip } = setupWorld('74229');
+  const { world, chip } = setupWorld('74x229');
   const wm = makeWm(chip, { DIN0:0,DIN1:0,DIN2:0,DIN3:0,DIN4:0, WR:1, RD:1, OE:1, NC1:0,NC2:0,NC3:0 });
   const sim = simulate(world, chip, wm);
   assert(isLow(getPinVoltage(sim, findPin(chip, 'EF'))),  '74229: empty -> EF=LOW');
   assert(isHigh(getPinVoltage(sim, findPin(chip, 'FF'))), '74229: empty -> FF=HIGH');
 }
 {
-  const { world, chip } = setupWorld('74229');
+  const { world, chip } = setupWorld('74x229');
   const wmW = makeWm(chip, { DIN0:0,DIN1:1,DIN2:1,DIN3:0,DIN4:1, WR:0, RD:1, OE:1, NC1:0,NC2:0,NC3:0 });
   simulate(world, chip, wmW);
   const wmR = makeWm(chip, { DIN0:0,DIN1:0,DIN2:0,DIN3:0,DIN4:0, WR:1, RD:0, OE:0, NC1:0,NC2:0,NC3:0 });
@@ -254,12 +254,12 @@ console.log('\nG5: 74229 - FIFO 16x5 Async');
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// G6: 74230 - Dual 4 bit Buffer (Inverting + Non-inverting)
+// G6: 74230 - Dual 4 bit Buffer (Inverting + Non inverting)
 // ─────────────────────────────────────────────────────────────────────────────
 console.log('\nG6: 74230 - Inv+Non-Inv 4 bit Buffers');
 {
   // Group 1 (TRI_NOT_LO): 1OE=0 -> 1Y = NOT(1A)
-  const { world, chip } = setupWorld('74230');
+  const { world, chip } = setupWorld('74x230');
   const wm = makeWm(chip, { '1OE':0, '1A1':1,'1A2':0,'1A3':1,'1A4':0, '2OE':1, '2A1':0,'2A2':0,'2A3':0,'2A4':0 });
   const sim = simulate(world, chip, wm);
   assert(isLow(getPinVoltage(sim, findPin(chip, '1Y1'))),  '74230: 1OE=0, 1A1=1 -> 1Y1=LOW (inv)');
@@ -269,7 +269,7 @@ console.log('\nG6: 74230 - Inv+Non-Inv 4 bit Buffers');
 }
 {
   // Group 2 (TRI_BUFFER_LO): 2OE=0 -> 2Y = 2A
-  const { world, chip } = setupWorld('74230');
+  const { world, chip } = setupWorld('74x230');
   const wm = makeWm(chip, { '1OE':1, '1A1':0,'1A2':0,'1A3':0,'1A4':0, '2OE':0, '2A1':1,'2A2':0,'2A3':1,'2A4':0 });
   const sim = simulate(world, chip, wm);
   assert(isHigh(getPinVoltage(sim, findPin(chip, '2Y1'))), '74230: 2OE=0, 2A1=1 -> 2Y1=HIGH');
@@ -279,7 +279,7 @@ console.log('\nG6: 74230 - Inv+Non-Inv 4 bit Buffers');
 }
 {
   // Disabled: HiZ
-  const { world, chip } = setupWorld('74230');
+  const { world, chip } = setupWorld('74x230');
   const wm = makeWm(chip, { '1OE':1, '1A1':1,'1A2':1,'1A3':1,'1A4':1, '2OE':1, '2A1':1,'2A2':1,'2A3':1,'2A4':1 });
   const sim = simulate(world, chip, wm);
   const v1 = getPinVoltage(sim, findPin(chip, '1Y1'));
@@ -294,7 +294,7 @@ console.log('\nG6: 74230 - Inv+Non-Inv 4 bit Buffers');
 console.log('\nG7: 74231 - Dual Inv Buffer (neg+pos OE)');
 {
   // Group 1 (TRI_NOT_LO): 1OE=0 -> 1Y = NOT(1A)
-  const { world, chip } = setupWorld('74231');
+  const { world, chip } = setupWorld('74x231');
   const wm = makeWm(chip, { '1OE':0, '1A1':1,'1A2':0,'1A3':0,'1A4':1, '2OE':0, '2A1':0,'2A2':1,'2A3':1,'2A4':0 });
   const sim = simulate(world, chip, wm);
   assert(isLow(getPinVoltage(sim, findPin(chip, '1Y1'))),  '74231: 1OE=0, 1A1=1 -> 1Y1=LOW');
@@ -302,7 +302,7 @@ console.log('\nG7: 74231 - Dual Inv Buffer (neg+pos OE)');
 }
 {
   // Group 2 (TRI_NOT_HI): 2OE=1 -> 2Y = NOT(2A)
-  const { world, chip } = setupWorld('74231');
+  const { world, chip } = setupWorld('74x231');
   const wm = makeWm(chip, { '1OE':1, '1A1':0,'1A2':0,'1A3':0,'1A4':0, '2OE':1, '2A1':1,'2A2':0,'2A3':1,'2A4':0 });
   const sim = simulate(world, chip, wm);
   assert(isLow(getPinVoltage(sim, findPin(chip, '2Y1'))),  '74231: 2OE=1, 2A1=1 -> 2Y1=LOW (inv)');
@@ -312,7 +312,7 @@ console.log('\nG7: 74231 - Dual Inv Buffer (neg+pos OE)');
 }
 {
   // Group 2 disabled (2OE=0): HiZ
-  const { world, chip } = setupWorld('74231');
+  const { world, chip } = setupWorld('74x231');
   const wm = makeWm(chip, { '1OE':1, '1A1':0,'1A2':0,'1A3':0,'1A4':0, '2OE':0, '2A1':1,'2A2':1,'2A3':1,'2A4':1 });
   const sim = simulate(world, chip, wm);
   const v = getPinVoltage(sim, findPin(chip, '2Y1'));
@@ -324,14 +324,14 @@ console.log('\nG7: 74231 - Dual Inv Buffer (neg+pos OE)');
 // ─────────────────────────────────────────────────────────────────────────────
 console.log('\nG8: 74232 - FIFO 16x4 Async');
 {
-  const { world, chip } = setupWorld('74232');
+  const { world, chip } = setupWorld('74x232');
   const wm = makeWm(chip, { DIN0:0,DIN1:0,DIN2:0,DIN3:0, WR:1, RD:1, OE:1, NC1:0 });
   const sim = simulate(world, chip, wm);
   assert(isLow(getPinVoltage(sim, findPin(chip, 'EF'))),  '74232: empty -> EF=LOW');
   assert(isHigh(getPinVoltage(sim, findPin(chip, 'FF'))), '74232: empty -> FF=HIGH');
 }
 {
-  const { world, chip } = setupWorld('74232');
+  const { world, chip } = setupWorld('74x232');
   const wmW = makeWm(chip, { DIN0:1,DIN1:1,DIN2:0,DIN3:0, WR:0, RD:1, OE:1, NC1:0 });
   simulate(world, chip, wmW);
   const wmR = makeWm(chip, { DIN0:0,DIN1:0,DIN2:0,DIN3:0, WR:1, RD:0, OE:0, NC1:0 });
@@ -343,7 +343,7 @@ console.log('\nG8: 74232 - FIFO 16x4 Async');
 }
 {
   // OE=HIGH -> HiZ outputs
-  const { world, chip } = setupWorld('74232');
+  const { world, chip } = setupWorld('74x232');
   const wmW = makeWm(chip, { DIN0:1,DIN1:1,DIN2:1,DIN3:1, WR:0, RD:1, OE:1, NC1:0 });
   simulate(world, chip, wmW);
   const wmR = makeWm(chip, { DIN0:0,DIN1:0,DIN2:0,DIN3:0, WR:1, RD:0, OE:1, NC1:0 });
@@ -357,7 +357,7 @@ console.log('\nG8: 74232 - FIFO 16x4 Async');
 // ─────────────────────────────────────────────────────────────────────────────
 console.log('\nG9: 74233 - FIFO 16x5 Async');
 {
-  const { world, chip } = setupWorld('74233');
+  const { world, chip } = setupWorld('74x233');
   const wmW = makeWm(chip, { DIN0:1,DIN1:1,DIN2:1,DIN3:1,DIN4:0, WR:0, RD:1, OE:1, NC1:0,NC2:0,NC3:0 });
   simulate(world, chip, wmW);
   const wmR = makeWm(chip, { DIN0:0,DIN1:0,DIN2:0,DIN3:0,DIN4:0, WR:1, RD:0, OE:0, NC1:0,NC2:0,NC3:0 });
@@ -372,14 +372,14 @@ console.log('\nG9: 74233 - FIFO 16x5 Async');
 // ─────────────────────────────────────────────────────────────────────────────
 console.log('\nG10: 74234 - FIFO 64x4 Async');
 {
-  const { world, chip } = setupWorld('74234');
+  const { world, chip } = setupWorld('74x234');
   const wm = makeWm(chip, { DIN0:0,DIN1:0,DIN2:0,DIN3:0, WR:1, RD:1, OE:1, NC1:0 });
   const sim = simulate(world, chip, wm);
   assert(isLow(getPinVoltage(sim, findPin(chip, 'EF'))),  '74234: empty -> EF=LOW');
   assert(isHigh(getPinVoltage(sim, findPin(chip, 'FF'))), '74234: empty -> FF=HIGH');
 }
 {
-  const { world, chip } = setupWorld('74234');
+  const { world, chip } = setupWorld('74x234');
   const wmW = makeWm(chip, { DIN0:0,DIN1:1,DIN2:0,DIN3:1, WR:0, RD:1, OE:1, NC1:0 });
   simulate(world, chip, wmW);
   const wmR = makeWm(chip, { DIN0:0,DIN1:0,DIN2:0,DIN3:0, WR:1, RD:0, OE:0, NC1:0 });
@@ -395,14 +395,14 @@ console.log('\nG10: 74234 - FIFO 64x4 Async');
 // ─────────────────────────────────────────────────────────────────────────────
 console.log('\nG11: 74235 - FIFO 64x5 Async');
 {
-  const { world, chip } = setupWorld('74235');
+  const { world, chip } = setupWorld('74x235');
   const wm = makeWm(chip, { DIN0:0,DIN1:0,DIN2:0,DIN3:0,DIN4:0, WR:1, RD:1, OE:1, NC1:0,NC2:0,NC3:0 });
   const sim = simulate(world, chip, wm);
   assert(isLow(getPinVoltage(sim, findPin(chip, 'EF'))),  '74235: empty -> EF=LOW');
   assert(isHigh(getPinVoltage(sim, findPin(chip, 'FF'))), '74235: empty -> FF=HIGH');
 }
 {
-  const { world, chip } = setupWorld('74235');
+  const { world, chip } = setupWorld('74x235');
   const wmW = makeWm(chip, { DIN0:1,DIN1:0,DIN2:0,DIN3:1,DIN4:1, WR:0, RD:1, OE:1, NC1:0,NC2:0,NC3:0 });
   simulate(world, chip, wmW);
   const wmR = makeWm(chip, { DIN0:0,DIN1:0,DIN2:0,DIN3:0,DIN4:0, WR:1, RD:0, OE:0, NC1:0,NC2:0,NC3:0 });
@@ -418,7 +418,7 @@ console.log('\nG11: 74235 - FIFO 64x5 Async');
 // ─────────────────────────────────────────────────────────────────────────────
 console.log('\nG12: 74236 - FIFO 64x4 Async');
 {
-  const { world, chip } = setupWorld('74236');
+  const { world, chip } = setupWorld('74x236');
   const wmW = makeWm(chip, { DIN0:1,DIN1:1,DIN2:0,DIN3:1, WR:0, RD:1, OE:1, NC1:0 });
   simulate(world, chip, wmW);
   const wmR = makeWm(chip, { DIN0:0,DIN1:0,DIN2:0,DIN3:0, WR:1, RD:0, OE:0, NC1:0 });
@@ -430,12 +430,12 @@ console.log('\nG12: 74236 - FIFO 64x4 Async');
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// G13: 74237 - 3-to-8 Decoder with Latch (active HIGH)
+// G13: 74237 - 3 to 8 Decoder with Latch (active HIGH)
 // ─────────────────────────────────────────────────────────────────────────────
-console.log('\nG13: 74237 - 3-to-8 Decoder with Latch (active HIGH)');
+console.log('\nG13: 74237 - 3 to 8 Decoder with Latch (active HIGH)');
 {
   // Enabled: E1n=0, E2=HIGH; LE=1; A=000 -> Y0=HIGH
-  const { world, chip } = setupWorld('74237');
+  const { world, chip } = setupWorld('74x237');
   const wm = makeWm(chip, { A0:0,A1:0,A2:0, E1n:0,E2:1, LE:1 });
   const sim = simulate(world, chip, wm);
   assert(isHigh(getPinVoltage(sim, findPin(chip, 'Y0'))), '74237: A=000 -> Y0=HIGH');
@@ -444,7 +444,7 @@ console.log('\nG13: 74237 - 3-to-8 Decoder with Latch (active HIGH)');
 }
 {
   // A=101 (5) -> Y5=HIGH
-  const { world, chip } = setupWorld('74237');
+  const { world, chip } = setupWorld('74x237');
   const wm = makeWm(chip, { A0:1,A1:0,A2:1, E1n:0,E2:1, LE:1 });
   const sim = simulate(world, chip, wm);
   assert(isHigh(getPinVoltage(sim, findPin(chip, 'Y5'))), '74237: A=101 -> Y5=HIGH');
@@ -452,7 +452,7 @@ console.log('\nG13: 74237 - 3-to-8 Decoder with Latch (active HIGH)');
 }
 {
   // Latch: set A=011, LE=1; then change A=111, LE=0 -> Y3 should still be HIGH
-  const { world, chip } = setupWorld('74237');
+  const { world, chip } = setupWorld('74x237');
   const wmLe1 = makeWm(chip, { A0:1,A1:1,A2:0, E1n:0,E2:1, LE:1 });
   simulate(world, chip, wmLe1);
   const wmLe0 = makeWm(chip, { A0:1,A1:1,A2:1, E1n:0,E2:1, LE:0 });
@@ -462,19 +462,19 @@ console.log('\nG13: 74237 - 3-to-8 Decoder with Latch (active HIGH)');
 }
 {
   // Disabled: E2=0 -> all outputs LOW
-  const { world, chip } = setupWorld('74237');
+  const { world, chip } = setupWorld('74x237');
   const wm = makeWm(chip, { A0:0,A1:0,A2:0, E1n:0,E2:0, LE:1 });
   const sim = simulate(world, chip, wm);
   assert(isLow(getPinVoltage(sim, findPin(chip, 'Y0'))), '74237: disabled (E2=0) -> Y0=LOW');
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// G14: 74238 - 3-to-8 Decoder (active HIGH)
+// G14: 74238 - 3 to 8 Decoder (active HIGH)
 // ─────────────────────────────────────────────────────────────────────────────
-console.log('\nG14: 74238 - 3-to-8 Decoder (active HIGH)');
+console.log('\nG14: 74238 - 3 to 8 Decoder (active HIGH)');
 {
   // Enabled: E3=1, E1n=0, E2n=0; A=000 -> Y0=HIGH
-  const { world, chip } = setupWorld('74238');
+  const { world, chip } = setupWorld('74x238');
   const wm = makeWm(chip, { A0:0,A1:0,A2:0, E3:1,E1n:0,E2n:0 });
   const sim = simulate(world, chip, wm);
   assert(isHigh(getPinVoltage(sim, findPin(chip, 'Y0'))), '74238: A=000 -> Y0=HIGH');
@@ -483,7 +483,7 @@ console.log('\nG14: 74238 - 3-to-8 Decoder (active HIGH)');
 }
 {
   // A=111 (7) -> Y7=HIGH
-  const { world, chip } = setupWorld('74238');
+  const { world, chip } = setupWorld('74x238');
   const wm = makeWm(chip, { A0:1,A1:1,A2:1, E3:1,E1n:0,E2n:0 });
   const sim = simulate(world, chip, wm);
   assert(isHigh(getPinVoltage(sim, findPin(chip, 'Y7'))), '74238: A=111 -> Y7=HIGH');
@@ -491,21 +491,21 @@ console.log('\nG14: 74238 - 3-to-8 Decoder (active HIGH)');
 }
 {
   // A=011 (3) -> Y3=HIGH
-  const { world, chip } = setupWorld('74238');
+  const { world, chip } = setupWorld('74x238');
   const wm = makeWm(chip, { A0:1,A1:1,A2:0, E3:1,E1n:0,E2n:0 });
   const sim = simulate(world, chip, wm);
   assert(isHigh(getPinVoltage(sim, findPin(chip, 'Y3'))), '74238: A=011 -> Y3=HIGH');
 }
 {
   // Disabled: E3=0 -> all outputs LOW
-  const { world, chip } = setupWorld('74238');
+  const { world, chip } = setupWorld('74x238');
   const wm = makeWm(chip, { A0:0,A1:0,A2:0, E3:0,E1n:0,E2n:0 });
   const sim = simulate(world, chip, wm);
   assert(isLow(getPinVoltage(sim, findPin(chip, 'Y0'))), '74238: E3=0 -> all outputs LOW');
 }
 {
   // Disabled: E1n=1 -> all outputs LOW
-  const { world, chip } = setupWorld('74238');
+  const { world, chip } = setupWorld('74x238');
   const wm = makeWm(chip, { A0:0,A1:0,A2:0, E3:1,E1n:1,E2n:0 });
   const sim = simulate(world, chip, wm);
   assert(isLow(getPinVoltage(sim, findPin(chip, 'Y0'))), '74238: E1n=1 -> all outputs LOW');
@@ -514,39 +514,41 @@ console.log('\nG14: 74238 - 3-to-8 Decoder (active HIGH)');
 // ─────────────────────────────────────────────────────────────────────────────
 // G15: 74239 - Dual 2-to-4 Decoder (active HIGH)
 // ─────────────────────────────────────────────────────────────────────────────
-console.log('\nG15: 74239 - Dual 2-to-4 Decoder (active HIGH)');
+console.log('\nG15: 74239 - Dual 2-to-4 Decoder (active HIGH outputs, active LOW enable)');
+// Per TI datasheet: enable pins 1En/2En are active LOW (same G̅ as the '139);
+// outputs are active HIGH. Disabled section -> all outputs LOW.
 {
-  // Section 1: 1E=1, 1A0=0, 1A1=0 -> 1Y0=HIGH
-  const { world, chip } = setupWorld('74239');
-  const wm = makeWm(chip, { '1E':1,'1A0':0,'1A1':0, '2E':0,'2A0':0,'2A1':0 });
+  // Section 1 enabled (1En=0), A=00 -> 1Y0=HIGH
+  const { world, chip } = setupWorld('74x239');
+  const wm = makeWm(chip, { '1En':0,'1A0':0,'1A1':0, '2En':1,'2A0':0,'2A1':0 });
   const sim = simulate(world, chip, wm);
-  assert(isHigh(getPinVoltage(sim, findPin(chip, '1Y0'))), '74239: 1E=1, A=00 -> 1Y0=HIGH');
-  assert(isLow(getPinVoltage(sim, findPin(chip, '1Y1'))),  '74239: 1E=1, A=00 -> 1Y1=LOW');
-  assert(isLow(getPinVoltage(sim, findPin(chip, '1Y2'))),  '74239: 1E=1, A=00 -> 1Y2=LOW');
-  assert(isLow(getPinVoltage(sim, findPin(chip, '1Y3'))),  '74239: 1E=1, A=00 -> 1Y3=LOW');
+  assert(isHigh(getPinVoltage(sim, findPin(chip, '1Y0'))), '74239: 1En=0, A=00 -> 1Y0=HIGH');
+  assert(isLow(getPinVoltage(sim, findPin(chip, '1Y1'))),  '74239: 1En=0, A=00 -> 1Y1=LOW');
+  assert(isLow(getPinVoltage(sim, findPin(chip, '1Y2'))),  '74239: 1En=0, A=00 -> 1Y2=LOW');
+  assert(isLow(getPinVoltage(sim, findPin(chip, '1Y3'))),  '74239: 1En=0, A=00 -> 1Y3=LOW');
 }
 {
-  // Section 1: 1A0=1, 1A1=1 -> 1Y3=HIGH
-  const { world, chip } = setupWorld('74239');
-  const wm = makeWm(chip, { '1E':1,'1A0':1,'1A1':1, '2E':0,'2A0':0,'2A1':0 });
+  // Section 1 enabled, A=11 -> 1Y3=HIGH
+  const { world, chip } = setupWorld('74x239');
+  const wm = makeWm(chip, { '1En':0,'1A0':1,'1A1':1, '2En':1,'2A0':0,'2A1':0 });
   const sim = simulate(world, chip, wm);
-  assert(isHigh(getPinVoltage(sim, findPin(chip, '1Y3'))), '74239: 1E=1, A=11 -> 1Y3=HIGH');
-  assert(isLow(getPinVoltage(sim, findPin(chip, '1Y0'))),  '74239: 1E=1, A=11 -> 1Y0=LOW');
+  assert(isHigh(getPinVoltage(sim, findPin(chip, '1Y3'))), '74239: 1En=0, A=11 -> 1Y3=HIGH');
+  assert(isLow(getPinVoltage(sim, findPin(chip, '1Y0'))),  '74239: 1En=0, A=11 -> 1Y0=LOW');
 }
 {
-  // Section 2: 2E=1, 2A0=1, 2A1=0 -> 2Y1=HIGH
-  const { world, chip } = setupWorld('74239');
-  const wm = makeWm(chip, { '1E':0,'1A0':0,'1A1':0, '2E':1,'2A0':1,'2A1':0 });
+  // Section 2 enabled (2En=0), A=01 -> 2Y1=HIGH
+  const { world, chip } = setupWorld('74x239');
+  const wm = makeWm(chip, { '1En':1,'1A0':0,'1A1':0, '2En':0,'2A0':1,'2A1':0 });
   const sim = simulate(world, chip, wm);
-  assert(isHigh(getPinVoltage(sim, findPin(chip, '2Y1'))), '74239: 2E=1, A=01 -> 2Y1=HIGH');
-  assert(isLow(getPinVoltage(sim, findPin(chip, '2Y0'))),  '74239: 2E=1, A=01 -> 2Y0=LOW');
+  assert(isHigh(getPinVoltage(sim, findPin(chip, '2Y1'))), '74239: 2En=0, A=01 -> 2Y1=HIGH');
+  assert(isLow(getPinVoltage(sim, findPin(chip, '2Y0'))),  '74239: 2En=0, A=01 -> 2Y0=LOW');
 }
 {
-  // Disabled: 1E=0 -> all outputs LOW
-  const { world, chip } = setupWorld('74239');
-  const wm = makeWm(chip, { '1E':0,'1A0':0,'1A1':0, '2E':0,'2A0':0,'2A1':0 });
+  // Disabled: 1En=1 -> all section 1 outputs LOW
+  const { world, chip } = setupWorld('74x239');
+  const wm = makeWm(chip, { '1En':1,'1A0':0,'1A1':0, '2En':1,'2A0':0,'2A1':0 });
   const sim = simulate(world, chip, wm);
-  assert(isLow(getPinVoltage(sim, findPin(chip, '1Y0'))), '74239: 1E=0 -> 1Y0=LOW');
+  assert(isLow(getPinVoltage(sim, findPin(chip, '1Y0'))), '74239: 1En=1 (disabled) -> 1Y0=LOW');
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -555,7 +557,7 @@ console.log('\nG15: 74239 - Dual 2-to-4 Decoder (active HIGH)');
 console.log('\nG16: 74241 - Octal Buffer');
 {
   // Group 1 (TRI_BUFFER_LO): 1OE=0 -> 1Y = 1A
-  const { world, chip } = setupWorld('74241');
+  const { world, chip } = setupWorld('74x241');
   const wm = makeWm(chip, { '1OE':0, '1A1':1,'1A2':0,'1A3':1,'1A4':0, '2OE':1, '2A1':0,'2A2':0,'2A3':0,'2A4':0 });
   const sim = simulate(world, chip, wm);
   assert(isHigh(getPinVoltage(sim, findPin(chip, '1Y1'))), '74241: 1OE=0, 1A1=1 -> 1Y1=HIGH');
@@ -565,7 +567,7 @@ console.log('\nG16: 74241 - Octal Buffer');
 }
 {
   // Group 2 (TRI_BUFFER_HI): 2OE=1 -> 2Y = 2A
-  const { world, chip } = setupWorld('74241');
+  const { world, chip } = setupWorld('74x241');
   const wm = makeWm(chip, { '1OE':1, '1A1':0,'1A2':0,'1A3':0,'1A4':0, '2OE':1, '2A1':0,'2A2':1,'2A3':0,'2A4':1 });
   const sim = simulate(world, chip, wm);
   assert(isLow(getPinVoltage(sim, findPin(chip, '2Y1'))),  '74241: 2OE=1, 2A1=0 -> 2Y1=LOW');
@@ -575,7 +577,7 @@ console.log('\nG16: 74241 - Octal Buffer');
 }
 {
   // Group 1 disabled (1OE=1): HiZ
-  const { world, chip } = setupWorld('74241');
+  const { world, chip } = setupWorld('74x241');
   const wm = makeWm(chip, { '1OE':1, '1A1':1,'1A2':1,'1A3':1,'1A4':1, '2OE':0, '2A1':0,'2A2':0,'2A3':0,'2A4':0 });
   const sim = simulate(world, chip, wm);
   const v1 = getPinVoltage(sim, findPin(chip, '1Y1'));
@@ -583,7 +585,7 @@ console.log('\nG16: 74241 - Octal Buffer');
 }
 {
   // Group 2 disabled (2OE=0): HiZ
-  const { world, chip } = setupWorld('74241');
+  const { world, chip } = setupWorld('74x241');
   const wm = makeWm(chip, { '1OE':1, '1A1':0,'1A2':0,'1A3':0,'1A4':0, '2OE':0, '2A1':1,'2A2':1,'2A3':1,'2A4':1 });
   const sim = simulate(world, chip, wm);
   const v = getPinVoltage(sim, findPin(chip, '2Y1'));

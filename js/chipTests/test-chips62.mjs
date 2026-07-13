@@ -1,21 +1,21 @@
 // test-chips62.mjs - Tests for all chips defined in js/chips/chips62.js
 // Chips under test:
-//   74x7074   : Mixed Gate+FF (NOT/NAND/NOR/D_FF/D_FF/NOT, 24-pin)
-//   74x7075   : Mixed Gate+FF (NOT/NAND/NAND/D_FF/D_FF/NOT, 24-pin)
-//   74x7076   : Mixed Gate+FF (NOT/NOR/NOR/D_FF/D_FF/NOT, 24-pin)
-//   74x7080   : 16 bit Parity Gen/Check (GENERIC_STUB, 20-pin)
-//   74x7132   : Adj Comparator (GENERIC_STUB, 14-pin)
-//   74HCU7204 : Dual Inverter (NOT, 8-pin)
-//   74x7240   : Octal Inv Buffer (TRI_NOT_LO, 20-pin)
-//   74x7241   : Octal Buffer (TRI_BUFFER_LO/HI, 20-pin)
-//   74x7244   : Octal Buffer (TRI_BUFFER_LO, 20-pin)
-//   74x7245   : Octal Transceiver (TRANSCEIVER_8BIT, 20-pin)
-//   74x7266   : Quad XNOR (XNOR, 14-pin)
-//   74x7273   : Octal D FF (D_FF_OCTAL, 20-pin)
-//   74x7292   : Divider/Timer (GENERIC_STUB, 16-pin)
-//   74x7294   : Divider/Timer (GENERIC_STUB, 16-pin)
-//   74x7340   : Bus Driver/Reg (GENERIC_STUB, 24-pin)
-//   74x7403   : FIFO 64x4 (GENERIC_STUB, 16-pin)
+//   74x7074   : Mixed Gate+FF (NOT/NAND/NOR/D_FF/D_FF/NOT, 24 pin)
+//   74x7075   : Mixed Gate+FF (NOT/NAND/NAND/D_FF/D_FF/NOT, 24 pin)
+//   74x7076   : Mixed Gate+FF (NOT/NOR/NOR/D_FF/D_FF/NOT, 24 pin)
+//   74x7080   : 16 bit Parity Gen/Check (GENERIC_STUB, 20 pin)
+//   74x7132   : Adj Comparator (GENERIC_STUB, 14 pin)
+//   74HCU7204 : Dual Inverter (NOT, 8 pin)
+//   74x7240   : Octal Inv Buffer (TRI_NOT_LO, 20 pin)
+//   74x7241   : Octal Buffer (TRI_BUFFER_LO/HI, 20 pin)
+//   74x7244   : Octal Buffer (TRI_BUFFER_LO, 20 pin)
+//   74x7245   : Octal Transceiver (TRANSCEIVER_8BIT, 20 pin)
+//   74x7266   : Quad XNOR (XNOR, 14 pin)
+//   74x7273   : Octal D FF (D_FF_OCTAL, 20 pin)
+//   74x7292   : Divider/Timer (GENERIC_STUB, 16 pin)
+//   74x7294   : Divider/Timer (GENERIC_STUB, 16 pin)
+//   74x7340   : Bus Driver/Reg (GENERIC_STUB, 24 pin)
+//   74x7403   : FIFO 64x4 (GENERIC_STUB, 16 pin)
 
 import { CHIPS_BLOCK_62 } from '../chips/chips62.js';
 import { BreadboardWorld, holeId } from '../breadboard.js';
@@ -400,7 +400,7 @@ console.log('\n=== SECTION F: 74x7245 (Octal Transceiver) ===');
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SECTION G: 74x7273 - Octal D Flip-Flop
+// SECTION G: 74x7273 - Octal D Flip Flop
 // ─────────────────────────────────────────────────────────────────────────────
 
 console.log('\n=== SECTION G: 74x7273 (Octal D FF) ===');
